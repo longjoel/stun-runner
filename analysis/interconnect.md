@@ -55,6 +55,10 @@ not game-level semantics.
   with `0x0004: CALL $0780` and `0x0005: CALL $0834`; the captured operations
   include internal `PM(0x1236)` and `DM(0x0955–0x095A)` accesses. This is not
   evidence of a 68010-visible transfer.
+- OBSERVED-IN-TRACE: the 600-frame `coin_start` schedule changes the ADSP
+  instruction trace relative to no input; the first divergence enters an ADSP
+  branch reading `DM($001B)`. This proves input-dependent ADSP execution, not
+  the direction or mechanism of the 68010↔ADSP exchange.
 
 ### 68010 input/status path
 
@@ -80,6 +84,10 @@ not game-level semantics.
   early instructions access candidate control locations in the `0xC000...`
   and `0xF480...` ranges. Register semantics and the 68010 submission path are
   unresolved.
+- OBSERVED-IN-TRACE: the same `coin_start` schedule changes the GSP trace;
+  the first differing region is adjacent to repeated `0xF4800020` and
+  `0xF4800030` accesses. This is an input-dependent control-path landmark,
+  not a proven command protocol.
 - UNKNOWN: command submission region and synchronization mechanism.
 
 ### 68010 ↔ JSA sound board
@@ -89,8 +97,15 @@ not game-level semantics.
   `0x2A04` and `0x280C`. Independent traces are byte-identical. These are
   candidate sound-board control/status locations, not yet a proven command
   queue.
+- OBSERVED-IN-TRACE: `coin_start` changes the 6502 trace and includes an
+  explicit `IRQ 0` interruption while executing at `0x414C`; the source of the
+  IRQ and its command payload remain unresolved.
 - UNKNOWN: command register/queue offsets and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
+
+The three-processor differential hashes and first-divergence landmarks are
+recorded in
+`reference/experiments/stunrun/processor-input-differential.metadata.json`.
 
 ## Evidence queue
 

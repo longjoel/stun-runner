@@ -1,0 +1,49 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "processor_input_differential",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "frames": 600,
+  "trace_flags": ["noloop"],
+  "input": "coin_start",
+  "events": [
+    {"frame": 120, "field": "Coin 1", "action": "press"},
+    {"frame": 122, "field": "Coin 1", "action": "release"},
+    {"frame": 300, "field": "1 Player Start", "action": "press"},
+    {"frame": 302, "field": "1 Player Start", "action": "release"}
+  ],
+  "comparisons": {
+    ":mainpcb:adsp": {
+      "none_sha256": "4a2f2acae22499b9acb4d54fd739b6b7f98a561fa74c267f17799f2a5273e697",
+      "none_bytes": 141337591,
+      "coin_start_sha256": "04d1c6a5835a76f3c75a52c4c9bd34b97dad93fb474628e24230dc7b56ee386a",
+      "coin_start_bytes": 141352671,
+      "first_difference_byte": 215686,
+      "first_difference_line": 9656,
+      "coin_context": ["0050: I0 = DM($001B)", "0051: AR = DM(I0,M1)", "0052: AF = NOT AR", "0053: IF EQ JUMP $00B4"]
+    },
+    ":mainpcb:jsa:cpu": {
+      "none_sha256": "52120f235fb834cb96d8a372339942a1fab925633604a8081cd05b3145551463",
+      "none_bytes": 80024608,
+      "coin_start_sha256": "dfee1896353ff4c0b350926e82888aeefeb4bd62454626ccda6e06b27c325a17",
+      "coin_start_bytes": 80024721,
+      "first_difference_byte": 18025482,
+      "first_difference_line": 1230757,
+      "coin_context": ["(interrupted at 414C, IRQ 0)", "41C1: pha", "41C2: txa"]
+    },
+    ":mainpcb:gsp": {
+      "none_sha256": "5f28914a2ba61bf95ee7e0de43b0179d14f0eee5607d2ebe970842ec9de60938",
+      "none_bytes": 394608373,
+      "coin_start_sha256": "be0a8f410e140b7a49f7665e19f40351bf4992cc4aa982168bcd66618b2cd735",
+      "coin_start_bytes": 394494637,
+      "first_difference_byte": 851708,
+      "first_difference_line": 32798,
+      "shared_control_context": ["0xFFF41C50: MOVE A0,@F4800020h,0", "0xFFF41C80: MOVE A0,@F4800030h,0"]
+    }
+  },
+  "observation": "The same bounded coin/start input schedule changes all three non-68010 instruction traces. ADSP and GSP differences are trace-level input dependence; the 6502 trace contains an explicit IRQ 0 boundary. These observations do not yet identify command direction or register semantics.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_traces_kept_local": true,
+  "next_question": "Correlate the sound IRQ boundary and GSP control accesses with 68010 trace PCs and MAME driver callbacks."
+}
