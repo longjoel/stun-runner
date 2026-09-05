@@ -1,6 +1,6 @@
 {
   "schema": "stunrun-experiment-metadata/v1",
-  "experiment": "adsp_source_buffer_write_probe",
+  "experiment": "experiments/stunrun/adsp_source_buffer_write.json",
   "runner": "tools/mame-adsp-window",
   "mame": "0.289 (mame0289-dirty)",
   "rom_manifest": "roms/stunrun.manifest.json",

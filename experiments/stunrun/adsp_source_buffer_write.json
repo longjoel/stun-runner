@@ -1,0 +1,19 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "adsp_source_buffer_write_probe",
+  "start": "power_on",
+  "events": [],
+  "instrumentation": {
+    "tool": "tools/mame-adsp-window",
+    "window": "0x17000-0x25fff",
+    "access": "68010 writes",
+    "tap_installation": "frame 10",
+    "frames": 600,
+    "inputs": ["none", "coin_start"]
+  },
+  "expect": {
+    "kind": "bounded_observation",
+    "terminal": "frame >= 600",
+    "interpretation": "A zero count is a bounded no-write result after tap installation, not proof about frames 0-9 or producer identity."
+  }
+}
