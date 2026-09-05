@@ -62,13 +62,13 @@ Agent 2 needs to know which hardware behavior must be reproduced immediately and
 
 ### M1 progress
 
-The first bounded debugger experiment could not observe 68010 writes to the
-MAME-confirmed ADSP program window (`0x800000–0x807fff`) because installed
-headless MAME did not deliver its watchpoint callbacks; it must not be read as
-a no-write result. A clean direct ADSP program-space snapshot is empty through
-frame 136 and contains 2,718 nonzero words by frame 600, proving that the
-title path populates executable ADSP RAM by the canonical title boundary. The
-ADSP data window, writer PCs, transfer payload, and program source remain open.
+Direct memory taps now observe the 68010 ADSP program upload in both independent
+600-frame modes: writer PC `0x02D35C` writes through `0x8048D6`, with the
+caller at `0x02C204` passing source pointer `0x0001702E` to `0x02D2E0`. The
+source stream normalizes to 17 records totaling 2,728 24-bit program words,
+and the enriched M1 checkpoint promotes `adsp_program_loaded=true` from the
+repeatable 2,718-word frame-600 image. The data window is narrowed to one
+initialization write; its internal ADSP-side semantics remain open.
 Repeatable processor traces now establish GSP activity by
 frame 132 and ADSP activity by frame 122, with first non-NOP ADSP execution by
 frame 136. Early GSP accesses include candidate `0xC000...` and `0xF480...`
@@ -82,8 +82,10 @@ The ADSP interrupt edge is now resolved for the observed title path: both
 independent 600-frame traces contain 30 ADSP `GINT` writes, 30 main-CPU IRQ 2
 entries, and 30 executions of the 68010 handler that clears `0x818060` and
 returns with `RTE`. MAME's `update_interrupts()` confirms that ADSP IRQ state
-drives main-CPU line 2. The remaining IRQ-0002 work is the program source,
-serial payload semantics, and the unresolved gameplay boundary. See
+drives main-CPU line 2. The 68010-visible serial buffer is also runtime
+resolved for the title path: 106 count/`0xFFFF` blocks each produce exactly
+the counted writes to the GSP FIFO. Remaining IRQ-0002 work is source-buffer
+ownership, post-gameplay traffic, and the unresolved gameplay boundary. See
 `reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
 
 The title-path sound transport is also partially resolved: a clean frame-447
@@ -119,8 +121,10 @@ Verification should exist before substantial reconstruction so mismatches become
 
 The minimum repeatable machine checkpoint is now defined as
 `stunrun-checkpoint/v1`: machine identity, frame/time identity, debugger-visible
-processor tags, and selected processor registers. The current title/attract
-fixture is captured in `reference/checkpoints/title/state.json`; semantic
-gameplay/RAM-region fields are intentionally not promoted because the frame-600
-image is not yet a proven gameplay selector. See
+processor tags, selected processor registers, and the verified ADSP program
+region summary/`adsp_program_loaded` machine selector. The enriched M1 fixture
+is captured in `reference/checkpoints/m1-machine-map/state.json`; the older
+title artifact remains preserved as legacy evidence. Semantic gameplay fields
+are intentionally not promoted because the frame-600 image is not yet a proven
+gameplay selector. See
 `analysis/checkpoint-schema.md`.

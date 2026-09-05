@@ -22,11 +22,11 @@ Verification harness: **bounded replay/checkpoint/trace path implemented; M1 wil
 
 Turn the frozen M0 laboratory into an evidence-backed machine/interconnect map without beginning broad decompilation:
 
-1. Resolve IRQ-0002: map the 68010↔ADSP program/data windows, mailbox/status behavior, and reset/interrupt flow.
-2. Resolve IRQ-0003: define the smallest normalized checkpoint schema for original, reproduction, and native targets.
-3. Run bounded experiments for ADSP upload traffic, ADSP data traffic, input polling, and sound commands.
+1. Close the remaining IRQ-0002 questions: source-buffer ownership, post-gameplay ADSP traffic, and the gameplay boundary.
+2. Preserve IRQ-0003's normalized checkpoint schema as a cross-target contract and extend it only when repeatable evidence supports new fields.
+3. Run bounded experiments for input polling, gameplay-boundary traffic, GSP submission, and any remaining sound/ADSP edges.
 4. Record exact runtime memory spaces, writer PCs, reader/writer processors, and observed state transitions.
-5. Create `analysis/interconnect.md` with confidence labels and evidence links.
+5. Maintain `analysis/interconnect.md` with confidence labels and evidence links.
 6. Promote only justified machine-state selectors into the replay contract.
 
 The first useful output is not decompiled C. It is a repeatable laboratory plus a box of provenance-labeled puzzle pieces.
@@ -107,8 +107,8 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   RAM-resident 17-record/2,728-word upload stream, the ADSP-buffer→GSP FIFO
   block contract, source-mapped control/reset/bank handlers, and the title-path
   JSA command-byte pairing. Remaining questions are source-buffer ownership,
-  the normalized checkpoint
-  extension, and a semantic gameplay selector.
+  post-gameplay traffic, and a semantic gameplay selector; the normalized M1
+  checkpoint extension is now captured and repeatable.
 
 ## Completed baseline slices
 

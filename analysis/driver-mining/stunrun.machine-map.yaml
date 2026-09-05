@@ -18,7 +18,7 @@ processors:
   - id: maincpu
     type: m68010
     role_hint: main_cpu
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     canonical_device_tag: null
   - id: gsp
     type: tms34010
@@ -139,13 +139,15 @@ regions:
       - ADSP program map is RAM at 0x0000-0x1fff in the target MAME configuration
       - the target ROM manifest has no separate ADSP program-code region
       - the 0x60000-byte mainpcb:user1 region is object ROM, not identified as executable ADSP program storage
+      - direct taps observe writer PC 0x02D35C and a repeatable 17-record upload totaling 2728 24-bit program words
+      - checkpoint selector adsp_program_loaded is repeatable at frame 600
 
   - name: jsa_main_command_response_window
     processor: maincpu
     start: 0x600000
     end: 0x603fff
     access: rw
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     candidate_selector: sound.jsa.main_command_response
     mame_handlers:
       - atari_jsa_base_device::main_response_r
@@ -164,49 +166,59 @@ regions:
     mame_handlers:
       - hd68k_adsp_data_r
       - hd68k_adsp_data_w
+    notes:
+      - bounded title-path taps observe only the initialization write 0x02C20C -> 0x80BFFE with data 0xFFFF
+      - no 68010 reads are observed in the bounded title path; internal ADSP data-space use remains unresolved
 
   - name: adsp_serial_buffer_window
     processor: maincpu
     start: 0x810000
     end: 0x813fff
     access: rw
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     candidate_selector: adsp.serial_buffer
     mame_handlers:
       - hd68k_adsp_buffer_r
       - hd68k_adsp_buffer_w
+    notes:
+      - 1200-frame taps observe 106 count/terminator blocks and exact count-matched writes to the GSP FIFO at 0xC0000C
 
   - name: adsp_control_window
     processor: maincpu
     start: 0x818000
     end: 0x81801f
     access: write
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     candidate_selector: adsp.control
     mame_handlers:
       - hd68k_adsp_control_w
     notes:
       - low offset selects bank, /BR, or /HALT behavior in the MAME model
+      - bounded taps observe 73 zero-valued writes in both no-input and coin/start runs
 
   - name: adsp_irq_clear_window
     processor: maincpu
     start: 0x818060
     end: 0x81807f
     access: write
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     candidate_selector: adsp.irq_clear
     mame_handlers:
       - hd68k_adsp_irq_clear_w
+    notes:
+      - both bounded 600-frame modes observe writes from 0x021426 and 0x02C234
 
   - name: adsp_irq_state_window
     processor: maincpu
     start: 0x838000
     end: 0x83ffff
     access: read
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus NO-OBSERVATION-IN-BOUNDED-TRACE
     candidate_selector: adsp.irq_state
     mame_handlers:
       - hd68k_adsp_irq_state_r
+    notes:
+      - no reads observed in either bounded 600-frame title-path mode; this is not a claim that the handler is unused globally
 
   - name: adc_12bit_channel_3_landmark
     processor: maincpu
@@ -234,9 +246,10 @@ relationships:
   - from: maincpu
     to: jsa2
     kind: command_latch_to_sound_nmi
-    evidence: MAME-CONFIRMED plus STATIC-CANDIDATE
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     mame_hint: main_command_w -> atari_sound_comm delayed command latch -> 6502 NMI; JSA-II command read at 0x2802
     candidate_rom_pc: 0x023ef6 writes 0x600000
+    observed_payload: active-lane byte 0x1e is read at 6502 PC 0x5839 through mirror 0x280a
   - from: jsa2
     to: soundcpu
     kind: response_latch_to_main_irq
