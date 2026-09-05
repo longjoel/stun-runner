@@ -84,6 +84,11 @@ not game-level semantics.
 
 ### 68010 ↔ JSA sound board
 
+- OBSERVED-IN-TRACE: the active `:mainpcb:jsa:cpu` executes a deterministic
+  600-frame boot/title stream beginning at `0x4000`; early accesses include
+  `0x2A04` and `0x280C`. Independent traces are byte-identical. These are
+  candidate sound-board control/status locations, not yet a proven command
+  queue.
 - UNKNOWN: command register/queue offsets and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
 

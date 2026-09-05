@@ -1,0 +1,22 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "sound_processor_trace_600",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "cpu": ":mainpcb:jsa:cpu",
+  "frames": 600,
+  "input": "none",
+  "trace_flags": ["noloop"],
+  "trace_bytes": 80024608,
+  "trace_sha256": "52120f235fb834cb96d8a372339942a1fab925633604a8081cd05b3145551463",
+  "repeat_sha256": "52120f235fb834cb96d8a372339942a1fab925633604a8081cd05b3145551463",
+  "repeat_identical": true,
+  "first_trace_pc": "0x4000",
+  "first_trace_instructions": ["SEI", "CLD", "LDX #$FF", "TXS", "LDA #$01", "STA $2A04"],
+  "candidate_sound_register_accesses": ["0x2A04", "0x280C"],
+  "observation": "The 6502 sound CPU executes a deterministic boot/title instruction stream; the first accesses are candidate sound-board control/status locations, not yet a proven main-CPU command path.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_trace_kept_local": true,
+  "next_question": "Pair a main-CPU event with JSA communication/register activity before assigning sound command semantics."
+}
