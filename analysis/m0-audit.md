@@ -37,3 +37,5 @@ tools/emit-proof --rompath /path/to/roms --output /tmp/stunrun-emit-proof
 ```
 
 M0 provenance note: the installed package's executable/version/hash and runtime behavior are pinned, but its upstream source commit is unavailable. The adjacent source checkout is not silently substituted for that identity. This is an explicit provenance limitation for review, not an unrecorded assumption.
+
+Environment note: installing the system `lcov` package was attempted, but this agent's noninteractive sudo environment cannot read the required password. The npm-provided `lcov` command and the repository's converters are sufficient for standard `.info` validation; `genhtml` remains unavailable until an administrator installs the Arch package interactively.
