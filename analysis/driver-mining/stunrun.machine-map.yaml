@@ -96,6 +96,20 @@ regions:
       - hd68k_adsp_program_r
       - hd68k_adsp_program_w
 
+  - name: jsa_main_command_response_window
+    processor: maincpu
+    start: 0x600000
+    end: 0x603fff
+    access: rw
+    evidence: MAME-CONFIRMED
+    candidate_selector: sound.jsa.main_command_response
+    mame_handlers:
+      - atari_jsa_base_device::main_response_r
+      - atari_jsa_base_device::main_command_w
+    notes:
+      - dynamically installed by init_multisync(0) when the JSA device is present
+      - handler installation uses an 0xff00 mask
+
   - name: adsp_data_window
     processor: maincpu
     start: 0x808000

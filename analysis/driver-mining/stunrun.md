@@ -76,6 +76,19 @@ The target machine configuration also instantiates Atari JSA II sound and wires 
 
 Evidence: `MAME-CONFIRMED`.
 
+For this target, `init_multisync(0)` dynamically installs the JSA main-CPU
+command/response handlers over `0x600000–0x603fff`:
+
+```text
+read  -> atari_jsa_base_device::main_response_r
+write -> atari_jsa_base_device::main_command_w
+mask  -> 0xff00
+```
+
+This is the MAME-modeled communication window. It is not yet a ROM-proven
+command schema; the input-dependent 6502 `IRQ 0` trace is recorded separately
+in `reference/experiments/stunrun/processor-input-differential.metadata.json`.
+
 ---
 
 ## 3. ROM-region puzzle pieces
