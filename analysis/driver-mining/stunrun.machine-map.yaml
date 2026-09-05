@@ -228,8 +228,9 @@ relationships:
   - from: jsa2
     to: maincpu
     kind: interrupt_callback
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     mame_hint: sound_int_write_line
+    observed_contract: JSA callback -> main CPU IRQ 4 -> 0x023f24 handler -> 0x023f66 reads 0x600000 response -> RTE
 
 initialization:
   - call: init_multisync(0)

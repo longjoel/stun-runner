@@ -165,6 +165,14 @@ The static/runtime GSP search is recorded in
   `0xFFDB64` before invoking the JSA helper. This is the strongest current
   ROM-side command-buffer candidate, but its byte layout and ownership remain
   unresolved.
+- RESOLVED FOR TITLE PATH (JSA→68010 half): both independent main-CPU traces
+  contain exactly two `IRQ 4` entries. Each enters `0x023F24`, reads the JSA
+  response at `0x600000` through `0x023F66`, and returns. MAME wires the JSA
+  `sound_int_write_line` callback to `m_sound_int_state`, which
+  `update_interrupts()` routes to main-CPU line 4. This establishes the
+  response-interrupt edge, but not the 6502 command payload or the cause of
+  the two observed events. See
+  `reference/experiments/stunrun/sound-handler-search.metadata.json`.
 - STATIC-CANDIDATE: the 6502 sound listing polls `$280C` at `0x4154`, then
   consumes a queued byte from `$0235,Y` and writes it to `$2A02` at `0x4161`.
   These are the strongest current ROM-side sound-consumer landmarks; their

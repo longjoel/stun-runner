@@ -75,8 +75,33 @@
     "0x023F66": 2,
     "0x023FAE": 2
   },
-  "observation": "The candidate 68010 sound routines execute in both no-input and coin-start traces with identical counts; the available evidence establishes a repeatable ROM-side JSA access path but does not yet tie a particular byte to a sound command or prove IRQ direction.",
+  "maincpu_sound_irq4_observation": {
+    "mame_source": "harddriv.cpp sound_int_write_line callback plus harddriv_m.cpp update_interrupts() routes m_sound_int_state to main CPU input line 4",
+    "traces": {
+      "none": {
+        "path": "/tmp/stunrun-m1-main-trace-none/maincpu-68010.trace",
+        "sha256": "70fe7220484832195d13cb988c715b0127d3992f7df6f8b0b1f16da0376151ec",
+        "irq4_entries": 2,
+        "handler_pc": "0x023f24",
+        "response_read_pc": "0x023f66",
+        "response_reads": 2,
+        "returns": 2
+      },
+      "coin_start": {
+        "path": "/tmp/stunrun-m1-main-trace-coin/maincpu-68010.trace",
+        "sha256": "a7d8ba57a4395eaaa3a002996a95b16b9c3761deaee039dcec837b0f9a81c7e0",
+        "irq4_entries": 2,
+        "handler_pc": "0x023f24",
+        "response_read_pc": "0x023f66",
+        "response_reads": 2,
+        "returns": 2
+      }
+    },
+    "observed_contract": "JSA main interrupt callback -> 68010 IRQ 4 -> handler 0x023f24 -> read response at 0x600000 from 0x023f66 -> RTE",
+    "scope_limit": "This resolves the JSA-to-68010 response-interrupt half only; it does not identify the 6502 command payload or prove that the observed IRQ4 events came from a particular ROM-side write."
+  },
+  "observation": "The candidate 68010 sound routines execute in both no-input and coin-start traces with identical counts; the available evidence establishes a repeatable ROM-side JSA access path and a JSA-to-68010 IRQ4 response path, but does not yet tie a particular byte to a sound command or resolve the 6502-side protocol.",
   "confidence": "STATIC-CANDIDATE+OBSERVED-IN-TRACE",
   "raw_traces_kept_local": true,
-  "next_question": "Capture a deliberately sound-producing event or correlate one candidate write with 6502 IRQ timing and command consumption."
+  "next_question": "Correlate one candidate 68010 write with 6502 command consumption and IRQ timing."
 }
