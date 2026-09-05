@@ -32,6 +32,39 @@
     "0x2006_GINT_write": {"none": 30, "coin_start": 30},
     "0x2007_MP_write": {"none": 10335, "coin_start": 10335}
   },
+  "trace_contexts": [
+    {
+      "pcs": ["0x009f", "0x00a0", "0x00a3", "0x00a6", "0x00a8"],
+      "operations": [
+        "AR = 0",
+        "DM($2007) = AR",
+        "AR = DM($2000)",
+        "DM($2007) = SR1 after shifting SIMBUF data",
+        "DM($2001) = SR0"
+      ],
+      "claim": "OBSERVED-IN-TRACE: an MP=0 SIMBUF read is followed by a transformed value used in subsequent serial-clock activity."
+    },
+    {
+      "pcs": ["0x04bc", "0x04c2", "0x04c5", "0x04de"],
+      "operations": [
+        "DM($2007) = 1",
+        "DM($2001) = AR for each sample/serial item",
+        "MY0 = DM($2000) in a repeated loop",
+        "DM($2007) = DM($0031)"
+      ],
+      "claim": "OBSERVED-IN-TRACE: a second MP-selected SIMBUF processing loop is active; the final bank value is loaded from ADSP data memory."
+    },
+    {
+      "pcs": ["0x004a", "0x004b", "0x004c", "0x004d-0x004f"],
+      "operations": [
+        "AR = DM($0030)",
+        "DM($1fe3) = AR",
+        "DM($2006) = AX0",
+        "poll DM($1fe3) until nonzero"
+      ],
+      "claim": "OBSERVED-IN-TRACE: GINT is issued between an internal request marker and a polling loop. The trace does not establish the external interrupt consumer or the value of AX0."
+    }
+  ],
   "interpretation": "OBSERVED-IN-TRACE: the ADSP executes SIMBUF, SIMCLK, SOMLATCH, SOMCLK, GINT, and MP special-data accesses in both bounded 600-frame traces. No DM($2004) or DM($2005) instruction is observed. Equal aggregate counts do not imply equal values or producer-side state; the full traces remain input-differential.",
   "runtime_status": "ADSP special-data access landmarks are instruction-trace observed; handler-side values and exact serial/object semantics remain unresolved",
   "confidence": "MAME-CONFIRMED-MAP plus OBSERVED-IN-TRACE"

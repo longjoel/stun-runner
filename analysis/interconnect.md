@@ -54,6 +54,13 @@ not game-level semantics.
   special-I/O path is active, including the GINT and object-ROM controls, but
   does not establish the values written or the meaning of each serial block.
   See `reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
+- OBSERVED-IN-TRACE: ADSP PC `0x00A0` selects MP bank 0, reads `SIMBUF`,
+  shifts the result, and writes the transformed value through the serial
+  clock path. PC `0x04BC` selects MP value 1 and repeatedly reads `SIMBUF`
+  while processing serial items before restoring MP from ADSP data memory.
+  Separately, PCs `0x004A–0x004F` write `GINT` and poll an internal marker.
+  These are literal producer-side protocol candidates; their values and
+  external consumer semantics remain unresolved.
 - Two independent 600-frame coin/start runs registered read/write probes for
   the ADSP data window `0x808000–0x80bfff`, but headless MAME did not deliver
   their action callbacks; see `reference/experiments/stunrun/adsp-data-window.metadata.json`.
