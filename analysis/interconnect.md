@@ -88,7 +88,15 @@ not game-level semantics.
   the first differing region is adjacent to repeated `0xF4800020` and
   `0xF4800030` accesses. This is an input-dependent control-path landmark,
   not a proven command protocol.
+- STATIC-CANDIDATE+OBSERVED-IN-TRACE: the 68010 reset/init routines at
+  `0x000356–0x0004F4` write through `0xC00002`/`0xC0000C` and configure
+  `0xF480...`, palette, and control locations. Their counts are identical in
+  the 600-frame no-input and coin-start traces, so they are initialization
+  landmarks rather than input-dependent command evidence.
 - UNKNOWN: command submission region and synchronization mechanism.
+
+The static/runtime GSP search is recorded in
+`reference/experiments/stunrun/gsp-handler-search.metadata.json`.
 
 ### 68010 ↔ JSA sound board
 

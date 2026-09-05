@@ -1,0 +1,35 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "static_gsp_io_search",
+  "listing": "reference/listings/stunrun.metadata.json",
+  "runtime_trace": "/tmp/stunrun-m1-main-trace-coin/maincpu-68010.trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "mame_window": {
+    "start": "0xC00000",
+    "end": "0xC03FFF",
+    "read_handler": "hd68k_gsp_io_r",
+    "write_handler": "hd68k_gsp_io_w"
+  },
+  "static_candidates": [
+    {
+      "range": "0x000356-0x00036E",
+      "observation": "copies table entries through 0xC00002 and 0xC0000C",
+      "runtime_counts": {"0x000356": 8}
+    },
+    {
+      "range": "0x0003BE-0x0003F6",
+      "observation": "initializes 0xC0000090, 0xC0000C, and 0xF4800000",
+      "runtime_counts": {"0x0003E0": 1, "0x0003E6": 1}
+    },
+    {
+      "range": "0x0003F8-0x0004F4",
+      "observation": "resets/configures GSP control, F480 registers, and palette ranges",
+      "runtime_counts": {"0x00040C": 1, "0x00043A": 1, "0x000468": 2, "0x000496": 1, "0x0004B8": 1}
+    }
+  ],
+  "coin_start_vs_none": "The listed initialization PCs have identical counts in the 600-frame none and coin_start traces.",
+  "confidence": "STATIC-CANDIDATE+OBSERVED-IN-TRACE",
+  "raw_traces_kept_local": true,
+  "next_question": "Find the first post-initialization 68010 GSP I/O routine whose trace differs at the coin/start or gameplay boundary."
+}
