@@ -116,6 +116,7 @@ def main() -> int:
     parser.add_argument("--rompath", required=True, type=pathlib.Path)
     parser.add_argument("--mame", default="mame")
     parser.add_argument("--output", type=pathlib.Path, required=True)
+    parser.add_argument("--cfg-dir", type=pathlib.Path, default=pathlib.Path("/tmp/stunrun-mame-cfg"))
     args = parser.parse_args()
     experiment = json.loads(args.experiment.read_text(encoding="utf-8"))
     validate(experiment)
@@ -129,7 +130,7 @@ def main() -> int:
         command = [
             args.mame, "-rompath", str(args.rompath), "stunrun",
             "-video", "soft", "-sound", "none", "-skip_gameinfo",
-            "-noreadconfig", "-nowriteconfig", "-cfg_directory", "/tmp/stunrun-mame-cfg",
+            "-noreadconfig", "-nowriteconfig", "-cfg_directory", str(args.cfg_dir),
             "-nonvram_save", "-seconds_to_run", str(seconds),
             "-snapname", experiment["id"], "-snapshot_directory", str(args.output),
             "-autoboot_script", str(script),

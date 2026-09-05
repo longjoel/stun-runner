@@ -1,0 +1,45 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/coin_start_sw_off_long.json",
+  "runner": "tools/mame-replay",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "events_frame": 1800,
+  "snapshot_runtime": "The replay runner continues through its bounded runtime after emitting the frame-1800 JSON marker; the screenshot is the resulting end-of-run frame and must not be treated as an exact frame-1800 numeric checkpoint.",
+  "runs": {
+    "a": {
+      "cfg_dir": "/tmp/stunrun-m1-replay-cfg-1800",
+      "result_sha256": "d86496237a2ce30659a469ef72d205edf6ecb2b8cca3d9f4b3c4135f6d53f867",
+      "log_sha256": "e9c5c8f6148d6c334393424e0027c87b4a7ed14ee69ede4b20883ec03cda5bfb",
+      "screenshot_sha256": "f7e89f2bd2f76d6dea35623b00df909b8f8edebae4ca2cbd4e583465e4ce211a"
+    },
+    "b": {
+      "cfg_dir": "/tmp/stunrun-m1-replay-cfg-1800-b",
+      "result_sha256": "d86496237a2ce30659a469ef72d205edf6ecb2b8cca3d9f4b3c4135f6d53f867",
+      "log_sha256": "e9c5c8f6148d6c334393424e0027c87b4a7ed14ee69ede4b20883ec03cda5bfb",
+      "screenshot_sha256": "f7e89f2bd2f76d6dea35623b00df909b8f8edebae4ca2cbd4e583465e4ce211a"
+    }
+  },
+  "gsp_post_loading_probe": {
+    "runner": "tools/mame-gsp-boundary",
+    "frames": 1800,
+    "capture_start_frame": 600,
+    "sw_off": {
+      "result_sha256": "d138b23698ae09f5d8305f77c77e3f460ddde1480b9507e14c0b802b00165fd9",
+      "canonical_log_sha256": "9f2faf05c453587a5b12a6a0794a809c2afcba8223e07c2dda040b4bdd58c888",
+      "fifo_writes_captured": 0,
+      "command_writes_captured": 0
+    },
+    "sw_off_none": {
+      "result_sha256": "edcb92c9602c47aeb0879bc1746557357b1bae4eb864c51a5933db2c5a56dbb7",
+      "canonical_log_sha256": "f6f898fcef1a51908a64637c6c4c62bd8ddbcaa215054d85a8a9938efc548ef8",
+      "fifo_writes_captured": 0,
+      "command_writes_captured": 0
+    },
+    "interpretation": "No writes to the two narrow GSP host registers were observed after frame 600 in either bounded mode; this does not characterize other GSP VRAM/control paths or the exact visual snapshot frame."
+  },
+  "observation": "With SW1:1-8 set to Off at frame 1, Coin 1 pulsed at frames 120-122, and 1 Player Start pulsed at frames 300-302, the resulting image shows the rendered track, player vehicle, HUD, speed, level, and credits rather than the default attract/demo image.",
+  "confidence": "OBSERVED-IN-REPLAY visual gameplay boundary",
+  "raw_artifacts_kept_local": true,
+  "next_question": "Capture a synchronized numeric checkpoint and input-dependent interconnect trace at the same gameplay boundary."
+}

@@ -125,6 +125,7 @@ regions:
       - input-port definition documents IN0 at 0x60c000
       - bit 0x01 is diagnostic jumper in mined source revision
       - normal coin/start reaches readers at 0x02C1A0 and 0x02C1EE; an early Coin 2 variant reaches the 0x0013FC/0x001404 polling loop
+      - MAME hd68k_port0_r combines SW1 in the high byte and IN0 in the low byte; a repeatable all-SW1-off replay reaches a rendered gameplay image
 
   - name: adsp_program_window
     processor: maincpu

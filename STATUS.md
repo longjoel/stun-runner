@@ -24,7 +24,7 @@ Turn the frozen M0 laboratory into an evidence-backed machine/interconnect map w
 
 1. Close the remaining IRQ-0002 questions: source-buffer ownership, post-gameplay ADSP traffic, and the gameplay boundary.
 2. Preserve IRQ-0003's normalized checkpoint schema as a cross-target contract and extend it only when repeatable evidence supports new fields.
-3. Run bounded experiments for input polling, gameplay-boundary traffic, the first input-dependent GSP submission, and any remaining sound/ADSP edges.
+3. Run bounded experiments for input polling, synchronized gameplay-boundary traffic, the first input-dependent GSP submission, and any remaining sound/ADSP edges.
 4. Record exact runtime memory spaces, writer PCs, reader/writer processors, and observed state transitions.
 5. Maintain `analysis/interconnect.md` with confidence labels and evidence links.
 6. Promote only justified machine-state selectors into the replay contract.
@@ -108,8 +108,9 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   block contract, a frame-363 title-path FIFO submission landmark, source-mapped
   control/reset/bank handlers, and the title-path JSA command-byte pairing.
   Remaining questions are source-buffer ownership, post-gameplay traffic, the
-  first input-dependent GSP submission, and a semantic gameplay selector; the
-  normalized M1 checkpoint extension is now captured and repeatable.
+  first input-dependent GSP submission, and a synchronized semantic gameplay
+  selector; a repeatable visual gameplay boundary now exists, while the
+  normalized M1 checkpoint extension remains repeatable for the title path.
 
 ## Completed baseline slices
 

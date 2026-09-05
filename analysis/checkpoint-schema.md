@@ -38,4 +38,7 @@ two independent captures. IRQ-0003 remains open for the semantic extension neede
 reproduction and native gameplay checkpoints. M1 has now supplied repeatable
 region/access observations that are eligible inputs to that extension—ADSP
 program upload, serial-buffer block/FIFO transfer, and control/IRQ writes—but
-no semantic gameplay field has been promoted.
+no semantic gameplay field has been promoted. The SW1-off replay fixture in
+`reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json` is
+repeatable visual evidence of a gameplay path, not a canonical numeric
+checkpoint; its screenshot timing is intentionally recorded as a limitation.

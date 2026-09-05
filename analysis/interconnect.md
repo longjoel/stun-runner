@@ -176,6 +176,12 @@ producer-side ADSP meaning of each block remains unresolved. See
   is missing, or because the installed MAME input model differs from the ROM's
   expected environment. The current evidence does not justify treating the
   input checks as a credit-state contract.
+- NARROWED UNKNOWN: setting all eight SW1 fields Off before the same Coin 1/Start
+  schedule produces a repeatable rendered gameplay image in two fresh MAME
+  configurations. This establishes an input/configuration-dependent visual
+  boundary, but the exact numeric transition and corresponding interconnect
+  traffic remain to be synchronized. See
+  `reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json`.
 - UNKNOWN: interrupt/flag direction and acknowledgement sequence.
 
 ### 68010 ↔ GSP/PSP

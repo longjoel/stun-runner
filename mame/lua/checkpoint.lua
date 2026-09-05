@@ -47,6 +47,28 @@ local machine = manager.machine
 local frame = 0
 local captured = false
 local checkpoint_frame = tonumber(os.getenv('STUNRUN_CHECKPOINT_FRAME') or '600')
+local input_mode = os.getenv('STUNRUN_CHECKPOINT_INPUT') or 'none'
+local events = input_mode == 'sw_off' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:2', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:3', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:4', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:5', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:6', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1},
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or {}
+local next_event = 1
+
+local function apply_event(event)
+    local port = assert(machine.ioport.ports[event.port], 'unknown input port: ' .. event.port)
+    local field = assert(port.fields[event.field], 'unknown input field: ' .. event.port .. '/' .. event.field)
+    field:set_value(event.action == 'press' and 1 or event.action == 'release' and 0 or event.value)
+end
 
 local function capture()
     local devices = machine.devices
@@ -113,6 +135,10 @@ end
 
 emu.register_frame_done(function()
     frame = frame + 1
+    while next_event <= #events and events[next_event].frame == frame do
+        apply_event(events[next_event])
+        next_event = next_event + 1
+    end
     if frame >= checkpoint_frame and not captured then
         captured = true
         capture()

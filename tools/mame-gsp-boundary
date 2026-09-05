@@ -14,6 +14,10 @@ FIRST = re.compile(
     r"M1_GSP_WRITE_FIRST frame=(\d+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
     r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+) post_init=(true|false)"
 )
+COMMAND_FIRST = re.compile(
+    r"M1_GSP_COMMAND_FIRST frame=(\d+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
+    r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+) post_init=(true|false)"
+)
 
 
 def main() -> int:
@@ -22,7 +26,7 @@ def main() -> int:
     parser.add_argument("output", type=pathlib.Path)
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--capture-start-frame", type=int, default=132)
-    parser.add_argument("--input", choices=("none", "coin_start"), default="none")
+    parser.add_argument("--input", choices=("none", "coin_start", "sw_off", "sw_off_none"), default="none")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0:
@@ -52,6 +56,12 @@ def main() -> int:
          "mask": int(m.group(5), 16), "post_init": m.group(6) == "true"}
         for m in FIRST.finditer(text)
     ]
+    command_first = [
+        {"frame": int(m.group(1)), "pc": int(m.group(2), 16),
+         "address": int(m.group(3), 16), "data": int(m.group(4), 16),
+         "mask": int(m.group(5), 16), "post_init": m.group(6) == "true"}
+        for m in COMMAND_FIRST.finditer(text)
+    ]
     canonical = re.sub(r"output=[^\n]+", "output=<output>", text)
     result = {
         "schema": "stunrun-gsp-boundary-result/v1",
@@ -62,7 +72,9 @@ def main() -> int:
         "input": args.input,
         "returncode": completed.returncode,
         "first_writes": first,
+        "first_command_writes": command_first,
         "distinct_first_pcs": sorted({row["pc"] for row in first}),
+        "distinct_command_pcs": sorted({row["pc"] for row in command_first}),
         "post_init_first_writes": sum(1 for row in first if row["post_init"]),
         "canonical_log_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
     }

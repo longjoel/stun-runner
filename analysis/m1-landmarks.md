@@ -75,6 +75,15 @@ is a reproducible attract/demo boundary, not yet a player-gameplay selector.
 See
 `reference/experiments/stunrun/coin-start-gameplay.metadata.json`.
 
+The default SW1 setting is not the only machine path. A paired replay that sets
+all eight `SW1` fields Off before the same Coin 1/Start schedule produces an
+identical rendered gameplay image in two fresh MAME configurations: track,
+player vehicle, HUD, speed, level, and credits are visible. The fixture is a
+visual gameplay-boundary observation, not yet an exact numeric checkpoint,
+because the replay runner's screenshot is captured after its frame-1800 JSON
+marker. See
+`reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json`.
+
 An early 30-frame Coin 1 pulse followed by Start produces the same result as
 the later two-frame pulse. In the static listing, the only direct references to
 coin bits 7/6 are in the `0x043590` candidate; its six direct callers remain
