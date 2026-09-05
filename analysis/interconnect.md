@@ -19,12 +19,12 @@ not game-level semantics.
 
 ## Observed-in-trace
 
-- Two independent 600-frame `adsp_program_upload` runs successfully registered
-  a 68010 program-space write watchpoint over `0x800000–0x807fff`, but the
-  installed headless MAME did not deliver watchpoint action callbacks. See
-  `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
-- The watchpoint result is setup-only; it does **not** establish an access
-  count, ADSP activity, or the program's load/source path.
+- Two independent 600-frame `adsp_program_upload` runs use direct memory taps to
+  observe 5,456 68010 program-space halfword writes over
+  `0x800000–0x807fff`, all from PC `0x02D35C`; the paired source and record
+  evidence is summarized below. The older debugger-watchpoint attempt remains
+  setup-only because installed headless MAME did not deliver its action
+  callbacks. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 - The six-frame M0 trace metadata still records empty GSP/ADSP instruction
   traces as a bounded observation, not proof of inactivity.
 - OBSERVED-IN-TRACE: independent 60-frame traces for both GSP and ADSP are
@@ -89,9 +89,16 @@ not game-level semantics.
 - OBSERVED-IN-TRACE (clean state snapshot): a direct read of the ADSP program
   space is empty at frame 136 and contains 2,718 nonzero words at frame 600.
   This proves title-path population of the executable ADSP RAM by the canonical
-  title boundary even though the headless watchpoint path does not identify the
-  writer PC or payload. See
+  title boundary; the older headless debugger-watchpoint path does not identify
+  the writer PC or payload. See
   `reference/experiments/stunrun/adsp-program-snapshot.metadata.json`.
+
+OBSERVED-IN-TRACE: the normalized 68010 buffer blocks form a concrete
+maincpu→GSP boundary: in each independent 1200-frame run, all 106
+length-prefixed blocks terminate with `0xFFFF`, and the transfer loop emits
+exactly the declared number of writes to the GSP FIFO at `0xC0000C`. The
+producer-side ADSP meaning of each block remains unresolved. See
+`reference/experiments/stunrun/adsp-buffer-window.metadata.json`.
 
 ## Open contracts
 

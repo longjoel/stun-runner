@@ -23,7 +23,7 @@ processors:
   - id: gsp
     type: tms34010
     role_hint: graphics_signal_processor
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     canonical_device_tag: null
   - id: adsp
     type: adsp2100
@@ -119,11 +119,12 @@ regions:
     start: 0x60c000
     end: 0x60c001
     access: read
-    evidence: MAME-CONFIRMED
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     candidate_selector: input.in0
     notes:
       - input-port definition documents IN0 at 0x60c000
       - bit 0x01 is diagnostic jumper in mined source revision
+      - normal coin/start reaches readers at 0x02C1A0 and 0x02C1EE; an early Coin 2 variant reaches the 0x0013FC/0x001404 polling loop
 
   - name: adsp_program_window
     processor: maincpu
@@ -250,6 +251,12 @@ relationships:
     mame_hint: main_command_w -> atari_sound_comm delayed command latch -> 6502 NMI; JSA-II command read at 0x2802
     candidate_rom_pc: 0x023ef6 writes 0x600000
     observed_payload: active-lane byte 0x1e is read at 6502 PC 0x5839 through mirror 0x280a
+  - from: maincpu
+    to: gsp
+    kind: adsp_buffer_block_to_gsp_fifo
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
+    mame_hint: hd68k_gsp_io_w at 0xc00000-0xc03fff; observed FIFO sink at 0xc0000c
+    observed_contract: 68010 PCs 0x02F0C2/0x02F0E2 frame each length-prefixed 0x810000 buffer block; transfer PCs 0x02248E/0x02249A produce exactly count writes to 0xC0000C before the 0xFFFF terminator
   - from: jsa2
     to: soundcpu
     kind: response_latch_to_main_irq
