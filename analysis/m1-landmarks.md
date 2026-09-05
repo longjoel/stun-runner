@@ -46,6 +46,12 @@ sequence begins at `0x009092`. This is a strong static input-polling candidate
 because it directly references the driver-mined `0x60C000` landmark, but its
 runtime state/meaning remains unverified.
 
+The normal 600-frame `coin_start` trace instead reaches `0x02C1A0` and
+`0x02C1EE`, which test bits 6 and 4 of `0x60C000`. An early Coin 2 variant
+enters `0x0013EC` and repeatedly executes the `0x0013FC`/`0x001404` loop,
+which tests bits 2 and 5 of `0x60C001`. The paired trace evidence is recorded
+in `reference/experiments/stunrun/input-differential.metadata.json`.
+
 ## Next targeted experiment
 
 Use breakpoints at `0x00B228`, `0x00BE6A`, and the input candidates only during

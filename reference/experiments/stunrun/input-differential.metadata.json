@@ -1,0 +1,31 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/landmark_probe.json",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "cpu": ":mainpcb:maincpu",
+  "frames": 600,
+  "trace_flags": ["noloop"],
+  "pairs": [
+    {
+      "input": "coin_start",
+      "trace_sha256": "a7d8ba57a4395eaaa3a002996a95b16b9c3761deaee039dcec837b0f9a81c7e0",
+      "trace_bytes": 154266927,
+      "observed": ["0x02C1A0", "0x02C1EE"]
+    },
+    {
+      "input": "coin2_early",
+      "trace_sha256": "86a402cf2136b17d1a11fa49b16e09ee542046f5ac7998914ad10084ff661c0f",
+      "trace_bytes": 195043248,
+      "observed": ["0x0013EC", "0x0013FC", "0x001404"]
+    }
+  ],
+  "observation": "The early Coin 2 variant enters a high-frequency 0x0013FC/0x001404 polling loop over 0x60c001; the normal coin-start path reaches the 0x02C1A0/0x02C1EE input checks instead.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_traces_kept_local": true,
+  "notes": [
+    "The 0x0013EC routine statically tests status/input bits 2 and 5; it is not identified as a credit handler.",
+    "This differential does not yet establish why the normal Coin 1 path leaves the displayed credit count unchanged."
+  ]
+}

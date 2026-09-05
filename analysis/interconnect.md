@@ -41,6 +41,16 @@ not game-level semantics.
   unavailable.
 - UNKNOWN: which data-window offsets are commands, status, or shared data, and
   whether access occurs only after a verified gameplay transition.
+
+### 68010 input/status path
+
+- OBSERVED-IN-TRACE: normal coin/start reaches the input checks at `0x02C1A0`
+  and `0x02C1EE`.
+- OBSERVED-IN-TRACE: an early Coin 2 variant enters a bounded trace dominated
+  by `0x0013EC` → `0x0013FC`/`0x001404`, polling `0x60C001`.
+- UNKNOWN: why the normal Coin 1 path leaves the displayed credit count at
+  zero; the current evidence does not justify treating the input checks as a
+  credit-state contract.
 - UNKNOWN: interrupt/flag direction and acknowledgement sequence.
 
 ### 68010 ↔ GSP/PSP
