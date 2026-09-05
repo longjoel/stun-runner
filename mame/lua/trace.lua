@@ -22,6 +22,9 @@ local events = input_mode == 'coin_start' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 2'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
     {frame = 330, port = ':mainpcb:a80000', field = '1 Player Start'}
+} or input_mode == 'service' and {
+    {frame = 1, port = ':mainpcb:IN0', field = 'Service Mode', press = true},
+    {frame = 120, port = ':mainpcb:IN0', field = 'Service Mode'}
 } or {}
 local next_event = 1
 

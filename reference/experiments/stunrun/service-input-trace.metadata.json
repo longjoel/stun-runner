@@ -1,0 +1,30 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "service_input_trace",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "cpu": ":mainpcb:maincpu",
+  "frames": 600,
+  "input": "service",
+  "events": [
+    {"frame": 1, "port": ":mainpcb:IN0", "field": "Service Mode", "action": "press"},
+    {"frame": 120, "port": ":mainpcb:IN0", "field": "Service Mode", "action": "release"}
+  ],
+  "trace_flags": ["noloop"],
+  "trace_sha256": "5e2552d92b956d75d88e9c16898248a94cb3566c5c26a17e4507ebe944859f0b",
+  "trace_bytes": 154198643,
+  "observed": ["0x000254", "0x0002A0", "0x020446", "0x023D98"],
+  "caller_search": {
+    "0x042666": false,
+    "0x0427FE": false,
+    "0x0429EA": false,
+    "0x042B02": false,
+    "0x042ED2": false,
+    "0x043744": false
+  },
+  "observation": "Service input reaches the reset/service polling path and later samples 0x60c001 in routines at 0x020446 and 0x023D98, but does not reach the six direct callers of the 0x043590 static input-handler candidate within 600 frames.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_trace_kept_local": true,
+  "next_question": "Identify the state transition or gameplay-entry input sequence that reaches one of the 0x043590 callers."
+}

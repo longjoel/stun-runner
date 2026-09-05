@@ -50,7 +50,11 @@ The normal 600-frame `coin_start` trace instead reaches `0x02C1A0` and
 `0x02C1EE`, which test bits 6 and 4 of `0x60C000`. An early Coin 2 variant
 enters `0x0013EC` and repeatedly executes the `0x0013FC`/`0x001404` loop,
 which tests bits 2 and 5 of `0x60C001`. The paired trace evidence is recorded
-in `reference/experiments/stunrun/input-differential.metadata.json`.
+in `reference/experiments/stunrun/input-differential.metadata.json`. A bounded
+service-mode trace reaches the reset/service polling path at `0x000254` and
+`0x0002A0`, then later samples `0x60C001` at `0x020446` and `0x023D98`; it
+still does not reach any of the six `0x043590` callers. See
+`reference/experiments/stunrun/service-input-trace.metadata.json`.
 
 ## Low-byte input-handler candidate
 
@@ -63,9 +67,19 @@ traces. This is a strong static candidate for an input event scanner, not yet
 a runtime-proven credit handler. See
 `reference/experiments/stunrun/input-handler-search.metadata.json`.
 
+The six call sites fall into distinct static contexts: `0x042666` is inside a
+loop that conditionally calls `0x020bb4`; `0x0427FE` is a short polling/state
+routine; `0x0429EA` and `0x042B02` are UI/rendering routines; `0x042ED2` is
+inside a table/geometry iteration; and `0x043744` is in a state/timer update
+routine. This classification is static only. None of the six caller PCs
+appears in the bounded 600- or 1200-frame normal coin-start traces, so the next
+runtime experiment should first establish the state transition that enters one
+of these routines rather than infer credit semantics from the event codes.
+
 ## Next targeted experiment
 
-Run a bounded trace that reaches one of the six callers, starting with the
-caller family around `0x042666–0x043744`. Keep the ADSP transfer and
-gameplay-state experiments separate; do not assign semantics from the listing
-alone.
+Run bounded traces across the reset/title, service/menu, and gameplay-entry
+states and search for the six caller PCs. Record the first reachable caller and
+the immediately surrounding PCs before assigning input or credit semantics.
+Keep the ADSP transfer and gameplay-state experiments separate; do not assign
+semantics from the listing alone.
