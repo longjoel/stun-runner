@@ -28,8 +28,10 @@ not game-level semantics.
   empty, while independent 600-frame traces are nonempty. The first observed
   GSP trace instruction is at `0xFFF59920`; the first observed non-NOP ADSP
   instruction is `0x0004: CALL $0780`. This bounds first activity to frames
-  61–600 without identifying the exact frame. Independent repeats of both
-  600-frame traces are byte-identical.
+  61–600 without identifying the exact frame. Follow-up bounded probes narrow
+  first GSP instruction activity to frame 132 and first ADSP instruction
+  activity to frame 122; the first non-NOP ADSP instruction is present by
+  frame 136. Independent repeats of both 600-frame traces are byte-identical.
 - See `reference/experiments/stunrun/processor-trace-600.metadata.json` for
   trace hashes and sizes.
 - Two independent 600-frame coin/start runs registered read/write probes for
