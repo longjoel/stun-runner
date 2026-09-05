@@ -87,19 +87,21 @@ not game-level semantics.
 - OBSERVED-IN-TRACE: the clean snapshot run shows the ADSP program space empty
   through frame 122 and populated by frame 136; the program is therefore not
   simply static zero-filled RAM for the whole title path.
-- UNKNOWN: the exact 68010 writer PCs, transfer bytes, and whether the source
-  is a ROM-side upload loop or another board-side mechanism. The earlier
-  debugger-watchpoint result is setup-only and must not be read as a no-write
-  result.
+- RESOLVED FOR TITLE PATH: direct 68010 program-space taps observe 5456 writes
+  in each independent 600-frame run, all from PC `0x02D35C`, covering
+  `0x800000–0x807ff6`. The static instruction at `0x02D35C` is
+  `move.l D0,(A2)+`; the preceding loop at `0x02D304–0x02D364` decodes source
+  bytes, computes the destination from `0x800000`, and supplies the observed
+  upload. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 - MAME-CONFIRMED: the target has no separate ADSP program-code ROM region.
   The ADSP program map is RAM at `0x0000–0x1fff`, with `0x2000–0x3fff`
   marked `nopr`/ROM? by the driver. The separate 0x60000-byte `user1` region
   is explicitly labeled ADSP object ROM and is accessed through the special
   `SIMBUF/MP` path, not identified as executable program storage.
-- NARROWED UNKNOWN: the title path populates ADSP program RAM between the
-  frame-122 and frame-136 snapshots, but the static candidate upload loops
-  and their writer-side values remain uncorrelated because handler callbacks
-  are unavailable in installed headless MAME.
+- NARROWED UNKNOWN: the title path populates ADSP program RAM through the
+  observed `0x02D35C` loop, but the source table/buffer semantics and exact
+  instruction-level normalization of the paired `MOVE.L` halfword taps remain
+  open.
 - UNKNOWN: 68010 reads or writes to the ADSP data window during the bounded
   coin/start title-path runs, because the headless watchpoint callback path is
   unavailable.

@@ -6,21 +6,41 @@
   "rom_manifest": "roms/stunrun.manifest.json",
   "start": "power_on",
   "terminal_condition": "frame >= 600",
-  "watchpoint": {
+  "window": {
     "cpu": ":mainpcb:maincpu",
     "space": "program",
     "access": "write",
     "range": "0x800000-0x807fff"
   },
-  "runs": 2,
-  "writes_observed_each_run": null,
-  "distinct_writer_pcs_each_run": null,
-  "canonical_log_sha256": "e0a8a9ad913e736c9bab1bbc6727c61dfa997cc8c21dad763123d50002eb609d",
-  "observation": "The 68010 program-space watchpoint was registered in both bounded runs, but headless MAME with -debugger none did not deliver watchpoint action callbacks; access count is therefore unknown.",
-  "confidence": "EXPERIMENT-SETUP-ONLY",
+  "tap": {
+    "mechanism": "68010 program-space memory tap installed after frame 10, when init_adsp() has dynamically installed the handler",
+    "range": "0x800000-0x807fff"
+  },
+  "runs": {
+    "none": {
+      "input": "none",
+      "result_path": "/tmp/stunrun-m1-adsp-window-tap/result.json",
+      "result_sha256": "072e2b2727ba575a46d4f51b7b7fb5b66e7d3ea06d14ca1ef2611f5ff57f7627",
+      "canonical_log_sha256": "0a5b1d4b17d2ffd65e1f2c4ec9b5c9fdff9e25c6fea1906da4cf14ec6e924034",
+      "observations": 5456,
+      "distinct_writer_pcs": ["0x02D35C"],
+      "address_range_observed": "0x800000-0x807ff6"
+    },
+    "coin_start": {
+      "input": "coin_start",
+      "result_path": "/tmp/stunrun-m1-adsp-window-tap-coin/result.json",
+      "result_sha256": "f68569fe18af6bfbe2241d1d2d92f470dd8b290ae37adf1a6ef80369add92504",
+      "canonical_log_sha256": "fe6ef292f0878e2682a6db4f2191e2538a7357dfb50438b6ae9b7e64519203d8",
+      "observations": 5456,
+      "distinct_writer_pcs": ["0x02D35C"],
+      "address_range_observed": "0x800000-0x807ff6"
+    }
+  },
+  "observation": "Direct memory taps in independent 600-frame no-input and coin_start runs observe 5456 program-window writes in each run, all from 68010 PC 0x02D35C, covering 0x800000-0x807ff6. The static listing shows 0x02D35C as MOVE.L D0,(A2)+; the preceding code derives A2 from 0x800000 plus a decoded offset and builds D0 from ROM/RAM bytes. This identifies the runtime writer and a reproducible upload loop, but not the source buffer's semantic ownership or the decoded transfer table.",
+  "confidence": "MAME-CONFIRMED window plus OBSERVED-IN-TRACE writer PC and transfer range",
   "raw_logs_kept_local": true,
   "notes": [
-    "This does not establish that the ADSP program is unused, not dynamically loaded, or identify its load source.",
-    "The next experiment targets the ADSP data window and interrupt/flag behavior."
+    "The tap reports bus-level write events; paired halfword events arise from the 68010 MOVE.L transfer and are not yet normalized into instruction-level longwords.",
+    "The next experiment correlates the decoded source bytes/table at 0x02D304-0x02D364 with the resulting ADSP image and checks the ADSP data/control window."
   ]
 }

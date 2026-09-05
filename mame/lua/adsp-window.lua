@@ -1,6 +1,5 @@
 -- Bounded 68010 watchpoint experiment for the MAME-confirmed ADSP windows.
 
-local debugger = manager.machine.debugger
 local output = assert(os.getenv('STUNRUN_ADSP_WINDOW_OUT'), 'STUNRUN_ADSP_WINDOW_OUT is required')
 local limit = tonumber(os.getenv('STUNRUN_ADSP_WINDOW_FRAMES') or '600')
 local base = assert(os.getenv('STUNRUN_ADSP_WINDOW_BASE'), 'STUNRUN_ADSP_WINDOW_BASE is required')
@@ -26,23 +25,33 @@ local function apply_event(event)
     print('M1_ADSP_INPUT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action)
 end
 
--- The action prints the machine debugger's write address/data and resumes.
--- The explicit CPU tag avoids dependence on the debugger's selected device.
-local watch_command
-if access == 'read' then
-    watch_command = 'wpset ' .. base .. ':mainpcb:maincpu,' .. length .. ',r,1,{ printf "M1_ADSP_READ kind=' .. label .. ' pc=%08X addr=%08X\\n",pc,wpaddr ; g }'
-else
-    watch_command = 'wpset ' .. base .. ':mainpcb:maincpu,' .. length .. ',w,1,{ printf "M1_ADSP_WRITE kind=' .. label .. ' pc=%08X addr=%08X data=%08X\\n",pc,wpaddr,wpdata ; g }'
-end
-debugger:command(watch_command)
-debugger:command('wplist')
-local consolelog = debugger.consolelog
-for index = math.max(1, #consolelog - 3), #consolelog do
-    print('M1_DEBUGGER ' .. tostring(consolelog[index]))
+local tap
+local function install_tap()
+    local cpu = manager.machine.devices[':mainpcb:maincpu']
+    local space = cpu.spaces['program']
+    local start_address = tonumber(base)
+    local end_address = start_address + tonumber(length) - 1
+    local pc = cpu.state['CURPC']
+    if access == 'read' then
+        tap = space:install_read_tap(start_address, end_address, 'stunrun_adsp_window_read',
+            function(offset, data, mask)
+                print(string.format('M1_ADSP_READ kind=%s pc=%08X addr=%08X',
+                    label, pc.value, offset))
+            end)
+    else
+        tap = space:install_write_tap(start_address, end_address, 'stunrun_adsp_window_write',
+            function(offset, data, mask)
+                print(string.format('M1_ADSP_WRITE kind=%s pc=%08X addr=%08X data=%08X',
+                    label, pc.value, offset, data))
+            end)
+    end
 end
 
 emu.register_frame_done(function()
     frame = frame + 1
+    if frame == 10 then
+        install_tap()
+    end
     while next_event <= #events and events[next_event].frame == frame do
         apply_event(events[next_event])
         next_event = next_event + 1

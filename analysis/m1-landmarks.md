@@ -13,19 +13,20 @@ Listing metadata: `reference/listings/stunrun.metadata.json`,
 | Candidate PC | Observed instructions | Confidence |
 |---|---|---|
 | `0x00B228` | Reads a count from `$AE70`, loads `A1 = $800000`, builds long values from successive bytes, and writes through `(A1)+` until the count expires. | `STATIC-CANDIDATE` |
-| `0x00BE6A` | Clears control/status locations, reads a count from `(A0)+`, loads `A1 = $800000`, builds long values, and writes through `(A1)+`. | `STATIC-CANDIDATE` |
+| `0x00BE6A` | Clears control/status locations, reads a count from `(A0)+`, loads `A1 = $800000`, builds long values from successive bytes, and writes through `(A1)+`. | `STATIC-CANDIDATE` |
+| `0x02D35C` | Runtime writer: `move.l D0,(A2)+` inside a decoded transfer loop; direct taps observe all 5456 program-window writes from this PC. | `OBSERVED-IN-TRACE` |
 | `0x00BED0` | Similar transfer shape beginning at `A1 = $804000`, which is outside the first documented program-window half and requires runtime/map confirmation. | `STATIC-CANDIDATE` |
 
-The bounded M1 watchpoint experiment registered a 68010 write watchpoint over
-`0x800000–0x807fff` during two independent 600-frame boot/title runs, but the
-headless debugger did not deliver action callbacks. It is therefore setup-only;
-do not infer an access count or call either routine an ADSP loader from it.
+Two independent 600-frame direct memory-tap runs observe 5456 writes each,
+all from `0x02D35C`, covering `0x800000–0x807ff6`. The preceding static loop
+at `0x02D304–0x02D364` decodes source bytes into `D0`, computes the destination
+in `A2`, and performs the observed `MOVE.L` upload. See
+`reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 
-The first breakpoint-probe setup is retained as an instrumentation experiment,
+The older breakpoint-probe setup is retained as an instrumentation experiment,
 but headless MAME with `-debugger none` did not deliver breakpoint action
-callbacks, so its empty hit list is not execution evidence. The authoritative
-600-frame `noloop` trace reaches `0x02C1A0` and `0x02C1EE` once each, while
-`0x00B228`, `0x00BE6A`, `0x009010`, and `0x009092` are absent. See
+callbacks, so its empty hit list is not execution evidence. The direct tap now
+supersedes it for the observed title-path upload. See
 `reference/experiments/stunrun/maincpu-600-trace.metadata.json`.
 
 ## ADSP data/control candidates

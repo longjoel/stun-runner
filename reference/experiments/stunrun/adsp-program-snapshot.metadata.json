@@ -42,8 +42,8 @@
     {"frame": 136, "pc": "0x000004", "mstat": "0x00000000", "nonzero_words": 0},
     {"frame": 600, "pc": "0x000014", "mstat": "0x00000000", "nonzero_words": 2718}
   ],
-  "observation": "With the pinned local NVRAM state and isolated MAME configuration, one bounded run observes empty ADSP program RAM at frame 136 and a second observes 2718 nonzero words at frame 600. This proves title-path population by the frame-600 boundary, while the available Lua instrumentation still does not identify the 68010 writer PC, exact transition frame, or transfer bytes.",
+  "observation": "With the pinned local NVRAM state and isolated MAME configuration, one bounded run observes empty ADSP program RAM at frame 136 and a second observes 2718 nonzero words at frame 600. Direct program-window taps now identify the title-path writer as 68010 PC 0x02D35C, with 5456 bus-level writes through 0x807ff6 in independent 600-frame runs; the exact transition frame and decoded source-table semantics remain open.",
   "confidence": "OBSERVED-IN-TRACE via repeatable MAME state snapshots; writer identity remains UNKNOWN",
   "raw_logs_kept_local": true,
-  "next_question": "Capture the 68010 writes with a reliable handler-level tap or instrument hd68k_adsp_program_w in a provenance-matched MAME build."
+  "next_question": "Correlate the 0x02D304-0x02D364 source-byte decoder with the resulting ADSP image and determine the smallest stable upload fixture."
 }
