@@ -7,11 +7,12 @@ Read these files in order before doing project work:
 3. `REQUIREMENTS.md` — hardware, ROM, compiler/assembler, and emulator requirements
 4. `EVIDENCE.md` — static listing, trace, snapshot, and canonical-checkpoint contract
 5. `TESTING.md` — unit, integration, end-to-end, regression, CI, and coverage strategy
-6. `LCOV.md` — native and original-machine coverage reporting
-7. `PREFLIGHT.md` — setup, cost-control, concurrency, stop conditions, and readiness gate
-8. `STATUS.md` — current milestone and immediate objective
-9. `MILESTONES.md` — observable definition of progress
-10. `QUESTIONS.md` — cross-agent requests and unresolved investigations
+6. `LCOV.md` — native and original-code coverage reporting
+7. `MAME_INSTRUMENTATION.md` — stock MAME Lua/debugger automation and reusable telemetry harness
+8. `PREFLIGHT.md` — readiness gate, cost-control, concurrency, schema, and stop-condition rules
+9. `STATUS.md` — current milestone and immediate objective
+10. `MILESTONES.md` — observable definition of progress
+11. `QUESTIONS.md` — cross-agent requests and unresolved investigations
 
 ## Role selection
 
@@ -27,9 +28,7 @@ Do not silently cross ownership boundaries. Use `QUESTIONS.md` for handoffs.
 
 The repository is at **M0 — Reproducible machine and evidence baseline**.
 
-Do not begin broad decompilation, semantic rewriting, or a broad native port until the M0 gate and the relevant portions of `PREFLIGHT.md` are satisfied.
-
-At minimum, establish:
+Do not begin broad decompilation, semantic rewriting, or a broad native port until all of the following exist:
 
 - a pinned S.T.U.N. Runner ROM set / revision;
 - a checked-in MAME-derived ROM manifest containing expected CRC32/SHA-1 values but no ROM contents;
@@ -39,8 +38,8 @@ At minimum, establish:
 - at least one bounded deterministic trace recipe;
 - a canonical reset/title checkpoint definition;
 - a tested plan for emitting replacement code for 68010, 6502, TMS34010, and ADSP-2100;
-- a deterministic input/replay format shared by oracle, reproduction, and native targets;
-- a test harness layout that runs without commercial ROMs and additionally enables oracle tests when valid ROMs are available locally.
+- a test harness layout that can run without commercial ROMs and can additionally enable oracle tests when valid ROMs are available locally;
+- the `PREFLIGHT.md` readiness gate satisfied for any large agent run.
 
 ## Raw evidence rule
 
@@ -64,19 +63,21 @@ Do not optimize for "translated lines." Optimize for behavior that is:
 
 Evidence-derived fixtures must retain provenance. Expected values may only change when new evidence shows the prior expectation was wrong, not merely because an implementation differs.
 
-## Bounded-task rule
+## Instrumentation rule
 
-Large agent runs must have a bounded objective, explicit input evidence, expected output artifacts, a success condition, and a stop condition.
+Prefer stock MAME automation before custom emulator changes.
 
-Do not accept broad tasks such as "decompile the game" or "port the graphics system" when a narrower experiment can be defined.
+Use the order defined in `MAME_INSTRUMENTATION.md`:
 
-Stop and create a handoff/investigation request rather than guessing when evidence is missing, contradictory, nondeterministic, or incompatible with an established oracle fixture. See `PREFLIGHT.md`.
+1. normal MAME command-line capabilities;
+2. reusable Lua scripts via `-autoboot_script`;
+3. Lua plugins where persistent tooling is useful;
+4. debugger commands orchestrated manually or from Lua;
+5. custom MAME instrumentation only when required evidence is not exposed adequately.
 
-## Concurrency rule
+When a manual debugger procedure is likely to be repeated, convert it into a reusable script/config rather than consuming agent time repeating it.
 
-Three roles do not mean three agents should edit the same artifacts concurrently.
-
-Use narrow branches/worktrees for substantial tasks. Serialize edits to shared semantic/test contracts when necessary. Handoffs must land as committed artifacts or explicit requests, not hidden conversational state.
+Generic instrumentation belongs under `mame/lua/lib/` or equivalent; S.T.U.N. Runner-specific addresses and experiment definitions belong in configuration/experiment data.
 
 ## Investigator instructions
 
@@ -91,6 +92,8 @@ Before semantic annotation, establish and document:
 Prioritize `analysis/interconnect.md`: shared RAM, command queues, interrupts, graphics submission, geometry/DSP communication, and sound commands are first-class reverse-engineering targets.
 
 When a routine or behavior becomes sufficiently understood, provide evidence that can be reduced into deterministic unit/integration fixtures. Do not alter fixtures merely to accommodate reconstruction behavior.
+
+Prefer reusable Lua/debugger experiments for memory watches, breakpoints, telemetry, and checkpoint capture rather than one-off manual sessions.
 
 ## Implementer instructions
 
@@ -119,8 +122,18 @@ Own the test architecture described in `TESTING.md`, including:
 - behavioral coverage;
 - regression preservation.
 
+Own or review the generic MAME replay/checkpoint harness so oracle experiments remain deterministic and reproducible.
+
 Do not silently modify production code to make verification pass.
+
+## Stop conditions and cost control
+
+Follow `PREFLIGHT.md`.
+
+Stop and hand off rather than guessing when evidence is absent, contradictory, version/hash validation fails, replay cannot be reproduced, an assembler cannot be independently validated, or a semantic conclusion would require inventing undocumented intent.
+
+Large tasks must be bounded by evidence, expected artifacts, success criteria, and stop criteria. "Decompile the game" is not an acceptable task definition.
 
 ## Session hygiene
 
-Leave persistent evidence, commands, tests, fixtures, and concise project-state updates in the repository. Do not rely on hidden agent context or previous chat history for facts another agent will need.
+Leave persistent evidence, commands, scripts, tests, fixtures, and concise project-state updates in the repository. Do not rely on hidden agent context or previous chat history for facts another agent will need.
