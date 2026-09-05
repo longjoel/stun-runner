@@ -2,7 +2,7 @@
 
 This file defines the conditions that should be satisfied before spending substantial agent time on broad reverse engineering or reconstruction.
 
-The goal is to prevent expensive work from being performed against an unstable machine definition, ambiguous evidence, conflicting agent state, or an unrepeatable local setup.
+The goal is to prevent expensive work from being performed against an unstable machine definition, ambiguous evidence, conflicting agent state, an unrepeatable local setup, or ad hoc emulator interaction that should have been automated.
 
 ## 1. One-command developer bootstrap
 
@@ -12,6 +12,7 @@ The repository should expose a single obvious entry point for setup and validati
 ./bootstrap
 ./test
 ./coverage
+./oracle-test
 ```
 
 or equivalent `make` / `just` targets.
@@ -23,7 +24,8 @@ A fresh checkout should be able to determine:
 - whether optional ROM-dependent tests can run;
 - whether required compilers/assemblers/encoders are available;
 - whether public unit tests pass;
-- where generated evidence and coverage artifacts will be written.
+- whether the MAME harness can launch and enumerate a target;
+- where generated evidence, failure artifacts, and coverage reports will be written.
 
 Do not make agents independently rediscover setup commands.
 
@@ -43,43 +45,69 @@ Recommended initial direction unless evidence argues otherwise:
 ```text
 Native language: C++20 or later
 Build: CMake + Ninja
-Tests: lightweight C/C++ test framework or CTest-compatible runner
+Tests: CTest-compatible runner
 Coverage: GCC/Clang instrumentation -> LCOV
 Platform layer: SDL where useful, but keep game semantics independent of SDL
 ```
 
 This is a project choice, not a reverse-engineering fact. Record the final choice before Agent 2 builds substantial architecture around it.
 
-## 3. Deterministic input/replay contract
+## 3. MAME harness as a required project surface
+
+The original MAME oracle must be driven through the stable browser-automation-style harness described in `MAME_HARNESS.md` for normal repeatable tests.
+
+The harness must provide, at minimum:
+
+- a stable launch/session API;
+- automatic machine/device inventory;
+- deterministic digital and analog input injection;
+- bounded frame/cycle/emulated-time waits;
+- semantic or machine-state selectors;
+- assertions;
+- fixture/checkpoint support;
+- screenshots and diagnostic state capture;
+- bounded trace control;
+- automatic failure artifact bundles;
+- a target-independent experiment/replay schema.
+
+Manual debugger work remains valid for exploration, but repeated procedures must be promoted into reusable harness capabilities.
+
+The project should explicitly aim for the developer experience of Playwright/Selenium applied to arcade software.
+
+## 4. Deterministic input/replay contract
 
 Define one canonical machine-readable input format before end-to-end work grows.
 
 It must represent at least:
 
-- start condition;
-- frame or cycle-relative timing;
+- start condition or fixture;
+- frame/cycle-relative timing;
 - digital controls;
 - analog controls;
 - coin/start/service inputs;
 - optional comments/labels;
-- expected terminal checkpoint.
+- expected terminal selector/checkpoint;
+- timeout.
 
 Example conceptual form:
 
 ```yaml
-experiment: boot_to_gameplay
+schema: arcade-experiment/v1
+id: boot_to_gameplay
 start: power_on
 events:
   - frame: 300
     input: COIN1
-    value: pressed
+    action: press
   - frame: 301
     input: COIN1
-    value: released
+    action: release
   - frame: 360
     input: START1
-    value: pressed
-checkpoint: first_gameplay_frame
+    action: press
+expect:
+  selector: gameplay
+  timeout_frames: 600
 ```
 
 The same logical input script should be translatable to:
@@ -90,7 +118,78 @@ The same logical input script should be translatable to:
 
 Do not allow each target to define its own unrelated replay format.
 
-## 4. Agent concurrency and ownership
+## 5. Bounded waits and failure diagnostics
+
+No harness wait may be unbounded.
+
+A timeout should produce a deterministic failure and retain enough diagnostic context to make the failure actionable.
+
+Expected failure artifacts should include a useful subset of:
+
+```text
+metadata.json
+input.jsonl
+screenshot.png
+checkpoint-before.json
+checkpoint-after.json
+telemetry.jsonl
+last-N-instruction.trace
+coverage.info
+```
+
+Prefer rolling buffers and retain-on-failure policies over maximum-volume always-on telemetry.
+
+## 6. Semantic selector contract
+
+Selectors are analogous to Playwright locators.
+
+They translate machine facts into stable test concepts such as:
+
+```text
+state("title")
+state("gameplay")
+object("player")
+mailbox("adsp")
+region("game_state")
+```
+
+Early selectors may be defined by concrete memory/register predicates.
+
+Selectors must:
+
+- be versioned or schema-governed;
+- retain evidence/provenance;
+- state exact vs normalized semantics;
+- be Investigator-owned semantic facts;
+- never be changed merely because reconstructed code disagrees.
+
+## 7. Fixture contract
+
+Fixtures should provide reusable known states similar to Playwright fixtures.
+
+Examples:
+
+```text
+power_on
+title_screen
+coin_inserted
+first_gameplay_frame
+```
+
+A fixture may be a MAME save state, deterministic replay result, or other validated representation.
+
+Every fixture must include:
+
+- generation recipe;
+- ROM manifest identity;
+- MAME version/commit;
+- harness/experiment identity;
+- schema version;
+- validation mechanism.
+
+Do not accept anonymous save-state binaries as project truth.
+
+## 8. Agent concurrency and ownership
 
 Three persistent roles do not imply three agents should edit the same files concurrently.
 
@@ -100,14 +199,14 @@ Rules:
 - an agent must state its role and task before editing;
 - shared coordination files should be updated deliberately, not opportunistically;
 - raw evidence is immutable;
-- Investigator owns semantic claims;
+- Investigator owns semantic claims and selectors;
 - Implementer owns implementation files;
-- Verifier owns oracle/golden expectations and differential-test architecture;
+- Verifier owns harness API semantics, fixtures, oracle/golden expectations, differential-test architecture, and failure artifacts;
 - agents should hand off through committed artifacts and `QUESTIONS.md`, not unstated conversational context.
 
 If two tasks require edits to the same semantic or test artifact, serialize them or explicitly reconcile them through review.
 
-## 5. Stop conditions
+## 9. Stop conditions
 
 Agents must know when to stop rather than spending tokens filling gaps with guesses.
 
@@ -118,6 +217,9 @@ Stop and create an investigation/handoff request when:
 - the processor/device tag cannot be identified confidently;
 - an expected ROM/hash/version mismatch occurs;
 - deterministic replay cannot be reproduced;
+- a selector cannot be justified from evidence;
+- a wait cannot be bounded reliably;
+- a fixture cannot be regenerated or validated;
 - an assembler/encoder emits bytes that cannot be independently validated;
 - implementation behavior conflicts with an established oracle fixture;
 - a semantic conclusion would require assuming undocumented intent;
@@ -125,13 +227,15 @@ Stop and create an investigation/handoff request when:
 
 An explicit `UNKNOWN` is better than an expensive hallucinated subsystem.
 
-## 6. Cost-control rules
+## 10. Cost-control rules
 
 Large agent runs should operate on bounded objectives.
 
 Prefer tasks such as:
 
 ```text
+Implement generic inventory and device enumeration.
+Implement the title-screen selector and prove it against two runs.
 Identify and document reset -> main initialization path.
 Map the main CPU <-> ADSP mailbox.
 Annotate only routines executed by boot_to_title.
@@ -155,14 +259,17 @@ Before a long task, define:
 - stop condition;
 - maximum intended scope.
 
-## 7. Artifact and storage policy
+## 11. Artifact and storage policy
 
 Generated artifacts fall into three classes.
 
 ### Commit normally
 
+- harness code;
 - scripts;
 - manifests/hashes;
+- experiment/replay definitions;
+- selectors and their provenance;
 - small deterministic fixtures;
 - curated traces/excerpts;
 - semantic metadata;
@@ -176,7 +283,8 @@ Generated artifacts fall into three classes.
 - full memory dumps;
 - large LCOV HTML reports;
 - temporary MAME output;
-- intermediate generated listings.
+- intermediate generated listings;
+- bulky failure bundles from successful local debugging once summarized.
 
 ### Never commit
 
@@ -186,7 +294,7 @@ Generated artifacts fall into three classes.
 
 Every large regenerable artifact should have enough metadata and scripts checked in to reproduce it.
 
-## 8. Provenance and legal hygiene
+## 12. Provenance and legal hygiene
 
 For every derived fixture or golden artifact, record whether it is:
 
@@ -195,9 +303,9 @@ For every derived fixture or golden artifact, record whether it is:
 - an emulator-generated diagnostic artifact;
 - a copyrighted game asset that should remain local.
 
-The public repository should prefer behavioral facts, hashes, state values, and tooling over redistributing original game content.
+The public repository should prefer behavioral facts, hashes, state values, selectors, experiments, and tooling over redistributing original game content.
 
-## 9. Independent verification
+## 13. Independent verification
 
 Reduce correlated agent mistakes.
 
@@ -210,39 +318,49 @@ Where practical:
 - re-run canonical experiments after major semantic changes;
 - do not accept "both reconstructed targets agree" as proof when both came from the same incorrect hypothesis.
 
-## 10. Schema stability
+## 14. Schema stability
 
 Before producing large quantities of data, define versioned schemas for:
 
 - ROM manifest;
 - experiment/input replay;
+- semantic selectors;
+- fixture metadata;
 - checkpoint state;
 - evidence metadata;
 - trace-derived fixtures;
 - symbol/semantic records;
-- original execution coverage mapping.
+- original execution coverage mapping;
+- failure artifact metadata.
 
 Each generated artifact should carry a schema version so tooling can reject stale incompatible data rather than misinterpret it.
 
-## 11. Preflight gate
+## 15. Preflight gate
 
 Large-scale reverse engineering may begin when all of the following are true:
 
-- [ ] PR containing the process/requirements/testing contracts is merged.
+- [ ] PR containing the process/requirements/testing/harness contracts is merged.
 - [ ] Native language/build/test choices are frozen.
-- [ ] One-command bootstrap/test entry points exist.
+- [ ] One-command bootstrap/test/oracle entry points exist.
 - [ ] Pinned MAME version/commit is recorded.
 - [ ] Canonical ROM set is selected and MAME-derived manifest is checked in.
 - [ ] Local ROM set validates against MAME.
-- [ ] Debugger-visible processor/device tags are recorded.
+- [ ] Harness launches the target through a stable entry point.
+- [ ] Harness inventory records debugger-visible processor/device tags.
 - [ ] Static-listing generation works for all programmable processors.
 - [ ] Deterministic replay schema and first replay exist.
-- [ ] First canonical reset/title checkpoint bundle can be regenerated.
+- [ ] At least one semantic or machine-state selector works reproducibly.
+- [ ] All harness waits are bounded and timeouts fail cleanly.
+- [ ] At least one assertion executes through the harness.
+- [ ] At least one fixture or canonical start state can be generated and validated.
+- [ ] A deliberately failing test automatically retains useful failure diagnostics.
+- [ ] First canonical reset/title checkpoint bundle can be regenerated through the harness.
+- [ ] A bounded MAME debugger trace can be started/stopped through the harness.
 - [ ] Minimal code-emission path is validated for 68010, 6502, TMS34010, and ADSP-2100.
 - [ ] Public tests run without ROMs.
 - [ ] ROM-dependent oracle tests skip cleanly when ROMs are absent.
 - [ ] LCOV native coverage pipeline works.
-- [ ] MAME-trace -> original-code LCOV prototype works for at least one processor.
+- [ ] Harness/MAME trace -> original-code LCOV prototype works for at least one processor.
 - [ ] Agent branch/worktree and stop-condition rules are understood.
 
 After this gate, spending substantial agent time becomes much more defensible because every result has a stable place to land and a repeatable way to be checked.
