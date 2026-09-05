@@ -34,9 +34,9 @@ The region around `0x00B24A–0x00B3FC` writes values to `0x808000`,
 `0x808002`, `0x808006`, `0x80800C–0x808016`, and reads `0x80800A`. It also
 touches nearby `0x81800A`, `0x81801A`, and `0x838001` locations.
 
-These are useful candidate control/status offsets, not a mailbox schema. Two
-coin/start runs observed no 68010 reads or writes to the full
-`0x808000–0x80BFFF` window during the bounded title-path experiment.
+These are useful candidate control/status offsets, not a mailbox schema. The
+window probes are setup-only because headless MAME did not deliver their
+watchpoint callbacks; no access count is asserted.
 
 ## Input candidates
 
@@ -52,9 +52,18 @@ enters `0x0013EC` and repeatedly executes the `0x0013FC`/`0x001404` loop,
 which tests bits 2 and 5 of `0x60C001`. The paired trace evidence is recorded
 in `reference/experiments/stunrun/input-differential.metadata.json`.
 
+## Low-byte input-handler candidate
+
+At `0x043590`, a static routine initializes `A0 = 0x60c001`, samples bits 7
+and 6 for coin inputs, samples bits 1/0/2 from `0xa80001`, debounces against
+`$ffff8014`, and returns distinct event codes. No direct `jsr $43590` appears
+in the listing, and the routine is absent from both the 600-frame and
+1200-frame normal coin-start traces. This is a strong static candidate for an
+input event scanner, not yet a runtime-proven credit handler. See
+`reference/experiments/stunrun/input-handler-search.metadata.json`.
+
 ## Next targeted experiment
 
-Use breakpoints at `0x00B228`, `0x00BE6A`, and the input candidates only during
-a bounded diagnostic/game-start attempt. If none execute, retain that as a
-bounded negative observation and expand the start-state experiment rather than
-assigning semantics from the listing alone.
+Locate the indirect caller/table for `0x043590`, then run a bounded trace from
+that caller. Keep the ADSP transfer and gameplay-state experiments separate;
+do not assign semantics from the listing alone.

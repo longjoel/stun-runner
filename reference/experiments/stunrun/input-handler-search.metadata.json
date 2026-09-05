@@ -1,0 +1,23 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "static_input_handler_search",
+  "listing": "reference/listings/stunrun.metadata.json",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "candidate_entry": "0x043590",
+  "candidate_range": "0x043582-0x0436e2",
+  "static_observations": [
+    "A0 is initialized to 0x60c001.",
+    "Input bits 7 and 6 are sampled from (A0).",
+    "Button bits 1, 0, and 2 are sampled from 0xa80001.",
+    "The routine uses a timer/reference value at 0xffff8014 and returns event codes including 0x01, 0x02, 0x10, 0x20, 0x40, and 0x80."
+  ],
+  "direct_callers_found": 0,
+  "runtime_searches": [
+    {"frames": 600, "input": "coin_start", "trace_sha256": "a7d8ba57a4395eaaa3a002996a95b16b9c3761deaee039dcec837b0f9a81c7e0", "entry_observed": false},
+    {"frames": 1200, "input": "coin_start", "trace_sha256": "db28580656b614db6d2f60b20eafe8284c40527e820177254795a1a58040946a", "entry_observed": false}
+  ],
+  "confidence": "STATIC-CANDIDATE",
+  "raw_traces_kept_local": true,
+  "next_question": "Locate the indirect caller or dispatch table for 0x043590 before assigning credit/control semantics."
+}
