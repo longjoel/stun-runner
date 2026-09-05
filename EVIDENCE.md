@@ -29,9 +29,9 @@ reference/
   listings/
     maincpu/
     gsp/
-    msp/
     adsp/
     sound/
+    optional/
   traces/
     boot/
     attract/
@@ -43,11 +43,13 @@ reference/
 analysis/
   maincpu-68010/
   gsp-tms34010/
-  msp-tms34010/
   adsp2100/
   sound-6502/
+  optional/
   interconnect.md
 ```
+
+Create processor-specific directories only for devices actually instantiated by the pinned target configuration/runtime inventory. Optional family devices such as an MSP must not create mandatory evidence paths when absent.
 
 Large reproducible traces may be excluded from git. The scripts and metadata required to regenerate them are project artifacts and should be committed.
 
@@ -59,7 +61,7 @@ Static listings answer:
 
 Use the pinned MAME debugger/disassembler where practical so instruction decoding agrees with the behavioral reference.
 
-Generate a baseline static listing for every programmable processor that exposes executable program memory.
+Generate a baseline static listing for every active programmable processor that exposes executable program memory.
 
 The raw listing belongs under `reference/listings/`.
 
@@ -128,14 +130,13 @@ reference/checkpoints/title/
   metadata.json
   maincpu.trace
   gsp.trace
-  msp.trace
   adsp.trace
   sound.trace
   maincpu.lst
   gsp.lst
-  msp.lst
   adsp.lst
   sound.lst
+  optional-device.trace   # only when the pinned target actually instantiates it
   memory-map.txt
   mainram.bin
   vram.bin
@@ -190,16 +191,19 @@ Scripts should select explicit device/CPU tags discovered from the pinned MAME m
 
 Do not guess trace CPU/device names from documentation.
 
-M0 requires enumerating the debugger-visible devices for the selected S.T.U.N. Runner set and recording the exact tags used for:
+M0 requires enumerating the debugger-visible devices for the selected S.T.U.N. Runner set and recording the exact tags used for every **active programmable processor** plus relevant memory spaces/devices.
+
+For the current driver-mined working model this should include:
 
 - 68010 main CPU
 - GSP
-- MSP
 - ADSP-2100
 - JSA sound CPU
 - relevant memory spaces/devices
 
-Those tags become part of the reproducible trace configuration.
+The MSP is currently treated as **absent/optional** because the target-specific MAME configuration uses `multisync_nomsp(config)`. Do not require an MSP debugger tag, listing, trace, checkpoint artifact, or toolchain for M0 unless the pinned runtime inventory contradicts that finding.
+
+Those active-device tags become part of the reproducible trace configuration.
 
 ## Memory maps and snapshots
 
