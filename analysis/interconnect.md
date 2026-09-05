@@ -113,6 +113,8 @@ recorded in
 `reference/experiments/stunrun/processor-input-differential.metadata.json`.
 The static/runtime candidate search is recorded in
 `reference/experiments/stunrun/sound-handler-search.metadata.json`.
+The service-input sound differential is recorded in
+`reference/experiments/stunrun/sound-service-differential.metadata.json`.
 
 ## Evidence queue
 

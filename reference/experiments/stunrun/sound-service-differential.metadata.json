@@ -1,0 +1,30 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "sound_service_differential",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "cpu": ":mainpcb:jsa:cpu",
+  "frames": 600,
+  "comparisons": {
+    "none": {
+      "trace_sha256": "52120f235fb834cb96d8a372339942a1fab925633604a8081cd05b3145551463",
+      "trace_bytes": 80024608
+    },
+    "service": {
+      "trace_sha256": "fd978ecc7436ab074a04412c9dd3b9dcd9b1e1ac187778c59e824fa282f1522e",
+      "trace_bytes": 79449369,
+      "events": [
+        {"frame": 1, "field": "Service Mode", "action": "press"},
+        {"frame": 120, "field": "Service Mode", "action": "release"}
+      ]
+    }
+  },
+  "first_difference_byte": 22474245,
+  "first_difference_line": 1531257,
+  "service_context": ["550D: rts", "4000: sei", "4001: cld", "4002: ldx #$ff", "4004: txs"],
+  "observation": "Service input changes the 6502 instruction stream and reaches the sound CPU reset vector at 0x4000 at the first divergence. This establishes an input-dependent sound-board state transition, not a proven main-CPU command or reset protocol.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_traces_kept_local": true,
+  "next_question": "Correlate the service-triggered 6502 reset-vector entry with the JSA device callback and 68010-side 0x600000/0x604000 accesses."
+}
