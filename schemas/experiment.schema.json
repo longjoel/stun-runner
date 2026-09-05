@@ -29,11 +29,37 @@
     },
     "expect": {
       "type": "object",
-      "required": ["kind", "frame"],
+      "oneOf": [
+        {
+          "required": ["kind", "frame"],
+          "properties": {
+            "kind": {"const": "frame"},
+            "frame": {"type": "integer", "minimum": 0},
+            "timeout_frames": {"type": "integer", "minimum": 1}
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": ["kind", "terminal"],
+          "properties": {
+            "kind": {"const": "bounded_observation"},
+            "terminal": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "instrumentation": {
+      "type": "object",
+      "required": ["tool"],
       "properties": {
-        "kind": {"enum": ["frame"]},
-        "frame": {"type": "integer", "minimum": 0},
-        "timeout_frames": {"type": "integer", "minimum": 1}
+        "tool": {"type": "string", "minLength": 1},
+        "window": {"type": "string", "minLength": 1},
+        "access": {"type": "string", "minLength": 1},
+        "accesses": {"type": "array", "items": {"type": "string"}},
+        "cpu": {"type": "string", "minLength": 1},
+        "pcs": {"type": "array", "items": {"type": "string"}},
+        "frames": {"type": "integer", "minimum": 1}
       },
       "additionalProperties": false
     }

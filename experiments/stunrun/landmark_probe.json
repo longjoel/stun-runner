@@ -1,0 +1,21 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "landmark_probe_title_coin_start",
+  "start": "power_on",
+  "events": [
+    {"frame": 120, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "press"},
+    {"frame": 122, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "release"},
+    {"frame": 300, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "press"},
+    {"frame": 302, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "release"}
+  ],
+  "instrumentation": {
+    "tool": "tools/mame-landmark-probe",
+    "cpu": ":mainpcb:maincpu",
+    "pcs": ["0x9010", "0x9092", "0xB228", "0xBE6A"],
+    "frames": 600
+  },
+  "expect": {
+    "kind": "bounded_observation",
+    "terminal": "frame >= 600"
+  }
+}

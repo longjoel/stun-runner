@@ -1,0 +1,22 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/landmark_probe.json",
+  "runner": "tools/mame-landmark-probe",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start": "power_on",
+  "terminal_condition": "frame >= 600",
+  "input": "coin_start",
+  "cpu": ":mainpcb:maincpu",
+  "pcs": ["0x9010", "0x9092", "0xB228", "0xBE6A"],
+  "runs": 1,
+  "hits": [],
+  "canonical_log_sha256": "8c0d563c78f3e1ada06b7e0bdc53ad37ba21760bf56b1f5bf29de3c8901af4dd",
+  "observation": "None of the four static landmark candidates executed during the bounded title-path run.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_log_kept_local": true,
+  "notes": [
+    "This narrows the title-path execution but does not invalidate the static candidates.",
+    "A verified gameplay transition or a broader state-entry experiment is required before interpreting these routines."
+  ]
+}
