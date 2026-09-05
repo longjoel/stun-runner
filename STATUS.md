@@ -24,7 +24,7 @@ Turn the frozen M0 laboratory into an evidence-backed machine/interconnect map w
 
 1. Close the remaining IRQ-0002 questions: source-buffer ownership, post-gameplay ADSP traffic, and the gameplay boundary.
 2. Preserve IRQ-0003's normalized checkpoint schema as a cross-target contract and extend it only when repeatable evidence supports new fields.
-3. Run bounded experiments for input polling, gameplay-boundary traffic, GSP submission, and any remaining sound/ADSP edges.
+3. Run bounded experiments for input polling, gameplay-boundary traffic, the first input-dependent GSP submission, and any remaining sound/ADSP edges.
 4. Record exact runtime memory spaces, writer PCs, reader/writer processors, and observed state transitions.
 5. Maintain `analysis/interconnect.md` with confidence labels and evidence links.
 6. Promote only justified machine-state selectors into the replay contract.
@@ -105,10 +105,11 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 - Deterministic replay schema, bounded frame selector, and machine-readable failure artifacts exist; semantic title/gameplay selectors remain future work.
 - M1 has established the active ADSP program writer (`0x02D35C`), its
   RAM-resident 17-record/2,728-word upload stream, the ADSP-buffer→GSP FIFO
-  block contract, source-mapped control/reset/bank handlers, and the title-path
-  JSA command-byte pairing. Remaining questions are source-buffer ownership,
-  post-gameplay traffic, and a semantic gameplay selector; the normalized M1
-  checkpoint extension is now captured and repeatable.
+  block contract, a frame-363 title-path FIFO submission landmark, source-mapped
+  control/reset/bank handlers, and the title-path JSA command-byte pairing.
+  Remaining questions are source-buffer ownership, post-gameplay traffic, the
+  first input-dependent GSP submission, and a semantic gameplay selector; the
+  normalized M1 checkpoint extension is now captured and repeatable.
 
 ## Completed baseline slices
 
