@@ -1,0 +1,6 @@
+{
+  "schema": "arcade-replay-result/v1",
+  "frame": 600,
+  "events_applied": 4,
+  "expected_events": 4
+}

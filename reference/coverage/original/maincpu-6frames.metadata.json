@@ -1,0 +1,16 @@
+{
+  "schema": "stunrun-original-coverage-metadata/v1",
+  "source_trace": "reference/traces/stunrun/metadata.json",
+  "processor": "maincpu-68010",
+  "test_name": "oracle_trace_6frames",
+  "converter": "tools/trace-to-lcov",
+  "listing": "reference/listings/stunrun.metadata.json",
+  "lcov_format": "standard .info",
+  "trace_bytes": 1835639,
+  "listing_instructions": 328829,
+  "trace_instruction_hits": 73419,
+  "covered_instructions": 117,
+  "lcov_sha256": "c3f1a4b6db45306813b7d2557694fe9291a2abc5a8636ce12bb71b62c3480581",
+  "kept_local": true,
+  "notes": ["The installed npm lcov command can summarize this format; genhtml is not installed on this host, and the converter emits valid LCOV for later rendering."]
+}

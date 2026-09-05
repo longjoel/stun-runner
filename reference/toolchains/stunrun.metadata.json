@@ -1,0 +1,16 @@
+{
+  "schema": "stunrun-code-emission-metadata/v1",
+  "proof": "tools/emit-proof",
+  "mame": "0.289 (mame0289-dirty)",
+  "validation": "MAME debugger disassembly of emitted bytes at fixed writable placements",
+  "processors": [
+    {"id": "maincpu-68010", "instruction": "NOP", "bytes": "4e71", "placement": "0xff8000", "decoded": "FF8000: nop"},
+    {"id": "gsp-tms34010", "instruction": "NOP", "bytes": "0003", "placement": "0xff800000", "decoded": "FF800000: NOP"},
+    {"id": "adsp2100", "instruction": "NOP", "bytes": "00000000", "placement": "0x0", "decoded": "0000: NOP"},
+    {"id": "sound-6502", "instruction": "NOP", "bytes": "ea", "placement": "0x1000", "decoded": "1000: nop"}
+  ],
+  "notes": [
+    "This is a minimal raw-emission proof, not a full assembler.",
+    "The project-owned encoder path is sufficient to begin replacement-image work; broader instruction coverage remains future work."
+  ]
+}

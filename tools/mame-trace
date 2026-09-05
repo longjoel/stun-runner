@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY CPU_TAG [FRAMES] [MAME_EXE]" >&2
+    exit 2
+}
+
+[[ $# -ge 3 && $# -le 5 ]] || usage
+rompath=$1
+output=$2
+cpu=$3
+frames=${4:-60}
+mame_exe=${5:-mame}
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+mkdir -p "$output"
+
+case "$cpu" in
+    :mainpcb:maincpu) id=maincpu-68010 ;;
+    :mainpcb:gsp) id=gsp-tms34010 ;;
+    :mainpcb:adsp) id=adsp2100 ;;
+    :mainpcb:jsa:cpu) id=sound-6502 ;;
+    *) echo "unsupported active CPU tag: $cpu" >&2; exit 2 ;;
+esac
+
+trace="$output/$id.trace"
+STUNRUN_TRACE_OUT="$trace" \
+STUNRUN_TRACE_CPU="$cpu" \
+STUNRUN_TRACE_FRAMES="$frames" \
+"$mame_exe" -rompath "$rompath" stunrun \
+    -video none -sound none -skip_gameinfo -noplugin data \
+    -debug -debugger none -seconds_to_run 2 \
+    -autoboot_script "$repo_dir/mame/lua/trace.lua" \
+    >"$output/mame.log" 2>&1
+
+[[ -e "$trace" ]] || { echo "trace was not produced: $trace" >&2; exit 1; }
+if [[ ! -s "$trace" ]]; then
+    echo "trace is empty for the requested bounded window: $trace" >&2
+fi
+printf '%s\n' "$trace"

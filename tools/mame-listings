@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY [MAME_EXE]" >&2
+    exit 2
+}
+
+[[ $# -ge 2 && $# -le 3 ]] || usage
+rompath=$1
+output=$2
+mame_exe=${3:-mame}
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+mkdir -p "$output"
+
+STUNRUN_LISTING_DIR="$output" "$mame_exe" -rompath "$rompath" stunrun \
+    -video none -sound none -skip_gameinfo -noplugin data \
+    -debug -debugger none -seconds_to_run 2 \
+    -autoboot_script "$repo_dir/mame/lua/listings.lua" \
+    >"$output/mame.log" 2>&1
+
+for listing in maincpu-68010 gsp-tms34010 adsp2100 sound-6502; do
+    file="$output/$listing.lst"
+    [[ -s "$file" ]] || { echo "missing listing: $file" >&2; exit 1; }
+done
+
+printf '%s\n' 'static listings generated:'
+for listing in "$output"/*.lst; do
+    printf '%s\n' "$listing"
+done

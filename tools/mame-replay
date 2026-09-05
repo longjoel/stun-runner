@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+"""Run an arcade-experiment/v1 file against the pinned MAME target."""
+
+import argparse
+import json
+import math
+import pathlib
+import subprocess
+import tempfile
+
+
+def lua_string(value: str) -> str:
+    return json.dumps(value)
+
+
+def lua_literal(value) -> str:
+    if value is None:
+        return "nil"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, str):
+        return lua_string(value)
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, list):
+        return "{" + ",".join(lua_literal(item) for item in value) + "}"
+    if isinstance(value, dict):
+        entries = []
+        for key, item in value.items():
+            entries.append(f"[{lua_string(key)}]={lua_literal(item)}")
+        return "{" + ",".join(entries) + "}"
+    raise TypeError(f"unsupported Lua value: {type(value)!r}")
+
+
+def validate(experiment: dict) -> None:
+    if experiment.get("schema") != "arcade-experiment/v1":
+        raise ValueError("unsupported experiment schema")
+    if not experiment.get("id") or not experiment.get("start"):
+        raise ValueError("experiment requires id and start")
+    expect = experiment.get("expect", {})
+    if expect.get("kind") != "frame" or not isinstance(expect.get("frame"), int):
+        raise ValueError("experiment expect must define a frame")
+    last_frame = -1
+    for event in experiment.get("events", []):
+        if not isinstance(event.get("frame"), int) or event["frame"] < last_frame:
+            raise ValueError("events must have nondecreasing non-negative frames")
+        last_frame = event["frame"]
+        if event.get("action") not in {"press", "release", "set"}:
+            raise ValueError("unsupported input action")
+        if event["action"] == "set" and "value" not in event:
+            raise ValueError("set events require value")
+
+
+def lua_script(experiment: dict) -> str:
+    events = lua_literal(experiment.get("events", []))
+    terminal = experiment["expect"]["frame"]
+    return f'''local events = {events}
+local machine = manager.machine
+local frame = 0
+local next_event = 1
+local captured = false
+
+local function quote(value)
+    value = tostring(value):gsub('\\\\', '\\\\\\\\'):gsub('"', '\\\\"')
+    return '"' .. value .. '"'
+end
+
+local function json(value)
+    if value == nil then return 'null' end
+    if type(value) == 'string' then return quote(value) end
+    if type(value) == 'number' or type(value) == 'boolean' then return tostring(value) end
+    local parts = {{}}
+    local keys = {{}}
+    for key, _ in pairs(value) do keys[#keys + 1] = key end
+    table.sort(keys)
+    for _, key in ipairs(keys) do parts[#parts + 1] = quote(key) .. ':' .. json(value[key]) end
+    return '{{' .. table.concat(parts, ',') .. '}}'
+end
+
+local function apply_event(event)
+    local port = machine.ioport.ports[event.port]
+    if port == nil then error('unknown input port: ' .. event.port) end
+    local field = port.fields[event.field]
+    if field == nil then error('unknown input field: ' .. event.port .. '/' .. event.field) end
+    if event.action == 'press' then
+        field:set_value(1)
+    elseif event.action == 'release' then
+        field:clear_value()
+    else
+        field:set_value(event.value)
+    end
+    print('MAME_REPLAY_EVENT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action)
+end
+
+emu.register_frame_done(function()
+    while next_event <= #events and events[next_event].frame == frame do
+        apply_event(events[next_event])
+        next_event = next_event + 1
+    end
+    if frame >= {terminal} and not captured then
+        captured = true
+        local result = {{schema='arcade-replay-result/v1', frame=frame, events_applied=next_event - 1, expected_events=#events}}
+        print('MAME_REPLAY_JSON ' .. json(result))
+    end
+    frame = frame + 1
+end)
+'''
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("experiment", type=pathlib.Path)
+    parser.add_argument("--rompath", required=True, type=pathlib.Path)
+    parser.add_argument("--mame", default="mame")
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    experiment = json.loads(args.experiment.read_text(encoding="utf-8"))
+    validate(experiment)
+    args.output.mkdir(parents=True, exist_ok=True)
+    seconds = max(2, math.ceil((experiment["expect"]["frame"] + 120) / 60))
+
+    with tempfile.TemporaryDirectory(prefix="stunrun-replay-") as temp_dir:
+        script = pathlib.Path(temp_dir) / "replay.lua"
+        log = pathlib.Path(temp_dir) / "mame.log"
+        script.write_text(lua_script(experiment), encoding="utf-8")
+        command = [
+            args.mame, "-rompath", str(args.rompath), "stunrun",
+            "-video", "soft", "-sound", "none", "-skip_gameinfo",
+            "-noplugin", "data", "-seconds_to_run", str(seconds),
+            "-snapname", experiment["id"], "-snapshot_directory", str(args.output),
+            "-autoboot_script", str(script),
+        ]
+        with log.open("w", encoding="utf-8") as handle:
+            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT, check=False)
+        text = log.read_text(encoding="utf-8")
+        (args.output / "mame.log").write_text(text, encoding="utf-8")
+        result_lines = [line.removeprefix("MAME_REPLAY_JSON ") for line in text.splitlines() if line.startswith("MAME_REPLAY_JSON ")]
+        if completed.returncode or not result_lines:
+            failure = {
+                "schema": "arcade-replay-failure/v1",
+                "experiment": str(args.experiment),
+                "returncode": completed.returncode,
+                "reason": "mame_exit" if completed.returncode else "missing_result",
+                "log": str(args.output / "mame.log"),
+            }
+            (args.output / "failure.json").write_text(json.dumps(failure, indent=2) + "\n", encoding="utf-8")
+            raise SystemExit(f"replay failed; see {args.output / 'mame.log'}")
+        (args.output / "result.json").write_text(result_lines[-1] + "\n", encoding="utf-8")
+        print(result_lines[-1])
+
+
+if __name__ == "__main__":
+    main()

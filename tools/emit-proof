@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""Emit and MAME-decode one minimal instruction for each active processor."""
+
+import argparse
+import hashlib
+import json
+import pathlib
+import subprocess
+
+
+FIXTURES = {
+    "maincpu-68010": {"mnemonic": "nop", "bytes": bytes.fromhex("4e71"), "placement": "0xff8000"},
+    "gsp-tms34010": {"mnemonic": "NOP", "bytes": bytes.fromhex("0003"), "placement": "0xff800000"},
+    "adsp2100": {"mnemonic": "NOP", "bytes": bytes.fromhex("00000000"), "placement": "0x0"},
+    "sound-6502": {"mnemonic": "nop", "bytes": bytes.fromhex("ea"), "placement": "0x1000"},
+}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--rompath", required=True, type=pathlib.Path)
+    parser.add_argument("--output", required=True, type=pathlib.Path)
+    parser.add_argument("--mame", default="mame")
+    args = parser.parse_args()
+    args.output.mkdir(parents=True, exist_ok=True)
+
+    emitted = {}
+    for name, fixture in FIXTURES.items():
+        binary = args.output / f"{name}.bin"
+        binary.write_bytes(fixture["bytes"])
+        emitted[name] = {
+            "mnemonic": fixture["mnemonic"],
+            "placement": fixture["placement"],
+            "bytes_hex": fixture["bytes"].hex(),
+            "sha256": hashlib.sha256(fixture["bytes"]).hexdigest(),
+            "binary": str(binary),
+        }
+
+    env = {
+        "STUNRUN_EMIT_VALIDATION_DIR": str(args.output),
+    }
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun",
+        "-video", "none", "-sound", "none", "-skip_gameinfo", "-noplugin", "data",
+        "-debug", "-debugger", "none", "-seconds_to_run", "1",
+        "-autoboot_script", str(pathlib.Path(__file__).parent.parent / "mame/lua/emit-validation.lua"),
+    ]
+    log = args.output / "mame.log"
+    with log.open("w", encoding="utf-8") as handle:
+        completed = subprocess.run(command, env={**__import__("os").environ, **env}, stdout=handle, stderr=subprocess.STDOUT, check=False)
+    if completed.returncode:
+        raise SystemExit(f"MAME validation failed; see {log}")
+
+    decoded = {}
+    for name, fixture in FIXTURES.items():
+        listing = (args.output / f"{name}.lst").read_text(encoding="utf-8")
+        if fixture["mnemonic"].lower() not in listing.lower():
+            raise SystemExit(f"MAME did not decode {name} as {fixture['mnemonic']}: {listing!r}")
+        decoded[name] = listing.splitlines()[0]
+
+    report = {"schema": "stunrun-code-emission-proof/v1", "mame": "system", "fixtures": emitted, "decoded": decoded}
+    (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(report, indent=2))
+
+
+if __name__ == "__main__":
+    main()

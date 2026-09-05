@@ -1,0 +1,15 @@
+{
+  "schema": "stunrun-static-listings/v1",
+  "system": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "generator": "tools/mame-listings",
+  "lua_script": "mame/lua/listings.lua",
+  "command": "tools/mame-listings <rompath> <output>",
+  "listings": [
+    {"id": "maincpu-68010", "tag": ":mainpcb:maincpu", "address": "0x0", "length": "0x100000", "bytes": 8633661, "sha256": "171e56ccf1a9940635a2e8e9929ab7edaa5841ac3238ef78acf0d6630f8e45e7", "kept_local": true},
+    {"id": "gsp-tms34010", "tag": ":mainpcb:gsp", "address": "0x0", "length": "0x100000", "bytes": 1507328, "sha256": "bbd64dcf4cccc554d9ff5bd0c0461ceb5123828b831b3098e3f3d589a324d438", "kept_local": true},
+    {"id": "adsp2100", "tag": ":mainpcb:adsp", "address": "0x0", "length": "0x4000", "bytes": 516096, "sha256": "094dd5b19454196c1868ef8b69bfa63e438df85aa9732b12f9a5f27bab49d1e0", "kept_local": true},
+    {"id": "sound-6502", "tag": ":mainpcb:jsa:cpu", "address": "0x0", "length": "0x10000", "bytes": 587544, "sha256": "4071cbd52df8b799e578c6d09bf4205ae5bfba7cadc9deb20645dcf38f17d953", "kept_local": true}
+  ]
+}

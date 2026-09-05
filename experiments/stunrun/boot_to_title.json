@@ -1,0 +1,11 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "boot_to_title",
+  "start": "power_on",
+  "events": [],
+  "expect": {
+    "kind": "frame",
+    "frame": 600,
+    "timeout_frames": 720
+  }
+}

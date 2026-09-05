@@ -1,9 +1,13 @@
 schema: 1
 target: stunrun
-status: source-mining-example
+status: runtime-reconciled-source-mining-baseline
 mame:
   source_commit: a263f49884249c87b18d8b61f007dc24004e450b
   canonical_project_revision: null
+  pinned_runtime_version: "0.289 (mame0289-dirty)"
+  pinned_runtime_executable_sha256: fcb54790e1837ed653020dc25a4e51d9ba7288d789cf556299d5d4d2cf2f3bc1
+  pinned_runtime_listxml_sha256: 36f961aecb2382a0cc8abd764164a05b9785eb988f5398d7407e8fa9c96d023b
+  source_commit_available: false
   files:
     - src/mame/atari/harddriv.cpp
     - src/mame/atari/harddriv.h

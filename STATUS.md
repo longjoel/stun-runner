@@ -12,9 +12,9 @@ Step 0 driver mining: **worked example retained; runtime tags reconciled against
 
 Reproduction target: **not started**
 
-Native target: **not started**
+Native target: **smoke coverage baseline only; implementation not started**
 
-Verification harness: **inventory foundation started; replay/checkpoint path not yet implemented**
+Verification harness: **bounded replay/checkpoint/trace path implemented; semantic selectors remain future work**
 
 ## Immediate objective
 
@@ -22,7 +22,7 @@ Freeze the specimen and laboratory before interpreting the game broadly:
 
 1. keep one MAME-supported S.T.U.N. Runner set fixed;
 2. record the installed MAME build and binary hash;
-3. refresh `analysis/driver-mining/stunrun.*` against that pinned source revision;
+3. retain the Step 0 machine map against the pinned installed MAME identity, with source-commit availability explicitly recorded;
 4. generate a ROM manifest from pinned MAME containing filenames, regions, sizes, CRC32, SHA-1, and load/interleave semantics;
 5. validate the local ROM set without committing ROM contents;
 6. enumerate debugger-visible CPU/device tags through the harness and reconcile them with the mined machine map;
@@ -104,9 +104,10 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 
 - Step 0 example has not yet been refreshed against the final pinned revision.
 - Installed MAME reports `0.289 (mame0289-dirty)` and exposes no source commit; its binary hash is recorded in `mame/system-baseline.json`.
-- No static-listing generation recipe checked in yet.
-- No deterministic replay/input recipe checked in yet; bounded title checkpoint capture now works.
-- No TMS34010 GSP or ADSP-2100 code-emission path validated yet.
+- Static-listing generation recipe works for all four active programmable processors; generated listings remain local and are hash-recorded in `reference/listings/stunrun.metadata.json`.
+- The native smoke coverage pipeline now emits standard LCOV through GCC/gcov; npm `lcov` is available, while `genhtml` is unavailable, so HTML rendering is not part of this baseline.
+- Deterministic replay schema, bounded frame selector, and machine-readable failure artifacts exist; semantic title/gameplay selectors remain future work.
+- Full M0 gate review is recorded in `analysis/m0-audit.md`; source-commit provenance remains an explicit installed-package limitation.
 
 ## Completed baseline slices
 
@@ -116,6 +117,10 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 - Runtime inventory evidence: `reference/inventory/stunrun.json`.
 - Machine-map reconciliation: `reference/inventory/stunrun.reconciliation.json` (all four active processors present; no unexpected programmable device).
 - Installed-MAME plugin workaround: inventory launches with `-noplugin data` because the packaged data plugin is incompatible with this Lua runtime.
+- Deterministic replay: `tools/mame-replay` runs `experiments/stunrun/boot_to_title.json` and `coin_start.json`; repeated boot runs produced identical screenshot hashes.
+- Bounded debugger traces: `tools/mame-trace` and `mame/lua/trace.lua`; six-frame trace metadata is under `reference/traces/stunrun/`.
+- Trace-to-LCOV prototype: `tools/trace-to-lcov`; first standard `.info` report is hash-recorded under `reference/coverage/original/`.
+- Minimal code-emission proof: `tools/emit-proof`; all four active processors decode emitted NOP fixtures through MAME.
 
 ## Last verified checkpoint
 

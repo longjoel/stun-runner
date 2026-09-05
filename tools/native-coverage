@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Build/run the ROM-free native smoke target and emit standard LCOV."""
+
+import argparse
+import pathlib
+import re
+import subprocess
+import tempfile
+
+
+GCOV_LINE = re.compile(r"^\s*([^:]+):\s*(\d+):(.*)$")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    root = pathlib.Path(__file__).resolve().parents[1]
+    source = root / "native/smoke.cpp"
+    args.output.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix="stunrun-native-coverage-") as temp:
+        temp = pathlib.Path(temp)
+        binary = temp / "smoke"
+        subprocess.run(
+            ["g++", "-std=c++20", "-O0", "-fprofile-arcs", "-ftest-coverage", str(source), "-o", str(binary)],
+            check=True,
+        )
+        subprocess.run([str(binary)], check=True, capture_output=True, text=True)
+        subprocess.run(["gcov", "-b", "-c", "-o", str(temp), str(source)], cwd=temp, check=True, capture_output=True, text=True)
+        gcov = temp / "smoke.cpp.gcov"
+        lines = ["TN:native_smoke", f"SF:{source}"]
+        total = covered = 0
+        for line in gcov.read_text(encoding="utf-8").splitlines():
+            match = GCOV_LINE.match(line)
+            if not match or match.group(1) == "-":
+                continue
+            raw_count = match.group(1).strip()
+            count = 0 if raw_count == "#####" else int(raw_count.rstrip("*"))
+            number = int(match.group(2))
+            total += 1
+            covered += count > 0
+            lines.append(f"DA:{number},{count}")
+        lines.extend([f"LF:{total}", f"LH:{covered}", "end_of_record", ""])
+        output = args.output / "native.info"
+        output.write_text("\n".join(lines), encoding="utf-8")
+        print(f"{output}: LF={total} LH={covered}")
+
+
+if __name__ == "__main__":
+    main()

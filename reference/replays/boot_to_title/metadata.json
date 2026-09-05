@@ -1,0 +1,20 @@
+{
+  "schema": "stunrun-replay-metadata/v1",
+  "experiment": "experiments/stunrun/boot_to_title.json",
+  "runner": "tools/mame-replay",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start": "power_on",
+  "terminal_condition": "frame >= 600",
+  "result": {"schema": "arcade-replay-result/v1", "frame": 600, "events_applied": 0, "expected_events": 0},
+  "screenshot": {
+    "filename": "boot_to_title.png",
+    "sha256": "40711892607ea1d9d3bbbd0ac2244d3d4b12324583516b0a901eac87bb7c3655",
+    "kept_local": true,
+    "repeat_count": 2
+  },
+  "notes": [
+    "The frame condition is a machine-state boundary, not yet a semantic title selector.",
+    "The screenshot hash matched across two independent runs."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "stunrun-trace-metadata/v1",
+  "experiment": "bounded power_on, 6 frames",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "runner": "tools/mame-trace",
+  "lua_script": "mame/lua/trace.lua",
+  "trace_flags": ["noloop"],
+  "traces": [
+    {"processor": "maincpu-68010", "tag": ":mainpcb:maincpu", "bytes": 1835639, "sha256": "720dc830f64b558232e46e782520e66f04ba4d943c9fbec157d49771e8724555", "kept_local": true},
+    {"processor": "gsp-tms34010", "tag": ":mainpcb:gsp", "bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "kept_local": true},
+    {"processor": "adsp2100", "tag": ":mainpcb:adsp", "bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "kept_local": true},
+    {"processor": "sound-6502", "tag": ":mainpcb:jsa:cpu", "bytes": 666080, "sha256": "2caea4ac547069be21393be60ea06a283ce0f442e61a02fa05f2ae5b47594913", "kept_local": true}
+  ],
+  "observation": "The GSP and ADSP produced empty traces in this six-frame power-on window; this is retained as an observation, not interpreted as proof that the devices never execute."
+}

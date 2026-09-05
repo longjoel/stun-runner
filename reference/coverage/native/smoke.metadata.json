@@ -1,0 +1,10 @@
+{
+  "schema": "coverage-metadata/v1",
+  "target": "native-smoke",
+  "source": "native/smoke.cpp",
+  "tool": "tools/native-coverage",
+  "format": "lcov",
+  "lines_found": 7,
+  "lines_hit": 6,
+  "report_sha256": "54a7ae51a10395fc95ab15f60eb8b7b16ea16c40af6d42f88eecee54f5204c3a"
+}

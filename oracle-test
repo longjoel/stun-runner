@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+if [[ -z "${STUNRUN_ROMPATH:-}" ]]; then
+    echo "oracle-test: SKIP (set STUNRUN_ROMPATH to a ROM path containing stunrun/)"
+    exit 0
+fi
+
+"$repo_dir/tools/check-roms" "$STUNRUN_ROMPATH"
+output=${STUNRUN_ORACLE_OUTPUT:-/tmp/stunrun-oracle-test}
+rm -rf "$output"
+mkdir -p "$output"
+"$repo_dir/tools/mame-inventory" "$STUNRUN_ROMPATH" >"$output/inventory.json"
+"$repo_dir/tools/mame-replay" "$repo_dir/experiments/stunrun/boot_to_title.json" \
+    --rompath "$STUNRUN_ROMPATH" --output "$output/replay"
+"$repo_dir/tools/emit-proof" --rompath "$STUNRUN_ROMPATH" --output "$output/emission"
+echo "oracle-test: passed; artifacts in $output"

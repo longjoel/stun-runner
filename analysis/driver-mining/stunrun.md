@@ -12,10 +12,10 @@ Target:
 MAME shortname: stunrun
 Driver family: src/mame/atari/harddriv.cpp
 Related files: src/mame/atari/harddriv.h, harddriv_m.cpp, harddriv_v.cpp
-Observed MAME source revision during this mining pass: a263f49884249c87b18d8b61f007dc24004e450b
+Pinned runtime identity for this project: MAME 0.289 (mame0289-dirty), executable SHA-256 `fcb54790e1837ed653020dc25a4e51d9ba7288d789cf556299d5d4d2cf2f3bc1` and `-listxml` SHA-256 `36f961aecb2382a0cc8abd764164a05b9785eb988f5398d7407e8fa9c96d023b`. The installed package exposes no source commit.
 ```
 
-This is a **source-mining snapshot**, not yet the project's canonical pinned MAME revision. Re-run this pass after the project pins MAME for M0.
+This is a source-mining snapshot reconciled against the pinned runtime inventory. Source-level claims inherited from the worked mining snapshot retain their original provenance; runtime tags, ROM metadata, and launch behavior are canonicalized by the project MAME baseline.
 
 ## 1. Immediate machine-model correction
 

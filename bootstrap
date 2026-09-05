@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+"$repo_dir/tools/env-check"
+"$repo_dir/tools/test-public"
+echo "bootstrap: public validation passed"
