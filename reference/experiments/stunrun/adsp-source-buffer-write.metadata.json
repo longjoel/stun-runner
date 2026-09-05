@@ -1,0 +1,31 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "adsp_source_buffer_write_probe",
+  "runner": "tools/mame-adsp-window",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start": "power_on",
+  "tap_installation": "frame 10, after the dynamically installed ADSP handlers are available",
+  "terminal_condition": "frame >= 600",
+  "window": {"cpu": ":mainpcb:maincpu", "space": "program", "access": "write", "range": "0x17000-0x25fff"},
+  "runs": {
+    "none": {
+      "input": "none",
+      "result_path": "/tmp/stunrun-m1-source-writes-none/result.json",
+      "result_sha256": "c2aec8db6035a48ec95716a369163c41687d93281aa255aed9bd531158cae821",
+      "canonical_log_sha256": "8ceff8cbb6febe508d85f49cfde34572f63c0026de2f31509513815c6d96bad8",
+      "observations": 0
+    },
+    "coin_start": {
+      "input": "coin_start",
+      "result_path": "/tmp/stunrun-m1-source-writes-coin/result.json",
+      "result_sha256": "6dda98e4ba0b072b8cb200afed3a03df89f9cc8e1b550f9db085e1f4ce15fd27",
+      "canonical_log_sha256": "4be94a07c0aa3fa628cba21800971643c4cf73e0831812062835fac9b164a225",
+      "observations": 0
+    }
+  },
+  "observation": "Neither independent run observes a 68010 write in 0x17000-0x25fff after the frame-10 tap installation; both still observe the known source reads and upload. This narrows the post-installation main-CPU producer question but does not characterize frames 0-9 or identify the device/ROM source of the buffer contents.",
+  "confidence": "OBSERVED-IN-TRACE bounded no-write result",
+  "raw_logs_kept_local": true,
+  "next_question": "Determine whether the source bytes are a ROM-visible table, an earlier boot-time initialization, or another producer before promoting source ownership semantics."
+}

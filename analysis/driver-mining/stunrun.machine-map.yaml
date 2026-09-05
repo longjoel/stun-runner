@@ -142,6 +142,7 @@ regions:
       - the 0x60000-byte mainpcb:user1 region is object ROM, not identified as executable ADSP program storage
       - direct taps observe writer PC 0x02D35C and a repeatable 17-record upload totaling 2728 24-bit program words
       - checkpoint selector adsp_program_loaded is repeatable at frame 600
+      - a paired frame-10-to-600 source-window probe observes no 68010 writes to 0x17000-0x25fff in either no-input or coin/start mode
 
   - name: jsa_main_command_response_window
     processor: maincpu

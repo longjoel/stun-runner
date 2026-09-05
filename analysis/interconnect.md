@@ -115,8 +115,12 @@ producer-side ADSP meaning of each block remains unresolved. See
   upload. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 - OBSERVED-IN-TRACE: the no-input and coin/start callers at `0x02C204` read the
   same 32-bit source pointer `0x0001702E` from `$17000` and pass it to
-  `0x02D2E0`. The uploader therefore consumes a repeatable RAM-resident
-  encoded stream; its ownership and producer remain unknown.
+  `0x02D2E0`. The uploader therefore consumes a repeatable encoded stream; a
+  paired frame-10-to-600 source-window write probe observes no 68010 writes to
+  `0x17000–0x25fff` in either mode. This narrows the post-installation
+  main-CPU producer question, but does not characterize frames 0–9 or identify
+  the device/ROM source of the bytes. See
+  `reference/experiments/stunrun/adsp-source-buffer-write.metadata.json`.
 - OBSERVED-IN-TRACE: normalizing the source-byte tap by its 68010 lane masks
   yields 17 records with control `0`, counts summing to 2,728 24-bit ADSP
   program words, one explicit destination gap covering word indices 2203–4136,

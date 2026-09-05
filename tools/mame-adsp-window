@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture bounded 68010 writes to the ADSP program window."""
+"""Capture bounded 68010 accesses to ADSP windows and the upload source range."""
 
 import argparse
 import hashlib
@@ -19,6 +19,7 @@ WINDOWS = {
     "program": ("0x800000", "0x8000", "0x800000-0x807fff"),
     "data": ("0x808000", "0x4000", "0x808000-0x80bfff"),
     "buffer": ("0x810000", "0x4000", "0x810000-0x813fff"),
+    "source": ("0x17000", "0xf000", "0x17000-0x25fff"),
     "control": ("0x818000", "0x20", "0x818000-0x81801f"),
     "irq_clear": ("0x818060", "0x20", "0x818060-0x81807f"),
     "irq_state": ("0x838000", "0x8000", "0x838000-0x83ffff"),
