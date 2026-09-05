@@ -93,6 +93,10 @@ not game-level semantics.
   `move.l D0,(A2)+`; the preceding loop at `0x02D304–0x02D364` decodes source
   bytes, computes the destination from `0x800000`, and supplies the observed
   upload. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
+- OBSERVED-IN-TRACE: the no-input and coin/start callers at `0x02C204` read the
+  same 32-bit source pointer `0x0001702E` from `$17000` and pass it to
+  `0x02D2E0`. The uploader therefore consumes a repeatable RAM-resident
+  encoded stream; its ownership and producer remain unknown.
 - MAME-CONFIRMED: the target has no separate ADSP program-code ROM region.
   The ADSP program map is RAM at `0x0000–0x1fff`, with `0x2000–0x3fff`
   marked `nopr`/ROM? by the driver. The separate 0x60000-byte `user1` region

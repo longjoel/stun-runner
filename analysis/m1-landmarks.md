@@ -23,6 +23,11 @@ at `0x02D304–0x02D364` decodes source bytes into `D0`, computes the destinatio
 in `A2`, and performs the observed `MOVE.L` upload. See
 `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 
+The title-path caller at `0x02C204` reads the 32-bit pointer `0x0001702E`
+from `$17000` and passes it to `0x02D2E0` in both no-input and coin/start runs.
+The source stream is therefore a RAM-resident encoded upload block; its
+producer and semantic table format remain unresolved.
+
 The older breakpoint-probe setup is retained as an instrumentation experiment,
 but headless MAME with `-debugger none` did not deliver breakpoint action
 callbacks, so its empty hit list is not execution evidence. The direct tap now

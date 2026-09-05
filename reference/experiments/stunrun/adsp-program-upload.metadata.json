@@ -19,24 +19,30 @@
   "runs": {
     "none": {
       "input": "none",
-      "result_path": "/tmp/stunrun-m1-adsp-window-tap/result.json",
-      "result_sha256": "072e2b2727ba575a46d4f51b7b7fb5b66e7d3ea06d14ca1ef2611f5ff57f7627",
-      "canonical_log_sha256": "0a5b1d4b17d2ffd65e1f2c4ec9b5c9fdff9e25c6fea1906da4cf14ec6e924034",
+      "result_path": "/tmp/stunrun-m1-adsp-source-bytes/result.json",
+      "result_sha256": "dfeaa168801153257fef5a0c0a8902281ad9cb1dafca2659200b19e25d4f74cc",
+      "canonical_log_sha256": "ead44559a6500001d23864f12f94a565c474798be9bc969df5f1fe5c8633ebe7",
       "observations": 5456,
       "distinct_writer_pcs": ["0x02D35C"],
-      "address_range_observed": "0x800000-0x807ff6"
+      "address_range_observed": "0x800000-0x807ff6",
+      "source_pointer": "0x0001702E",
+      "source_pointer_pc": "0x02C204",
+      "source_pointer_bus_words": ["0x0001", "0x702E"]
     },
     "coin_start": {
       "input": "coin_start",
-      "result_path": "/tmp/stunrun-m1-adsp-window-tap-coin/result.json",
-      "result_sha256": "f68569fe18af6bfbe2241d1d2d92f470dd8b290ae37adf1a6ef80369add92504",
-      "canonical_log_sha256": "fe6ef292f0878e2682a6db4f2191e2538a7357dfb50438b6ae9b7e64519203d8",
+      "result_path": "/tmp/stunrun-m1-adsp-source-bytes-coin/result.json",
+      "result_sha256": "7201701d81b16f71b1bf628807f015eca473aa2ea14fa3f07ee40b0c64b8090a",
+      "canonical_log_sha256": "128d97f32c4e0af6eea3cfd1aaedef42af410ab3ff63450b198ccf6714d9fa50",
       "observations": 5456,
       "distinct_writer_pcs": ["0x02D35C"],
-      "address_range_observed": "0x800000-0x807ff6"
+      "address_range_observed": "0x800000-0x807ff6",
+      "source_pointer": "0x0001702E",
+      "source_pointer_pc": "0x02C204",
+      "source_pointer_bus_words": ["0x0001", "0x702E"]
     }
   },
-  "observation": "Direct memory taps in independent 600-frame no-input and coin_start runs observe 5456 program-window writes in each run, all from 68010 PC 0x02D35C, covering 0x800000-0x807ff6. The static listing shows 0x02D35C as MOVE.L D0,(A2)+; the preceding code derives A2 from 0x800000 plus a decoded offset and builds D0 from ROM/RAM bytes. This identifies the runtime writer and a reproducible upload loop, but not the source buffer's semantic ownership or the decoded transfer table.",
+  "observation": "Direct memory taps in independent 600-frame no-input and coin_start runs observe 5456 program-window writes in each run, all from 68010 PC 0x02D35C, covering 0x800000-0x807ff6. The caller at 0x02C204 reads the same 32-bit source pointer 0x0001702E from $17000 and passes it to 0x02D2E0 in both runs. The static listing shows 0x02D35C as MOVE.L D0,(A2)+; the preceding code derives A2 from 0x800000 plus a decoded offset and builds D0 from the encoded byte stream at 0x1702E. This identifies the runtime writer and source pointer, but not the source buffer's semantic ownership or a normalized instruction-level decode of the bus-lane bytes.",
   "confidence": "MAME-CONFIRMED window plus OBSERVED-IN-TRACE writer PC and transfer range",
   "raw_logs_kept_local": true,
   "notes": [

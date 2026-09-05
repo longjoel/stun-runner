@@ -26,6 +26,8 @@ local function apply_event(event)
 end
 
 local tap
+local source_tap
+local source_bytes_tap
 local function install_tap()
     local cpu = manager.machine.devices[':mainpcb:maincpu']
     local space = cpu.spaces['program']
@@ -45,6 +47,23 @@ local function install_tap()
                     label, pc.value, offset, data))
             end)
     end
+    -- The observed title-path caller passes the source pointer from $17000
+    -- into 0x02d2e0. Keep this narrow diagnostic alongside the window tap so
+    -- the upload destination can be paired with its source pointer.
+    source_tap = space:install_read_tap(0x17000, 0x17007, 'stunrun_adsp_source',
+        function(offset, data, mask)
+            if pc.value == 0x02c204 or pc.value == 0x02c1b6 then
+                print(string.format('M1_ADSP_SOURCE pc=%08X addr=%08X data=%08X mask=%08X',
+                    pc.value, offset, data, mask))
+                end
+        end)
+    source_bytes_tap = space:install_read_tap(0x17000, 0x1ffff, 'stunrun_adsp_source_bytes',
+        function(offset, data, mask)
+            if pc.value >= 0x02d2e0 and pc.value <= 0x02d364 then
+                print(string.format('M1_ADSP_SOURCE_BYTE pc=%08X addr=%08X data=%08X mask=%08X',
+                    pc.value, offset, data, mask))
+            end
+        end)
 end
 
 emu.register_frame_done(function()
