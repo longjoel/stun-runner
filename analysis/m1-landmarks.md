@@ -18,15 +18,19 @@ Listing metadata: `reference/listings/stunrun.metadata.json`,
 | `0x00BED0` | Similar transfer shape beginning at `A1 = $804000`, which is outside the first documented program-window half and requires runtime/map confirmation. | `STATIC-CANDIDATE` |
 
 Two independent 600-frame direct memory-tap runs observe 5456 writes each,
-all from `0x02D35C`, covering `0x800000–0x807ff6`. The preceding static loop
+all from `0x02D35C`, covering `0x800000–0x8048d6`. The preceding static loop
 at `0x02D304–0x02D364` decodes source bytes into `D0`, computes the destination
 in `A2`, and performs the observed `MOVE.L` upload. See
 `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 
 The title-path caller at `0x02C204` reads the 32-bit pointer `0x0001702E`
 from `$17000` and passes it to `0x02D2E0` in both no-input and coin/start runs.
-The source stream is therefore a RAM-resident encoded upload block; its
-producer and semantic table format remain unresolved.
+Normalizing the traced byte lanes yields 17 records totaling 2,728 24-bit ADSP
+program words, with one explicit destination gap at word indices 2203–4136,
+then a `0xFF` terminator. The source stream is a
+RAM-resident encoded upload block; its producer and semantic ownership remain
+unresolved. The complete record table is in
+`reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 
 The older breakpoint-probe setup is retained as an instrumentation experiment,
 but headless MAME with `-debugger none` did not deliver breakpoint action

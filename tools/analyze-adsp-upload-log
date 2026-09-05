@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Normalize a traced 68010 ADSP upload stream into record metadata."""
+
+import argparse
+import json
+import pathlib
+import re
+
+
+SOURCE = re.compile(
+    r"M1_ADSP_SOURCE_BYTE pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
+    r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
+)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("log", type=pathlib.Path)
+    args = parser.parse_args()
+
+    bytes_seen = []
+    for line in args.log.read_text(encoding="utf-8").splitlines():
+        match = SOURCE.search(line)
+        if not match:
+            continue
+        data = int(match.group(3), 16)
+        mask = int(match.group(4), 16)
+        if mask == 0xFF00:
+            bytes_seen.append((data >> 8) & 0xFF)
+        elif mask == 0x00FF:
+            bytes_seen.append(data & 0xFF)
+        else:
+            raise SystemExit(f"unexpected byte-lane mask: {match.group(4)}")
+
+    position = 0
+    records = []
+    while position + 5 <= len(bytes_seen):
+        control = bytes_seen[position]
+        destination = (bytes_seen[position + 1] << 8) | bytes_seen[position + 2]
+        count = (bytes_seen[position + 3] << 8) | bytes_seen[position + 4]
+        position += 5
+        if control == 0xFF:
+            break
+        if control != 0:
+            raise SystemExit(f"unexpected record control 0x{control:02x} at {position - 5}")
+        payload_bytes = count * 3
+        if position + payload_bytes > len(bytes_seen):
+            raise SystemExit(f"truncated payload at {position - 5}")
+        records.append({"destination_word_index": destination, "program_word_count": count})
+        position += payload_bytes
+
+    total = sum(record["program_word_count"] for record in records)
+    contiguous = all(
+        current["destination_word_index"]
+        == previous["destination_word_index"] + previous["program_word_count"]
+        for previous, current in zip(records, records[1:])
+    )
+    result = {
+        "schema": "stunrun-adsp-upload-analysis/v1",
+        "source_bytes_observed": len(bytes_seen),
+        "records": records,
+        "record_count": len(records),
+        "total_program_words": total,
+        "destination_contiguous": contiguous,
+        "terminator_observed": position < len(bytes_seen) and bytes_seen[position] == 0xFF,
+        "bytes_consumed": position + (1 if position < len(bytes_seen) else 0),
+    }
+    print(json.dumps(result, indent=2))
+
+
+if __name__ == "__main__":
+    main()

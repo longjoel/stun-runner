@@ -89,7 +89,7 @@ not game-level semantics.
   simply static zero-filled RAM for the whole title path.
 - RESOLVED FOR TITLE PATH: direct 68010 program-space taps observe 5456 writes
   in each independent 600-frame run, all from PC `0x02D35C`, covering
-  `0x800000–0x807ff6`. The static instruction at `0x02D35C` is
+  `0x800000–0x8048d6`. The static instruction at `0x02D35C` is
   `move.l D0,(A2)+`; the preceding loop at `0x02D304–0x02D364` decodes source
   bytes, computes the destination from `0x800000`, and supplies the observed
   upload. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
@@ -97,6 +97,12 @@ not game-level semantics.
   same 32-bit source pointer `0x0001702E` from `$17000` and pass it to
   `0x02D2E0`. The uploader therefore consumes a repeatable RAM-resident
   encoded stream; its ownership and producer remain unknown.
+- OBSERVED-IN-TRACE: normalizing the source-byte tap by its 68010 lane masks
+  yields 17 records with control `0`, counts summing to 2,728 24-bit ADSP
+  program words, one explicit destination gap covering word indices 2203–4136,
+  and a `0xFF` terminator. This matches the 5,456 observed halfword writes
+  from `0x02D35C` and the populated ADSP image. The record table is preserved
+  in `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 - MAME-CONFIRMED: the target has no separate ADSP program-code ROM region.
   The ADSP program map is RAM at `0x0000–0x1fff`, with `0x2000–0x3fff`
   marked `nopr`/ROM? by the driver. The separate 0x60000-byte `user1` region

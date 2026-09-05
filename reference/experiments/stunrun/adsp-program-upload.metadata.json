@@ -24,10 +24,12 @@
       "canonical_log_sha256": "ead44559a6500001d23864f12f94a565c474798be9bc969df5f1fe5c8633ebe7",
       "observations": 5456,
       "distinct_writer_pcs": ["0x02D35C"],
-      "address_range_observed": "0x800000-0x807ff6",
+      "address_range_observed": "0x800000-0x8048d6",
       "source_pointer": "0x0001702E",
       "source_pointer_pc": "0x02C204",
-      "source_pointer_bus_words": ["0x0001", "0x702E"]
+      "source_pointer_bus_words": ["0x0001", "0x702E"],
+      "decoded_records": 17,
+      "decoded_program_words": 2728
     },
     "coin_start": {
       "input": "coin_start",
@@ -36,17 +38,29 @@
       "canonical_log_sha256": "128d97f32c4e0af6eea3cfd1aaedef42af410ab3ff63450b198ccf6714d9fa50",
       "observations": 5456,
       "distinct_writer_pcs": ["0x02D35C"],
-      "address_range_observed": "0x800000-0x807ff6",
+      "address_range_observed": "0x800000-0x8048d6",
       "source_pointer": "0x0001702E",
       "source_pointer_pc": "0x02C204",
-      "source_pointer_bus_words": ["0x0001", "0x702E"]
+      "source_pointer_bus_words": ["0x0001", "0x702E"],
+      "decoded_records": 17,
+      "decoded_program_words": 2728
     }
   },
-  "observation": "Direct memory taps in independent 600-frame no-input and coin_start runs observe 5456 program-window writes in each run, all from 68010 PC 0x02D35C, covering 0x800000-0x807ff6. The caller at 0x02C204 reads the same 32-bit source pointer 0x0001702E from $17000 and passes it to 0x02D2E0 in both runs. The static listing shows 0x02D35C as MOVE.L D0,(A2)+; the preceding code derives A2 from 0x800000 plus a decoded offset and builds D0 from the encoded byte stream at 0x1702E. This identifies the runtime writer and source pointer, but not the source buffer's semantic ownership or a normalized instruction-level decode of the bus-lane bytes.",
+  "decoded_stream_contract": {
+    "record_header": "control:u8, destination_word_index:u16, program_word_count:u16",
+    "payload": "program_word_count consecutive 24-bit ADSP program words; each is emitted as a 68010 MOVE.L bus transfer with two observed halfword taps",
+    "terminator": "0xff control byte after the final payload",
+    "records": [{"destination_word_index": 0, "program_word_count": 246}, {"destination_word_index": 246, "program_word_count": 30}, {"destination_word_index": 276, "program_word_count": 96}, {"destination_word_index": 372, "program_word_count": 160}, {"destination_word_index": 532, "program_word_count": 72}, {"destination_word_index": 604, "program_word_count": 598}, {"destination_word_index": 1202, "program_word_count": 57}, {"destination_word_index": 1259, "program_word_count": 242}, {"destination_word_index": 1501, "program_word_count": 84}, {"destination_word_index": 1585, "program_word_count": 50}, {"destination_word_index": 1635, "program_word_count": 62}, {"destination_word_index": 1697, "program_word_count": 223}, {"destination_word_index": 1920, "program_word_count": 139}, {"destination_word_index": 2059, "program_word_count": 41}, {"destination_word_index": 2100, "program_word_count": 103}, {"destination_word_index": 4137, "program_word_count": 13}, {"destination_word_index": 4150, "program_word_count": 512}],
+    "total_program_words": 2728,
+    "destination_contiguous": false,
+    "destination_gaps": [{"start_word_index": 2203, "end_word_index": 4136, "word_count": 1934}],
+    "confidence": "OBSERVED-IN-TRACE normalized from the source-byte tap and corroborated by 5456 program-window halfword writes"
+  },
+  "observation": "Direct memory taps in independent 600-frame no-input and coin_start runs observe 5456 program-window halfword writes in each run, all from 68010 PC 0x02D35C, covering 0x800000-0x8048d6. The caller at 0x02C204 reads the same 32-bit source pointer 0x0001702E from $17000 and passes it to 0x02D2E0 in both runs. Normalizing the source-byte tap by the 68010 byte-lane masks yields 17 records totaling 2728 24-bit ADSP program words, including one explicit destination gap, followed by 0xff; this exactly accounts for the paired halfword writes. The source buffer's producer and semantic ownership remain unresolved.",
   "confidence": "MAME-CONFIRMED window plus OBSERVED-IN-TRACE writer PC and transfer range",
   "raw_logs_kept_local": true,
   "notes": [
     "The tap reports bus-level write events; paired halfword events arise from the 68010 MOVE.L transfer and are not yet normalized into instruction-level longwords.",
-    "The next experiment correlates the decoded source bytes/table at 0x02D304-0x02D364 with the resulting ADSP image and checks the ADSP data/control window."
+    "The next experiment correlates the decoded 24-bit records with the ADSP snapshot and checks the ADSP data/control window."
   ]
 }
