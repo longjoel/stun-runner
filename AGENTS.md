@@ -7,9 +7,11 @@ Read these files in order before doing project work:
 3. `REQUIREMENTS.md` — hardware, ROM, compiler/assembler, and emulator requirements
 4. `EVIDENCE.md` — static listing, trace, snapshot, and canonical-checkpoint contract
 5. `TESTING.md` — unit, integration, end-to-end, regression, CI, and coverage strategy
-6. `STATUS.md` — current milestone and immediate objective
-7. `MILESTONES.md` — observable definition of progress
-8. `QUESTIONS.md` — cross-agent requests and unresolved investigations
+6. `LCOV.md` — native and original-machine coverage reporting
+7. `PREFLIGHT.md` — setup, cost-control, concurrency, stop conditions, and readiness gate
+8. `STATUS.md` — current milestone and immediate objective
+9. `MILESTONES.md` — observable definition of progress
+10. `QUESTIONS.md` — cross-agent requests and unresolved investigations
 
 ## Role selection
 
@@ -25,7 +27,9 @@ Do not silently cross ownership boundaries. Use `QUESTIONS.md` for handoffs.
 
 The repository is at **M0 — Reproducible machine and evidence baseline**.
 
-Do not begin broad decompilation, semantic rewriting, or a broad native port until all of the following exist:
+Do not begin broad decompilation, semantic rewriting, or a broad native port until the M0 gate and the relevant portions of `PREFLIGHT.md` are satisfied.
+
+At minimum, establish:
 
 - a pinned S.T.U.N. Runner ROM set / revision;
 - a checked-in MAME-derived ROM manifest containing expected CRC32/SHA-1 values but no ROM contents;
@@ -35,7 +39,8 @@ Do not begin broad decompilation, semantic rewriting, or a broad native port unt
 - at least one bounded deterministic trace recipe;
 - a canonical reset/title checkpoint definition;
 - a tested plan for emitting replacement code for 68010, 6502, TMS34010, and ADSP-2100;
-- a test harness layout that can run without commercial ROMs and can additionally enable oracle tests when valid ROMs are available locally.
+- a deterministic input/replay format shared by oracle, reproduction, and native targets;
+- a test harness layout that runs without commercial ROMs and additionally enables oracle tests when valid ROMs are available locally.
 
 ## Raw evidence rule
 
@@ -58,6 +63,20 @@ Do not optimize for "translated lines." Optimize for behavior that is:
 5. independently verified.
 
 Evidence-derived fixtures must retain provenance. Expected values may only change when new evidence shows the prior expectation was wrong, not merely because an implementation differs.
+
+## Bounded-task rule
+
+Large agent runs must have a bounded objective, explicit input evidence, expected output artifacts, a success condition, and a stop condition.
+
+Do not accept broad tasks such as "decompile the game" or "port the graphics system" when a narrower experiment can be defined.
+
+Stop and create a handoff/investigation request rather than guessing when evidence is missing, contradictory, nondeterministic, or incompatible with an established oracle fixture. See `PREFLIGHT.md`.
+
+## Concurrency rule
+
+Three roles do not mean three agents should edit the same artifacts concurrently.
+
+Use narrow branches/worktrees for substantial tasks. Serialize edits to shared semantic/test contracts when necessary. Handoffs must land as committed artifacts or explicit requests, not hidden conversational state.
 
 ## Investigator instructions
 
