@@ -82,10 +82,14 @@ not game-level semantics.
   bounded 600-frame boot/title runs.
 - UNKNOWN: whether the ADSP program is preloaded, loaded by another path, or
   populated outside this window.
-- MAME-CONFIRMED: the target includes a separate 0x60000-byte `user1` region
-  labeled ADSP object ROM, while the ADSP program map itself is RAM at 0x0000–
-  0x1fff with 0x2000–0x3fff marked `nopr`/ROM?. This makes onboard object-ROM
-  access a credible source path, but does not prove how the rev-6 code uses it.
+- MAME-CONFIRMED: the target has no separate ADSP program-code ROM region.
+  The ADSP program map is RAM at `0x0000–0x1fff`, with `0x2000–0x3fff`
+  marked `nopr`/ROM? by the driver. The separate 0x60000-byte `user1` region
+  is explicitly labeled ADSP object ROM and is accessed through the special
+  `SIMBUF/MP` path, not identified as executable program storage.
+- NARROWED UNKNOWN: the title traces do not reach the static 68010 upload
+  routine, so the initial population mechanism for ADSP program RAM remains
+  unknown despite the absence of a listed program ROM region.
 - UNKNOWN: 68010 reads or writes to the ADSP data window during the bounded
   coin/start title-path runs, because the headless watchpoint callback path is
   unavailable.

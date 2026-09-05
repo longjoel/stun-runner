@@ -135,6 +135,10 @@ regions:
     mame_handlers:
       - hd68k_adsp_program_r
       - hd68k_adsp_program_w
+    notes:
+      - ADSP program map is RAM at 0x0000-0x1fff in the target MAME configuration
+      - the target ROM manifest has no separate ADSP program-code region
+      - the 0x60000-byte mainpcb:user1 region is object ROM, not identified as executable ADSP program storage
 
   - name: jsa_main_command_response_window
     processor: maincpu
@@ -215,6 +219,12 @@ regions:
       - address comes from MAME input-port comment and must be confirmed against canonical runtime map
 
 relationships:
+  - from: adsp
+    to: maincpu
+    kind: interrupt_signal_and_ack
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
+    mame_hint: hdadsp_special_w case 6 sets m_adsp_irq_state; update_interrupts routes it to main CPU input line 2; hd68k_adsp_irq_clear_w clears it
+    observed_contract: ADSP DM($2006) GINT -> 68010 IRQ 2 -> handler 0x0213fe -> write 0x818060 at 0x021402 -> RTE
   - from: jsa2
     to: maincpu
     kind: interrupt_callback
