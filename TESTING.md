@@ -4,6 +4,23 @@ This project is treated as a traditional software project with an unusual advant
 
 The goal is not merely to produce source that looks plausible. The goal is to continuously prove that reconstructed behavior matches the original.
 
+## Harness-first rule
+
+Oracle-facing tests should use the stable automation layer described in `MAME_HARNESS.md` whenever practical.
+
+Treat MAME the way web developers treat a browser under Playwright or Selenium:
+
+```text
+browser -> MAME
+page/DOM -> machine state
+locator -> semantic selector
+click/type -> input injection
+fixture -> save state/checkpoint
+trace viewer -> failure artifact bundle
+```
+
+Do not make one-off debugger rituals the default test interface. If an operation is repeated, promote it into the harness as a reusable selector, fixture, assertion, experiment, or diagnostic capability.
+
 ## Testing pyramid
 
 ```text
@@ -55,7 +72,8 @@ Unit tests should cover at least:
 - command encoding/decoding;
 - input normalization;
 - renderer-independent geometry/math routines;
-- trace/listing parsers and project tooling.
+- trace/listing parsers and project tooling;
+- harness selectors, replay parsing, assertions, and artifact-generation logic.
 
 ---
 
@@ -100,18 +118,21 @@ The test should specify whether exact byte-for-byte equivalence is required or w
 
 End-to-end tests are the strongest verification layer.
 
-Run the same experiment against:
+Run the same logical experiment against:
 
 1. the original ROM under the pinned MAME build;
 2. the reproduction build under the same emulated machine where applicable;
 3. the native Linux build.
 
+The experiment definition should be target-independent and should be consumed through each target's adapter rather than rewritten separately.
+
 Use:
 
 - the same ROM revision;
-- the same deterministic initial state;
+- the same deterministic initial state or equivalent fixture;
 - the same deterministic input stream;
 - the same checkpoint definitions;
+- the same semantic selectors where meaningful;
 - the same comparison schema.
 
 At checkpoints compare useful observable state such as:
@@ -129,7 +150,31 @@ Do not require every byte of the machine to match unless that is meaningful. Har
 
 ---
 
-## 4. Canonical normalized state
+## 4. Semantic selectors and bounded waits
+
+Semantic selectors are the emulator equivalent of Playwright locators.
+
+Examples may eventually include:
+
+```text
+state("title")
+state("gameplay")
+object("player")
+mailbox("adsp")
+region("game_state")
+```
+
+Initially, a selector may simply map to one or more concrete memory/register conditions.
+
+Selectors must retain evidence/provenance and belong to the Investigator-owned semantic model. They must not be changed merely to make reconstruction behavior pass.
+
+All waits must be bounded by frames, cycles, or emulated time.
+
+A timed-out wait is a test failure and should trigger automatic diagnostic capture. Never allow an oracle test to wait forever for a condition.
+
+---
+
+## 5. Canonical normalized state
 
 Agent 3 should maintain a machine-readable normalized checkpoint representation.
 
@@ -157,7 +202,35 @@ This normalized form is especially important when the native port intentionally 
 
 ---
 
-## 5. Golden tests
+## 6. Fixtures
+
+Use Playwright-style fixture semantics for expensive or common initial states.
+
+Examples:
+
+```text
+power_on
+title_screen
+coin_inserted
+first_gameplay_frame
+```
+
+Fixtures may be backed by MAME save states, deterministic replay, or another reproducible mechanism.
+
+Every fixture must have:
+
+- a generation recipe;
+- pinned MAME identity;
+- ROM manifest identity;
+- schema/version metadata;
+- a human-readable purpose;
+- a way to regenerate or validate it.
+
+A save-state binary without metadata is not a valid project fixture.
+
+---
+
+## 7. Golden tests
 
 Curated original outputs may be used as golden fixtures.
 
@@ -176,7 +249,7 @@ Do not treat giant opaque traces as golden fixtures when a compact derived fixtu
 
 ---
 
-## 6. Fixture compiler
+## 8. Fixture compiler
 
 Tests should not normally parse multi-gigabyte raw traces directly.
 
@@ -207,13 +280,45 @@ A fixture must record:
 
 ---
 
-## 7. Coverage
+## 9. Failure artifacts
+
+The harness should behave like Playwright's trace-on-failure tooling.
+
+A failed oracle or E2E test should automatically retain a compact bundle such as:
+
+```text
+metadata.json
+input.jsonl
+screenshot.png
+checkpoint-before.json
+checkpoint-after.json
+telemetry.jsonl
+maincpu-last-N.trace
+coverage.info
+```
+
+Prefer rolling buffers and retain-on-failure policies instead of writing maximum-volume diagnostics for every successful test.
+
+Useful policies include:
+
+```text
+trace: retain-on-failure
+screenshots: only-on-failure
+telemetry: rolling-buffer
+coverage: always
+```
+
+Failure artifacts should be sufficient for an Investigator or Verifier to reproduce the divergence without manually replaying the entire session first.
+
+---
+
+## 10. Coverage
 
 Traditional native source coverage is useful but insufficient. This project tracks multiple coverage dimensions.
 
 LCOV is the common reporting layer for coverage. See `LCOV.md` for the exact integration model.
 
-### 7.1 Native source coverage
+### 10.1 Native source coverage
 
 Use normal compiler instrumentation and LCOV/genhtml for native code and project tools.
 
@@ -223,7 +328,7 @@ Report at least:
 - branch coverage where practical;
 - function coverage.
 
-### 7.2 Original execution coverage
+### 10.2 Original execution coverage
 
 From MAME traces, track which original executable addresses have actually been observed executing.
 
@@ -248,7 +353,7 @@ COLD
 NEVER OBSERVED
 ```
 
-### 7.3 Tested original execution coverage
+### 10.3 Tested original execution coverage
 
 Distinguish code merely observed during exploratory play from code exercised by reproducible automated experiments.
 
@@ -263,7 +368,7 @@ A key metric is:
 
 > percentage of known original executable behavior covered by a reproducible test.
 
-### 7.4 Semantic coverage
+### 10.4 Semantic coverage
 
 Track understanding, for example:
 
@@ -277,7 +382,7 @@ subsystems understood
 inter-processor interfaces documented
 ```
 
-### 7.5 Behavioral coverage
+### 10.5 Behavioral coverage
 
 Track user-visible and subsystem milestones separately:
 
@@ -296,7 +401,7 @@ No single percentage should be presented as "decompilation complete." Use the di
 
 ---
 
-## 8. Visual verification
+## 11. Visual verification
 
 Visual verification should be staged to avoid brittle tests too early.
 
@@ -316,7 +421,7 @@ Native ports may legitimately diverge in presentation while preserving gameplay 
 
 ---
 
-## 9. Continuous integration
+## 12. Continuous integration
 
 The project should support two CI modes.
 
@@ -334,6 +439,7 @@ build reproduction toolchains where possible
 assembler encoder tests
 unit tests
 integration tests using checked-in legal fixtures
+harness parser/selector/assertion tests
 trace/parser tests
 LCOV capture for native/tooling code
 genhtml report generation
@@ -347,9 +453,10 @@ Expected jobs include:
 
 ```text
 verify ROM hashes against generated MAME manifest
-run pinned MAME
+launch pinned MAME through harness
 replay deterministic experiment
 capture original checkpoint
+retain diagnostics on failure
 run reproduction
 run native port
 compare normalized states
@@ -372,7 +479,7 @@ SKIP  oracle_gameplay   ROM set unavailable
 
 ---
 
-## 10. Regression policy
+## 13. Regression policy
 
 Every verified bug should become a regression test when practical.
 
@@ -380,7 +487,7 @@ When Agent 3 finds a mismatch:
 
 1. capture the smallest reproducible experiment;
 2. classify it as IMPLEMENTATION, UNDERSTANDING, or UNKNOWN;
-3. create/update an evidence-backed fixture;
+3. create/update an evidence-backed fixture or selector if appropriate;
 4. fix the appropriate layer;
 5. keep the test permanently if it represents meaningful behavior.
 
@@ -388,15 +495,17 @@ Do not delete a failing behavioral test merely because the implementation has ch
 
 ---
 
-## 11. Agent responsibilities
+## 14. Agent responsibilities
 
 ### Investigator
 
 - discovers original behavior;
 - creates evidence-backed hypotheses;
+- creates/evolves semantic selectors with provenance;
 - proposes or generates fixtures from original observations;
 - identifies previously unexecuted code and experiments needed to reach it;
 - ensures traces contain enough address information for original execution coverage;
+- promotes repeated observation procedures into reusable harness capabilities where practical;
 - does not alter expected results merely to accommodate implementation behavior.
 
 ### Implementer
@@ -404,11 +513,14 @@ Do not delete a failing behavioral test merely because the implementation has ch
 - builds reproduction and native code against established fixtures;
 - adds normal unit tests for reconstructed modules;
 - enables conventional LCOV-compatible coverage for native/tooling code;
+- consumes the shared replay/checkpoint contracts;
 - does not silently redefine oracle expectations;
 - requests investigation when a verified fixture appears incompatible with the current semantic model.
 
 ### Verifier
 
+- owns the stable harness and target adapters;
+- owns bounded waits, assertions, fixtures, and failure artifact policy;
 - owns differential, integration, golden, and end-to-end verification architecture;
 - owns normalized checkpoint schemas;
 - owns coverage reporting for original behavior;
@@ -418,7 +530,7 @@ Do not delete a failing behavioral test merely because the implementation has ch
 
 ---
 
-## 12. Progress reporting
+## 15. Progress reporting
 
 A useful project report should eventually contain metrics similar to:
 
