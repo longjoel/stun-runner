@@ -103,10 +103,12 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 - Static-listing generation recipe works for all four active programmable processors; generated listings remain local and are hash-recorded in `reference/listings/stunrun.metadata.json`.
 - The native smoke coverage pipeline now emits standard LCOV through GCC/gcov; npm `lcov` is available, while `genhtml` is unavailable, so HTML rendering is not part of this baseline.
 - Deterministic replay schema, bounded frame selector, and machine-readable failure artifacts exist; semantic title/gameplay selectors remain future work.
-- M1 has established an observed ADSP special-I/O path, an ADSP-buffer→GSP FIFO
-  data-flow edge, and clean state snapshots showing ADSP program RAM populated
-  by the frame-600 title boundary. The 68010 writer PC/payload, serial-block
-  semantics, and semantic gameplay selector remain unresolved.
+- M1 has established the active ADSP program writer (`0x02D35C`), its
+  RAM-resident 17-record/2,728-word upload stream, the ADSP-buffer→GSP FIFO
+  block contract, source-mapped control/reset/bank handlers, and the title-path
+  JSA command-byte pairing. Remaining questions are source-buffer ownership,
+  the normalized checkpoint
+  extension, and a semantic gameplay selector.
 
 ## Completed baseline slices
 

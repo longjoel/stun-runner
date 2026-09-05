@@ -10,9 +10,9 @@ import re
 import subprocess
 
 
-WRITE = re.compile(r"M1_ADSP_WRITE kind=([a-z]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) data=([0-9A-Fa-f]+)")
+WRITE = re.compile(r"M1_ADSP_WRITE kind=([a-z_]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) data=([0-9A-Fa-f]+)")
 READ = re.compile(
-    r"M1_ADSP_READ kind=([a-z]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
+    r"M1_ADSP_READ kind=([a-z_]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
     r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
 )
 WINDOWS = {

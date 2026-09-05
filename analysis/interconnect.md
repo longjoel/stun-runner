@@ -131,13 +131,12 @@ not game-level semantics.
 - OBSERVED-IN-TRACE+MAME-CONFIRMED: the 68010 writes the ADSP control window
   73 times in both 600-frame runs, all with zero data. The observed word-offset
   addresses map to LED, `/BR`, `/HALT`, reset, deferred bank, and default-control
-  functions in `hd68k_adsp_control_w`. The no-input run also writes the IRQ
-  clear at `0x818060` twice; coin/start writes it zero times, and neither mode
-  reads the `0x838000–0x83ffff` IRQ-state window. See
+  functions in `hd68k_adsp_control_w`. Both modes also write the IRQ clear at
+  `0x818060` twice, from `0x021426` and `0x02C234`; neither mode reads the
+  `0x838000–0x83ffff` IRQ-state window. See
   `reference/experiments/stunrun/adsp-control-window.metadata.json`.
-- UNKNOWN: whether the input-dependent IRQ-clear difference is a replay-state
-  artifact or a meaningful path distinction, and whether these windows carry
-  additional traffic after a verified gameplay transition.
+- UNKNOWN: whether the IRQ-state read window carries traffic after a verified
+  gameplay transition or is only a modeled/debug status interface.
 - MAME-CONFIRMED: the data special map exposes SIMBUF/SOM/XOUT/GINT and
   object-ROM bank-selection controls; the main CPU also has buffer/control/IRQ
   windows listed above. Runtime ownership and hot offsets remain unresolved.
