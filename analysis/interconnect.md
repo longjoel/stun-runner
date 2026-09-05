@@ -110,6 +110,10 @@ not game-level semantics.
   `0xFFDB64` before invoking the JSA helper. This is the strongest current
   ROM-side command-buffer candidate, but its byte layout and ownership remain
   unresolved.
+- STATIC-CANDIDATE: the 6502 sound listing polls `$280C` at `0x4154`, then
+  consumes a queued byte from `$0235,Y` and writes it to `$2A02` at `0x4161`.
+  These are the strongest current ROM-side sound-consumer landmarks; their
+  exact JSA register mapping remains unresolved.
 - UNKNOWN: command register/queue offsets and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
 

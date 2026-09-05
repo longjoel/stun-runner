@@ -11,6 +11,20 @@
     "read_handler": "atari_jsa_base_device::main_response_r",
     "write_handler": "atari_jsa_base_device::main_command_w"
   },
+  "sound_cpu_static_candidates": [
+    {
+      "pc": "0x4154",
+      "operation": "bit $280c",
+      "context": "the 6502 main loop tests a JSA status/control location before consuming queued data",
+      "confidence": "STATIC-CANDIDATE"
+    },
+    {
+      "pc": "0x4161",
+      "operation": "lda $0235,y; sta $2a02",
+      "context": "the 6502 consumes a byte from a RAM queue and writes it to a JSA device register",
+      "confidence": "STATIC-CANDIDATE"
+    }
+  ],
   "static_candidates": [
     {
       "pc": "0x030170",
