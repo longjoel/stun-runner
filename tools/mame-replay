@@ -129,7 +129,8 @@ def main() -> int:
         command = [
             args.mame, "-rompath", str(args.rompath), "stunrun",
             "-video", "soft", "-sound", "none", "-skip_gameinfo",
-            "-noplugin", "data", "-seconds_to_run", str(seconds),
+            "-noreadconfig", "-nowriteconfig", "-cfg_directory", "/tmp/stunrun-mame-cfg",
+            "-nonvram_save", "-seconds_to_run", str(seconds),
             "-snapname", experiment["id"], "-snapshot_directory", str(args.output),
             "-autoboot_script", str(script),
         ]

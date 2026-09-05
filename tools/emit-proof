@@ -41,7 +41,8 @@ def main() -> int:
     }
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun",
-        "-video", "none", "-sound", "none", "-skip_gameinfo", "-noplugin", "data",
+        "-video", "none", "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save",
         "-debug", "-debugger", "none", "-seconds_to_run", "1",
         "-autoboot_script", str(pathlib.Path(__file__).parent.parent / "mame/lua/emit-validation.lua"),
     ]

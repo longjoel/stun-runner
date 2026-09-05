@@ -34,7 +34,8 @@ STUNRUN_TRACE_FRAMES="$frames" \
 STUNRUN_TRACE_INPUT="$input_mode" \
 SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" \
 "$mame_exe" -rompath "$rompath" stunrun \
-    -video none -sound none -skip_gameinfo -noplugin data \
+    -video none -sound none -skip_gameinfo -noreadconfig -nowriteconfig \
+    -cfg_directory /tmp/stunrun-mame-cfg -nonvram_save \
     -debug -debugger none -seconds_to_run "$(( (frames + 59) / 60 + 1 ))" \
     -autoboot_script "$repo_dir/mame/lua/trace.lua" \
     >"$output/mame.log" 2>&1

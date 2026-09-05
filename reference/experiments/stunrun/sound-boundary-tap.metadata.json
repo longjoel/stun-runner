@@ -6,7 +6,12 @@
   "mame": {
     "version": "0.289 (mame0289-dirty)",
     "executable_sha256": "fcb54790e1837ed653020dc25a4e51d9ba7288d789cf556299d5d4d2cf2f3bc1",
-    "rom_manifest": "roms/stunrun.manifest.json"
+    "rom_manifest": "roms/stunrun.manifest.json",
+    "launch_flags": ["-noreadconfig", "-nowriteconfig", "-cfg_directory", "<mame-cfg>", "-nonvram_save", "-debug", "-debugger", "none"],
+    "nvram_sha256": {
+      "mainpcb_200e": "b25f6677cf5a5e6b90fb83869e327f24ba31f56423f557b5939eb72f9982b30e",
+      "mainpcb_210e": "8429a111eaaec78b12a6ed3d55d87fc34140362204f20ee75f369801f5e34f53"
+    }
   },
   "start": "power_on",
   "terminal_condition": "frame >= 600",
@@ -18,23 +23,25 @@
   "runs": {
     "none": {
       "frames": 600,
-      "result_path": "/tmp/stunrun-m1-sound-boundary-none-repeat/result.json",
-      "result_sha256": "068128d7699f590981cfb251412ca34423243bb4c58fdf08ebad9eef4c8e7d4b",
-      "canonical_log_sha256": "f15b178f5f0defca3d5a82ae6ee7b6914f4f5754fa58281b7b6b979b79b7e830",
-      "event_counts": {"main_command": 0, "main_response": 0, "sound_command": 0, "sound_response": 1},
-      "event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
+      "result_path": "/tmp/stunrun-m1-sound-default-none/result.json",
+      "result_sha256": "95a8d4079454afd4571a6e73e5544ec4ecaec1e7e25e38643f799a41cab3da78",
+      "canonical_log_sha256": "6c9841e0f3bec91d16ce51511c1a6c64de70379f5aa39f690243551512d16f06",
+      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 0, "sound_response": 3},
+      "main_command_event": {"frame": 447, "pc": "0x023ef6", "address": "0x600000", "bus_data": "0x1e1e", "mask": "0xff00", "candidate_byte": "0x1e"},
+      "startup_event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
     },
     "coin_start": {
       "frames": 600,
-      "result_path": "/tmp/stunrun-m1-sound-boundary-coin-latest/result.json",
-      "result_sha256": "de07917e9e8a51f06d5ce66f79338720120985610a267eec642c9d1e97577fae",
-      "canonical_log_sha256": "2cb197408efb4076f578798d69b3f96432ccf542932b2a878b2d9eaff0590227",
-      "event_counts": {"main_command": 0, "main_response": 0, "sound_command": 0, "sound_response": 1},
-      "event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
+      "result_path": "/tmp/stunrun-m1-sound-default-coin/result.json",
+      "result_sha256": "189264eb1176574edb88ea591af7fba40061a2594dcac9f61e7f1ef36f8247de",
+      "canonical_log_sha256": "ca9d9894c8b96f07e803b144f46e73da272356f5ab08c81275a0e41ed7bf1119",
+      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 0, "sound_response": 3},
+      "main_command_event": {"frame": 447, "pc": "0x023ef6", "address": "0x600000", "bus_data": "0x1e1e", "mask": "0xff00", "candidate_byte": "0x1e"},
+      "startup_event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
     }
   },
-  "observation": "The direct 6502 memory tap observes one deterministic startup response write in each independent 600-frame run. No later command/response accesses are exposed through these taps, despite the static and instruction-trace evidence for 68010 accesses to 0x600000. The dynamic main-CPU handler therefore requires a stronger instrumentation path before byte-level command correlation can be claimed.",
-  "confidence": "OBSERVED-IN-TRACE for the 6502 startup write; EXPERIMENT-SETUP-ONLY for absent dynamic-window tap events",
+  "observation": "Clean independent 600-frame runs expose the same eight transport events: one 6502 startup response write, three later 6502 response writes, four main response reads, and one main command write. The command write reports bus data 0x1e1e with mask 0xff00 at ROM PC 0x023ef6; 0x1e is the candidate byte after lane interpretation, not yet a proven sound payload. The Lua tap does not expose a 6502 read at 0x2802, so command-latch consumption and NMI timing remain uncorrelated.",
+  "confidence": "MAME-CONFIRMED transport plus OBSERVED-IN-TRACE main command/response accesses; 6502 command-consumption tap remains unresolved",
   "raw_logs_kept_local": true,
   "next_question": "Instrument the atari_sound_comm callbacks or obtain a MAME build exposing dynamic-handler taps, then correlate command bytes with 6502 NMI consumption."
 }

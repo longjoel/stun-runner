@@ -103,10 +103,10 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 - Static-listing generation recipe works for all four active programmable processors; generated listings remain local and are hash-recorded in `reference/listings/stunrun.metadata.json`.
 - The native smoke coverage pipeline now emits standard LCOV through GCC/gcov; npm `lcov` is available, while `genhtml` is unavailable, so HTML rendering is not part of this baseline.
 - Deterministic replay schema, bounded frame selector, and machine-readable failure artifacts exist; semantic title/gameplay selectors remain future work.
-- M1 has established an observed ADSP special-I/O path and an ADSP-buffer→GSP FIFO
-  data-flow edge in repeatable title-path traces. The 68010 program-window upload
-  question, serial-block semantics, interrupt consumer, and semantic gameplay
-  selector remain unresolved.
+- M1 has established an observed ADSP special-I/O path, an ADSP-buffer→GSP FIFO
+  data-flow edge, and clean state snapshots showing ADSP program RAM populated
+  by the frame-600 title boundary. The 68010 writer PC/payload, serial-block
+  semantics, and semantic gameplay selector remain unresolved.
 
 ## Completed baseline slices
 
@@ -115,7 +115,10 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 - Repeatable runtime inventory: `tools/mame-inventory`.
 - Runtime inventory evidence: `reference/inventory/stunrun.json`.
 - Machine-map reconciliation: `reference/inventory/stunrun.reconciliation.json` (all four active processors present; no unexpected programmable device).
-- Installed-MAME plugin workaround: inventory launches with `-noplugin data` because the packaged data plugin is incompatible with this Lua runtime.
+- Reproducible MAME launchers use `-noreadconfig -nowriteconfig`, an isolated
+  config directory, and `-nonvram_save`; pinned local NVRAM hashes are recorded
+  in `mame/system-baseline.json`, so persisted user DIP/input state cannot
+  contaminate evidence.
 - Deterministic replay: `tools/mame-replay` runs `experiments/stunrun/boot_to_title.json` and `coin_start.json`; repeated boot runs produced identical screenshot hashes.
 - Bounded debugger traces: `tools/mame-trace` and `mame/lua/trace.lua`; six-frame trace metadata is under `reference/traces/stunrun/`.
 - Trace-to-LCOV prototype: `tools/trace-to-lcov`; first standard `.info` report is hash-recorded under `reference/coverage/original/`.

@@ -9,7 +9,7 @@
   "frame": 600,
   "emulated_seconds": 9.96648,
   "script": "mame/lua/checkpoint.lua",
-  "launch": "SDL_VIDEODRIVER=dummy mame -rompath <rompath> stunrun -video soft -sound none -skip_gameinfo -noplugin data -seconds_to_run 10 -snapname title -snapshot_directory <output> -autoboot_script mame/lua/checkpoint.lua",
+  "launch": "SDL_VIDEODRIVER=dummy mame -rompath <rompath> -noreadconfig -nowriteconfig -cfg_directory <mame-cfg> -nonvram_save stunrun -video soft -sound none -skip_gameinfo -seconds_to_run 10 -snapname title -snapshot_directory <output> -autoboot_script mame/lua/checkpoint.lua",
   "selector_status": "OBSERVED-IN-TRACE screenshot shows INSERT 1 COIN title/attract screen; no semantic memory selector has been promoted yet",
   "screenshot": {
     "filename": "title.png",

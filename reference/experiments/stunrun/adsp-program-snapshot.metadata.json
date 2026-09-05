@@ -1,0 +1,49 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "mame_adsp_program_ram_snapshot",
+  "runner": "tools/mame-adsp-program-snapshot",
+  "script": "mame/lua/adsp-program-snapshot.lua",
+  "mame": {
+    "version": "0.289 (mame0289-dirty)",
+    "executable_sha256": "fcb54790e1837ed653020dc25a4e51d9ba7288d789cf556299d5d4d2cf2f3bc1",
+    "rom_manifest": "roms/stunrun.manifest.json",
+    "launch_flags": ["-noreadconfig", "-nowriteconfig", "-cfg_directory", "<mame-cfg>", "-nonvram_save", "-debug", "-debugger", "none"],
+    "nvram_sha256": {
+      "mainpcb_200e": "b25f6677cf5a5e6b90fb83869e327f24ba31f56423f557b5939eb72f9982b30e",
+      "mainpcb_210e": "8429a111eaaec78b12a6ed3d55d87fc34140362204f20ee75f369801f5e34f53"
+    }
+  },
+  "start": "power_on",
+  "terminal_condition": "frame >= 600",
+  "space": {
+    "processor": ":mainpcb:adsp",
+    "name": "program",
+    "range": "0x0000-0x1fff",
+    "read_width": 32,
+    "summary": "count nonzero program-space words and retain the first 16 words"
+  },
+  "runs": {
+    "frame_136": {
+      "frames": 136,
+      "targets": "136",
+      "result_path": "/tmp/stunrun-m1-adsp-snapshot-136/result.json",
+      "result_sha256": "4e5bfda1d538b41dd03ad7a9652deec43802890b4f310b6f98c42f8e5628db89",
+      "canonical_log_sha256": "e384367ed9427066d81a28f65fc71552d9438861a7fda0b3564c8ab6c7f80192"
+    },
+    "frame_600": {
+      "frames": 600,
+      "targets": "600",
+      "result_path": "/tmp/stunrun-m1-adsp-snapshot-600/result.json",
+      "result_sha256": "db5855b5750915f5664029a1567520e6c1ac631d5bf2534d0263a1a361d7d0b3",
+      "canonical_log_sha256": "0d66465bb211767057ff1428f0259c0422677148473f2559a6edef01d3a0a886"
+    }
+  },
+  "snapshots": [
+    {"frame": 136, "pc": "0x000004", "mstat": "0x00000000", "nonzero_words": 0},
+    {"frame": 600, "pc": "0x000014", "mstat": "0x00000000", "nonzero_words": 2718}
+  ],
+  "observation": "With the pinned local NVRAM state and isolated MAME configuration, one bounded run observes empty ADSP program RAM at frame 136 and a second observes 2718 nonzero words at frame 600. This proves title-path population by the frame-600 boundary, while the available Lua instrumentation still does not identify the 68010 writer PC, exact transition frame, or transfer bytes.",
+  "confidence": "OBSERVED-IN-TRACE via repeatable MAME state snapshots; writer identity remains UNKNOWN",
+  "raw_logs_kept_local": true,
+  "next_question": "Capture the 68010 writes with a reliable handler-level tap or instrument hd68k_adsp_program_w in a provenance-matched MAME build."
+}

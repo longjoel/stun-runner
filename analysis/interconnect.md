@@ -73,23 +73,33 @@ not game-level semantics.
 - Two independent 600-frame coin/start runs registered read/write probes for
   the ADSP data window `0x808000–0x80bfff`, but headless MAME did not deliver
   their action callbacks; see `reference/experiments/stunrun/adsp-data-window.metadata.json`.
+- OBSERVED-IN-TRACE (clean state snapshot): a direct read of the ADSP program
+  space is empty at frame 136 and contains 2,718 nonzero words at frame 600.
+  This proves title-path population of the executable ADSP RAM by the canonical
+  title boundary even though the headless watchpoint path does not identify the
+  writer PC or payload. See
+  `reference/experiments/stunrun/adsp-program-snapshot.metadata.json`.
 
 ## Open contracts
 
 ### 68010 ↔ ADSP
 
-- OBSERVED-IN-TRACE: no 68010 writes to the ADSP program window during two
-  bounded 600-frame boot/title runs.
-- UNKNOWN: whether the ADSP program is preloaded, loaded by another path, or
-  populated outside this window.
+- OBSERVED-IN-TRACE: the clean snapshot run shows the ADSP program space empty
+  through frame 122 and populated by frame 136; the program is therefore not
+  simply static zero-filled RAM for the whole title path.
+- UNKNOWN: the exact 68010 writer PCs, transfer bytes, and whether the source
+  is a ROM-side upload loop or another board-side mechanism. The earlier
+  debugger-watchpoint result is setup-only and must not be read as a no-write
+  result.
 - MAME-CONFIRMED: the target has no separate ADSP program-code ROM region.
   The ADSP program map is RAM at `0x0000–0x1fff`, with `0x2000–0x3fff`
   marked `nopr`/ROM? by the driver. The separate 0x60000-byte `user1` region
   is explicitly labeled ADSP object ROM and is accessed through the special
   `SIMBUF/MP` path, not identified as executable program storage.
-- NARROWED UNKNOWN: the title traces do not reach the static 68010 upload
-  routine, so the initial population mechanism for ADSP program RAM remains
-  unknown despite the absence of a listed program ROM region.
+- NARROWED UNKNOWN: the title path populates ADSP program RAM between the
+  frame-122 and frame-136 snapshots, but the static candidate upload loops
+  and their writer-side values remain uncorrelated because handler callbacks
+  are unavailable in installed headless MAME.
 - UNKNOWN: 68010 reads or writes to the ADSP data window during the bounded
   coin/start title-path runs, because the headless watchpoint callback path is
   unavailable.
@@ -187,13 +197,15 @@ The static/runtime GSP search is recorded in
   consumes a queued byte from `$0235,Y` and writes it to `$2A02` at `0x4161`.
   These are the strongest current ROM-side sound-consumer landmarks; their
   exact JSA register mapping remains unresolved.
-- OBSERVED-IN-TRACE (bounded memory-tap probe): independent 600-frame
-  no-input and coin/start runs each expose the same startup 6502 write of
-  `0xFF` to `$2A02` at PC `0x413E`. The probe exposes no later direct 6502
-  command/response accesses and no dynamic 68010-window accesses. This is
-  not evidence that those accesses do not occur: the installed MAME build's
-  Lua taps do not reliably survive or observe the dynamically installed main
-  CPU handler. The result and limitation are recorded in
+- OBSERVED-IN-TRACE (clean bounded memory-tap probe): independent 600-frame
+  no-input and coin/start runs expose the same eight transport events: the
+  startup 6502 write of `0xFF` to `$2A02`, three later 6502 response writes,
+  four main response reads, and one main command write. The command write
+  reports bus data `0x1E1E` with mask `0xFF00` at ROM PC `0x023EF6`; `0x1E` is
+  only the candidate byte after lane interpretation. The tap does not
+  expose a 6502 read at `$2802`, so command-latch consumption and NMI timing
+  remain unresolved; absent tap events are not absence claims. The result and
+  limitation are recorded in
   `reference/experiments/stunrun/sound-boundary-tap.metadata.json`.
 - UNKNOWN: command register/queue offsets and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.

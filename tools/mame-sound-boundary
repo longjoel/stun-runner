@@ -30,7 +30,8 @@ def main() -> int:
     log = args.output / "mame.log"
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
-        "-sound", "none", "-skip_gameinfo", "-noplugin", "data", "-debug",
+        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-debug",
         "-debugger", "none", "-seconds_to_run", str(max(2, (args.frames + 59) // 60 + 1)),
         "-autoboot_script", str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/sound-boundary.lua"),
     ]

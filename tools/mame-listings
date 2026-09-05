@@ -15,7 +15,8 @@ repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
 mkdir -p "$output"
 
 STUNRUN_LISTING_DIR="$output" "$mame_exe" -rompath "$rompath" stunrun \
-    -video none -sound none -skip_gameinfo -noplugin data \
+    -video none -sound none -skip_gameinfo -noreadconfig -nowriteconfig \
+    -cfg_directory /tmp/stunrun-mame-cfg -nonvram_save \
     -debug -debugger none -seconds_to_run 2 \
     -autoboot_script "$repo_dir/mame/lua/listings.lua" \
     >"$output/mame.log" 2>&1

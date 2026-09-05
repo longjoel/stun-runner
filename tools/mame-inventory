@@ -15,7 +15,8 @@ log_file=$(mktemp /tmp/stunrun-inventory.XXXXXX)
 trap 'rm -f "$log_file"' EXIT
 
 "$mame_exe" -rompath "$rompath" stunrun \
-    -video none -sound none -skip_gameinfo -noplugin data \
+    -video none -sound none -skip_gameinfo -noreadconfig -nowriteconfig \
+    -cfg_directory /tmp/stunrun-mame-cfg -nonvram_save \
     -seconds_to_run 2 -autoboot_script "$repo_dir/mame/lua/inventory.lua" \
     >"$log_file" 2>&1
 

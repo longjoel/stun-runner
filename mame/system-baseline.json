@@ -15,7 +15,15 @@
   },
   "launch": {
     "rompath": "<rompath>",
-    "command": "mame -rompath <rompath> stunrun -video none -sound none -skip_gameinfo -seconds_to_run 2"
+    "command": "mame -rompath <rompath> -noreadconfig -nowriteconfig -cfg_directory <mame-cfg> -nonvram_save stunrun -video none -sound none -skip_gameinfo -seconds_to_run 2"
+  },
+  "nvram_baseline": {
+    "source": "local MAME NVRAM directory; contents are not committed",
+    "files": {
+      "mainpcb_200e": "b25f6677cf5a5e6b90fb83869e327f24ba31f56423f557b5939eb72f9982b30e",
+      "mainpcb_210e": "8429a111eaaec78b12a6ed3d55d87fc34140362204f20ee75f369801f5e34f53"
+    },
+    "launch_requirement": "use -nonvram_save with the pinned local NVRAM state"
   },
   "notes": [
     "The installed build identifies itself as dirty and does not expose a git commit.",

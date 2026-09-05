@@ -62,10 +62,14 @@ Agent 2 needs to know which hardware behavior must be reproduced immediately and
 
 ### M1 progress
 
-The first bounded experiment observed no 68010 writes to the MAME-confirmed
-ADSP program window (`0x800000–0x807fff`) across two independent 600-frame
-power-on/title runs. The ADSP data window, interrupt/flag behavior, and program
-source remain open. Repeatable processor traces now establish GSP activity by
+The first bounded debugger experiment could not observe 68010 writes to the
+MAME-confirmed ADSP program window (`0x800000–0x807fff`) because installed
+headless MAME did not deliver its watchpoint callbacks; it must not be read as
+a no-write result. A clean direct ADSP program-space snapshot is empty through
+frame 136 and contains 2,718 nonzero words by frame 600, proving that the
+title path populates executable ADSP RAM by the canonical title boundary. The
+ADSP data window, writer PCs, transfer payload, and program source remain open.
+Repeatable processor traces now establish GSP activity by
 frame 132 and ADSP activity by frame 122, with first non-NOP ADSP execution by
 frame 136. Early GSP accesses include candidate `0xC000...` and `0xF480...`
 control ranges; ADSP startup uses internal `PM(0x1236)` and
