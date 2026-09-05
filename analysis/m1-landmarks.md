@@ -56,13 +56,21 @@ service-mode trace reaches the reset/service polling path at `0x000254` and
 still does not reach any of the six `0x043590` callers. See
 `reference/experiments/stunrun/service-input-trace.metadata.json`.
 
-The `coin_start` replay does reach an in-game road/HUD boundary at frame 600.
-Its trace repeatedly executes `0x020446`, `0x023D98`, `0x0244F0`, and
-`0x02BB14`, which sample the low-byte input or player-button windows, while
-none of the six `0x043590` callers executes. The captured HUD still displays
-`Credits: 0`; this establishes a reproducible gameplay boundary but does not
-yet explain the credit behavior. See
+The `coin_start` replay reaches the same road/demo imagery as the no-input
+replay at frame 600. Its trace repeatedly executes `0x020446`, `0x023D98`,
+`0x0244F0`, and `0x02BB14`, which sample low-byte input or player-button
+windows, while none of the six `0x043590` callers executes. The captured HUD
+still displays `Credits: 0`; because the no-input screenshot is identical, this
+is a reproducible attract/demo boundary, not yet a player-gameplay selector.
+See
 `reference/experiments/stunrun/coin-start-gameplay.metadata.json`.
+
+An early 30-frame Coin 1 pulse followed by Start produces the same result as
+the later two-frame pulse. In the static listing, the only direct references to
+coin bits 7/6 are in the `0x043590` candidate; its six direct callers remain
+absent from all tested boot/title/service/coin-start traces. This narrows the
+credit question without proving that MAME input or game coinage is faulty. See
+`reference/experiments/stunrun/coin-timing-negative.metadata.json`.
 
 ## Low-byte input-handler candidate
 
@@ -86,7 +94,7 @@ of these routines rather than infer credit semantics from the event codes.
 
 ## Next targeted experiment
 
-Use the now-reachable gameplay input routines to compare a coin/start replay
-with a no-input replay and identify the state/credit variables that differ.
-Keep the six-caller `0x043590` path as a separate unresolved branch; do not
-assign input or credit semantics from the listing alone.
+Run controlled coin-pulse timing variants and compare the resulting HUD/state
+before promoting a gameplay selector. Keep the six-caller `0x043590` path as a
+separate unresolved branch; do not assign input or credit semantics from the
+listing alone.

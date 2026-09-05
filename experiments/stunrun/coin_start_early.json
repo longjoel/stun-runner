@@ -1,0 +1,16 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "coin_start_early",
+  "start": "power_on",
+  "events": [
+    {"frame": 1, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "press", "label": "insert coin early"},
+    {"frame": 30, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "release"},
+    {"frame": 300, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "press", "label": "start game"},
+    {"frame": 330, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "release"}
+  ],
+  "expect": {
+    "kind": "frame",
+    "frame": 600,
+    "timeout_frames": 720
+  }
+}

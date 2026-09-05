@@ -1,0 +1,27 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/coin_start_early.json",
+  "runner": "tools/mame-replay",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "frames": 600,
+  "events_applied": 4,
+  "events": [
+    {"frame": 1, "field": "Coin 1", "action": "press"},
+    {"frame": 30, "field": "Coin 1", "action": "release"},
+    {"frame": 300, "field": "1 Player Start", "action": "press"},
+    {"frame": 330, "field": "1 Player Start", "action": "release"}
+  ],
+  "repeated_screenshot_sha256": [
+    "40711892607ea1d9d3bbbd0ac2244d3d4b12324583516b0a901eac87bb7c3655",
+    "40711892607ea1d9d3bbbd0ac2244d3d4b12324583516b0a901eac87bb7c3655"
+  ],
+  "comparison": {
+    "no_input_screenshot_sha256": "40711892607ea1d9d3bbbd0ac2244d3d4b12324583516b0a901eac87bb7c3655",
+    "coin_start_screenshot_sha256": "40711892607ea1d9d3bbbd0ac2244d3d4b12324583516b0a901eac87bb7c3655"
+  },
+  "observation": "An early, longer Coin 1 pulse followed by Start produces the same road/demo image and Credits: 0 HUD as no input and the later coin_start sequence. This does not establish that coins are ignored; the run remains in an unproven attract/demo state.",
+  "confidence": "OBSERVED-IN-REPLAY",
+  "raw_artifacts_kept_local": true,
+  "next_question": "Reach the 0x043590 caller path or another proven credit-state transition before interpreting coin acceptance."
+}

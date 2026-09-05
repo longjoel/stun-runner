@@ -22,9 +22,9 @@
   "screenshot": {
     "path": "/tmp/stunrun-replay-coin/coin_start.png",
     "sha256": "40711892607ea1d9d3bbbd0ac2244d3d4b12324583516b0a901eac87bb7c3655",
-    "observation": "In-game road and HUD are visible at frame 600; the HUD displays Credits: 0."
+    "observation": "Road/demo imagery and HUD are visible at frame 600; the HUD displays Credits: 0. The identical no-input replay image means this is not yet proof of player gameplay."
   },
   "confidence": "OBSERVED-IN-REPLAY+TRACE",
   "raw_artifacts_kept_local": true,
-  "next_question": "Identify the exact gameplay-state variables and determine why the coin event does not produce a nonzero displayed credit count."
+  "next_question": "Determine whether coin acceptance requires a different pulse timing or input path before defining a player-gameplay selector."
 }
