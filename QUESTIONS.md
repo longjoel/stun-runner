@@ -36,7 +36,7 @@ Use shortname `stunrun`, displayed title `S.T.U.N. Runner (rev 6)`, with locally
 
 ## IRQ-0002
 
-Status: OPEN
+Status: PARTIALLY RESOLVED
 From: Project bootstrap
 To: Investigator
 Priority: HIGH
@@ -59,6 +59,13 @@ Identify, to appropriate confidence:
 ### Why it matters
 
 Agent 2 needs to know which hardware behavior must be reproduced immediately and which can initially be treated as an external service.
+
+### M1 progress
+
+The first bounded experiment observed no 68010 writes to the MAME-confirmed
+ADSP program window (`0x800000–0x807fff`) across two independent 600-frame
+power-on/title runs. The ADSP data window, interrupt/flag behavior, and program
+source remain open. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 
 ---
 

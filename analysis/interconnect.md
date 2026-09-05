@@ -16,16 +16,30 @@ not game-level semantics.
 
 ## Observed-in-trace
 
-No M1 interconnect observation has been promoted yet. The six-frame M0 trace
-metadata explicitly records empty GSP/ADSP traces as a bounded observation,
-not proof of inactivity.
+- Two independent 600-frame `adsp_program_upload` runs set a 68010 program-space
+  write watchpoint over `0x800000–0x807fff` and observed zero writes. See
+  `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
+- This narrows the hypothesis: the ADSP program is not dynamically populated by
+  68010 writes during this bounded boot/title path. It does **not** establish
+  that the ADSP is inactive or identify the program's load/source path.
+- The six-frame M0 trace metadata still records empty GSP/ADSP instruction
+  traces as a bounded observation, not proof of inactivity.
+- Two independent 600-frame coin/start runs observed no 68010 reads or writes
+  in the ADSP data window `0x808000–0x80bfff`; see
+  `reference/experiments/stunrun/adsp-data-window.metadata.json`.
 
 ## Open contracts
 
 ### 68010 ↔ ADSP
 
-- UNKNOWN: whether and when the 68010 uploads program words during boot.
-- UNKNOWN: which data-window offsets are commands, status, or shared data.
+- OBSERVED-IN-TRACE: no 68010 writes to the ADSP program window during two
+  bounded 600-frame boot/title runs.
+- UNKNOWN: whether the ADSP program is preloaded, loaded by another path, or
+  populated outside this window.
+- OBSERVED-IN-TRACE: no 68010 reads or writes to the ADSP data window during
+  the bounded coin/start title-path runs.
+- UNKNOWN: which data-window offsets are commands, status, or shared data, and
+  whether access occurs only after a verified gameplay transition.
 - UNKNOWN: interrupt/flag direction and acknowledgement sequence.
 
 ### 68010 ↔ GSP/PSP

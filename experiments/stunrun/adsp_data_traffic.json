@@ -1,0 +1,21 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "adsp_data_traffic",
+  "start": "power_on",
+  "events": [
+    {"frame": 120, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "press"},
+    {"frame": 122, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "release"},
+    {"frame": 300, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "press"},
+    {"frame": 302, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "release"}
+  ],
+  "instrumentation": {
+    "tool": "tools/mame-adsp-window",
+    "window": "0x808000-0x80bfff",
+    "accesses": ["read", "write"],
+    "frames": 600
+  },
+  "expect": {
+    "kind": "bounded_observation",
+    "terminal": "frame >= 600"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/adsp_data_traffic.json",
+  "runner": "tools/mame-adsp-window",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start": "power_on",
+  "terminal_condition": "frame >= 600",
+  "input": "coin_start",
+  "windows": [
+    {
+      "range": "0x808000-0x80bfff",
+      "access": "write",
+      "runs": 2,
+      "observations_each_run": 0,
+      "canonical_log_sha256": "a353890b173ad251eb470ac1c42a12ecc0d8784757b48d50119bfdff7192fb8e"
+    },
+    {
+      "range": "0x808000-0x80bfff",
+      "access": "read",
+      "runs": 2,
+      "observations_each_run": 0,
+      "canonical_log_sha256": "0e3cc257f4c1b778028e7daf54b4b47261c6cd03cdb1226f26428d25ec16f2e7"
+    }
+  ],
+  "observation": "No 68010 reads or writes to the ADSP data window were observed during two independent coin/start runs.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_logs_kept_local": true,
+  "notes": [
+    "The coin/start actions were delivered at frames 120/122 and 300/302.",
+    "This does not establish that the data window is unused outside the bounded title path or identify ADSP-side accesses."
+  ]
+}

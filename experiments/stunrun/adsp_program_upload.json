@@ -1,0 +1,15 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "adsp_program_upload",
+  "start": "power_on",
+  "instrumentation": {
+    "tool": "tools/mame-adsp-window",
+    "window": "0x800000-0x807fff",
+    "access": "68010 writes",
+    "frames": 600
+  },
+  "expect": {
+    "kind": "bounded_observation",
+    "terminal": "frame >= 600"
+  }
+}

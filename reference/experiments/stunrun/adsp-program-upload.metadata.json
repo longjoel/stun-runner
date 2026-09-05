@@ -1,0 +1,26 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/adsp_program_upload.json",
+  "runner": "tools/mame-adsp-window",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start": "power_on",
+  "terminal_condition": "frame >= 600",
+  "watchpoint": {
+    "cpu": ":mainpcb:maincpu",
+    "space": "program",
+    "access": "write",
+    "range": "0x800000-0x807fff"
+  },
+  "runs": 2,
+  "writes_observed_each_run": 0,
+  "distinct_writer_pcs_each_run": [],
+  "canonical_log_sha256": "e0a8a9ad913e736c9bab1bbc6727c61dfa997cc8c21dad763123d50002eb609d",
+  "observation": "No 68010 writes to the ADSP program window were observed during either bounded run.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_logs_kept_local": true,
+  "notes": [
+    "This does not establish that the ADSP program is unused or identify its load source.",
+    "The next experiment targets the ADSP data window and interrupt/flag behavior."
+  ]
+}
