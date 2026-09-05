@@ -46,7 +46,7 @@ This project is intentionally simpler than the ongoing Virtual On effort. It is 
 
 ## Working hardware model
 
-Current Step 0 mining against MAME source revision `a263f49884249c87b18d8b61f007dc24004e450b` indicates:
+The completed M0 runtime inventory and Step 0 mining indicate:
 
 - Atari Multisync A046901 family main board
 - Motorola 68010 main CPU, nominally 8 MHz
@@ -57,7 +57,7 @@ Current Step 0 mining against MAME source revision `a263f49884249c87b18d8b61f007
 
 Importantly, the target-specific MAME config calls `multisync_nomsp(config)`, so the optional second TMS34010 MSP is **not currently part of the active S.T.U.N. Runner processor inventory**.
 
-This remains provisional until the project pins MAME and the runtime harness inventory confirms the exact device configuration.
+The exact runtime tags and active-processor set are recorded under `reference/inventory/`; the installed MAME source-commit limitation is recorded in `mame/system-baseline.json` and `analysis/m0-audit.md`.
 
 ## Primary ROM set
 

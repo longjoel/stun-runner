@@ -2,9 +2,11 @@
 
 ## Current milestone
 
-**M0 — Reproducible machine, harness, evidence, and toolchain baseline**
+**M1 — Machine map**
 
 ## State
+
+M0: **complete** — reproducible machine, harness, evidence, coverage, and emission baseline committed
 
 Original in MAME: **ROM-validated and runtime-inventoried; title checkpoint established**
 
@@ -14,24 +16,18 @@ Reproduction target: **not started**
 
 Native target: **smoke coverage baseline only; implementation not started**
 
-Verification harness: **bounded replay/checkpoint/trace path implemented; semantic selectors remain future work**
+Verification harness: **bounded replay/checkpoint/trace path implemented; M1 will promote machine facts into selectors**
 
-## Immediate objective
+## Immediate objective — M1 machine map
 
-Freeze the specimen and laboratory before interpreting the game broadly:
+Turn the frozen M0 laboratory into an evidence-backed machine/interconnect map without beginning broad decompilation:
 
-1. keep one MAME-supported S.T.U.N. Runner set fixed;
-2. record the installed MAME build and binary hash;
-3. retain the Step 0 machine map against the pinned installed MAME identity, with source-commit availability explicitly recorded;
-4. generate a ROM manifest from pinned MAME containing filenames, regions, sizes, CRC32, SHA-1, and load/interleave semantics;
-5. validate the local ROM set without committing ROM contents;
-6. enumerate debugger-visible CPU/device tags through the harness and reconcile them with the mined machine map;
-7. generate baseline static listings for each **active** programmable processor;
-8. apply driver-mined hardware landmarks and search static XREFs;
-9. establish a deterministic bounded boot-to-title harness experiment;
-10. define the first canonical checkpoint/failure bundle;
-11. prove bounded debugger tracing and trace-to-LCOV;
-12. prove/select code-emission tooling for each active programmable CPU/DSP requiring reconstruction.
+1. Resolve IRQ-0002: map the 68010↔ADSP program/data windows, mailbox/status behavior, and reset/interrupt flow.
+2. Resolve IRQ-0003: define the smallest normalized checkpoint schema for original, reproduction, and native targets.
+3. Run bounded experiments for ADSP upload traffic, ADSP data traffic, input polling, and sound commands.
+4. Record exact runtime memory spaces, writer PCs, reader/writer processors, and observed state transitions.
+5. Create `analysis/interconnect.md` with confidence labels and evidence links.
+6. Promote only justified machine-state selectors into the replay contract.
 
 The first useful output is not decompiled C. It is a repeatable laboratory plus a box of provenance-labeled puzzle pieces.
 
@@ -65,11 +61,11 @@ From the worked driver-mining example:
 
 These are hardware-interface labels, not yet gameplay semantics.
 
-## First handoff
+## M1 handoff
 
 ### Investigator
 
-Refresh Step 0 against pinned MAME, then establish:
+Use the committed M0 artifacts as inputs, then establish:
 
 - exact target shortname/revision;
 - exact MAME build/version/commit;
@@ -78,12 +74,12 @@ Refresh Step 0 against pinned MAME, then establish:
 - static listings;
 - XREFs to driver-mined address landmarks;
 - bounded boot/title experiment;
-- initial `analysis/interconnect.md` observations;
+- `analysis/interconnect.md` observations;
 - first experiments from `analysis/driver-mining/stunrun.md`.
 
 ### Implementer
 
-Avoid broad game implementation until M0 baseline exists.
+Avoid broad game implementation until M1 identifies a verified slice and its machine contract.
 
 Prove minimal replacement-code generation independently for the active targets:
 
@@ -96,18 +92,18 @@ Do not build an MSP toolchain unless pinned runtime inventory demonstrates an MS
 
 ### Verifier
 
-Implement the harness/checkpoint path described in `MAME_HARNESS.md` and reconcile runtime inventory against the Step 0 machine map.
+Extend the M0 harness with targeted memory/interrupt telemetry and the normalized checkpoint schema from IRQ-0003.
 
 The first oracle pipeline should support deterministic launch/input, bounded waits, checkpoint capture, deliberate failure artifacts, bounded tracing, and original-code LCOV generation.
 
 ## Current blockers
 
-- Step 0 example has not yet been refreshed against the final pinned revision.
+- M0 is complete; the installed package's unavailable upstream source commit remains documented in `analysis/m0-audit.md`.
 - Installed MAME reports `0.289 (mame0289-dirty)` and exposes no source commit; its binary hash is recorded in `mame/system-baseline.json`.
 - Static-listing generation recipe works for all four active programmable processors; generated listings remain local and are hash-recorded in `reference/listings/stunrun.metadata.json`.
 - The native smoke coverage pipeline now emits standard LCOV through GCC/gcov; npm `lcov` is available, while `genhtml` is unavailable, so HTML rendering is not part of this baseline.
 - Deterministic replay schema, bounded frame selector, and machine-readable failure artifacts exist; semantic title/gameplay selectors remain future work.
-- Full M0 gate review is recorded in `analysis/m0-audit.md`; source-commit provenance remains an explicit installed-package limitation.
+- M1 has not yet established the 68010↔ADSP interconnect or a semantic gameplay selector.
 
 ## Completed baseline slices
 
