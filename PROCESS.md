@@ -82,16 +82,22 @@ analysis/
   memory-map.md
   functions.md
   state-machine.md
+  interconnect.md
   unknowns.md
 asm/
   annotated/
-evidence/
+reference/
+  listings/
   traces/
   snapshots/
   experiments/
+  maps/
+  checkpoints/
 symbols/
   symbols.yaml
 ```
+
+`reference/` is the raw/regenerable evidence root. Raw evidence must not be edited to match an interpretation. Derived annotations, semantic names, hypotheses, and explanations belong under `analysis/`, `asm/`, or `symbols/`.
 
 Create directories only when useful; do not manufacture empty structure for appearance.
 
@@ -181,7 +187,7 @@ The native port asks:
 
 ## Rules
 
-1. Read `PROJECT.md`, `STATUS.md`, `MILESTONES.md`, and `QUESTIONS.md` before changing code.
+1. Read `AGENTS.md` first, then the contracts it requires.
 2. Keep changes small and runnable.
 3. Do not invent semantics silently.
 4. If the semantic model is ambiguous, submit an investigation request.
@@ -223,7 +229,7 @@ Where practical, compare:
 
 ## Scripted inputs
 
-Prefer identical deterministic input sequences against original, reproduction, and native targets.
+Prefer identical deterministic input sequences against original, reproduction, and native targets through the common replay/harness contract.
 
 Example:
 
@@ -320,7 +326,9 @@ Useful experiments include:
 - capture repeated traces with one input changed;
 - compare before/after snapshots around one event.
 
-Record useful experiments under `evidence/experiments/` or the closest existing evidence artifact.
+Record useful raw experiment output under `reference/experiments/`. Record the interpretation, conclusion, confidence, and links back to the raw experiment under `analysis/` or the relevant semantic artifact.
+
+Repeated emulator interactions should be captured as reusable MAME harness capabilities or experiment specifications rather than undocumented manual debugger rituals. See `MAME_HARNESS.md` and `MAME_INSTRUMENTATION.md`.
 
 ---
 
@@ -348,6 +356,8 @@ clean up code
 
 Prefer vertical slices that increase the amount of runnable, observable behavior available to all agents.
 
+M0 is intentionally broader than a boot trace: it is the reproducible machine/harness/evidence/toolchain preflight gate defined in `MILESTONES.md` and `PREFLIGHT.md`.
+
 ---
 
 # Definition of done for a subsystem
@@ -365,20 +375,19 @@ A subsystem is considered reconstructed when:
 
 # Startup instructions for every agent
 
-At the beginning of a work session:
+`AGENTS.md` is the canonical session entry point. At the beginning of a work session:
 
-1. Read this file.
-2. Read `PROJECT.md`.
-3. Read `STATUS.md`.
-4. Read `MILESTONES.md`.
-5. Read `QUESTIONS.md`.
-6. Inspect recent project evidence and commits relevant to the current milestone.
-7. Work only within your role's ownership boundary unless explicitly coordinating a handoff.
-8. Leave the repository in a state the next agent can understand without relying on your chat history.
+1. Read `AGENTS.md`.
+2. Read each project contract it requires in the listed order.
+3. Inspect `STATUS.md`, `MILESTONES.md`, `QUESTIONS.md`, and recent evidence/commits relevant to the current task.
+4. State the active role and bounded objective.
+5. Prefer the reusable MAME harness for emulator interaction.
+6. Work only within the role's ownership boundary unless explicitly coordinating a handoff.
+7. Leave persistent commands, tests, evidence, and project-state updates so the next agent does not depend on hidden chat context.
 
 ## Investigator kickoff
 
-You are **Agent 1 — Investigator**. Your job is to convert raw MAME and machine-level evidence into an evidence-backed semantic model. Focus first on the current milestone in `STATUS.md`. Preserve uncertainty. Prefer experiments over guesses. Do not implement the reconstruction for Agent 2.
+You are **Agent 1 — Investigator**. Your job is to convert raw MAME and machine-level evidence into an evidence-backed semantic model. Focus first on the current milestone in `STATUS.md`. Preserve uncertainty. Prefer reproducible harness experiments over guesses. Do not implement the reconstruction for Agent 2.
 
 ## Implementer kickoff
 
@@ -386,7 +395,7 @@ You are **Agent 2 — Implementer**. Your job is to maintain both the reproducti
 
 ## Verifier kickoff
 
-You are **Agent 3 — Verifier**. Your job is to independently compare original, reproduction, and native behavior. Build repeatable tests and checkpoints. Classify discrepancies as `IMPLEMENTATION`, `UNDERSTANDING`, or `UNKNOWN`. Do not silently repair failures. Focus first on proving or disproving the current milestone in `STATUS.md`.
+You are **Agent 3 — Verifier**. Your job is to independently compare original, reproduction, and native behavior. Build repeatable harness-driven tests and checkpoints. Classify discrepancies as `IMPLEMENTATION`, `UNDERSTANDING`, or `UNKNOWN`. Do not silently repair failures. Focus first on proving or disproving the current milestone in `STATUS.md`.
 
 ---
 
