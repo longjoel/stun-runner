@@ -12,6 +12,16 @@ local events = input_mode == 'coin_start' and {
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
     {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start'}
+} or input_mode == 'coin2_start' and {
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 2', press = true},
+    {frame = 150, port = ':mainpcb:IN0', field = 'Coin 2'},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
+    {frame = 330, port = ':mainpcb:a80000', field = '1 Player Start'}
+} or input_mode == 'coin2_early' and {
+    {frame = 1, port = ':mainpcb:IN0', field = 'Coin 2', press = true},
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 2'},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
+    {frame = 330, port = ':mainpcb:a80000', field = '1 Player Start'}
 } or {}
 local next_event = 1
 
