@@ -1,0 +1,30 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "processor_startup_landmarks",
+  "source_metadata": "reference/experiments/stunrun/processor-trace-600.metadata.json",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "observations": {
+    "gsp": {
+      "trace_sha256": "4d2cc5f7151025352796fb4bb887ac66b2b7144f055d3fd0151206aa593096a0",
+      "first_pc": "0xFFF59920",
+      "candidate_control_accesses": [
+        "0xC0000080", "0xC0000090", "0xC00000A0", "0xC00000B0",
+        "0xC0000110", "0xC0000120", "0xC0000130", "0xC0000140",
+        "0xC0000150", "0xC0000160", "0xF4800010", "0xF4800020",
+        "0xF4800030", "0xF4800090", "0xF48000A0", "0xF48000B0"
+      ],
+      "interpretation": "Candidate GSP control/communication accesses observed in the instruction trace; register semantics are unresolved."
+    },
+    "adsp": {
+      "trace_sha256": "f9283a743811d45de55a19019ad2c408df0de399a9bbcfd2462c8ef2d4849cda",
+      "first_non_nop_pc": "0x0004",
+      "initial_calls": ["0x0780", "0x0834"],
+      "initial_internal_memory_operations": ["PM(0x1236)", "DM(0x0955)", "DM(0x0956)", "DM(0x0959)", "DM(0x095A)"],
+      "interpretation": "The ADSP executes an internal initialization sequence in the bounded trace; this does not identify the 68010-visible program/data-window transfer path."
+    }
+  },
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_traces_kept_local": true,
+  "next_question": "Correlate the first GSP control accesses and ADSP initialization with 68010 trace PCs or interrupt acknowledgements."
+}

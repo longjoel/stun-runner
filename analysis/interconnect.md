@@ -51,6 +51,10 @@ not game-level semantics.
   unavailable.
 - UNKNOWN: which data-window offsets are commands, status, or shared data, and
   whether access occurs only after a verified gameplay transition.
+- OBSERVED-IN-TRACE: the ADSP executes an internal startup sequence beginning
+  with `0x0004: CALL $0780` and `0x0005: CALL $0834`; the captured operations
+  include internal `PM(0x1236)` and `DM(0x0955–0x095A)` accesses. This is not
+  evidence of a 68010-visible transfer.
 
 ### 68010 input/status path
 
@@ -72,7 +76,10 @@ not game-level semantics.
 
 ### 68010 ↔ GSP/PSP
 
-- UNKNOWN: first runtime GSP execution boundary for the title/start path.
+- OBSERVED-IN-TRACE: GSP execution begins by frame 132 in the bounded probe;
+  early instructions access candidate control locations in the `0xC000...`
+  and `0xF480...` ranges. Register semantics and the 68010 submission path are
+  unresolved.
 - UNKNOWN: command submission region and synchronization mechanism.
 
 ### 68010 ↔ JSA sound board
