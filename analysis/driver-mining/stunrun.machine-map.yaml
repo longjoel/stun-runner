@@ -231,6 +231,18 @@ relationships:
     evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     mame_hint: sound_int_write_line
     observed_contract: JSA callback -> main CPU IRQ 4 -> 0x023f24 handler -> 0x023f66 reads 0x600000 response -> RTE
+  - from: maincpu
+    to: jsa2
+    kind: command_latch_to_sound_nmi
+    evidence: MAME-CONFIRMED plus STATIC-CANDIDATE
+    mame_hint: main_command_w -> atari_sound_comm delayed command latch -> 6502 NMI; JSA-II command read at 0x2802
+    candidate_rom_pc: 0x023ef6 writes 0x600000
+  - from: jsa2
+    to: soundcpu
+    kind: response_latch_to_main_irq
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
+    mame_hint: sound_response_w at 0x2a02 -> sound_int_write_line -> main CPU IRQ4; main response read at 0x600000 clears it
+    candidate_rom_pc: 0x4161 writes 0x2a02
 
 initialization:
   - call: init_multisync(0)

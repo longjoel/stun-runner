@@ -173,6 +173,16 @@ The static/runtime GSP search is recorded in
   response-interrupt edge, but not the 6502 command payload or the cause of
   the two observed events. See
   `reference/experiments/stunrun/sound-handler-search.metadata.json`.
+- MAME-CONFIRMED TRANSPORT: the 68010 `0x600000` write path enters
+  `main_command_w`, which schedules a delayed command latch and asserts the
+  JSA 6502 NMI; the JSA-II sound CPU reads that command at `$2802` through
+  `sound_command_r`. In the reverse direction, a 6502 write to `$2A02`
+  through `sound_response_w` schedules a delayed response latch, invokes the
+  main interrupt callback, and produces the observed main IRQ4; the 68010
+  reads and clears that response through `main_response_r` at `0x600000`.
+  This establishes the emulator transport contract, while ROM-side byte
+  pairing and exact acknowledgement semantics remain unresolved. See
+  `reference/experiments/stunrun/sound-handler-search.metadata.json`.
 - STATIC-CANDIDATE: the 6502 sound listing polls `$280C` at `0x4154`, then
   consumes a queued byte from `$0235,Y` and writes it to `$2A02` at `0x4161`.
   These are the strongest current ROM-side sound-consumer landmarks; their

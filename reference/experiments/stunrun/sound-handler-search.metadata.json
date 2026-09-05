@@ -11,6 +11,15 @@
     "read_handler": "atari_jsa_base_device::main_response_r",
     "write_handler": "atari_jsa_base_device::main_command_w"
   },
+  "mame_transport_contract": {
+    "source": [
+      "third_party/mame-master/src/mame/atari/atariscom.cpp",
+      "third_party/mame-master/src/mame/atari/atarijsa.cpp"
+    ],
+    "main_to_sound": "68010 main_command_w schedules a delayed command-latch write; the latch asserts the JSA 6502 NMI, and JSA-II sound_command_r reads and clears that pending command at 0x2802.",
+    "sound_to_main": "JSA-II sound_response_w at 0x2a02 schedules a delayed response-latch write; the sound interrupt callback asserts main IRQ4, and main_response_r at 0x600000 reads and clears the pending response.",
+    "confidence": "MAME-CONFIRMED transport model; ROM-side byte pairing remains unresolved"
+  },
   "sound_cpu_static_candidates": [
     {
       "pc": "0x4154",
