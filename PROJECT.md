@@ -11,11 +11,12 @@ MAME is the behavioral reference implementation and laboratory environment.
 
 ## Project contracts
 
-The project is governed by four complementary documents:
+The project is governed by five complementary documents:
 
 - `PROCESS.md` — three-agent reverse-engineering method and ownership boundaries
 - `REQUIREMENTS.md` — hardware inventory, ROM manifest policy, pinned-MAME requirements, and compiler/assembler acceptance rules
 - `EVIDENCE.md` — static listing, trace, snapshot, deterministic-input, and canonical-checkpoint rules
+- `TESTING.md` — unit, integration, differential, end-to-end, regression, CI, fixture, and coverage strategy
 - `AGENTS.md` — mandatory entry point and current instructions for every agent session
 
 Agents must read these before broad implementation work.
@@ -58,6 +59,40 @@ The project distinguishes three classes of artifact:
 
 Raw evidence is never edited to match an interpretation. See `EVIDENCE.md`.
 
+## Testing philosophy
+
+Treat this like a conventional software project with an unusual oracle: the original game under pinned MAME.
+
+The desired chain is:
+
+```text
+original behavior
+      ↓
+reproducible experiment
+      ↓
+evidence-backed fixture
+      ↓
+semantic understanding
+      ↓
+reproduction implementation
+      ↓
+native implementation
+      ↓
+independent verification
+```
+
+Progress should be protected by:
+
+- unit tests for reconstructed routines and tools;
+- integration tests for CPU/DSP/device boundaries;
+- deterministic end-to-end replay;
+- golden fixtures derived from original behavior;
+- permanent regression tests for meaningful mismatches;
+- public CI that does not require commercial ROMs;
+- optional ROM-dependent oracle verification where valid ROMs are available locally.
+
+Coverage is multidimensional. Track native source coverage, original execution coverage, tested-original execution coverage, semantic coverage, and behavioral milestone coverage separately. Do not collapse them into one misleading percentage.
+
 ## Initial research questions
 
 1. What exact MAME machine/board configuration is selected for the chosen S.T.U.N. Runner set?
@@ -71,6 +106,9 @@ Raw evidence is never edited to match an interpretation. See `EVIDENCE.md`.
 9. What state can Agent 3 snapshot cheaply and deterministically at reset, title, game start, and first gameplay frame?
 10. What assembler/encoder strategy will reproducibly emit replacement code for the TMS34010 and ADSP-2100?
 11. How do the 68010, GSP/MSP, ADSP, and JSA sound CPU communicate, and which shared-memory/mailbox boundaries can become explicit subsystem contracts?
+12. Which original routines can first be reduced into fast deterministic unit-test fixtures?
+13. What is the first normalized checkpoint schema shared by original, reproduction, and native targets?
+14. How should original execution coverage be computed and visualized per processor?
 
 ## Repository policy
 
@@ -81,6 +119,8 @@ Raw evidence is never edited to match an interpretation. See `EVIDENCE.md`.
 - Keep semantic annotations distinct from implementation guesses.
 - Treat each processor as a separate program initially and document cross-processor behavior in `analysis/interconnect.md`.
 - Prefer tiny verified slices over broad translation passes.
+- Preserve meaningful regression tests permanently.
+- Never change an oracle-derived expected value solely because reconstructed code disagrees with it.
 
 ## Expected working areas
 
@@ -92,13 +132,25 @@ mame/scripts/   reproducible debugger scripts
 roms/           hash manifests only; no commercial ROM contents
 reproduction/   original-hardware/emulator-targeted reconstruction
 native/         Linux-native implementation
-tools/          trace, compare, manifest, extraction, and build helpers
-tests/          differential and behavioral tests
+tools/          trace, compare, manifest, extraction, fixture, coverage, and build helpers
+tests/          unit, integration, differential, golden, and E2E tests
 symbols/        machine-readable labels and confidence metadata
 ```
 
 ## Success criterion
 
-The project succeeds when increasingly large slices of S.T.U.N. Runner can be observed, explained, reproduced in the original environment, expressed natively on Linux, and automatically checked against the original behavior.
+The project succeeds when increasingly large slices of S.T.U.N. Runner can be:
 
-The project should also leave behind a reusable method: a new arcade target should be bootstrappable by changing the machine/ROM/toolchain contract while retaining the same evidence and three-agent workflow.
+1. observed in the original;
+2. reproducibly exercised;
+3. semantically explained;
+4. reconstructed in the original environment;
+5. expressed natively on Linux;
+6. independently checked against the original;
+7. protected by repeatable regression tests.
+
+The most meaningful long-term metric is:
+
+> How much of the original game's behavior is understood, reproducibly exercised, reconstructed, and independently verified?
+
+The project should also leave behind a reusable method: a new arcade target should be bootstrappable by changing the machine/ROM/toolchain contract while retaining the same evidence, testing, and three-agent workflow.
