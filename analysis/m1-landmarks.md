@@ -56,14 +56,16 @@ in `reference/experiments/stunrun/input-differential.metadata.json`.
 
 At `0x043590`, a static routine initializes `A0 = 0x60c001`, samples bits 7
 and 6 for coin inputs, samples bits 1/0/2 from `0xa80001`, debounces against
-`$ffff8014`, and returns distinct event codes. No direct `jsr $43590` appears
-in the listing, and the routine is absent from both the 600-frame and
-1200-frame normal coin-start traces. This is a strong static candidate for an
-input event scanner, not yet a runtime-proven credit handler. See
+`$ffff8014`, and returns distinct event codes. Six direct callers enter at
+`0x042666`, `0x0427FE`, `0x0429EA`, `0x042B02`, `0x042ED2`, and `0x043744`.
+The routine is absent from both the 600-frame and 1200-frame normal coin-start
+traces. This is a strong static candidate for an input event scanner, not yet
+a runtime-proven credit handler. See
 `reference/experiments/stunrun/input-handler-search.metadata.json`.
 
 ## Next targeted experiment
 
-Locate the indirect caller/table for `0x043590`, then run a bounded trace from
-that caller. Keep the ADSP transfer and gameplay-state experiments separate;
-do not assign semantics from the listing alone.
+Run a bounded trace that reaches one of the six callers, starting with the
+caller family around `0x042666–0x043744`. Keep the ADSP transfer and
+gameplay-state experiments separate; do not assign semantics from the listing
+alone.

@@ -12,12 +12,13 @@
     "Button bits 1, 0, and 2 are sampled from 0xa80001.",
     "The routine uses a timer/reference value at 0xffff8014 and returns event codes including 0x01, 0x02, 0x10, 0x20, 0x40, and 0x80."
   ],
-  "direct_callers_found": 0,
+  "direct_callers_found": 6,
+  "direct_callers": ["0x042666", "0x0427FE", "0x0429EA", "0x042B02", "0x042ED2", "0x043744"],
   "runtime_searches": [
     {"frames": 600, "input": "coin_start", "trace_sha256": "a7d8ba57a4395eaaa3a002996a95b16b9c3761deaee039dcec837b0f9a81c7e0", "entry_observed": false},
     {"frames": 1200, "input": "coin_start", "trace_sha256": "db28580656b614db6d2f60b20eafe8284c40527e820177254795a1a58040946a", "entry_observed": false}
   ],
   "confidence": "STATIC-CANDIDATE",
   "raw_traces_kept_local": true,
-  "next_question": "Locate the indirect caller or dispatch table for 0x043590 before assigning credit/control semantics."
+  "next_question": "Determine which of the six direct callers is reached by the normal gameplay/start path before assigning credit/control semantics."
 }
