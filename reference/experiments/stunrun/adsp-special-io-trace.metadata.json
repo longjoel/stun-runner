@@ -65,6 +65,24 @@
       "claim": "OBSERVED-IN-TRACE: GINT is issued between an internal request marker and a polling loop. The trace does not establish the external interrupt consumer or the value of AX0."
     }
   ],
+  "maincpu_irq2_ack_correlation": {
+    "mame_source": "harddriv_m.cpp: update_interrupts() routes m_adsp_irq_state to main CPU input line 2; harddriv_m.cpp: ADSP GINT sets m_adsp_irq_state; hd68k_adsp_irq_clear_w clears it",
+    "none": {
+      "irq2_entries": 30,
+      "handler_entries": 30,
+      "handler_pc": "0x0213fe",
+      "clear_pc": "0x021402",
+      "post_clear_pcs": ["0x021408", "0x02140e", "0x021418"]
+    },
+    "coin_start": {
+      "irq2_entries": 30,
+      "handler_entries": 30,
+      "handler_pc": "0x0213fe",
+      "clear_pc": "0x021402",
+      "post_clear_pcs": ["0x021408", "0x02140e", "0x021418"]
+    },
+    "interpretation": "The 30 ADSP DM($2006) writes and 30 main-CPU IRQ 2 entries have matching counts in both bounded traces. Every IRQ 2 entry runs the 68010 handler at 0x0213fe, clears 0x818060 at 0x021402, performs the handler body, and returns with RTE at 0x021418. Together with the MAME wiring, this resolves the ADSP-GINT -> main-CPU IRQ2 -> 68010 acknowledgement edge for the observed title path."
+  },
   "interpretation": "OBSERVED-IN-TRACE: the ADSP executes SIMBUF, SIMCLK, SOMLATCH, SOMCLK, GINT, and MP special-data accesses in both bounded 600-frame traces. No DM($2004) or DM($2005) instruction is observed. Equal aggregate counts do not imply equal values or producer-side state; the full traces remain input-differential.",
   "runtime_status": "ADSP special-data access landmarks are instruction-trace observed; handler-side values and exact serial/object semantics remain unresolved",
   "confidence": "MAME-CONFIRMED-MAP plus OBSERVED-IN-TRACE"

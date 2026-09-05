@@ -61,6 +61,15 @@ not game-level semantics.
   Separately, PCs `0x004A–0x004F` write `GINT` and poll an internal marker.
   These are literal producer-side protocol candidates; their values and
   external consumer semantics remain unresolved.
+- RESOLVED FOR TITLE PATH: each bounded trace contains 30 ADSP `GINT`
+  writes and 30 main-CPU `IRQ 2` entries. Every `IRQ 2` entry enters the
+  handler at `0x0213FE`, clears the ADSP interrupt window at `0x818060` from
+  `0x021402`, executes the handler body, and returns at `0x021418`. MAME's
+  `update_interrupts()` routes `m_adsp_irq_state` to main-CPU line 2, while
+  `GINT` sets that state and the clear handler resets it. This resolves the
+  observed ADSP `GINT → 68010 IRQ2 → acknowledgement` edge; it does not
+  resolve the serial-block payload semantics. See
+  `reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
 - Two independent 600-frame coin/start runs registered read/write probes for
   the ADSP data window `0x808000–0x80bfff`, but headless MAME did not deliver
   their action callbacks; see `reference/experiments/stunrun/adsp-data-window.metadata.json`.

@@ -74,6 +74,14 @@ program upload or mailbox contract. See
 `reference/experiments/stunrun/processor-startup-landmarks.metadata.json` and
 `analysis/interconnect.md`.
 
+The ADSP interrupt edge is now resolved for the observed title path: both
+independent 600-frame traces contain 30 ADSP `GINT` writes, 30 main-CPU IRQ 2
+entries, and 30 executions of the 68010 handler that clears `0x818060` and
+returns with `RTE`. MAME's `update_interrupts()` confirms that ADSP IRQ state
+drives main-CPU line 2. The remaining IRQ-0002 work is the program source,
+serial payload semantics, and the unresolved gameplay boundary. See
+`reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
+
 ---
 
 ## IRQ-0003
