@@ -187,6 +187,14 @@ The static/runtime GSP search is recorded in
   consumes a queued byte from `$0235,Y` and writes it to `$2A02` at `0x4161`.
   These are the strongest current ROM-side sound-consumer landmarks; their
   exact JSA register mapping remains unresolved.
+- OBSERVED-IN-TRACE (bounded memory-tap probe): independent 600-frame
+  no-input and coin/start runs each expose the same startup 6502 write of
+  `0xFF` to `$2A02` at PC `0x413E`. The probe exposes no later direct 6502
+  command/response accesses and no dynamic 68010-window accesses. This is
+  not evidence that those accesses do not occur: the installed MAME build's
+  Lua taps do not reliably survive or observe the dynamically installed main
+  CPU handler. The result and limitation are recorded in
+  `reference/experiments/stunrun/sound-boundary-tap.metadata.json`.
 - UNKNOWN: command register/queue offsets and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
 
