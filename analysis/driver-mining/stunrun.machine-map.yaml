@@ -1,0 +1,159 @@
+schema: 1
+target: stunrun
+status: source-mining-example
+mame:
+  source_commit: a263f49884249c87b18d8b61f007dc24004e450b
+  canonical_project_revision: null
+  files:
+    - src/mame/atari/harddriv.cpp
+    - src/mame/atari/harddriv.h
+    - src/mame/atari/harddriv_m.cpp
+    - src/mame/atari/harddriv_v.cpp
+
+processors:
+  - id: maincpu
+    type: m68010
+    role_hint: main_cpu
+    evidence: MAME-CONFIRMED
+    canonical_device_tag: null
+  - id: gsp
+    type: tms34010
+    role_hint: graphics_signal_processor
+    evidence: MAME-CONFIRMED
+    canonical_device_tag: null
+  - id: adsp
+    type: adsp2100
+    role_hint: math_geometry_dsp
+    evidence: MAME-CONFIRMED
+    canonical_device_tag: null
+  - id: soundcpu
+    type: 6502-class
+    role_hint: jsa_ii_sound_cpu
+    evidence: MAME-CONFIRMED
+    canonical_device_tag: null
+
+excluded_optional_processors:
+  - id: msp
+    type: tms34010
+    reason: target configuration calls multisync_nomsp(config)
+    evidence: MAME-CONFIRMED
+
+non_cpu_devices:
+  - id: psp
+    type: tms34012
+    role_hint: pixel_processor_or_expander
+    evidence: MAME-CONFIRMED
+    software_target: false
+  - id: jsa2
+    type: atari_jsa_ii
+    role_hint: sound_board
+    evidence: MAME-CONFIRMED
+
+rom_regions:
+  - name: main_program
+    tag: mainpcb:maincpu
+    size: 0x100000
+    processor: maincpu
+    evidence: MAME-CONFIRMED
+    notes:
+      - 68010 ROMs are loaded byte-interleaved
+    sample_loads:
+      - filename: 136070-2102.200r
+        offset: 0x000000
+        size: 0x010000
+        crc32: e0ed54d8
+        sha1: 15850568d8308b6499cbe55b5d8308041d906a29
+      - filename: 136070-2101.210r
+        offset: 0x000001
+        size: 0x010000
+        crc32: 3008bcf8
+        sha1: 9d3a20b639969bab68441f76467ed60e395c10e3
+
+regions:
+  - name: main_input_in0
+    processor: maincpu
+    start: 0x60c000
+    end: 0x60c001
+    access: read
+    evidence: MAME-CONFIRMED
+    candidate_selector: input.in0
+    notes:
+      - input-port definition documents IN0 at 0x60c000
+      - bit 0x01 is diagnostic jumper in mined source revision
+
+  - name: adsp_program_window
+    processor: maincpu
+    start: 0x800000
+    end: 0x807fff
+    access: rw
+    evidence: MAME-CONFIRMED
+    candidate_selector: adsp.program
+    mame_handlers:
+      - hd68k_adsp_program_r
+      - hd68k_adsp_program_w
+
+  - name: adsp_data_window
+    processor: maincpu
+    start: 0x808000
+    end: 0x80bfff
+    access: rw
+    evidence: MAME-CONFIRMED
+    candidate_selector: adsp.data
+    mame_handlers:
+      - hd68k_adsp_data_r
+      - hd68k_adsp_data_w
+
+  - name: adc_12bit_channel_3_landmark
+    processor: maincpu
+    start: 0xb80000
+    end: 0xb80001
+    access: read
+    evidence: MAME-CONFIRMED
+    candidate_selector: input.adc12.ch3
+    notes:
+      - address comes from MAME input-port comment and must be confirmed against canonical runtime map
+
+relationships:
+  - from: jsa2
+    to: maincpu
+    kind: interrupt_callback
+    evidence: MAME-CONFIRMED
+    mame_hint: sound_int_write_line
+
+initialization:
+  - call: init_multisync(0)
+    evidence: MAME-CONFIRMED
+  - call: init_adsp()
+    evidence: MAME-CONFIRMED
+  - call: multisync_nomsp(config)
+    evidence: MAME-CONFIRMED
+
+candidate_experiments:
+  - id: DM-EXP-001
+    name: adsp_upload
+    watch_region: adsp_program_window
+    start: power_on
+    stop: title_checkpoint
+    goal: identify main-CPU DSP upload writers and dump runtime ADSP program image
+  - id: DM-EXP-002
+    name: adsp_data_traffic
+    watch_region: adsp_data_window
+    mode: change-only
+    goal: locate command status and shared-data hot spots
+  - id: DM-EXP-003
+    name: main_input_xref
+    landmark: main_input_in0
+    goal: identify digital input polling and normalization path
+  - id: DM-EXP-004
+    name: adc_differential
+    landmark: adc_12bit_channel_3_landmark
+    goal: correlate physical analog inputs with CPU-visible values and reader PCs
+  - id: DM-EXP-005
+    name: sound_command_boundary
+    goal: identify 68010-to-JSA command and acknowledgement protocol
+
+assumption_conflicts:
+  - id: DM-0001
+    assumption: S.T.U.N. Runner actively uses a second TMS34010 MSP
+    evidence: target configuration calls multisync_nomsp(config)
+    resolution: exclude MSP unless canonical pinned-MAME runtime inventory contradicts source mining
