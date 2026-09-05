@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+"""Reconcile mined processor expectations with a MAME inventory JSON file."""
+
+import argparse
+import json
+import pathlib
+import re
+import sys
+
+
+ALIASES = {
+    "m68010": {"m68010"},
+    "tms34010": {"tms34010"},
+    "adsp2100": {"adsp2100"},
+    "6502-class": {"m6502", "m6502g"},
+}
+
+
+def processor_rows(machine_map: str):
+    section = machine_map.split("processors:", 1)[1].split("excluded_optional_processors:", 1)[0]
+    rows = []
+    current = None
+    for line in section.splitlines():
+        id_match = re.match(r"\s*- id:\s*(\S+)", line)
+        type_match = re.match(r"\s+type:\s*(\S+)", line)
+        if id_match:
+            if current is not None:
+                rows.append(current)
+            current = {"id": id_match.group(1)}
+        elif type_match and current is not None:
+            current["type"] = type_match.group(1)
+    if current is not None:
+        rows.append(current)
+    return rows
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("machine_map", type=pathlib.Path)
+    parser.add_argument("inventory", type=pathlib.Path)
+    parser.add_argument("-o", "--output", type=pathlib.Path)
+    args = parser.parse_args()
+
+    expected = processor_rows(args.machine_map.read_text(encoding="utf-8"))
+    inventory = json.loads(args.inventory.read_text(encoding="utf-8"))
+    devices = inventory["devices"]
+    actual = [
+        {"tag": d["tag"], "shortname": d["shortname"], "name": d["name"]}
+        for d in devices
+        if d["shortname"] in {name for names in ALIASES.values() for name in names}
+    ]
+
+    results = []
+    for item in expected:
+        allowed = ALIASES.get(item.get("type"), {item.get("type")})
+        matches = [d for d in actual if d["shortname"] in allowed]
+        results.append({**item, "status": "present" if matches else "missing", "matches": matches})
+
+    expected_shortnames = {name for item in expected for name in ALIASES.get(item.get("type"), {item.get("type")})}
+    unexpected = [d for d in actual if d["shortname"] not in expected_shortnames]
+    report = {
+        "schema": "stunrun-machine-reconciliation/v1",
+        "system": inventory["system"],
+        "mame": inventory["mame"],
+        "processors": results,
+        "unexpected_programmable_devices": unexpected,
+        "ok": all(item["status"] == "present" for item in results) and not unexpected,
+    }
+    output = json.dumps(report, indent=2) + "\n"
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(output, encoding="utf-8")
+    else:
+        sys.stdout.write(output)
+    return 0 if report["ok"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

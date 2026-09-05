@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    echo "usage: $0 ROMPATH [MAME_EXE]" >&2
+    exit 2
+}
+
+[[ $# -ge 1 && $# -le 2 ]] || usage
+rompath=$1
+mame_exe=${2:-mame}
+
+[[ -d "$rompath/stunrun" ]] || {
+    echo "missing ROM set directory: $rompath/stunrun" >&2
+    exit 1
+}
+
+exec "$mame_exe" -rompath "$rompath" -verifyroms stunrun

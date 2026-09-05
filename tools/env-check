@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -u
+
+version_line() {
+    local tool="$1"
+    shift
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        printf 'absent\n'
+        return 0
+    fi
+
+    local output
+    output=$("$tool" "$@" 2>&1 | head -n 1)
+    if [[ -n "$output" ]]; then
+        printf '%s\n' "$output"
+    else
+        printf 'present (%s)\n' "$(command -v "$tool")"
+    fi
+}
+
+printf 'tool\tstatus\tpath/version\n'
+for tool in mame python3 cmake ninja gcc clang lcov genhtml lua luajit ca65 ld65 m68k-elf-as m68k-linux-gnu-as; do
+    if command -v "$tool" >/dev/null 2>&1; then
+        case "$tool" in
+            mame) version=$(version_line "$tool" -version) ;;
+            python3) version=$(version_line "$tool" --version) ;;
+            lua|luajit) version=$(version_line "$tool" -v) ;;
+            cmake|ninja|gcc|clang|lcov|genhtml|ca65|ld65|m68k-elf-as|m68k-linux-gnu-as)
+                version=$(version_line "$tool" --version) ;;
+        esac
+        printf '%s\tpresent\t%s (%s)\n' "$tool" "$(command -v "$tool")" "$version"
+    else
+        printf '%s\tabsent\t-\n' "$tool"
+    fi
+done

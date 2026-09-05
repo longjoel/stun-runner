@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    echo "usage: $0 ROMPATH [MAME_EXE]" >&2
+    exit 2
+}
+
+[[ $# -ge 1 && $# -le 2 ]] || usage
+rompath=$1
+mame_exe=${2:-mame}
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+log_file=$(mktemp /tmp/stunrun-inventory.XXXXXX)
+trap 'rm -f "$log_file"' EXIT
+
+"$mame_exe" -rompath "$rompath" stunrun \
+    -video none -sound none -skip_gameinfo -noplugin data \
+    -seconds_to_run 2 -autoboot_script "$repo_dir/mame/lua/inventory.lua" \
+    >"$log_file" 2>&1
+
+json=$(sed -n 's/^MAME_INVENTORY_JSON //p' "$log_file")
+[[ -n "$json" ]] || {
+    cat "$log_file" >&2
+    echo "inventory script produced no JSON" >&2
+    exit 1
+}
+printf '%s\n' "$json"

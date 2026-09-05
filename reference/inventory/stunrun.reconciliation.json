@@ -1,0 +1,63 @@
+{
+  "schema": "stunrun-machine-reconciliation/v1",
+  "system": {
+    "description": "S.T.U.N. Runner (rev 6)",
+    "name": "stunrun"
+  },
+  "mame": {
+    "build": "0.289 (mame0289-dirty)",
+    "version": "0.289"
+  },
+  "processors": [
+    {
+      "id": "maincpu",
+      "type": "m68010",
+      "status": "present",
+      "matches": [
+        {
+          "tag": ":mainpcb:maincpu",
+          "shortname": "m68010",
+          "name": "Motorola MC68010"
+        }
+      ]
+    },
+    {
+      "id": "gsp",
+      "type": "tms34010",
+      "status": "present",
+      "matches": [
+        {
+          "tag": ":mainpcb:gsp",
+          "shortname": "tms34010",
+          "name": "Texas Instruments TMS34010"
+        }
+      ]
+    },
+    {
+      "id": "adsp",
+      "type": "adsp2100",
+      "status": "present",
+      "matches": [
+        {
+          "tag": ":mainpcb:adsp",
+          "shortname": "adsp2100",
+          "name": "Analog Devices ADSP-2100"
+        }
+      ]
+    },
+    {
+      "id": "soundcpu",
+      "type": "6502-class",
+      "status": "present",
+      "matches": [
+        {
+          "tag": ":mainpcb:jsa:cpu",
+          "shortname": "m6502",
+          "name": "MOS Technology 6502"
+        }
+      ]
+    }
+  ],
+  "unexpected_programmable_devices": [],
+  "ok": true
+}

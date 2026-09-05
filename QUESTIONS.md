@@ -4,7 +4,7 @@ Use this file for questions that cross agent ownership boundaries. Preserve reso
 
 ## IRQ-0001
 
-Status: OPEN
+Status: RESOLVED
 From: Project bootstrap
 To: Investigator
 Priority: HIGH
@@ -27,6 +27,10 @@ Record:
 ### Why it matters
 
 All traces, snapshots, annotations, reproduction builds, and verifier comparisons need a single stable reference revision.
+
+### Resolution
+
+Use shortname `stunrun`, displayed title `S.T.U.N. Runner (rev 6)`, with locally installed MAME `0.289 (mame0289-dirty)`. The executable SHA-256 and listxml SHA-256 are recorded in `mame/system-baseline.json`; this installed dirty build exposes no MAME source commit. The ROM set validates successfully with `tools/check-roms`.
 
 ---
 

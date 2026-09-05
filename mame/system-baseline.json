@@ -1,0 +1,24 @@
+{
+  "schema": "stunrun-mame-baseline/v1",
+  "target": "stunrun",
+  "mame": {
+    "version": "0.289 (mame0289-dirty)",
+    "executable": "/usr/lib/mame/mame",
+    "sha256": "fcb54790e1837ed653020dc25a4e51d9ba7288d789cf556299d5d4d2cf2f3bc1",
+    "source_commit": null,
+    "sourcefile": "atari/harddriv.cpp",
+    "listxml_sha256": "36f961aecb2382a0cc8abd764164a05b9785eb988f5398d7407e8fa9c96d023b"
+  },
+  "rom_manifest": {
+    "path": "roms/stunrun.manifest.json",
+    "sha256": "b3cf2b613752c494cb441f85090dd056f53b9006bdc4564eb53396d3c4ae729d"
+  },
+  "launch": {
+    "rompath": "<rompath>",
+    "command": "mame -rompath <rompath> stunrun -video none -sound none -skip_gameinfo -seconds_to_run 2"
+  },
+  "notes": [
+    "The installed build identifies itself as dirty and does not expose a git commit.",
+    "ROM contents remain local and are not part of this repository."
+  ]
+}

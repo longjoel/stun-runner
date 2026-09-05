@@ -6,22 +6,22 @@
 
 ## State
 
-Original in MAME: **not yet baselined in this repository**
+Original in MAME: **ROM-validated and runtime-inventoried; title checkpoint established**
 
-Step 0 driver mining: **worked example created; must be refreshed against the final pinned MAME revision**
+Step 0 driver mining: **worked example retained; runtime tags reconciled against system MAME 0.289**
 
 Reproduction target: **not started**
 
 Native target: **not started**
 
-Verification harness: **not started**
+Verification harness: **inventory foundation started; replay/checkpoint path not yet implemented**
 
 ## Immediate objective
 
 Freeze the specimen and laboratory before interpreting the game broadly:
 
-1. choose one MAME-supported S.T.U.N. Runner set;
-2. pin one MAME version/commit;
+1. keep one MAME-supported S.T.U.N. Runner set fixed;
+2. record the installed MAME build and binary hash;
 3. refresh `analysis/driver-mining/stunrun.*` against that pinned source revision;
 4. generate a ROM manifest from pinned MAME containing filenames, regions, sizes, CRC32, SHA-1, and load/interleave semantics;
 5. validate the local ROM set without committing ROM contents;
@@ -102,15 +102,21 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 
 ## Current blockers
 
-- No canonical ROM set/revision selected yet.
-- No canonical MAME version recorded yet.
 - Step 0 example has not yet been refreshed against the final pinned revision.
-- No MAME-derived ROM manifest checked in yet.
-- No runtime device-tag inventory recorded yet.
+- Installed MAME reports `0.289 (mame0289-dirty)` and exposes no source commit; its binary hash is recorded in `mame/system-baseline.json`.
 - No static-listing generation recipe checked in yet.
-- No deterministic harness trace/checkpoint recipe checked in yet.
+- No deterministic replay/input recipe checked in yet; bounded title checkpoint capture now works.
 - No TMS34010 GSP or ADSP-2100 code-emission path validated yet.
+
+## Completed baseline slices
+
+- Canonical working set: `stunrun`, S.T.U.N. Runner (rev 6), 25 ROM files; MAME `-verifyroms` passes.
+- MAME-derived manifest: `roms/stunrun.manifest.json`.
+- Repeatable runtime inventory: `tools/mame-inventory`.
+- Runtime inventory evidence: `reference/inventory/stunrun.json`.
+- Machine-map reconciliation: `reference/inventory/stunrun.reconciliation.json` (all four active processors present; no unexpected programmable device).
+- Installed-MAME plugin workaround: inventory launches with `-noplugin data` because the packaged data plugin is incompatible with this Lua runtime.
 
 ## Last verified checkpoint
 
-None yet.
+`title-attract`, captured at frame 600 / 9.96648 emulated seconds. Numeric state is recorded in `reference/checkpoints/title/state.json`; the screenshot remains local and is identified by hash in `reference/checkpoints/title/metadata.json`.

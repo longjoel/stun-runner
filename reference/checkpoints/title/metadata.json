@@ -1,0 +1,19 @@
+{
+  "schema": "stunrun-checkpoint-metadata/v1",
+  "checkpoint": "title-attract",
+  "system": "stunrun",
+  "description": "S.T.U.N. Runner (rev 6)",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start_condition": "power_on",
+  "frame": 600,
+  "emulated_seconds": 9.96648,
+  "script": "mame/lua/checkpoint.lua",
+  "launch": "SDL_VIDEODRIVER=dummy mame -rompath <rompath> stunrun -video soft -sound none -skip_gameinfo -noplugin data -seconds_to_run 10 -snapname title -snapshot_directory <output> -autoboot_script mame/lua/checkpoint.lua",
+  "selector_status": "OBSERVED-IN-TRACE screenshot shows INSERT 1 COIN title/attract screen; no semantic memory selector has been promoted yet",
+  "screenshot": {
+    "filename": "title.png",
+    "sha256": "e11398c9813010f7cfa17350c74f7a6053a9132c82277827d2c0f994b3602ac6",
+    "kept_local": true
+  }
+}
