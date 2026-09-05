@@ -105,6 +105,11 @@ not game-level semantics.
   the JSA window in an interrupt/ring-buffer-shaped path. Their counts are
   stable between no-input and coin-start traces (`8`, `2`, and `2`), so this
   narrows the ROM-side access path without assigning byte-level semantics.
+- STATIC-CANDIDATE+OBSERVED-IN-TRACE: the observed writes are reached through
+  `0x030170 -> 0x023EDA`; the caller loads bytes from a state-indexed buffer at
+  `0xFFDB64` before invoking the JSA helper. This is the strongest current
+  ROM-side command-buffer candidate, but its byte layout and ownership remain
+  unresolved.
 - UNKNOWN: command register/queue offsets and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
 

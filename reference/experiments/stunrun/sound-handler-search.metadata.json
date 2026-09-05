@@ -13,6 +13,20 @@
   },
   "static_candidates": [
     {
+      "pc": "0x030170",
+      "callee": "0x023EDA",
+      "operation": "passes a byte loaded from 0xffdb64 + 32 * state + index",
+      "context": "loop sends buffered bytes through the JSA write helper",
+      "confidence": "STATIC-CANDIDATE"
+    },
+    {
+      "pc": "0x0300B8",
+      "callee": "0x023EDE",
+      "operation": "passes literal 0x07 to the alternate JSA write helper",
+      "context": "timer/state routine; not observed in the 600-frame traces",
+      "confidence": "STATIC-CANDIDATE"
+    },
+    {
       "pc": "0x023EF6",
       "operation": "move.b D0, $600000",
       "context": "interrupts masked around the write; preceded by a test of bit 15 at $a80000",
@@ -32,11 +46,17 @@
     }
   ],
   "coin_start_trace_counts": {
+    "0x030170": 8,
+    "0x023EDA": 8,
+    "0x0300B8": 0,
     "0x023EF6": 8,
     "0x023F66": 2,
     "0x023FAE": 2
   },
   "no_input_trace_counts": {
+    "0x030170": 8,
+    "0x023EDA": 8,
+    "0x0300B8": 0,
     "0x023EF6": 8,
     "0x023F66": 2,
     "0x023FAE": 2
