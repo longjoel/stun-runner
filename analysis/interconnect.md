@@ -128,8 +128,16 @@ not game-level semantics.
 - NARROWED UNKNOWN: beyond the single `0x02C20C` initialization write, no
   68010 data-window traffic is observed in the bounded title path. Internal
   ADSP data-space traffic and post-gameplay main-CPU accesses remain open.
-- UNKNOWN: which data-window offsets are commands, status, or shared data, and
-  whether access occurs only after a verified gameplay transition.
+- OBSERVED-IN-TRACE+MAME-CONFIRMED: the 68010 writes the ADSP control window
+  73 times in both 600-frame runs, all with zero data. The observed word-offset
+  addresses map to LED, `/BR`, `/HALT`, reset, deferred bank, and default-control
+  functions in `hd68k_adsp_control_w`. The no-input run also writes the IRQ
+  clear at `0x818060` twice; coin/start writes it zero times, and neither mode
+  reads the `0x838000–0x83ffff` IRQ-state window. See
+  `reference/experiments/stunrun/adsp-control-window.metadata.json`.
+- UNKNOWN: whether the input-dependent IRQ-clear difference is a replay-state
+  artifact or a meaningful path distinction, and whether these windows carry
+  additional traffic after a verified gameplay transition.
 - MAME-CONFIRMED: the data special map exposes SIMBUF/SOM/XOUT/GINT and
   object-ROM bank-selection controls; the main CPU also has buffer/control/IRQ
   windows listed above. Runtime ownership and hot offsets remain unresolved.
