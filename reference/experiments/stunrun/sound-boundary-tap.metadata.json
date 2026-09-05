@@ -17,31 +17,31 @@
   "terminal_condition": "frame >= 600",
   "taps": [
     {"processor": ":mainpcb:maincpu", "range": "0x600000-0x600001", "access": "read/write", "label": "main_response/main_command"},
-    {"processor": ":mainpcb:jsa:cpu", "range": "0x2802-0x2803", "access": "read", "label": "sound_command"},
-    {"processor": ":mainpcb:jsa:cpu", "range": "0x2a02-0x2a03", "access": "write", "label": "sound_response"}
+    {"processor": ":mainpcb:jsa:cpu", "range": "0x2802-0x29fb", "access": "read", "label": "sound_command (JSA mirror range)"},
+    {"processor": ":mainpcb:jsa:cpu", "range": "0x2a02-0x2bfb", "access": "write", "label": "sound_response (JSA mirror range)"}
   ],
   "runs": {
     "none": {
       "frames": 600,
-      "result_path": "/tmp/stunrun-m1-sound-default-none/result.json",
-      "result_sha256": "95a8d4079454afd4571a6e73e5544ec4ecaec1e7e25e38643f799a41cab3da78",
-      "canonical_log_sha256": "6c9841e0f3bec91d16ce51511c1a6c64de70379f5aa39f690243551512d16f06",
-      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 0, "sound_response": 3},
+      "result_path": "/tmp/stunrun-m1-sound-mirror/result.json",
+      "result_sha256": "e4fb777d302fdcb8aca032a9e5d169f42be17da0cb11037d86c1e483c1d76956",
+      "canonical_log_sha256": "e735e5f28777a6efdcc422477997149ebf9ed10f324066b9e5b06b471d22e34b",
+      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 287510, "sound_response": 2513},
       "main_command_event": {"frame": 447, "pc": "0x023ef6", "address": "0x600000", "bus_data": "0x1e1e", "mask": "0xff00", "candidate_byte": "0x1e"},
       "startup_event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
     },
     "coin_start": {
       "frames": 600,
-      "result_path": "/tmp/stunrun-m1-sound-default-coin/result.json",
-      "result_sha256": "189264eb1176574edb88ea591af7fba40061a2594dcac9f61e7f1ef36f8247de",
-      "canonical_log_sha256": "ca9d9894c8b96f07e803b144f46e73da272356f5ab08c81275a0e41ed7bf1119",
-      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 0, "sound_response": 3},
+      "result_path": "/tmp/stunrun-m1-sound-mirror-coin/result.json",
+      "result_sha256": "19c71c620e6dce1ae8cd7bf884945efdc8a739c79a5ffa082e43f47a57812d68",
+      "canonical_log_sha256": "a0740c1a8d5c3e4973803fc834883da4baba8344542c488d516899bd183aa64f",
+      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 287510, "sound_response": 2513},
       "main_command_event": {"frame": 447, "pc": "0x023ef6", "address": "0x600000", "bus_data": "0x1e1e", "mask": "0xff00", "candidate_byte": "0x1e"},
       "startup_event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
     }
   },
-  "observation": "Clean independent 600-frame runs expose the same eight transport events: one 6502 startup response write, three later 6502 response writes, four main response reads, and one main command write. The command write reports bus data 0x1e1e with mask 0xff00 at ROM PC 0x023ef6; 0x1e is the candidate byte after lane interpretation, not yet a proven sound payload. The Lua tap does not expose a 6502 read at 0x2802, so command-latch consumption and NMI timing remain uncorrelated.",
-  "confidence": "MAME-CONFIRMED transport plus OBSERVED-IN-TRACE main command/response accesses; 6502 command-consumption tap remains unresolved",
+  "observation": "Clean independent 600-frame runs expose identical JSA activity after extending the taps across the MAME mirror ranges: 1 main command, 4 main responses, 287510 sound-command reads, and 2513 sound-response writes. The ROM reads aliases such as $280c/$280e; MAME maps these through the $2802 mirror range to sound_command_r. The main command reports bus data 0x1e1e with mask 0xff00 at ROM PC 0x023ef6; 0x1e is the candidate byte after lane interpretation, not yet a proven payload. The high-volume reads are polling/processing activity, so byte-level command pairing remains unresolved.",
+  "confidence": "MAME-CONFIRMED transport and mirror mapping plus OBSERVED-IN-TRACE command/response accesses; byte-level pairing remains unresolved",
   "raw_logs_kept_local": true,
-  "next_question": "Instrument the atari_sound_comm callbacks or obtain a MAME build exposing dynamic-handler taps, then correlate command bytes with 6502 NMI consumption."
+  "next_question": "Correlate the main command byte with the first post-NMI sound-command read and classify the 6502 polling/queue behavior."
 }

@@ -20,20 +20,20 @@ local function cpu_pc(tag)
     return state['CURPC'].value
 end
 
-local function read_tap(address, tag, label)
+local function read_tap(address, end_address, tag, label)
     local cpu = manager.machine.devices[tag]
     taps[#taps + 1] = cpu.spaces['program']:install_read_tap(
-        address, address + 1, 'stunrun_' .. label,
+        address, end_address, 'stunrun_' .. label,
         function(offset, data, mask)
             print(string.format('M1_SOUND_READ label=%s frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
                 label, frame, cpu_pc(tag), offset, data, mask))
         end)
 end
 
-local function write_tap(address, tag, label)
+local function write_tap(address, end_address, tag, label)
     local cpu = manager.machine.devices[tag]
     taps[#taps + 1] = cpu.spaces['program']:install_write_tap(
-        address, address + 1, 'stunrun_' .. label,
+        address, end_address, 'stunrun_' .. label,
         function(offset, data, mask)
             print(string.format('M1_SOUND_WRITE label=%s frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
                 label, frame, cpu_pc(tag), offset, data, mask))
@@ -43,13 +43,15 @@ end
 local function install_main_taps()
     -- The main window is dynamically installed by init_multisync(0).  Install
     -- these after machine start so the taps attach to the final handlers.
-    read_tap(0x600000, ':mainpcb:maincpu', 'main_response')
-    write_tap(0x600000, ':mainpcb:maincpu', 'main_command')
+    read_tap(0x600000, 0x600001, ':mainpcb:maincpu', 'main_response')
+    write_tap(0x600000, 0x600001, ':mainpcb:maincpu', 'main_command')
 end
 
--- JSA-II's command and response registers are in the 6502 address space.
-read_tap(0x2802, ':mainpcb:jsa:cpu', 'sound_command')
-write_tap(0x2a02, ':mainpcb:jsa:cpu', 'sound_response')
+-- JSA-II's command and response registers are mirrored across the 6502
+-- address space.  The ROM uses aliases such as $280c/$280e, so tap the full
+-- MAME mirror ranges rather than only the canonical schematic addresses.
+read_tap(0x2802, 0x29fb, ':mainpcb:jsa:cpu', 'sound_command')
+write_tap(0x2a02, 0x2bfb, ':mainpcb:jsa:cpu', 'sound_response')
 
 local function apply_event(event)
     local port = assert(manager.machine.ioport.ports[event.port])

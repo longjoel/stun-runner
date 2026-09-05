@@ -193,21 +193,23 @@ The static/runtime GSP search is recorded in
   This establishes the emulator transport contract, while ROM-side byte
   pairing and exact acknowledgement semantics remain unresolved. See
   `reference/experiments/stunrun/sound-handler-search.metadata.json`.
-- STATIC-CANDIDATE: the 6502 sound listing polls `$280C` at `0x4154`, then
-  consumes a queued byte from `$0235,Y` and writes it to `$2A02` at `0x4161`.
-  These are the strongest current ROM-side sound-consumer landmarks; their
-  exact JSA register mapping remains unresolved.
+- STATIC-CANDIDATE+MAME-CONFIRMED-MIRROR: the 6502 sound listing polls `$280C`
+  at `0x4154`, then consumes a queued byte from `$0235,Y` and writes it to
+  `$2A02` at `0x4161`. JSA-II maps `$2802` with mirror mask `0x1F9`, so the
+  observed `$280C`/`$280E` reads are aliases of `sound_command_r`, not
+  unrelated status registers. The exact queue/payload relationship remains
+  unresolved.
 - OBSERVED-IN-TRACE (clean bounded memory-tap probe): independent 600-frame
-  no-input and coin/start runs expose the same eight transport events: the
-  startup 6502 write of `0xFF` to `$2A02`, three later 6502 response writes,
-  four main response reads, and one main command write. The command write
-  reports bus data `0x1E1E` with mask `0xFF00` at ROM PC `0x023EF6`; `0x1E` is
-  only the candidate byte after lane interpretation. The tap does not
-  expose a 6502 read at `$2802`, so command-latch consumption and NMI timing
-  remain unresolved; absent tap events are not absence claims. The result and
-  limitation are recorded in
+  no-input and coin/start runs expose identical activity when the taps cover
+  the JSA mirror ranges: one main command, four main responses, 287510 sound
+  command reads, and 2513 sound response writes. The main command reports bus
+  data `0x1E1E` with mask `0xFF00` at ROM PC `0x023EF6`; `0x1E` is only the
+  candidate byte after lane interpretation. The high-volume reads are mostly
+  polling/processing activity, so this resolves command-register observation
+  but not byte-level pairing. The result is recorded in
   `reference/experiments/stunrun/sound-boundary-tap.metadata.json`.
-- UNKNOWN: command register/queue offsets and acknowledgement behavior.
+- UNKNOWN: exact command payload queue ownership, first post-NMI read boundary,
+  and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
 
 The three-processor differential hashes and first-divergence landmarks are
