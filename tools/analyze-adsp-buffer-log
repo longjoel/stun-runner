@@ -12,6 +12,10 @@ READ = re.compile(
     r"M1_ADSP_READ kind=buffer pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
     r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
 )
+BLOCK = re.compile(
+    r"M1_ADSP_BLOCK frame=(\d+) sequence=(\d+) count=(\d+) "
+    r"terminator=([0-9A-Fa-f]+) fifo_writes=(\d+)"
+)
 
 
 def main() -> int:
@@ -21,7 +25,16 @@ def main() -> int:
 
     headers = []
     terminators = []
+    block_summaries = []
     for line in args.log.read_text(encoding="utf-8").splitlines():
+        block = BLOCK.search(line)
+        if block:
+            block_summaries.append({
+                "frame": int(block.group(1)), "sequence": int(block.group(2)),
+                "count": int(block.group(3)), "terminator": int(block.group(4), 16),
+                "fifo_writes": int(block.group(5)),
+            })
+            continue
         match = READ.search(line)
         if not match:
             continue
@@ -48,6 +61,11 @@ def main() -> int:
         "count_histogram": dict(sorted(collections.Counter(p["count"] for p in pairs).items())),
         "all_terminators_ff": all(p["terminator_data"] == 0xFFFF for p in pairs),
         "all_address_formulas_match": all(p["address_formula"] for p in pairs),
+        "block_summaries": len(block_summaries),
+        "all_fifo_write_counts_match": bool(block_summaries)
+        and all(block["count"] == block["fifo_writes"] for block in block_summaries),
+        "first_block_summaries": block_summaries[:16],
+        "last_block_summaries": block_summaries[-16:],
         "first_blocks": pairs[:16],
         "last_blocks": pairs[-16:],
     }

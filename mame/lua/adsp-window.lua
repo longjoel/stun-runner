@@ -28,6 +28,10 @@ end
 local tap
 local source_tap
 local source_bytes_tap
+local gsp_fifo_tap
+local block_sequence = 0
+local active_block_count
+local active_fifo_writes = 0
 local function install_tap()
     local cpu = manager.machine.devices[':mainpcb:maincpu']
     local space = cpu.spaces['program']
@@ -36,9 +40,18 @@ local function install_tap()
     local pc = cpu.state['CURPC']
     if access == 'read' then
         tap = space:install_read_tap(start_address, end_address, 'stunrun_adsp_window_read',
-            function(offset, data, mask)
-                print(string.format('M1_ADSP_READ kind=%s pc=%08X addr=%08X data=%08X mask=%08X',
-                    label, pc.value, offset, data, mask))
+        function(offset, data, mask)
+            if pc.value == 0x02f0c2 then
+                block_sequence = block_sequence + 1
+                active_block_count = data
+                active_fifo_writes = 0
+            elseif pc.value == 0x02f0e2 and active_block_count ~= nil then
+                print(string.format('M1_ADSP_BLOCK frame=%d sequence=%d count=%d terminator=%04X fifo_writes=%d',
+                    frame, block_sequence, active_block_count, data, active_fifo_writes))
+                active_block_count = nil
+            end
+            print(string.format('M1_ADSP_READ kind=%s pc=%08X addr=%08X data=%08X mask=%08X',
+                label, pc.value, offset, data, mask))
             end)
     else
         tap = space:install_write_tap(start_address, end_address, 'stunrun_adsp_window_write',
@@ -62,6 +75,12 @@ local function install_tap()
             if pc.value >= 0x02d2e0 and pc.value <= 0x02d364 then
                 print(string.format('M1_ADSP_SOURCE_BYTE pc=%08X addr=%08X data=%08X mask=%08X',
                     pc.value, offset, data, mask))
+                end
+        end)
+    gsp_fifo_tap = space:install_write_tap(0xc0000c, 0xc0000f, 'stunrun_gsp_fifo',
+        function(offset, data, mask)
+            if active_block_count ~= nil and (pc.value == 0x02248e or pc.value == 0x02249a) then
+                active_fifo_writes = active_fifo_writes + 1
             end
         end)
 end
