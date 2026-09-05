@@ -1,0 +1,26 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/landmark_probe.json",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start": "power_on",
+  "input": "coin_start",
+  "frames": 600,
+  "cpu": ":mainpcb:maincpu",
+  "trace_flags": ["noloop"],
+  "trace_sha256": "a7d8ba57a4395eaaa3a002996a95b16b9c3761deaee039dcec837b0f9a81c7e0",
+  "trace_bytes": 6149216,
+  "candidate_execution_counts": {
+    "0x009010": 0,
+    "0x009092": 0,
+    "0x00B228": 0,
+    "0x00BE6A": 0,
+    "0x02C1A0": 1,
+    "0x02C1EE": 1,
+    "0x02DC9E": 0
+  },
+  "observation": "The bounded trace reaches the 0x02C1A0 and 0x02C1EE input checks, but not the earlier input or ADSP transfer candidates.",
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_trace_kept_local": true
+}

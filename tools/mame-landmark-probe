@@ -20,6 +20,7 @@ def main() -> int:
     parser.add_argument("pcs", help="comma-separated 68010 PCs, e.g. 0xB228,0xBE6A")
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--input", choices=("none", "coin_start"), default="none")
+    parser.add_argument("--debugger", choices=("none", "console"), default="none")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0:
@@ -29,7 +30,7 @@ def main() -> int:
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
         "-sound", "none", "-skip_gameinfo", "-noplugin", "data", "-debug",
-        "-debugger", "none", "-seconds_to_run", str(max(2, (args.frames + 59) // 60 + 1)),
+        "-debugger", args.debugger, "-seconds_to_run", str(max(2, (args.frames + 59) // 60 + 1)),
         "-autoboot_script", str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/landmark-probe.lua"),
     ]
     environment = {

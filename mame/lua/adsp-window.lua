@@ -22,7 +22,7 @@ local function apply_event(event)
     assert(port ~= nil, 'unknown input port: ' .. event.port)
     local field = port.fields[event.field]
     assert(field ~= nil, 'unknown input field: ' .. event.port .. '/' .. event.field)
-    if event.action == 'press' then field:set_value(1) else field:clear_value() end
+    if event.action == 'press' then field:set_value(1) else field:set_value(0) end
     print('M1_ADSP_INPUT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action)
 end
 

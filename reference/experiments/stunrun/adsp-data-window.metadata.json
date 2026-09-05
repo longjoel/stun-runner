@@ -12,19 +12,19 @@
       "range": "0x808000-0x80bfff",
       "access": "write",
       "runs": 2,
-      "observations_each_run": 0,
+      "observations_each_run": null,
       "canonical_log_sha256": "a353890b173ad251eb470ac1c42a12ecc0d8784757b48d50119bfdff7192fb8e"
     },
     {
       "range": "0x808000-0x80bfff",
       "access": "read",
       "runs": 2,
-      "observations_each_run": 0,
+      "observations_each_run": null,
       "canonical_log_sha256": "0e3cc257f4c1b778028e7daf54b4b47261c6cd03cdb1226f26428d25ec16f2e7"
     }
   ],
-  "observation": "No 68010 reads or writes to the ADSP data window were observed during two independent coin/start runs.",
-  "confidence": "OBSERVED-IN-TRACE",
+  "observation": "The ADSP data-window watchpoints were registered, but headless MAME with -debugger none did not deliver watchpoint action callbacks; access counts are unknown.",
+  "confidence": "EXPERIMENT-SETUP-ONLY",
   "raw_logs_kept_local": true,
   "notes": [
     "The coin/start actions were delivered at frames 120/122 and 300/302.",

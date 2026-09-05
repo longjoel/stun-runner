@@ -12,11 +12,11 @@
   "runs": 1,
   "hits": [],
   "canonical_log_sha256": "8c0d563c78f3e1ada06b7e0bdc53ad37ba21760bf56b1f5bf29de3c8901af4dd",
-  "observation": "None of the four static landmark candidates executed during the bounded title-path run.",
-  "confidence": "OBSERVED-IN-TRACE",
+  "observation": "The debugger breakpoint setup was recorded, but headless MAME with -debugger none did not deliver breakpoint action callbacks; this result is not valid evidence that the candidates did not execute.",
+  "confidence": "EXPERIMENT-SETUP-ONLY",
   "raw_log_kept_local": true,
   "notes": [
-    "This narrows the title-path execution but does not invalidate the static candidates.",
+    "Use the canonical noloop instruction trace for execution counts instead.",
     "A verified gameplay transition or a broader state-entry experiment is required before interpreting these routines."
   ]
 }

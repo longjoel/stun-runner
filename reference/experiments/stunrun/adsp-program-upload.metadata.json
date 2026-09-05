@@ -13,14 +13,14 @@
     "range": "0x800000-0x807fff"
   },
   "runs": 2,
-  "writes_observed_each_run": 0,
-  "distinct_writer_pcs_each_run": [],
+  "writes_observed_each_run": null,
+  "distinct_writer_pcs_each_run": null,
   "canonical_log_sha256": "e0a8a9ad913e736c9bab1bbc6727c61dfa997cc8c21dad763123d50002eb609d",
-  "observation": "No 68010 writes to the ADSP program window were observed during either bounded run.",
-  "confidence": "OBSERVED-IN-TRACE",
+  "observation": "The 68010 program-space watchpoint was registered in both bounded runs, but headless MAME with -debugger none did not deliver watchpoint action callbacks; access count is therefore unknown.",
+  "confidence": "EXPERIMENT-SETUP-ONLY",
   "raw_logs_kept_local": true,
   "notes": [
-    "This does not establish that the ADSP program is unused or identify its load source.",
+    "This does not establish that the ADSP program is unused, not dynamically loaded, or identify its load source.",
     "The next experiment targets the ADSP data window and interrupt/flag behavior."
   ]
 }

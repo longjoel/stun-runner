@@ -16,16 +16,17 @@ Listing metadata: `reference/listings/stunrun.metadata.json`,
 | `0x00BE6A` | Clears control/status locations, reads a count from `(A0)+`, loads `A1 = $800000`, builds long values, and writes through `(A1)+`. | `STATIC-CANDIDATE` |
 | `0x00BED0` | Similar transfer shape beginning at `A1 = $804000`, which is outside the first documented program-window half and requires runtime/map confirmation. | `STATIC-CANDIDATE` |
 
-The bounded M1 watchpoint experiment observed no 68010 writes to
-`0x800000–0x807fff` during two independent 600-frame boot/title runs. The
-static candidates therefore have not executed on that path, or their target
-addresses are reached only in a later state. Do not call either routine an
-ADSP loader until a breakpoint/watchpoint or trace observes it.
+The bounded M1 watchpoint experiment registered a 68010 write watchpoint over
+`0x800000–0x807fff` during two independent 600-frame boot/title runs, but the
+headless debugger did not deliver action callbacks. It is therefore setup-only;
+do not infer an access count or call either routine an ADSP loader from it.
 
-The follow-up `landmark_probe_title_coin_start` experiment set execution
-breakpoints at `0x00B228`, `0x00BE6A`, `0x009010`, and `0x009092`; none fired
-in the bounded 600-frame run. See
-`reference/experiments/stunrun/landmark-probe.metadata.json`.
+The first breakpoint-probe setup is retained as an instrumentation experiment,
+but headless MAME with `-debugger none` did not deliver breakpoint action
+callbacks, so its empty hit list is not execution evidence. The authoritative
+600-frame `noloop` trace reaches `0x02C1A0` and `0x02C1EE` once each, while
+`0x00B228`, `0x00BE6A`, `0x009010`, and `0x009092` are absent. See
+`reference/experiments/stunrun/maincpu-600-trace.metadata.json`.
 
 ## ADSP data/control candidates
 

@@ -13,14 +13,16 @@ local events = input_mode == 'coin_start' and {
 } or {}
 local next_event = 1
 
+local cpu = manager.machine.devices[':mainpcb:maincpu']
+assert(cpu ~= nil and cpu.debug ~= nil, 'main CPU debugger interface unavailable')
 for pc in string.gmatch(assert(os.getenv('STUNRUN_LANDMARK_PCS')), '[^,]+') do
-    debugger:command('bpset ' .. pc .. ':mainpcb:maincpu,1,{ printf "M1_LANDMARK_HIT pc=%08X\\n",pc ; g }')
+    cpu.debug:bpset(tonumber(pc), nil, 'printf "M1_LANDMARK_HIT pc=%08X\\n",pc ; g')
 end
 
 local function apply_event(event)
     local field = assert(manager.machine.ioport.ports[event.port]).fields[event.field]
     assert(field ~= nil, 'unknown input field: ' .. event.port .. '/' .. event.field)
-    if event.press then field:set_value(1) else field:clear_value() end
+    if event.press then field:set_value(1) else field:set_value(0) end
     print('M1_LANDMARK_INPUT frame=' .. frame .. ' field=' .. event.field)
 end
 

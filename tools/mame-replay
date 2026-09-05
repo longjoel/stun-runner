@@ -83,13 +83,15 @@ local function apply_event(event)
     local field = port.fields[event.field]
     if field == nil then error('unknown input field: ' .. event.port .. '/' .. event.field) end
     if event.action == 'press' then
+        -- MAME's field API takes a logical active value; it applies the
+        -- field's active-low polarity to the port representation.
         field:set_value(1)
     elseif event.action == 'release' then
-        field:clear_value()
+        field:set_value(0)
     else
         field:set_value(event.value)
     end
-    print('MAME_REPLAY_EVENT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action)
+    print('MAME_REPLAY_EVENT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action .. ' port_value=' .. string.format('%08X', port:read()))
 end
 
 emu.register_frame_done(function()
