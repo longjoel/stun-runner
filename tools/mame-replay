@@ -4,6 +4,7 @@
 import argparse
 import json
 import math
+import os
 import pathlib
 import subprocess
 import tempfile
@@ -132,8 +133,10 @@ def main() -> int:
             "-snapname", experiment["id"], "-snapshot_directory", str(args.output),
             "-autoboot_script", str(script),
         ]
+        environment = dict(os.environ)
+        environment.setdefault("SDL_VIDEODRIVER", "dummy")
         with log.open("w", encoding="utf-8") as handle:
-            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT, check=False)
+            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT, check=False, env=environment)
         text = log.read_text(encoding="utf-8")
         (args.output / "mame.log").write_text(text, encoding="utf-8")
         result_lines = [line.removeprefix("MAME_REPLAY_JSON ") for line in text.splitlines() if line.startswith("MAME_REPLAY_JSON ")]

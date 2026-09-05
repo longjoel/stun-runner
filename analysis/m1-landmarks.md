@@ -56,6 +56,14 @@ service-mode trace reaches the reset/service polling path at `0x000254` and
 still does not reach any of the six `0x043590` callers. See
 `reference/experiments/stunrun/service-input-trace.metadata.json`.
 
+The `coin_start` replay does reach an in-game road/HUD boundary at frame 600.
+Its trace repeatedly executes `0x020446`, `0x023D98`, `0x0244F0`, and
+`0x02BB14`, which sample the low-byte input or player-button windows, while
+none of the six `0x043590` callers executes. The captured HUD still displays
+`Credits: 0`; this establishes a reproducible gameplay boundary but does not
+yet explain the credit behavior. See
+`reference/experiments/stunrun/coin-start-gameplay.metadata.json`.
+
 ## Low-byte input-handler candidate
 
 At `0x043590`, a static routine initializes `A0 = 0x60c001`, samples bits 7
@@ -78,8 +86,7 @@ of these routines rather than infer credit semantics from the event codes.
 
 ## Next targeted experiment
 
-Run bounded traces across the reset/title, service/menu, and gameplay-entry
-states and search for the six caller PCs. Record the first reachable caller and
-the immediately surrounding PCs before assigning input or credit semantics.
-Keep the ADSP transfer and gameplay-state experiments separate; do not assign
-semantics from the listing alone.
+Use the now-reachable gameplay input routines to compare a coin/start replay
+with a no-input replay and identify the state/credit variables that differ.
+Keep the six-caller `0x043590` path as a separate unresolved branch; do not
+assign input or credit semantics from the listing alone.
