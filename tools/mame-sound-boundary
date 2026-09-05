@@ -62,7 +62,11 @@ def main() -> int:
         "events": len(events),
         "event_counts": {
             label: sum(event["label"] == label for event in events)
-            for label in ("main_command", "main_response", "sound_command", "sound_response")
+            for label in (
+                "main_command", "main_response", "sound_command", "sound_response",
+                "sound_rdio", "sound_irq_ack", "sound_oki", "sound_voice",
+                "sound_wrio", "sound_mix", "sound_other",
+            )
         },
         "first_events": events[:32],
         "last_events": events[-32:],

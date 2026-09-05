@@ -17,31 +17,33 @@
   "terminal_condition": "frame >= 600",
   "taps": [
     {"processor": ":mainpcb:maincpu", "range": "0x600000-0x600001", "access": "read/write", "label": "main_response/main_command"},
-    {"processor": ":mainpcb:jsa:cpu", "range": "0x2802-0x29fb", "access": "read", "label": "sound_command (JSA mirror range)"},
-    {"processor": ":mainpcb:jsa:cpu", "range": "0x2a02-0x2bfb", "access": "write", "label": "sound_response (JSA mirror range)"}
+    {"processor": ":mainpcb:jsa:cpu", "range": "0x2802-0x29fb", "access": "read", "label": "classified JSA read mirror range"},
+    {"processor": ":mainpcb:jsa:cpu", "range": "0x2a02-0x2bfb", "access": "write", "label": "classified JSA write mirror range"}
   ],
   "runs": {
     "none": {
       "frames": 600,
-      "result_path": "/tmp/stunrun-m1-sound-mirror/result.json",
-      "result_sha256": "e4fb777d302fdcb8aca032a9e5d169f42be17da0cb11037d86c1e483c1d76956",
-      "canonical_log_sha256": "e735e5f28777a6efdcc422477997149ebf9ed10f324066b9e5b06b471d22e34b",
-      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 287510, "sound_response": 2513},
+      "result_path": "/tmp/stunrun-m1-sound-classified/result.json",
+      "result_sha256": "33acf65cd64cbf2dcb6ac7cd2d0b2a9000114ebb8997ac8d759ef0c4ad448c89",
+      "canonical_log_sha256": "6dcaaba7bb43e400e93da2d0f2b85aded0f3ea87c2f16bd1d417d05f668f5767",
+      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 4, "sound_response": 3, "sound_rdio": 283775, "sound_irq_ack": 2487, "sound_oki": 1244, "sound_voice": 0, "sound_wrio": 2504, "sound_mix": 6, "sound_other": 0},
+      "command_reads": [{"frame": 1, "pc": "0x4139", "address": "0x280a", "data": "0x00"}, {"frame": 369, "pc": "0x4139", "address": "0x280a", "data": "0x00"}, {"frame": 411, "pc": "0x4139", "address": "0x280a", "data": "0x00"}, {"frame": 447, "pc": "0x5839", "address": "0x280a", "data": "0x1e"}],
       "main_command_event": {"frame": 447, "pc": "0x023ef6", "address": "0x600000", "bus_data": "0x1e1e", "mask": "0xff00", "candidate_byte": "0x1e"},
       "startup_event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
     },
     "coin_start": {
       "frames": 600,
-      "result_path": "/tmp/stunrun-m1-sound-mirror-coin/result.json",
-      "result_sha256": "19c71c620e6dce1ae8cd7bf884945efdc8a739c79a5ffa082e43f47a57812d68",
-      "canonical_log_sha256": "a0740c1a8d5c3e4973803fc834883da4baba8344542c488d516899bd183aa64f",
-      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 287510, "sound_response": 2513},
+      "result_path": "/tmp/stunrun-m1-sound-classified-coin/result.json",
+      "result_sha256": "752f8232389c46adbbbd9a2ec1e5f5790b3e025b1a50fa083a118ba97ada62f3",
+      "canonical_log_sha256": "7c6e45723a46f54e44e83c4df25bf6b9e76789644b945c65d8238186229b18a2",
+      "event_counts": {"main_command": 1, "main_response": 4, "sound_command": 4, "sound_response": 3, "sound_rdio": 283775, "sound_irq_ack": 2487, "sound_oki": 1244, "sound_voice": 0, "sound_wrio": 2504, "sound_mix": 6, "sound_other": 0},
+      "command_reads": [{"frame": 1, "pc": "0x4139", "address": "0x280a", "data": "0x00"}, {"frame": 369, "pc": "0x4139", "address": "0x280a", "data": "0x00"}, {"frame": 411, "pc": "0x4139", "address": "0x280a", "data": "0x00"}, {"frame": 447, "pc": "0x5839", "address": "0x280a", "data": "0x1e"}],
       "main_command_event": {"frame": 447, "pc": "0x023ef6", "address": "0x600000", "bus_data": "0x1e1e", "mask": "0xff00", "candidate_byte": "0x1e"},
       "startup_event": {"frame": 1, "pc": "0x413e", "address": "0x2a02", "data": "0xff", "mask": "0xff"}
     }
   },
-  "observation": "Clean independent 600-frame runs expose identical JSA activity after extending the taps across the MAME mirror ranges: 1 main command, 4 main responses, 287510 sound-command reads, and 2513 sound-response writes. The ROM reads aliases such as $280c/$280e; MAME maps these through the $2802 mirror range to sound_command_r. The main command reports bus data 0x1e1e with mask 0xff00 at ROM PC 0x023ef6; 0x1e is the candidate byte after lane interpretation, not yet a proven payload. The high-volume reads are polling/processing activity, so byte-level command pairing remains unresolved.",
-  "confidence": "MAME-CONFIRMED transport and mirror mapping plus OBSERVED-IN-TRACE command/response accesses; byte-level pairing remains unresolved",
+  "observation": "Clean independent 600-frame runs expose identical classified JSA activity: 1 main command, 4 main responses, 4 sound_command reads, 3 sound_response writes, plus distinct rdio/status, IRQ-ack, OKI, WRIO, and MIX traffic. The ROM command alias is $280a, not $280c: MAME's 0x1f9 mirror mask places $280a with $2802 sound_command_r, while $280c maps rdio_r and $280e maps sound_irq_ack_r. At frame 447, the main write reports bus data 0x1e1e with mask 0xff00 at PC 0x023ef6, and the subsequent 6502 read at PC 0x5839/$280a returns 0x1e. This is strong byte-level pairing for the title-path command.",
+  "confidence": "MAME-CONFIRMED transport and mirror mapping plus OBSERVED-IN-TRACE byte pairing for the frame-447 title-path command",
   "raw_logs_kept_local": true,
-  "next_question": "Correlate the main command byte with the first post-NMI sound-command read and classify the 6502 polling/queue behavior."
+  "next_question": "Determine whether the frame-447 command is the smallest stable sound fixture and identify the ROM-side producer buffer semantics."
 }

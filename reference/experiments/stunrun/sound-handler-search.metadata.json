@@ -16,9 +16,9 @@
       "third_party/mame-master/src/mame/atari/atariscom.cpp",
       "third_party/mame-master/src/mame/atari/atarijsa.cpp"
     ],
-    "main_to_sound": "68010 main_command_w schedules a delayed command-latch write; the latch asserts the JSA 6502 NMI, and JSA-II sound_command_r reads and clears that pending command at 0x2802 (with ROM-observed aliases such as 0x280c/0x280e through the MAME mirror mask).",
+    "main_to_sound": "68010 main_command_w schedules a delayed command-latch write; the latch asserts the JSA 6502 NMI, and JSA-II sound_command_r reads and clears that pending command at 0x2802 (the ROM-observed alias 0x280a is in the same MAME mirror class).",
     "sound_to_main": "JSA-II sound_response_w at 0x2a02 schedules a delayed response-latch write; the sound interrupt callback asserts main IRQ4, and main_response_r at 0x600000 reads and clears the pending response.",
-    "confidence": "MAME-CONFIRMED transport model; ROM-side byte pairing remains unresolved"
+    "confidence": "MAME-CONFIRMED transport model; frame-447 ROM-side byte pairing observed, broader payload semantics remain unresolved"
   },
   "sound_cpu_static_candidates": [
     {
@@ -109,7 +109,7 @@
     "observed_contract": "JSA main interrupt callback -> 68010 IRQ 4 -> handler 0x023f24 -> read response at 0x600000 from 0x023f66 -> RTE",
     "scope_limit": "This resolves the JSA-to-68010 response-interrupt half only; it does not identify the 6502 command payload or prove that the observed IRQ4 events came from a particular ROM-side write."
   },
-  "observation": "The candidate 68010 sound routines execute in both no-input and coin-start traces with identical counts. Clean mirror-range taps now establish repeated ROM-side reads through aliases of JSA-II sound_command_r, alongside the repeatable JSA-to-68010 IRQ4 response path; a particular main-CPU byte is not yet paired to a specific sound-consumer read.",
+  "observation": "The candidate 68010 sound routines execute in both no-input and coin-start traces with identical counts. Classified mirror-range taps show four sound_command reads at the ROM alias 0x280a; the frame-447 read at 0x5839 returns 0x1e immediately after the 68010 writes bus byte 0x1e at 0x023ef6. The same probe distinguishes high-volume 0x280c rdio/status reads and 0x280e IRQ-ack reads, alongside the repeatable JSA-to-68010 IRQ4 response path.",
   "confidence": "STATIC-CANDIDATE+OBSERVED-IN-TRACE",
   "raw_traces_kept_local": true,
   "next_question": "Correlate the main command byte with the first post-NMI sound-command read and classify the 6502 polling/queue behavior."

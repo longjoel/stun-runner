@@ -159,12 +159,12 @@ The static/runtime GSP search is recorded in
 
 - OBSERVED-IN-TRACE: the active `:mainpcb:jsa:cpu` executes a deterministic
   600-frame boot/title stream beginning at `0x4000`; early accesses include
-  `0x2A04` and `0x280C`. Independent traces are byte-identical. These are
-  candidate sound-board control/status locations, not yet a proven command
-  queue.
+  `0x2A04` and `0x280C`. Independent traces are byte-identical. Source mapping
+  identifies these as JSA WRIO and RDIO mirror accesses, respectively.
 - OBSERVED-IN-TRACE: `coin_start` changes the 6502 trace and includes an
-  explicit `IRQ 0` interruption while executing at `0x414C`; the source of the
-  IRQ and its command payload remain unresolved.
+  explicit `IRQ 0` interruption while executing at `0x414C`; the source of
+  that periodic sound IRQ remains unresolved, but it is distinct from the
+  frame-447 command/NMI pairing below.
 - STATIC-CANDIDATE+OBSERVED-IN-TRACE: the 68010 executes `0x023EF6`, which
   writes a byte to `0x600000`, and executes `0x023F66`/`0x023FAE`, which read
   the JSA window in an interrupt/ring-buffer-shaped path. Their counts are
@@ -190,26 +190,26 @@ The static/runtime GSP search is recorded in
   through `sound_response_w` schedules a delayed response latch, invokes the
   main interrupt callback, and produces the observed main IRQ4; the 68010
   reads and clears that response through `main_response_r` at `0x600000`.
-  This establishes the emulator transport contract, while ROM-side byte
-  pairing and exact acknowledgement semantics remain unresolved. See
+  This establishes the emulator transport contract; the title-path byte
+  pairing is recorded below, while broader payload semantics and exact
+  acknowledgement behavior remain unresolved. See
   `reference/experiments/stunrun/sound-handler-search.metadata.json`.
 - STATIC-CANDIDATE+MAME-CONFIRMED-MIRROR: the 6502 sound listing polls `$280C`
   at `0x4154`, then consumes a queued byte from `$0235,Y` and writes it to
-  `$2A02` at `0x4161`. JSA-II maps `$2802` with mirror mask `0x1F9`, so the
-  observed `$280C`/`$280E` reads are aliases of `sound_command_r`, not
-  unrelated status registers. The exact queue/payload relationship remains
-  unresolved.
+  `$2A02` at `0x4161`. JSA-II maps `$2802` with mirror mask `0x1F9`; the ROM's
+  `$280A` access is the `sound_command_r` mirror, while `$280C` is `rdio_r` and
+  `$280E` is `sound_irq_ack_r`.
 - OBSERVED-IN-TRACE (clean bounded memory-tap probe): independent 600-frame
-  no-input and coin/start runs expose identical activity when the taps cover
-  the JSA mirror ranges: one main command, four main responses, 287510 sound
-  command reads, and 2513 sound response writes. The main command reports bus
-  data `0x1E1E` with mask `0xFF00` at ROM PC `0x023EF6`; `0x1E` is only the
-  candidate byte after lane interpretation. The high-volume reads are mostly
-  polling/processing activity, so this resolves command-register observation
-  but not byte-level pairing. The result is recorded in
+  no-input and coin/start runs expose identical classified activity when the
+  taps cover the JSA mirror ranges: one main command, four main responses, four
+  sound-command reads, and three sound-response writes, with separate status,
+  IRQ-ack, OKI, WRIO, and MIX traffic. At frame 447 the main command reports
+  bus data `0x1E1E` with mask `0xFF00` at ROM PC `0x023EF6`; the subsequent
+  6502 read at PC `0x5839` from `$280A` returns `0x1E`. This is the strongest
+  current title-path byte pairing. The result is recorded in
   `reference/experiments/stunrun/sound-boundary-tap.metadata.json`.
-- UNKNOWN: exact command payload queue ownership, first post-NMI read boundary,
-  and acknowledgement behavior.
+- UNKNOWN: whether the frame-447 command is the smallest stable sound fixture,
+  producer buffer ownership, and exact acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
 
 The three-processor differential hashes and first-divergence landmarks are

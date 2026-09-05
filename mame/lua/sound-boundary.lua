@@ -20,13 +20,28 @@ local function cpu_pc(tag)
     return state['CURPC'].value
 end
 
+local function jsa_io_label(address, direction)
+    -- JSA-II uses mirror mask 0x1f9.  The unmapped low register bits select
+    -- the four device functions: 0, 2, 4, and 6.
+    local register = address % 8
+    local names = direction == 'read' and {
+        [0] = 'sound_oki', [2] = 'sound_command',
+        [4] = 'sound_rdio', [6] = 'sound_irq_ack'
+    } or {
+        [0] = 'sound_voice', [2] = 'sound_response',
+        [4] = 'sound_wrio', [6] = 'sound_mix'
+    }
+    return names[register] or 'sound_other'
+end
+
 local function read_tap(address, end_address, tag, label)
     local cpu = manager.machine.devices[tag]
     taps[#taps + 1] = cpu.spaces['program']:install_read_tap(
         address, end_address, 'stunrun_' .. label,
         function(offset, data, mask)
+            local event_label = label == 'sound_io' and jsa_io_label(offset, 'read') or label
             print(string.format('M1_SOUND_READ label=%s frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
-                label, frame, cpu_pc(tag), offset, data, mask))
+                event_label, frame, cpu_pc(tag), offset, data, mask))
         end)
 end
 
@@ -35,8 +50,9 @@ local function write_tap(address, end_address, tag, label)
     taps[#taps + 1] = cpu.spaces['program']:install_write_tap(
         address, end_address, 'stunrun_' .. label,
         function(offset, data, mask)
+            local event_label = label == 'sound_io' and jsa_io_label(offset, 'write') or label
             print(string.format('M1_SOUND_WRITE label=%s frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
-                label, frame, cpu_pc(tag), offset, data, mask))
+                event_label, frame, cpu_pc(tag), offset, data, mask))
         end)
 end
 
@@ -50,8 +66,8 @@ end
 -- JSA-II's command and response registers are mirrored across the 6502
 -- address space.  The ROM uses aliases such as $280c/$280e, so tap the full
 -- MAME mirror ranges rather than only the canonical schematic addresses.
-read_tap(0x2802, 0x29fb, ':mainpcb:jsa:cpu', 'sound_command')
-write_tap(0x2a02, 0x2bfb, ':mainpcb:jsa:cpu', 'sound_response')
+read_tap(0x2802, 0x29fb, ':mainpcb:jsa:cpu', 'sound_io')
+write_tap(0x2a02, 0x2bfb, ':mainpcb:jsa:cpu', 'sound_io')
 
 local function apply_event(event)
     local port = assert(manager.machine.ioport.ports[event.port])

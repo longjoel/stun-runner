@@ -86,6 +86,14 @@ drives main-CPU line 2. The remaining IRQ-0002 work is the program source,
 serial payload semantics, and the unresolved gameplay boundary. See
 `reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
 
+The title-path sound transport is also partially resolved: a clean frame-447
+68010 write at `0x023EF6` carries active-lane byte `0x1E`, and the subsequent
+6502 read at `0x5839/$280A` returns `0x1E`. MAME source maps `$280A` as a
+mirror of JSA-II `$2802` `sound_command_r`; `$280C` and `$280E` are distinct
+RDIO and IRQ-ack mirrors. Remaining sound work is fixture selection and
+producer-buffer semantics, not discovery of the command transport. See
+`reference/experiments/stunrun/sound-boundary-tap.metadata.json`.
+
 ---
 
 ## IRQ-0003
