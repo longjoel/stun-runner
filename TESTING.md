@@ -81,16 +81,18 @@ Unit tests should cover at least:
 
 Integration tests validate boundaries between reconstructed subsystems.
 
-Important examples include:
+Important examples for the **active target configuration** include:
 
 - 68010 → ADSP command/mailbox behavior;
 - ADSP → shared-memory result behavior;
-- 68010 → GSP/MSP command submission;
-- GSP/MSP shared state and synchronization;
+- 68010 → GSP command submission;
+- GSP/shared-state synchronization;
 - 68010 → JSA II sound command behavior;
 - input registers → game-state transitions;
 - timer/interrupt behavior;
 - renderer command stream generation.
+
+If Step 0/runtime inventory later shows an MSP or another optional programmable device is active for a different revision/target, add integration tests for that boundary then. Do not require absent family devices for S.T.U.N. Runner's current baseline.
 
 Whenever possible, construct integration fixtures from a canonical MAME checkpoint.
 
@@ -332,17 +334,18 @@ Report at least:
 
 From MAME traces, track which original executable addresses have actually been observed executing.
 
-The project converts stable address-hit maps into LCOV tracefiles against generated pseudo-source listings, one instruction per stable line. This allows `genhtml` to produce heatmaps for original 68010, TMS34010, ADSP-2100, and 6502 code without conflating those metrics with native source coverage.
+The project converts stable address-hit maps into LCOV tracefiles against generated pseudo-source listings, one instruction per stable line. This allows `genhtml` to produce heatmaps for original active processor code without conflating those metrics with native source coverage.
 
-Report per processor where possible:
+For the current S.T.U.N. Runner working model, report per active processor where possible:
 
 ```text
 68010       executed addresses / known code addresses
 TMS34010 GSP
-TMS34010 MSP
 ADSP-2100
 6502
 ```
+
+If runtime inventory proves another programmable processor is active, add its coverage dataset then. In particular, do not require a TMS34010 MSP coverage report while Step 0/runtime inventory says the MSP is absent.
 
 Prefer maps/heatmaps that classify addresses or functions as:
 
