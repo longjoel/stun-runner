@@ -211,9 +211,11 @@ A fixture must record:
 
 Traditional native source coverage is useful but insufficient. This project tracks multiple coverage dimensions.
 
+LCOV is the common reporting layer for coverage. See `LCOV.md` for the exact integration model.
+
 ### 7.1 Native source coverage
 
-Use normal tooling such as LLVM coverage or gcov/lcov for native code and project tools.
+Use normal compiler instrumentation and LCOV/genhtml for native code and project tools.
 
 Report at least:
 
@@ -225,6 +227,8 @@ Report at least:
 
 From MAME traces, track which original executable addresses have actually been observed executing.
 
+The project converts stable address-hit maps into LCOV tracefiles against generated pseudo-source listings, one instruction per stable line. This allows `genhtml` to produce heatmaps for original 68010, TMS34010, ADSP-2100, and 6502 code without conflating those metrics with native source coverage.
+
 Report per processor where possible:
 
 ```text
@@ -234,8 +238,6 @@ TMS34010 MSP
 ADSP-2100
 6502
 ```
-
-This is a reverse-engineering coverage metric, not source-code coverage.
 
 Prefer maps/heatmaps that classify addresses or functions as:
 
@@ -249,6 +251,13 @@ NEVER OBSERVED
 ### 7.3 Tested original execution coverage
 
 Distinguish code merely observed during exploratory play from code exercised by reproducible automated experiments.
+
+Maintain separate LCOV datasets where practical:
+
+```text
+coverage/original-observed.info
+coverage/original-tested.info
+```
 
 A key metric is:
 
@@ -326,7 +335,8 @@ assembler encoder tests
 unit tests
 integration tests using checked-in legal fixtures
 trace/parser tests
-coverage report generation
+LCOV capture for native/tooling code
+genhtml report generation
 ```
 
 ### ROM-dependent oracle verification
@@ -344,7 +354,8 @@ run reproduction
 run native port
 compare normalized states
 run golden/differential tests
-generate original execution coverage
+generate original observed/tested LCOV datasets
+generate per-processor genhtml reports
 ```
 
 If ROMs are unavailable, oracle tests should be reported as skipped, not failed.
@@ -385,12 +396,14 @@ Do not delete a failing behavioral test merely because the implementation has ch
 - creates evidence-backed hypotheses;
 - proposes or generates fixtures from original observations;
 - identifies previously unexecuted code and experiments needed to reach it;
+- ensures traces contain enough address information for original execution coverage;
 - does not alter expected results merely to accommodate implementation behavior.
 
 ### Implementer
 
 - builds reproduction and native code against established fixtures;
 - adds normal unit tests for reconstructed modules;
+- enables conventional LCOV-compatible coverage for native/tooling code;
 - does not silently redefine oracle expectations;
 - requests investigation when a verified fixture appears incompatible with the current semantic model.
 
@@ -399,6 +412,7 @@ Do not delete a failing behavioral test merely because the implementation has ch
 - owns differential, integration, golden, and end-to-end verification architecture;
 - owns normalized checkpoint schemas;
 - owns coverage reporting for original behavior;
+- owns the trace-to-LCOV conversion pipeline and generated original-code `.info` datasets;
 - independently classifies mismatches;
 - does not silently modify production implementation to make tests pass.
 
