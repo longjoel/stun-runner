@@ -1,0 +1,30 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "processor_trace_600",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "input": "none",
+  "trace_flags": ["noloop"],
+  "processors": {
+    ":mainpcb:gsp": {
+      "frames_60_bytes": 0,
+      "frames_600_bytes": 394608373,
+      "frames_600_sha256": "5f28914a2ba61bf95ee7e0de43b0179d14f0eee5607d2ebe970842ec9de60938",
+      "first_observed_nonempty_window": "frames 61-600",
+      "first_trace_pc": "0xFFF59920",
+      "first_trace_instruction": "SETF 20h,0,1"
+    },
+    ":mainpcb:adsp": {
+      "frames_60_bytes": 0,
+      "frames_600_bytes": 141337591,
+      "frames_600_sha256": "4a2f2acae22499b9acb4d54fd739b6b7f98a561fa74c267f17799f2a5273e697",
+      "first_observed_nonempty_window": "frames 61-600",
+      "first_trace_pc": "0x0004",
+      "first_trace_instruction": "CALL $0780"
+    }
+  },
+  "confidence": "OBSERVED-IN-TRACE",
+  "raw_traces_kept_local": true,
+  "next_question": "Bound the first executing frame and correlate GSP/ADSP activity with 68010 command or interrupt landmarks."
+}

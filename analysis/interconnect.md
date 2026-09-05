@@ -24,6 +24,13 @@ not game-level semantics.
   count, ADSP activity, or the program's load/source path.
 - The six-frame M0 trace metadata still records empty GSP/ADSP instruction
   traces as a bounded observation, not proof of inactivity.
+- OBSERVED-IN-TRACE: independent 60-frame traces for both GSP and ADSP are
+  empty, while independent 600-frame traces are nonempty. The first observed
+  GSP trace instruction is at `0xFFF59920`; the first observed non-NOP ADSP
+  instruction is `0x0004: CALL $0780`. This bounds first activity to frames
+  61–600 without identifying the exact frame.
+- See `reference/experiments/stunrun/processor-trace-600.metadata.json` for
+  trace hashes and sizes.
 - Two independent 600-frame coin/start runs registered read/write probes for
   the ADSP data window `0x808000–0x80bfff`, but headless MAME did not deliver
   their action callbacks; see `reference/experiments/stunrun/adsp-data-window.metadata.json`.
@@ -48,9 +55,16 @@ not game-level semantics.
   and `0x02C1EE`.
 - OBSERVED-IN-TRACE: an early Coin 2 variant enters a bounded trace dominated
   by `0x0013EC` → `0x0013FC`/`0x001404`, polling `0x60C001`.
-- UNKNOWN: why the normal Coin 1 path leaves the displayed credit count at
-  zero; the current evidence does not justify treating the input checks as a
-  credit-state contract.
+- OBSERVED-IN-REPLAY: the normal and early Coin 1/start sequences both reach
+  the same road/demo image as no input at frame 600, with `Credits: 0`.
+- STATIC-CANDIDATE: routine `0x043590` is the only listing routine that samples
+  coin bits 7/6 at `0x60C001`; it has six direct callers, but none executes in
+  the tested boot/title/service/coin-start traces.
+- UNKNOWN: whether the normal Coin 1 path leaves the displayed credit count at
+  zero because the run remains in attract/demo, because a required transition
+  is missing, or because the installed MAME input model differs from the ROM's
+  expected environment. The current evidence does not justify treating the
+  input checks as a credit-state contract.
 - UNKNOWN: interrupt/flag direction and acknowledgement sequence.
 
 ### 68010 ↔ GSP/PSP

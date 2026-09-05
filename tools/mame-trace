@@ -32,6 +32,7 @@ STUNRUN_TRACE_OUT="$trace" \
 STUNRUN_TRACE_CPU="$cpu" \
 STUNRUN_TRACE_FRAMES="$frames" \
 STUNRUN_TRACE_INPUT="$input_mode" \
+SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" \
 "$mame_exe" -rompath "$rompath" stunrun \
     -video none -sound none -skip_gameinfo -noplugin data \
     -debug -debugger none -seconds_to_run "$(( (frames + 59) / 60 + 1 ))" \
