@@ -73,9 +73,11 @@ not game-level semantics.
 - OBSERVED-IN-TRACE: direct 68010 taps over `0x810000–0x813fff` in independent
   1200-frame no-input and coin/start runs observe identical 625,989 reads,
   spanning `0x810000–0x813f50` from PCs `0x02F0C2`, `0x02F0E2`, `0x02248E`,
-  and `0x02249A`. This directly corroborates the instruction-trace
-  ADSP-buffer→GSP FIFO edge; no writes were observed in the bounded 600-frame
-  probe. See `reference/experiments/stunrun/adsp-buffer-window.metadata.json`.
+  and `0x02249A`. Each run has 106 count/terminator pairs: the count at
+  `0x810000` is followed by a `0xFFFF` read at `0x810000 + 2*count`. This
+  directly corroborates the instruction-trace ADSP-buffer→GSP FIFO edge; no
+  writes were observed in the bounded 600-frame probe. See
+  `reference/experiments/stunrun/adsp-buffer-window.metadata.json`.
 - OBSERVED-IN-TRACE: direct 68010 data-window taps in independent 600-frame
   no-input and coin/start runs observe exactly one write, `0x02C20C` →
   `0x80BFFE` with data `0xFFFF`, and zero 68010 reads in

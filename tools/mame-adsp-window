@@ -11,7 +11,10 @@ import subprocess
 
 
 WRITE = re.compile(r"M1_ADSP_WRITE kind=([a-z]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) data=([0-9A-Fa-f]+)")
-READ = re.compile(r"M1_ADSP_READ kind=([a-z]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+)")
+READ = re.compile(
+    r"M1_ADSP_READ kind=([a-z]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
+    r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
+)
 WINDOWS = {
     "program": ("0x800000", "0x8000", "0x800000-0x807fff"),
     "data": ("0x808000", "0x4000", "0x808000-0x80bfff"),
@@ -62,7 +65,8 @@ def main() -> int:
         for match in WRITE.finditer(text)
     ]
     reads = [
-        {"kind": match.group(1), "pc": int(match.group(2), 16), "address": int(match.group(3), 16)}
+        {"kind": match.group(1), "pc": int(match.group(2), 16), "address": int(match.group(3), 16),
+         "data": int(match.group(4), 16), "mask": int(match.group(5), 16)}
         for match in READ.finditer(text)
     ]
     observations = writes if args.access == "write" else reads

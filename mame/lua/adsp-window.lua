@@ -37,8 +37,8 @@ local function install_tap()
     if access == 'read' then
         tap = space:install_read_tap(start_address, end_address, 'stunrun_adsp_window_read',
             function(offset, data, mask)
-                print(string.format('M1_ADSP_READ kind=%s pc=%08X addr=%08X',
-                    label, pc.value, offset))
+                print(string.format('M1_ADSP_READ kind=%s pc=%08X addr=%08X data=%08X mask=%08X',
+                    label, pc.value, offset, data, mask))
             end)
     else
         tap = space:install_write_tap(start_address, end_address, 'stunrun_adsp_window_write',

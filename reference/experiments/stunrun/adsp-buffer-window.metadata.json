@@ -7,27 +7,36 @@
   "rom_manifest": "roms/stunrun.manifest.json",
   "start": "power_on",
   "terminal_condition": "frame >= 1200",
-  "tap": {"processor": ":mainpcb:maincpu", "range": "0x810000-0x813fff", "access": "read", "installed_after_frame": 10},
+  "tap": {"processor": ":mainpcb:maincpu", "range": "0x810000-0x813fff", "access": "read", "installed_after_frame": 10, "captures": ["pc", "address", "data", "mask"]},
   "runs": {
     "none": {
-      "result_path": "/tmp/stunrun-m1-adsp-buffer-read-1200/result.json",
-      "result_sha256": "62763685cabd6a063733239fcc5cd7b7096617717b4cbb995e83a7df0a250c66",
-      "canonical_log_sha256": "db5a0a9f18614b16cecb5b2cf566a8f37bc1869239eae5e7f004d2664c065836",
+      "result_path": "/tmp/stunrun-m1-adsp-buffer-values-1200/result.json",
+      "result_sha256": "1f8e51a56634fc64f0402501e9d114f61da3c8b4e15dadbd24a2b4ca752147fa",
+      "canonical_log_sha256": "b686df750e8481c4155763f4971402eb34f182d8dcc5a87a05cf8194a8c301cb",
       "observations": 625989,
       "distinct_pcs": ["0x02F0C2", "0x02F0E2", "0x02248E", "0x02249A"],
-      "address_range": "0x810000-0x813f50"
+      "address_range": "0x810000-0x813f50",
+      "block_headers": 106,
+      "terminators": 106,
+      "terminator_value": "0xFFFF",
+      "terminator_address_formula": "0x810000 + (count * 2)"
     },
     "coin_start": {
-      "result_path": "/tmp/stunrun-m1-adsp-buffer-read-1200-coin/result.json",
-      "result_sha256": "69420f52dcad8f690625a20d06cb9a20d4b7c237876370102621699232a389ea",
-      "canonical_log_sha256": "2046b7b45f5069486152feda02882d16b8a1e81a58ed596a6b25017c64074b6a",
+      "result_path": "/tmp/stunrun-m1-adsp-buffer-values-1200-coin/result.json",
+      "result_sha256": "141433cd6462db4570d156379e4d8581cc7fa00ca047cdbb3f0064bd7d3c873e",
+      "canonical_log_sha256": "b775a5bb46226330e03c17673b14e38da425c426a82bc9c4c76f33b4b46d5276",
       "observations": 625989,
       "distinct_pcs": ["0x02F0C2", "0x02F0E2", "0x02248E", "0x02249A"],
-      "address_range": "0x810000-0x813f50"
+      "address_range": "0x810000-0x813f50",
+      "block_headers": 106,
+      "terminators": 106,
+      "terminator_value": "0xFFFF",
+      "terminator_address_formula": "0x810000 + (count * 2)"
     }
   },
-  "observation": "Direct 68010 read taps in independent 1200-frame no-input and coin_start runs observe identical 625989 reads from the ADSP serial/output buffer. The reads span 0x810000-0x813f50 and come from PCs 0x02F0C2/0x02F0E2 and transfer-loop PCs 0x02248E/0x02249A. This runtime evidence corroborates the existing instruction-trace edge from the buffer into the GSP FIFO; no buffer writes were observed in the 600-frame title-path write probe.",
+  "observation": "Direct 68010 read taps with data/mask capture in independent 1200-frame no-input and coin_start runs observe identical 625989 reads from the ADSP serial/output buffer. Each run contains 106 paired blocks: PC 0x02F0C2 reads a count at 0x810000, the transfer loop reads the block, and PC 0x02F0E2 reads 0xFFFF at 0x810000 + (count * 2). The reads span 0x810000-0x813f50 and come from PCs 0x02F0C2/0x02F0E2 and transfer-loop PCs 0x02248E/0x02249A. This runtime evidence corroborates the existing instruction-trace edge from the buffer into the GSP FIFO; no buffer writes were observed in the 600-frame title-path write probe.",
   "confidence": "MAME-CONFIRMED map plus OBSERVED-IN-TRACE runtime read activity and input-identical buffer-to-GSP path",
   "raw_logs_kept_local": true,
-  "next_question": "Normalize the length-prefixed blocks read from 0x810000 and correlate their terminators with GSP FIFO submissions."
+  "analysis_command": "tools/analyze-adsp-buffer-log <mame.log>",
+  "next_question": "Correlate the normalized buffer block counts with individual GSP FIFO submission boundaries."
 }
