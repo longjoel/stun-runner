@@ -100,12 +100,19 @@ not game-level semantics.
 - OBSERVED-IN-TRACE: `coin_start` changes the 6502 trace and includes an
   explicit `IRQ 0` interruption while executing at `0x414C`; the source of the
   IRQ and its command payload remain unresolved.
+- STATIC-CANDIDATE+OBSERVED-IN-TRACE: the 68010 executes `0x023EF6`, which
+  writes a byte to `0x600000`, and executes `0x023F66`/`0x023FAE`, which read
+  the JSA window in an interrupt/ring-buffer-shaped path. Their counts are
+  stable between no-input and coin-start traces (`8`, `2`, and `2`), so this
+  narrows the ROM-side access path without assigning byte-level semantics.
 - UNKNOWN: command register/queue offsets and acknowledgement behavior.
 - UNKNOWN: which deterministic input/event is the smallest useful sound trigger.
 
 The three-processor differential hashes and first-divergence landmarks are
 recorded in
 `reference/experiments/stunrun/processor-input-differential.metadata.json`.
+The static/runtime candidate search is recorded in
+`reference/experiments/stunrun/sound-handler-search.metadata.json`.
 
 ## Evidence queue
 

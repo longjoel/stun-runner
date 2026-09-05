@@ -1,0 +1,48 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "static_sound_handler_search",
+  "listing": "reference/listings/stunrun.metadata.json",
+  "runtime_trace": "/tmp/stunrun-m1-main-trace-coin/maincpu-68010.trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "dynamic_window": {
+    "start": "0x600000",
+    "end": "0x603fff",
+    "read_handler": "atari_jsa_base_device::main_response_r",
+    "write_handler": "atari_jsa_base_device::main_command_w"
+  },
+  "static_candidates": [
+    {
+      "pc": "0x023EF6",
+      "operation": "move.b D0, $600000",
+      "context": "interrupts masked around the write; preceded by a test of bit 15 at $a80000",
+      "confidence": "STATIC-CANDIDATE"
+    },
+    {
+      "pc": "0x023F66",
+      "operation": "move.b $600000, (A0); rte",
+      "context": "interrupt-returning receive/ring-buffer-shaped routine",
+      "confidence": "STATIC-CANDIDATE"
+    },
+    {
+      "pc": "0x023FAE",
+      "operation": "move.w $604000, D1; move.b $600000, D1",
+      "context": "reads the adjacent 0x604000 status/reset region and JSA window",
+      "confidence": "STATIC-CANDIDATE"
+    }
+  ],
+  "coin_start_trace_counts": {
+    "0x023EF6": 8,
+    "0x023F66": 2,
+    "0x023FAE": 2
+  },
+  "no_input_trace_counts": {
+    "0x023EF6": 8,
+    "0x023F66": 2,
+    "0x023FAE": 2
+  },
+  "observation": "The candidate 68010 sound routines execute in both no-input and coin-start traces with identical counts; the available evidence establishes a repeatable ROM-side JSA access path but does not yet tie a particular byte to a sound command or prove IRQ direction.",
+  "confidence": "STATIC-CANDIDATE+OBSERVED-IN-TRACE",
+  "raw_traces_kept_local": true,
+  "next_question": "Capture a deliberately sound-producing event or correlate one candidate write with 6502 IRQ timing and command consumption."
+}
