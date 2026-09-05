@@ -37,6 +37,14 @@ not game-level semantics.
   frame 136. Independent repeats of both 600-frame traces are byte-identical.
 - See `reference/experiments/stunrun/processor-trace-600.metadata.json` for
   trace hashes and sizes.
+- OBSERVED-IN-TRACE: the 68010 executes `0x02C5EA` 14 times in each bounded
+  600-frame no-input and `coin_start` trace. Each execution passes
+  `0x810000` to `0x02F0AE`; that routine consumes a length-prefixed block from
+  the MAME-mapped ADSP serial/output buffer and `0x02247A` copies the block to
+  the GSP FIFO at `0xC0000C`, followed by a `-1` terminator check. This is an
+  observed ADSP-buffer→GSP data-flow edge, not proof of the ADSP producer's
+  command semantics. See
+  `reference/experiments/stunrun/adsp-interface-map.metadata.json`.
 - Two independent 600-frame coin/start runs registered read/write probes for
   the ADSP data window `0x808000–0x80bfff`, but headless MAME did not deliver
   their action callbacks; see `reference/experiments/stunrun/adsp-data-window.metadata.json`.

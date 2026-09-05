@@ -33,7 +33,33 @@
     "load_count": 6,
     "interleave": "ROM_LOAD16_BYTE"
   },
-  "runtime_status": "MAME-CONFIRMED-MAP; runtime watchpoint callbacks remain unavailable in installed headless MAME",
+  "observed_adsp_buffer_to_gsp_transfer": {
+    "trace_paths": [
+      "/tmp/stunrun-m1-main-trace-none/maincpu-68010.trace",
+      "/tmp/stunrun-m1-main-trace-coin/maincpu-68010.trace"
+    ],
+    "frames": 600,
+    "trace_sha256": {
+      "none": "70fe7220484832195d13cb988c715b0127d3992f7df6f8b0b1f16da0376151ec",
+      "coin_start": "a7d8ba57a4395eaaa3a002996a95b16b9c3761deaee039dcec837b0f9a81c7e0"
+    },
+    "trace_bytes": {
+      "none": 154266505,
+      "coin_start": 154266927
+    },
+    "caller_pc": "0x02c5ea",
+    "callee_pc": "0x02f0ae",
+    "transfer_helper_pc": "0x02247a",
+    "source_base": "0x810000",
+    "destination": "0xc0000c",
+    "executions": {
+      "none": 14,
+      "coin_start": 14
+    },
+    "mechanism": "The caller passes 0x810000 to 0x02f0ae. The callee reads a word from the source as a byte-count, advances past it, and 0x02247a copies that many bytes to the GSP FIFO at 0xc0000c; the callee then checks the final source word for -1.",
+    "interpretation": "OBSERVED-IN-TRACE: the rev-6 68010 consumes the MAME-mapped ADSP serial/output buffer as a source for GSP FIFO submissions. This identifies a data-flow edge, but not the ADSP producer-side protocol or the semantic meaning of each block."
+  },
+  "runtime_status": "MAME-CONFIRMED-MAP; runtime watchpoint callbacks remain unavailable in installed headless MAME; one ADSP-buffer-to-GSP transfer path is observed in instruction traces",
   "confidence": "MAME-CONFIRMED",
   "next_question": "Use instruction traces and any reachable control/data landmarks to determine which of these interfaces the rev-6 ROM actually exercises."
 }
