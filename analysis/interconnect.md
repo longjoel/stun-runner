@@ -45,6 +45,15 @@ not game-level semantics.
   observed ADSP-buffer→GSP data-flow edge, not proof of the ADSP producer's
   command semantics. See
   `reference/experiments/stunrun/adsp-interface-map.metadata.json`.
+- OBSERVED-IN-TRACE: the ADSP executes the MAME special-data offsets for
+  `SIMBUF` (`DM($2000)`), `SIMCLK` (`$2001`), `SOMLATCH` (`$2002`),
+  `SOMCLK` (`$2003`), `GINT` (`$2006`), and object-ROM bank select `MP`
+  (`$2007`) in both 600-frame traces. The aggregate counts are respectively
+  `73416`, `33158`, `84700`, `30`, `30`, and `10335`; `$2004` and `XOUT`
+  (`$2005`) have zero observed instructions. This establishes that the ADSP
+  special-I/O path is active, including the GINT and object-ROM controls, but
+  does not establish the values written or the meaning of each serial block.
+  See `reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
 - Two independent 600-frame coin/start runs registered read/write probes for
   the ADSP data window `0x808000–0x80bfff`, but headless MAME did not deliver
   their action callbacks; see `reference/experiments/stunrun/adsp-data-window.metadata.json`.

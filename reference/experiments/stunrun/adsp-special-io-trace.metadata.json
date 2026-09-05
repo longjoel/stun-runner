@@ -1,0 +1,38 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "mame_adsp_special_io_trace",
+  "source": [
+    "analysis/driver-mining/stunrun.machine-map.yaml",
+    "analysis/interconnect.md",
+    "third_party/mame-master/src/mame/atari/harddriv_m.cpp"
+  ],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "traces": {
+    "none": {
+      "path": "/tmp/stunrun-m1-adsp-600b/adsp2100.trace",
+      "frames": 600,
+      "sha256": "4a2f2acae22499b9acb4d54fd739b6b7f98a561fa74c267f17799f2a5273e697",
+      "bytes": 141337591
+    },
+    "coin_start": {
+      "path": "/tmp/stunrun-m1-adsp-coin-600/adsp2100.trace",
+      "frames": 600,
+      "sha256": "04d1c6a5835a76f3c75a52c4c9bd34b97dad93fb474628e24230dc7b56ee386a",
+      "bytes": 141352671
+    }
+  },
+  "special_data_access_counts": {
+    "0x2000_SIMBUF_read": {"none": 73416, "coin_start": 73416},
+    "0x2001_SIMCLK_write": {"none": 33158, "coin_start": 33158},
+    "0x2002_SOMLATCH_write": {"none": 84700, "coin_start": 84700},
+    "0x2003_SOMCLK_write": {"none": 30, "coin_start": 30},
+    "0x2004_unassigned": {"none": 0, "coin_start": 0},
+    "0x2005_XOUT_write": {"none": 0, "coin_start": 0},
+    "0x2006_GINT_write": {"none": 30, "coin_start": 30},
+    "0x2007_MP_write": {"none": 10335, "coin_start": 10335}
+  },
+  "interpretation": "OBSERVED-IN-TRACE: the ADSP executes SIMBUF, SIMCLK, SOMLATCH, SOMCLK, GINT, and MP special-data accesses in both bounded 600-frame traces. No DM($2004) or DM($2005) instruction is observed. Equal aggregate counts do not imply equal values or producer-side state; the full traces remain input-differential.",
+  "runtime_status": "ADSP special-data access landmarks are instruction-trace observed; handler-side values and exact serial/object semantics remain unresolved",
+  "confidence": "MAME-CONFIRMED-MAP plus OBSERVED-IN-TRACE"
+}
