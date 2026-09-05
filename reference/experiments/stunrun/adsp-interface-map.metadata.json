@@ -59,7 +59,7 @@
     "mechanism": "The caller passes 0x810000 to 0x02f0ae. The callee reads a word from the source as a byte-count, advances past it, and 0x02247a copies that many bytes to the GSP FIFO at 0xc0000c; the callee then checks the final source word for -1.",
     "interpretation": "OBSERVED-IN-TRACE: the rev-6 68010 consumes the MAME-mapped ADSP serial/output buffer as a source for GSP FIFO submissions. This identifies a data-flow edge, but not the ADSP producer-side protocol or the semantic meaning of each block."
   },
-  "runtime_status": "MAME-CONFIRMED-MAP; runtime watchpoint callbacks remain unavailable in installed headless MAME; one ADSP-buffer-to-GSP transfer path is observed in instruction traces",
+  "runtime_status": "MAME-CONFIRMED-MAP; direct memory taps observe the 68010 reading the ADSP buffer in the bounded 1200-frame title path; one ADSP-buffer-to-GSP transfer path is also instruction-trace observed",
   "confidence": "MAME-CONFIRMED",
-  "next_question": "Use instruction traces and any reachable control/data landmarks to determine which of these interfaces the rev-6 ROM actually exercises."
+  "next_question": "Normalize the length-prefixed buffer blocks and correlate their terminators with GSP FIFO submissions."
 }

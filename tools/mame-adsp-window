@@ -15,6 +15,10 @@ READ = re.compile(r"M1_ADSP_READ kind=([a-z]+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-
 WINDOWS = {
     "program": ("0x800000", "0x8000", "0x800000-0x807fff"),
     "data": ("0x808000", "0x4000", "0x808000-0x80bfff"),
+    "buffer": ("0x810000", "0x4000", "0x810000-0x813fff"),
+    "control": ("0x818000", "0x20", "0x818000-0x81801f"),
+    "irq_clear": ("0x818060", "0x20", "0x818060-0x81807f"),
+    "irq_state": ("0x838000", "0x8000", "0x838000-0x83ffff"),
 }
 
 
