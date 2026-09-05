@@ -1,0 +1,20 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "gsp_boundary",
+  "start": "power_on",
+  "events": [],
+  "instrumentation": {
+    "tool": "tools/mame-gsp-boundary",
+    "window": "0xc0000c-0xc0000f",
+    "access": "68010 writes",
+    "tap_installation": "frame 10",
+    "capture_start_frame": 305,
+    "frames": 600,
+    "inputs": ["none", "coin_start"]
+  },
+  "expect": {
+    "kind": "bounded_observation",
+    "terminal": "frame >= 600",
+    "interpretation": "Capture only the first 32 FIFO writes from frame 305 onward; identical title-path sequences do not establish gameplay semantics."
+  }
+}

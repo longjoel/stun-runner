@@ -1,0 +1,46 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/gsp_boundary.json",
+  "runner": "tools/mame-gsp-boundary",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start": "power_on",
+  "tap_installation": "frame 10, after the dynamically installed GSP handlers are available",
+  "capture_start_frame": 305,
+  "terminal_condition": "frame >= 600",
+  "window": {
+    "cpu": ":mainpcb:maincpu",
+    "space": "program",
+    "access": "write",
+    "range": "0xc0000c-0xc0000f",
+    "meaning": "observed GSP FIFO sink within the MAME-confirmed 0xc00000-0xc03fff GSP I/O window"
+  },
+  "runs": {
+    "none": {
+      "input": "none",
+      "result_path": "/tmp/stunrun-m1-gsp-boundary-none-305/result.json",
+      "result_sha256": "7044c167fd98722fd2e8f630578b26178fefc7d160ee46e0662463b4a61e670f",
+      "canonical_log_sha256": "006bdb7f1a9322486083c88279eed4dbbe2edb345f276e7cdf1e2666d21662a9",
+      "returncode": 0
+    },
+    "coin_start": {
+      "input": "coin_start",
+      "result_path": "/tmp/stunrun-m1-gsp-boundary-coin-305/result.json",
+      "result_sha256": "e751bcfb2555cbe817a758bc9d7be56ed89a07b5ed05f8c338f7e0c232358b3c",
+      "canonical_log_sha256": "1262d8000aebff6129a437579846bfd42c565ef696c053091a35915bd0387fd0",
+      "returncode": 0
+    }
+  },
+  "observed_sequence": {
+    "first_frame": 363,
+    "writes_captured_per_run": 32,
+    "distinct_writer_pcs": ["0x02146C", "0x02147C", "0x021492", "0x0215EE", "0x0216A8", "0x0216D2", "0x0216E2", "0x0216F6"],
+    "sequence_equal_across_inputs": true,
+    "data_prefix": ["0xB800", "0x0105", "0x0103", "0x0013", "0x0004", "0x013C", "0x0137", "0x0037", "0x0013", "0x0001", "0xFFFF", "0x0000"]
+  },
+  "observation": "The first captured title-path FIFO writes after frame 305 occur at frame 363 in both independent runs and have the same writer-PC/data sequence. This promotes a runtime main-CPU-to-GSP FIFO submission boundary, but does not identify whether the sequence is initialization, attract rendering, or gameplay command traffic.",
+  "confidence": "MAME-CONFIRMED sink plus OBSERVED-IN-TRACE title-path writer sequence",
+  "instrumentation_limit": "A broad 0xc00000-0xc03fff Lua tap caused installed MAME 0.289 to segfault in the Lua bridge under high callback load; this experiment intentionally uses the narrower proven FIFO subrange.",
+  "raw_logs_kept_local": true,
+  "next_question": "Reach a verified gameplay transition and compare the FIFO writer/data sequence against the title-path baseline."
+}

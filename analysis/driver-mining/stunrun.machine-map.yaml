@@ -258,6 +258,7 @@ relationships:
     evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
     mame_hint: hd68k_gsp_io_w at 0xc00000-0xc03fff; observed FIFO sink at 0xc0000c
     observed_contract: 68010 PCs 0x02F0C2/0x02F0E2 frame each length-prefixed 0x810000 buffer block; transfer PCs 0x02248E/0x02249A produce exactly count writes to 0xC0000C before the 0xFFFF terminator
+    observed_title_path: frame-363 FIFO sequence after frame-305 capture begins at 0x0216A8 and includes 0x0215EE, 0x0216F6, 0x0216D2, 0x0216E2, 0x02146C, 0x02147C, and 0x021492 in both no-input and coin/start runs
   - from: jsa2
     to: soundcpu
     kind: response_latch_to_main_irq

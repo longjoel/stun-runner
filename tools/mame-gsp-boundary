@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""Capture bounded 68010 writes to the observed GSP FIFO sink."""
+
+import argparse
+import hashlib
+import json
+import os
+import pathlib
+import re
+import subprocess
+
+
+FIRST = re.compile(
+    r"M1_GSP_WRITE_FIRST frame=(\d+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
+    r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+) post_init=(true|false)"
+)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rompath", type=pathlib.Path)
+    parser.add_argument("output", type=pathlib.Path)
+    parser.add_argument("--frames", type=int, default=600)
+    parser.add_argument("--capture-start-frame", type=int, default=132)
+    parser.add_argument("--input", choices=("none", "coin_start"), default="none")
+    parser.add_argument("--mame", default="mame")
+    args = parser.parse_args()
+    if args.frames <= 0:
+        parser.error("--frames must be positive")
+    args.output.mkdir(parents=True, exist_ok=True)
+    log = args.output / "mame.log"
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
+        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-debug",
+        "-debugger", "none", "-seconds_to_run", str(max(2, (args.frames + 59) // 60 + 1)),
+        "-autoboot_script", str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/gsp-boundary.lua"),
+    ]
+    environment = {
+        "STUNRUN_GSP_BOUNDARY_OUT": str(args.output),
+        "STUNRUN_GSP_BOUNDARY_FRAMES": str(args.frames),
+        "STUNRUN_GSP_BOUNDARY_CAPTURE_START": str(args.capture_start_frame),
+        "STUNRUN_GSP_BOUNDARY_INPUT": args.input,
+    }
+    with log.open("w", encoding="utf-8") as handle:
+        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                   env={**os.environ, **environment}, check=False)
+    text = log.read_text(encoding="utf-8")
+    first = [
+        {"frame": int(m.group(1)), "pc": int(m.group(2), 16),
+         "address": int(m.group(3), 16), "data": int(m.group(4), 16),
+         "mask": int(m.group(5), 16), "post_init": m.group(6) == "true"}
+        for m in FIRST.finditer(text)
+    ]
+    canonical = re.sub(r"output=[^\n]+", "output=<output>", text)
+    result = {
+        "schema": "stunrun-gsp-boundary-result/v1",
+        "experiment": "gsp_boundary",
+        "window": "0xc0000c-0xc0000f",
+        "capture_start_frame": args.capture_start_frame,
+        "frames": args.frames,
+        "input": args.input,
+        "returncode": completed.returncode,
+        "first_writes": first,
+        "distinct_first_pcs": sorted({row["pc"] for row in first}),
+        "post_init_first_writes": sum(1 for row in first if row["post_init"]),
+        "canonical_log_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+    (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    if completed.returncode:
+        raise SystemExit(f"MAME failed; see {log}")
+    print(json.dumps(result, separators=(",", ":")))
+
+
+if __name__ == "__main__":
+    main()

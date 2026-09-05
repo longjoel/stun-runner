@@ -193,7 +193,17 @@ producer-side ADSP meaning of each block remains unresolved. See
   `0xF480...`, palette, and control locations. Their counts are identical in
   the 600-frame no-input and coin-start traces, so they are initialization
   landmarks rather than input-dependent command evidence.
-- UNKNOWN: command submission region and synchronization mechanism.
+- OBSERVED-IN-TRACE: a stable narrow FIFO tap over `0xC0000C` captures the
+  first title-path writes after frame 305 at frame 363 in both no-input and
+  coin/start runs. The identical sequence includes writers at
+  `0x0216A8`, `0x0215EE`, `0x0216F6`, `0x0216D2`, `0x0216E2`, `0x02146C`,
+  `0x02147C`, and `0x021492`, with the same data prefix beginning
+  `B800, 0105, 0103, 0013, 0004`. These are runtime FIFO-submission
+  landmarks, not yet gameplay semantics. See
+  `reference/experiments/stunrun/gsp-boundary.metadata.json`.
+- NARROWED UNKNOWN: the FIFO sink is now runtime-observed, but command framing,
+  synchronization, and the first input-dependent/gameplay submission remain
+  unresolved.
 
 The static/runtime GSP search is recorded in
 `reference/experiments/stunrun/gsp-handler-search.metadata.json`.
