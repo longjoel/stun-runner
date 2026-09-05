@@ -70,9 +70,12 @@ not game-level semantics.
   observed ADSP `GINT → 68010 IRQ2 → acknowledgement` edge; it does not
   resolve the serial-block payload semantics. See
   `reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
-- Two independent 600-frame coin/start runs registered read/write probes for
-  the ADSP data window `0x808000–0x80bfff`, but headless MAME did not deliver
-  their action callbacks; see `reference/experiments/stunrun/adsp-data-window.metadata.json`.
+- OBSERVED-IN-TRACE: direct 68010 data-window taps in independent 600-frame
+  no-input and coin/start runs observe exactly one write, `0x02C20C` →
+  `0x80BFFE` with data `0xFFFF`, and zero 68010 reads in
+  `0x808000–0x80BFFF`. This is the reset/initialization landmark visible in
+  the bounded title path; it does not characterize internal ADSP data-space
+  accesses. See `reference/experiments/stunrun/adsp-data-window.metadata.json`.
 - OBSERVED-IN-TRACE (clean state snapshot): a direct read of the ADSP program
   space is empty at frame 136 and contains 2,718 nonzero words at frame 600.
   This proves title-path population of the executable ADSP RAM by the canonical
@@ -112,9 +115,9 @@ not game-level semantics.
   observed `0x02D35C` loop, but the source table/buffer semantics and exact
   instruction-level normalization of the paired `MOVE.L` halfword taps remain
   open.
-- UNKNOWN: 68010 reads or writes to the ADSP data window during the bounded
-  coin/start title-path runs, because the headless watchpoint callback path is
-  unavailable.
+- NARROWED UNKNOWN: beyond the single `0x02C20C` initialization write, no
+  68010 data-window traffic is observed in the bounded title path. Internal
+  ADSP data-space traffic and post-gameplay main-CPU accesses remain open.
 - UNKNOWN: which data-window offsets are commands, status, or shared data, and
   whether access occurs only after a verified gameplay transition.
 - MAME-CONFIRMED: the data special map exposes SIMBUF/SOM/XOUT/GINT and
