@@ -1,0 +1,24 @@
+{
+  "schema": "stunrun-checkpoint-metadata/v1",
+  "checkpoint": "m1-machine-map-title",
+  "system": "stunrun",
+  "description": "S.T.U.N. Runner (rev 6)",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "start_condition": "power_on",
+  "frame": 600,
+  "emulated_seconds": 9.96648,
+  "script": "mame/lua/checkpoint.lua",
+  "runner": "tools/mame-checkpoint",
+  "launch_flags": ["-noreadconfig", "-nowriteconfig", "-cfg_directory", "<mame-cfg>", "-nonvram_save", "-video", "soft", "-sound", "none"],
+  "state_sha256": "de377c5fd66816e6a56701730a45cb53d2c9ce019b58ae0bf7ff37f9da4995e2",
+  "repeat_count": 2,
+  "capture_state_sha256": "3ebdd4c811e4c7d2ffe8ba2e48ce7f025a343a36001af77b0dc364fbaa02a36c",
+  "repeat_capture_state_sha256": "3ebdd4c811e4c7d2ffe8ba2e48ce7f025a343a36001af77b0dc364fbaa02a36c",
+  "selector_status": "PROMOTED machine selector adsp_program_loaded=true; no semantic gameplay selector claimed",
+  "evidence": [
+    "reference/experiments/stunrun/adsp-program-snapshot.metadata.json",
+    "reference/experiments/stunrun/adsp-program-upload.metadata.json"
+  ],
+  "note": "This is the enriched M1 checkpoint. The older reference/checkpoints/title artifact is preserved as legacy M0 evidence because its processor-state capture came from a different prior launch observation."
+}

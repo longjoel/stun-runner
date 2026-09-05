@@ -2,7 +2,9 @@
 
 The current canonical machine checkpoint is `stunrun-checkpoint/v1`, emitted by
 `mame/lua/checkpoint.lua` and captured in
-`reference/checkpoints/title/state.json`.
+`reference/checkpoints/m1-machine-map/state.json`. The older
+`reference/checkpoints/title/state.json` artifact remains preserved as legacy
+M0 evidence.
 
 ## Canonical fields
 
@@ -30,7 +32,9 @@ added only with repeatable evidence and an explicit exact-versus-normalized
 comparison rule.
 
 This is sufficient for boot/title machine identity and processor-state
-reconciliation. IRQ-0003 remains open for the semantic extension needed by
+reconciliation. The M1 checkpoint now adds an exact ADSP program-region
+summary and the machine selector `adsp_program_loaded`, both repeatable across
+two independent captures. IRQ-0003 remains open for the semantic extension needed by
 reproduction and native gameplay checkpoints. M1 has now supplied repeatable
 region/access observations that are eligible inputs to that extension—ADSP
 program upload, serial-buffer block/FIFO transfer, and control/IRQ writes—but
