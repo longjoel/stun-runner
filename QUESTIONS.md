@@ -65,13 +65,20 @@ Agent 2 needs to know which hardware behavior must be reproduced immediately and
 The first bounded experiment observed no 68010 writes to the MAME-confirmed
 ADSP program window (`0x800000–0x807fff`) across two independent 600-frame
 power-on/title runs. The ADSP data window, interrupt/flag behavior, and program
-source remain open. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
+source remain open. Repeatable processor traces now establish GSP activity by
+frame 132 and ADSP activity by frame 122, with first non-NOP ADSP execution by
+frame 136. Early GSP accesses include candidate `0xC000...` and `0xF480...`
+control ranges; ADSP startup uses internal `PM(0x1236)` and
+`DM(0x0955–0x095A)` operations. These do not yet prove a 68010-visible
+program upload or mailbox contract. See
+`reference/experiments/stunrun/processor-startup-landmarks.metadata.json` and
+`analysis/interconnect.md`.
 
 ---
 
 ## IRQ-0003
 
-Status: OPEN
+Status: PARTIALLY RESOLVED
 From: Project bootstrap
 To: Verifier
 Priority: MEDIUM
@@ -87,3 +94,13 @@ Prefer a small format that can grow over time. Candidate fields include frame/cy
 ### Why it matters
 
 Verification should exist before substantial reconstruction so mismatches become evidence rather than subjective debugging sessions.
+
+### M1 progress
+
+The minimum repeatable machine checkpoint is now defined as
+`stunrun-checkpoint/v1`: machine identity, frame/time identity, debugger-visible
+processor tags, and selected processor registers. The current title/attract
+fixture is captured in `reference/checkpoints/title/state.json`; semantic
+gameplay/RAM-region fields are intentionally not promoted because the frame-600
+image is not yet a proven gameplay selector. See
+`analysis/checkpoint-schema.md`.
