@@ -73,6 +73,46 @@ rom_regions:
         crc32: 3008bcf8
         sha1: 9d3a20b639969bab68441f76467ed60e395c10e3
 
+  - name: adsp_object_rom
+    tag: mainpcb:user1
+    size: 0x60000
+    processor: adsp
+    evidence: MAME-CONFIRMED
+    notes:
+      - MAME labels this region "384k for ADSP object ROM"
+      - byte-interleaved 16-bit big-endian loads
+    sample_loads:
+      - filename: 136070-2121.90h
+        offset: 0x000000
+        size: 0x010000
+        crc32: 0ebf8e58
+        sha1: b6bf3e020b29a34ef3eaca6b5e1f17bb89fdc476
+      - filename: 136070-2118.90k
+        offset: 0x000001
+        size: 0x010000
+        crc32: fb98abaf
+        sha1: 6a141effee644f34634b57d1fe4c03f56981f966
+      - filename: 136070-2122.10h
+        offset: 0x020000
+        size: 0x010000
+        crc32: bd5380bd
+        sha1: e1e2b3c9f9bfc988f0dcc9a9f520f51957e13a97
+      - filename: 136070-2119.10k
+        offset: 0x020001
+        size: 0x010000
+        crc32: bde8bd31
+        sha1: efb8878382adfe16ba590a28a949029749fc6a63
+      - filename: 136070-2120.9h
+        offset: 0x040000
+        size: 0x010000
+        crc32: 55a30976
+        sha1: 045a04d3d24e783a6a643cab08e8974ee5dc2128
+      - filename: 136070-2117.9k
+        offset: 0x040001
+        size: 0x010000
+        crc32: d4a9696d
+        sha1: 574e5f3758ac2e18423ca4f7d076baded7330376a
+
 regions:
   - name: main_input_in0
     processor: maincpu
@@ -121,6 +161,49 @@ regions:
       - hd68k_adsp_data_r
       - hd68k_adsp_data_w
 
+  - name: adsp_serial_buffer_window
+    processor: maincpu
+    start: 0x810000
+    end: 0x813fff
+    access: rw
+    evidence: MAME-CONFIRMED
+    candidate_selector: adsp.serial_buffer
+    mame_handlers:
+      - hd68k_adsp_buffer_r
+      - hd68k_adsp_buffer_w
+
+  - name: adsp_control_window
+    processor: maincpu
+    start: 0x818000
+    end: 0x81801f
+    access: write
+    evidence: MAME-CONFIRMED
+    candidate_selector: adsp.control
+    mame_handlers:
+      - hd68k_adsp_control_w
+    notes:
+      - low offset selects bank, /BR, or /HALT behavior in the MAME model
+
+  - name: adsp_irq_clear_window
+    processor: maincpu
+    start: 0x818060
+    end: 0x81807f
+    access: write
+    evidence: MAME-CONFIRMED
+    candidate_selector: adsp.irq_clear
+    mame_handlers:
+      - hd68k_adsp_irq_clear_w
+
+  - name: adsp_irq_state_window
+    processor: maincpu
+    start: 0x838000
+    end: 0x83ffff
+    access: read
+    evidence: MAME-CONFIRMED
+    candidate_selector: adsp.irq_state
+    mame_handlers:
+      - hd68k_adsp_irq_state_r
+
   - name: adc_12bit_channel_3_landmark
     processor: maincpu
     start: 0xb80000
@@ -143,6 +226,25 @@ initialization:
     evidence: MAME-CONFIRMED
   - call: init_adsp()
     evidence: MAME-CONFIRMED
+    dynamic_handlers:
+      - range: 0x800000-0x807fff
+        access: rw
+        handler: hd68k_adsp_program_r/w
+      - range: 0x808000-0x80bfff
+        access: rw
+        handler: hd68k_adsp_data_r/w
+      - range: 0x810000-0x813fff
+        access: rw
+        handler: hd68k_adsp_buffer_r/w
+      - range: 0x818000-0x81801f
+        access: write
+        handler: hd68k_adsp_control_w
+      - range: 0x818060-0x81807f
+        access: write
+        handler: hd68k_adsp_irq_clear_w
+      - range: 0x838000-0x83ffff
+        access: read
+        handler: hd68k_adsp_irq_state_r
   - call: multisync_nomsp(config)
     evidence: MAME-CONFIRMED
 

@@ -181,6 +181,29 @@ Candidate symbol family:
 ADSP_DATA_WINDOW
 ```
 
+### Additional ADSP interfaces
+
+The same `init_adsp()` path dynamically installs additional main-CPU-visible
+interfaces:
+
+```text
+0x810000–0x813fff  hd68k_adsp_buffer_r/w       serial/output buffer RAM
+0x818000–0x81801f  hd68k_adsp_control_w        bank, /BR, /HALT controls
+0x818060–0x81807f  hd68k_adsp_irq_clear_w      interrupt clear writes
+0x838000–0x83ffff  hd68k_adsp_irq_state_r      interrupt state reads
+```
+
+The MAME ADSP data map also exposes special offsets corresponding to SIMBUF,
+SOM latch/clock, XOUT, GINT, and object-ROM bank selection. These names and
+handlers establish the modeled interconnect; they do not by themselves prove
+which offsets the S.T.U.N. Runner ROM uses during the title or gameplay path.
+
+The target ROM definition separately includes `mainpcb:user1`, a 0x60000-byte
+region explicitly labeled `384k for ADSP object ROM`, loaded from six
+byte-interleaved ROMs. This is strong MAME-confirmed evidence that the ADSP has
+an onboard object-ROM source, but runtime execution and transfer ownership
+remain experiment questions.
+
 ### Important semantic caveat
 
 The handler names are `MAME-NAMED-HYPOTHESIS` for game-level meaning. The addresses and handler installation are `MAME-CONFIRMED`; the purpose of individual locations inside those windows must be learned from runtime behavior.

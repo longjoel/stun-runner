@@ -11,6 +11,9 @@ not game-level semantics.
 | 68010 program space | `analysis/driver-mining/stunrun.machine-map.yaml` | Active main CPU at `:mainpcb:maincpu`. |
 | ADSP program window | same machine map; `hd68k_adsp_program_r/w` | 68010-visible range `0x800000–0x807fff`. |
 | ADSP data window | same machine map; `hd68k_adsp_data_r/w` | 68010-visible range `0x808000–0x80bfff`. |
+| ADSP serial/output buffer | `init_adsp()`; `hd68k_adsp_buffer_r/w` | 68010-visible range `0x810000–0x813fff`. |
+| ADSP control/IRQ interfaces | `init_adsp()`; control, clear, and state handlers | 68010-visible ranges `0x818000–0x81801f`, `0x818060–0x81807f`, and `0x838000–0x83ffff`. |
+| ADSP object ROM | `ROM_REGION16_BE("mainpcb:user1")` | 0x60000-byte MAME region labeled ADSP object ROM. |
 | JSA interrupt callback | Step 0 driver-mining record | Sound board is wired into the main-board interrupt path; runtime behavior remains to be measured. |
 | MSP | runtime reconciliation | No active MSP device is present for this target. |
 
@@ -46,11 +49,18 @@ not game-level semantics.
   bounded 600-frame boot/title runs.
 - UNKNOWN: whether the ADSP program is preloaded, loaded by another path, or
   populated outside this window.
+- MAME-CONFIRMED: the target includes a separate 0x60000-byte `user1` region
+  labeled ADSP object ROM, while the ADSP program map itself is RAM at 0x0000–
+  0x1fff with 0x2000–0x3fff marked `nopr`/ROM?. This makes onboard object-ROM
+  access a credible source path, but does not prove how the rev-6 code uses it.
 - UNKNOWN: 68010 reads or writes to the ADSP data window during the bounded
   coin/start title-path runs, because the headless watchpoint callback path is
   unavailable.
 - UNKNOWN: which data-window offsets are commands, status, or shared data, and
   whether access occurs only after a verified gameplay transition.
+- MAME-CONFIRMED: the data special map exposes SIMBUF/SOM/XOUT/GINT and
+  object-ROM bank-selection controls; the main CPU also has buffer/control/IRQ
+  windows listed above. Runtime ownership and hot offsets remain unresolved.
 - OBSERVED-IN-TRACE: the ADSP executes an internal startup sequence beginning
   with `0x0004: CALL $0780` and `0x0005: CALL $0834`; the captured operations
   include internal `PM(0x1236)` and `DM(0x0955–0x095A)` accesses. This is not

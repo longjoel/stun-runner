@@ -1,0 +1,39 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "mame_adsp_interface_map",
+  "source": [
+    "analysis/driver-mining/stunrun.machine-map.yaml",
+    "analysis/driver-mining/stunrun.md",
+    "third_party/mame-master/src/mame/atari/harddriv.cpp",
+    "third_party/mame-master/src/mame/atari/harddriv_m.cpp"
+  ],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "dynamic_maincpu_handlers": [
+    {"range": "0x800000-0x807fff", "access": "rw", "handler": "hd68k_adsp_program_r/w"},
+    {"range": "0x808000-0x80bfff", "access": "rw", "handler": "hd68k_adsp_data_r/w"},
+    {"range": "0x810000-0x813fff", "access": "rw", "handler": "hd68k_adsp_buffer_r/w"},
+    {"range": "0x818000-0x81801f", "access": "write", "handler": "hd68k_adsp_control_w"},
+    {"range": "0x818060-0x81807f", "access": "write", "handler": "hd68k_adsp_irq_clear_w"},
+    {"range": "0x838000-0x83ffff", "access": "read", "handler": "hd68k_adsp_irq_state_r"}
+  ],
+  "adsp_data_special_offsets": {
+    "0": "SIMBUF read",
+    "1": "SIMCLK write",
+    "2": "SOMLATCH write",
+    "3": "SOMCLK write",
+    "5": "XOUT write",
+    "6": "GINT write; asserts main-side ADSP interrupt state",
+    "7": "MP write; selects object-ROM bank"
+  },
+  "object_rom": {
+    "tag": "mainpcb:user1",
+    "size": "0x60000",
+    "mame_label": "384k for ADSP object ROM",
+    "load_count": 6,
+    "interleave": "ROM_LOAD16_BYTE"
+  },
+  "runtime_status": "MAME-CONFIRMED-MAP; runtime watchpoint callbacks remain unavailable in installed headless MAME",
+  "confidence": "MAME-CONFIRMED",
+  "next_question": "Use instruction traces and any reachable control/data landmarks to determine which of these interfaces the rev-6 ROM actually exercises."
+}
