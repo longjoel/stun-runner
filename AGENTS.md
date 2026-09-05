@@ -8,25 +8,26 @@ Read these files in order before doing project work:
 4. `EVIDENCE.md` — static listing, trace, snapshot, and canonical-checkpoint contract
 5. `TESTING.md` — unit, integration, end-to-end, regression, CI, and coverage strategy
 6. `LCOV.md` — native and original-code coverage reporting
-7. `MAME_INSTRUMENTATION.md` — stock MAME Lua/debugger automation and reusable telemetry harness
-8. `PREFLIGHT.md` — readiness gate, cost-control, concurrency, schema, and stop-condition rules
-9. `STATUS.md` — current milestone and immediate objective
-10. `MILESTONES.md` — observable definition of progress
-11. `QUESTIONS.md` — cross-agent requests and unresolved investigations
+7. `MAME_INSTRUMENTATION.md` — stock MAME Lua/debugger instrumentation contract
+8. `MAME_HARNESS.md` — Playwright-style automation harness and test-driver contract
+9. `PREFLIGHT.md` — readiness gate, cost controls, stop conditions, and concurrency rules
+10. `STATUS.md` — current milestone and immediate objective
+11. `MILESTONES.md` — observable definition of progress
+12. `QUESTIONS.md` — cross-agent requests and unresolved investigations
 
 ## Role selection
 
 Each working agent must explicitly operate as exactly one role for a task:
 
-- **Investigator** — owns evidence generation, tracing, static listings, annotation, experiments, interconnect discovery, semantic understanding, and evidence-backed fixture discovery.
+- **Investigator** — owns evidence generation, tracing, static listings, annotation, experiments, interconnect discovery, semantic understanding, selectors, telemetry definitions, and evidence-backed fixture discovery.
 - **Implementer** — owns reproduction and native implementations, processor-specific assembler/toolchain validation, and ordinary implementation-level unit tests.
-- **Verifier** — owns independent deterministic replay, checkpoint capture, differential/integration/end-to-end tests, golden fixtures, coverage reporting, and mismatch classification.
+- **Verifier** — owns the MAME harness, deterministic replay, checkpoint capture, semantic assertions, fixtures, failure artifacts, differential/integration/end-to-end tests, golden fixtures, coverage reporting, and mismatch classification.
 
 Do not silently cross ownership boundaries. Use `QUESTIONS.md` for handoffs.
 
 ## Current priority
 
-The repository is at **M0 — Reproducible machine and evidence baseline**.
+The repository is at **M0 — Reproducible machine, harness, and evidence baseline**.
 
 Do not begin broad decompilation, semantic rewriting, or a broad native port until all of the following exist:
 
@@ -39,7 +40,8 @@ Do not begin broad decompilation, semantic rewriting, or a broad native port unt
 - a canonical reset/title checkpoint definition;
 - a tested plan for emitting replacement code for 68010, 6502, TMS34010, and ADSP-2100;
 - a test harness layout that can run without commercial ROMs and can additionally enable oracle tests when valid ROMs are available locally;
-- the `PREFLIGHT.md` readiness gate satisfied for any large agent run.
+- a stable Playwright-style MAME harness entry point capable of deterministic input, bounded waits, assertions, fixture/checkpoint creation, and failure artifacts;
+- a first trace-to-LCOV report from original code.
 
 ## Raw evidence rule
 
@@ -49,9 +51,11 @@ Never modify a raw listing, trace, memory dump, screenshot, or canonical metadat
 
 Large raw traces may remain local when regenerable; the scripts, metadata, hashes, and representative evidence needed to reproduce conclusions belong in the repository.
 
-## Testing rule
+## Testing and harness rule
 
-Treat the original game under the pinned MAME build as the behavioral oracle.
+Treat the original game under the pinned MAME build as the behavioral oracle, and interact with that oracle through the stable harness described in `MAME_HARNESS.md` whenever possible.
+
+Do not make ad hoc MAME interaction the normal workflow when the same action can be represented as a reusable harness capability, selector, fixture, experiment, or assertion.
 
 Do not optimize for "translated lines." Optimize for behavior that is:
 
@@ -61,23 +65,9 @@ Do not optimize for "translated lines." Optimize for behavior that is:
 4. reconstructed;
 5. independently verified.
 
-Evidence-derived fixtures must retain provenance. Expected values may only change when new evidence shows the prior expectation was wrong, not merely because an implementation differs.
+Evidence-derived fixtures and selectors must retain provenance. Expected values may only change when new evidence shows the prior expectation was wrong, not merely because an implementation differs.
 
-## Instrumentation rule
-
-Prefer stock MAME automation before custom emulator changes.
-
-Use the order defined in `MAME_INSTRUMENTATION.md`:
-
-1. normal MAME command-line capabilities;
-2. reusable Lua scripts via `-autoboot_script`;
-3. Lua plugins where persistent tooling is useful;
-4. debugger commands orchestrated manually or from Lua;
-5. custom MAME instrumentation only when required evidence is not exposed adequately.
-
-When a manual debugger procedure is likely to be repeated, convert it into a reusable script/config rather than consuming agent time repeating it.
-
-Generic instrumentation belongs under `mame/lua/lib/` or equivalent; S.T.U.N. Runner-specific addresses and experiment definitions belong in configuration/experiment data.
+All waits must be bounded. A timeout must produce useful diagnostic artifacts rather than hang indefinitely.
 
 ## Investigator instructions
 
@@ -91,9 +81,9 @@ Before semantic annotation, establish and document:
 
 Prioritize `analysis/interconnect.md`: shared RAM, command queues, interrupts, graphics submission, geometry/DSP communication, and sound commands are first-class reverse-engineering targets.
 
-When a routine or behavior becomes sufficiently understood, provide evidence that can be reduced into deterministic unit/integration fixtures. Do not alter fixtures merely to accommodate reconstruction behavior.
+When a routine or behavior becomes sufficiently understood, provide evidence that can be reduced into deterministic unit/integration fixtures or semantic selectors. Do not alter fixtures or selectors merely to accommodate reconstruction behavior.
 
-Prefer reusable Lua/debugger experiments for memory watches, breakpoints, telemetry, and checkpoint capture rather than one-off manual sessions.
+If a useful observation procedure will recur, prefer contributing a reusable harness/configuration capability over a one-off manual debugger ritual.
 
 ## Implementer instructions
 
@@ -105,15 +95,23 @@ When semantics are uncertain, preserve literal mechanism rather than inventing i
 
 Write fast unit tests for reconstructed routines and modules. Build against established fixtures; do not silently redefine oracle expectations.
 
+Consume the same replay/checkpoint schema used by the MAME harness rather than inventing target-specific E2E inputs.
+
 ## Verifier instructions
 
-Canonical evidence must identify ROM manifest, MAME build, start condition, debugger/input scripts, trace flags, and captured state.
+Canonical evidence must identify ROM manifest, MAME build, start condition, harness/experiment identity, debugger/input scripts, trace flags, and captured state.
 
 Prefer deterministic replay and machine-state comparison over visual similarity. Loop-condensed traces are useful for discovery but must not replace exact execution traces where instruction counts/timing matter.
 
-Own the test architecture described in `TESTING.md`, including:
+Own the harness architecture described in `MAME_HARNESS.md`, including:
 
+- stable game-agnostic automation API;
+- semantic selector execution;
+- bounded waits and timeouts;
+- deterministic input replay;
+- fixtures/save-state setup;
 - normalized checkpoint schemas;
+- automatic trace/screenshot/telemetry artifacts on failure;
 - differential original/reproduction/native tests;
 - golden fixtures;
 - integration and end-to-end suites;
@@ -122,18 +120,25 @@ Own the test architecture described in `TESTING.md`, including:
 - behavioral coverage;
 - regression preservation.
 
-Own or review the generic MAME replay/checkpoint harness so oracle experiments remain deterministic and reproducible.
+Keep stock MAME/Lua details behind the harness adapter where practical so test specs survive MAME API changes.
 
 Do not silently modify production code to make verification pass.
 
-## Stop conditions and cost control
+## Stop conditions
 
-Follow `PREFLIGHT.md`.
+Stop and create a handoff/investigation request rather than guessing when:
 
-Stop and hand off rather than guessing when evidence is absent, contradictory, version/hash validation fails, replay cannot be reproduced, an assembler cannot be independently validated, or a semantic conclusion would require inventing undocumented intent.
+- required evidence is missing or contradictory;
+- ROM/MAME provenance mismatches;
+- replay is not deterministic;
+- a selector cannot be justified from evidence;
+- a wait cannot be bounded reliably;
+- an assembler/encoder cannot be independently validated;
+- implementation conflicts with a trusted oracle fixture;
+- changing an expected result would require convenience rather than new evidence.
 
-Large tasks must be bounded by evidence, expected artifacts, success criteria, and stop criteria. "Decompile the game" is not an acceptable task definition.
+An explicit `UNKNOWN` is a valid result.
 
 ## Session hygiene
 
-Leave persistent evidence, commands, scripts, tests, fixtures, and concise project-state updates in the repository. Do not rely on hidden agent context or previous chat history for facts another agent will need.
+Leave persistent evidence, commands, tests, selectors, fixtures, harness capabilities, and concise project-state updates in the repository. Do not rely on hidden agent context or previous chat history for facts another agent will need.
