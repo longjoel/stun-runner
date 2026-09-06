@@ -129,6 +129,15 @@ object/animation/renderer record, not armor, weapon, or ammunition state.
 Trace provenance is in
 `reference/experiments/stunrun/main-ram-button2-dd80-write-trace.metadata.json`.
 
+The near-zero countdown boundary was separately traced from a saved
+`damage_probe_sweep` state at setup frame 3300. At relative frame 217, PC
+`0x021302` cleared the complete `0xFF9500–0xFF9585` status block (67 word
+writes), followed by the ordinary initialization writers beginning at
+relative frame 267. The status reset is therefore a timeout/game-state reset,
+not evidence of craft damage or armor depletion. The bounded 2,317-event trace
+is recorded in
+`reference/experiments/stunrun/main-ram-timeout-reset-write-trace.metadata.json`.
+
 ## Longitudinal status control
 
 The weapon schedule and a matching `late_drive` control were extended to

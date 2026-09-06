@@ -1,0 +1,28 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_timeout_reset_write_trace",
+  "tools": ["tools/mame-ram-write-trace", "tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "base_checkpoint": {
+    "input": "damage_probe_sweep",
+    "setup_frame": 3300,
+    "state_artifact": "/tmp/stunrun-damage3300.sta",
+    "note": "Local regenerable state; not committed"
+  },
+  "capture": {
+    "range": "0xFF9500–0xFF9585",
+    "relative_frames": [1, 1200],
+    "input": "fork_hold_left",
+    "event_count": 2317,
+    "truncated": false,
+    "canonical_log_sha256": "f0f4cba72568df6115dd7d96e52869ae419a0d79cc4fbace4ef0c870fd660abc"
+  },
+  "reset_event": {
+    "relative_frame": 217,
+    "pc": "0x021302",
+    "writes": 67,
+    "effect": "clears the complete captured status block before normal initialization resumes at relative frame 267"
+  },
+  "semantic_status": "TIMEOUT-GAME-STATE-RESET; NOT-DAMAGE-OR-ARMOR-EVIDENCE"
+}
