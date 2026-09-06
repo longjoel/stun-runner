@@ -58,6 +58,14 @@ begins populating at frame 408, and is complete by frame 411. See
 `reference/experiments/stunrun/m3-adsp-init-prefix.metadata.json`, and
 `reference/experiments/stunrun/m3-adsp-init-state.metadata.json`.
 
+The source-defined init/control/upload slices are now also emitted by a
+dependency-free C99 implementation shared by the reproduction and native
+targets. A deterministic native shell parses the common experiment schema,
+dispatches replay events, and checks the verified title-path contracts; its
+six CTest targets and 20 ROM-free repository tests pass. This is integration
+scaffolding and a source-emission proof, not yet evidence that the C slice
+reproduces the full original initialization checkpoint in MAME.
+
 ## Working processor inventory
 
 Current Step 0 mining indicates the active programmable processors are:
