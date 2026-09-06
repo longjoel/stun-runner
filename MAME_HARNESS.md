@@ -247,6 +247,11 @@ Save states are local regenerable artifacts and must carry the ROM/MAME,
 experiment schedule, capture frame, and checkpoint hashes in metadata before
 being used as canonical evidence.
 
+Writer traces can use the same saved checkpoints with
+`tools/mame-ram-write-trace --load-state STATE`; the trace frame range is then
+relative to the loaded state and the tool stages the state in an isolated MAME
+slot before starting the bounded Lua tap.
+
 A fixture establishes a known starting state that many tests can reuse.
 
 Conceptually:

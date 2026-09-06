@@ -13,6 +13,15 @@
     "truncated": false,
     "canonical_log_sha256": "567992439f6ad9327ef7860306eba0653d7ffc270ab692bdfeb497649a0c50f7"
   },
+  "save_state_fork_capture": {
+    "state_artifact": "/tmp/stunrun-center2200.sta",
+    "input": "fork_button2_sweep",
+    "relative_frames": [2, 1800],
+    "event_count": 22533,
+    "truncated": false,
+    "canonical_log_sha256": "c22d811cd51a36a2865aff141c9023dfada6d1d50c227af29544246ad87542e0",
+    "writer_pcs": ["0x03D18C", "0x03D1B2", "0x03D208", "0x03D248", "0x03CF06", "0x03CF0A", "0x03CF0C", "0x03CF14", "0x03CF18", "0x03CF20", "0x03CF24", "0x03CF2A", "0x03CF2E", "0x03CF34", "0x03CF38"]
+  },
   "writer_pcs": {
     "record_index_and_copy": "0x03D012",
     "record_field_updates": ["0x03D18C", "0x03D1B2", "0x03D208", "0x03D248"],

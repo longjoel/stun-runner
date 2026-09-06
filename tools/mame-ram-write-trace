@@ -8,7 +8,9 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
+import tempfile
 
 
 EVENT = re.compile(
@@ -30,23 +32,39 @@ def main() -> int:
     parser.add_argument("--start-frame", type=int, default=680)
     parser.add_argument("--end-frame", type=int, default=705)
     parser.add_argument("--max-events", type=int, default=50000)
-    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center"), default="none")
+    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center", "fork_button2_sweep", "fork_hold_left", "fork_hold_right"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
+    parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if not (0 <= args.base <= args.end and args.end_frame >= args.start_frame > 0):
         parser.error("invalid address or frame range")
+    if args.load_state and not args.load_state.is_file():
+        raise SystemExit(f"save state does not exist: {args.load_state}")
     args.output.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
+    state_stage = None
+    state_directory = "/tmp/stunrun-state-dir"
+    if args.load_state:
+        state_stage = pathlib.Path(tempfile.mkdtemp(prefix="stunrun-state-trace-"))
+        slot_directory = state_stage / "stunrun"
+        slot_directory.mkdir()
+        shutil.copy2(args.load_state, slot_directory / "1.sta")
+        state_directory = str(state_stage)
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
         "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
         "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-seconds_to_run",
-        str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
+        str(86400 if args.load_state else max(2, (args.frames + 59) // 60 + 1)),
+        "-state_directory", state_directory, "-statename", "%g",
+        "-autoboot_script",
         str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/ram-write-trace.lua"),
     ]
     if args.nothrottle:
         command.insert(command.index("-seconds_to_run"), "-nothrottle")
+    if args.load_state:
+        command.insert(command.index("-seconds_to_run"), "-state")
+        command.insert(command.index("-seconds_to_run"), "1")
     environment = {
         **os.environ,
         "STUNRUN_RAM_TRACE_OUT": str(args.output),
@@ -61,10 +79,14 @@ def main() -> int:
         "STUNRUN_RAM_TRACE_MAX_EVENTS": str(args.max_events),
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
-    with log.open("w", encoding="utf-8") as handle:
-        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
-                                   env=environment, check=False)
-    text = log.read_text(encoding="utf-8")
+    try:
+        with log.open("w", encoding="utf-8") as handle:
+            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                       env=environment, check=False)
+        text = log.read_text(encoding="utf-8")
+    finally:
+        if state_stage is not None:
+            shutil.rmtree(state_stage, ignore_errors=True)
     events = [{"frame": int(m.group(1)), "pc": int(m.group(2), 16),
                "address": int(m.group(3), 16), "data": int(m.group(4), 16),
                "mask": int(m.group(5), 16)} for m in EVENT.finditer(text)]
@@ -72,7 +94,7 @@ def main() -> int:
     result = {
         "schema": "stunrun-ram-write-trace-result/v1",
         "device": args.device, "space": args.space,
-        "base": args.base, "end": args.end,
+        "base": args.base, "end": args.end, "load_state": str(args.load_state) if args.load_state else None,
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,
         "returncode": completed.returncode, "events": events,

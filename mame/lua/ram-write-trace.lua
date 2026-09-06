@@ -20,7 +20,23 @@ local events = {}
 local next_event = 1
 local tap
 
-local input_events = input_mode == 'collision_probe_center' and {
+local input_events = input_mode == 'fork_button2_sweep' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'press'},
+    {frame = 600, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'},
+    {frame = 600, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 255},
+    {frame = 1200, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
+    {frame = 1800, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 255}
+} or input_mode == 'fork_hold_left' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'fork_hold_right' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 255},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'collision_probe_center' and {
     {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
