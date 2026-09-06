@@ -17,7 +17,26 @@ local sw_off_prefix = {
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', action = 'press'},
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'press'}
 }
-local events = input_mode == 'coin_start' and {
+local drive_prefix = {
+    {port = ':mainpcb:SW1', field = 'SW1:1', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:2', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:3', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:4', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:5', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:6', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
+}
+local events = input_mode == 'drive' and {
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 0},
+    {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 1},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'set', value = 0},
+    {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start', action = 'set', value = 1},
+    {frame = 600, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'set', value = 0},
+    {frame = 600, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 1200, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'set', value = 1},
+    {frame = 1200, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128}
+} or input_mode == 'coin_start' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', press = true},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
@@ -48,8 +67,14 @@ local next_event = 1
 local function apply_event(event)
     local field = assert(manager.machine.ioport.ports[event.port]).fields[event.field]
     assert(field ~= nil, 'unknown input field: ' .. event.port .. '/' .. event.field)
-    if event.press then field:set_value(1) else field:set_value(0) end
+    if event.press then field:set_value(1) elseif event.action == 'set' then field:set_value(event.value) else field:set_value(0) end
     print('MAME_TRACE_INPUT frame=' .. frame .. ' field=' .. event.field)
+end
+
+if input_mode == 'drive' then
+    emu.register_prestart(function()
+        for _, event in ipairs(drive_prefix) do apply_event(event) end
+    end)
 end
 
 debugger:command('trace ' .. output .. ',' .. cpu .. ',noloop')

@@ -95,9 +95,10 @@ The bounded `coin_start_sw_off_drive_logical` replay then holds P1 Button 1 and
 sets `AD Stick X` to 220 from frames 600–1200 before returning it to 128. Two
 fresh configurations produce the same exact-frame image, and that image differs
 from the no-input scene (HUD speed 605 versus 620). This is the first
-input-dependent rendered delta in the current replay set; it is not yet a
-semantic gameplay checkpoint because the normalized machine/GSP differential
-has not been captured. See
+input-dependent rendered delta in the current replay set. The same schedule
+also produces a repeatable normalized checkpoint, a late GSP state
+differential, and a first main-CPU trace divergence at `0x02046A`/`0x02046C`.
+It is still not a semantic gameplay checkpoint or selector. See
 `reference/experiments/stunrun/drive-input-rendered-delta.metadata.json`.
 
 An early 30-frame Coin 1 pulse followed by Start produces the same result as

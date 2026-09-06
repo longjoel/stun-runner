@@ -36,6 +36,21 @@
       "frame_1800": "GSP PC/ST, control_hi sum, and sparse high-VRAM sum differ"
     }
   },
+  "maincpu_trace_differential": {
+    "runner": "tools/mame-trace",
+    "cpu": ":mainpcb:maincpu",
+    "frames": 1200,
+    "trace_flags": ["noloop"],
+    "none_sha256": "3ce17038a15ad1c2a9ff7064f9210ee67330cec2d9e063fe89cd1b46c9759bd7",
+    "drive_sha256": "399855b3f3d11c1711e23b48b44f4a7f70d220d680222a0208eba01c90048340",
+    "first_difference_byte": 133525122,
+    "first_difference_line": 5684152,
+    "first_difference_context": {
+      "none": ["020466: asl.b   #1, D2", "020468: bcs     $20474", "020474: move.b  (A0), D0"],
+      "drive": ["020466: asl.b   #1, D2", "020468: bcs     $20474", "02046A: clr.b   D1", "02046C: move.b  (A0), D0", "02046E: beq     $2049a"]
+    },
+    "interpretation": "The driven schedule changes the 68010 execution at the existing low-byte input-polling path, before the late GSP state divergence. This is a runtime input path observation, not yet a semantic field or gameplay-state contract."
+  },
   "input_schedule": [
     {"frame": 600, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "set", "value": 0},
     {"frame": 600, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 220},

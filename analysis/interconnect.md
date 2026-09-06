@@ -163,6 +163,13 @@ producer-side ADSP meaning of each block remains unresolved. See
 
 - OBSERVED-IN-TRACE: normal coin/start reaches the input checks at `0x02C1A0`
   and `0x02C1EE`.
+- OBSERVED-IN-TRACE: the verified drive schedule produces a first main-CPU
+  trace divergence at the existing `0x02046A`/`0x02046C` input-polling path:
+  the no-input trace proceeds through `0x020474`, while the driven trace clears
+  the byte and tests for zero. This links the runtime control schedule to a
+  concrete 68010 path before the later GSP state divergence, without assigning
+  gameplay semantics to the byte or routine. See
+  `reference/experiments/stunrun/drive-input-rendered-delta.metadata.json`.
 - OBSERVED-IN-TRACE: an early Coin 2 variant enters a bounded trace dominated
   by `0x0013EC` → `0x0013FC`/`0x001404`, polling `0x60C001`.
 - OBSERVED-IN-REPLAY: the normal and early Coin 1/start sequences both reach
