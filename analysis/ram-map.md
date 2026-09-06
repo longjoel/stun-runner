@@ -35,6 +35,7 @@ not ordinary 68010 work RAM.
 | `0xFF9564–0xFF9567` | elapsed-update counter candidate; `0x024506` increments the longword continuously during the gameplay window | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9568–0xFF956B` | countdown candidate initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9532–0xFF9535` | live score accumulator candidate; cleared at several game-state entries, formatted/displayed by nearby UI paths, and incremented by point-shaped constants (`0xC8`, `0x3E8`, `0x7D0`, `0x4E20`) plus table-derived values | `STATIC-CANDIDATE; DYNAMIC CLEAR-ONLY` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
 ## ROM-to-RAM mechanism annotations
@@ -82,6 +83,16 @@ tables and course/state branches, with observed values `0`, `3`, and `6`.
 These are strong countdown and course/track candidates, not yet confirmed HUD
 labels. Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
+
+The adjacent `0xFF9532` longword is a separate score candidate. Static
+listing evidence shows clears at `0x024334`, `0x024BE6`, `0x027196`, and
+`0x02B624`, display/formatting reads at `0x024CEA`, `0x024DA6`, `0x026A60`,
+and `0x042168`, and additions at `0x028DFA`, `0x028E54`, `0x028F1C`, and the
+timer path `0x0290A8–0x02910A`. The bounded late-drive trace observed four
+longword writes to this field, all clears or initialization; it did not reach
+a scoring event. This supports a live-score role without claiming that the
+field has been exercised by a verified scoring action. See
+`reference/experiments/stunrun/main-ram-score-candidate.metadata.json`.
 
 A structure-only trace confirms the separation: the no-input run records only
 84 periodic `0x0206CC → 0xFF94C0` writes, while late-drive records 122 writes

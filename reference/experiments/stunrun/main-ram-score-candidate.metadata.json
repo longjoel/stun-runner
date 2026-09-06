@@ -1,0 +1,35 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_score_candidate_static_and_trace",
+  "tools": ["tools/mame-ram-write-trace", "tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "candidate": "0xFF9532–0xFF9535",
+  "static_evidence": {
+    "clear_sites": ["0x024334", "0x024BE6", "0x027196", "0x02B624"],
+    "display_or_format_reads": ["0x024CEA", "0x024DA6", "0x026A60", "0x042168"],
+    "point_shaped_additions": {
+      "0x028DFA": "0x4E20",
+      "0x028E54": "table-derived",
+      "0x028F1C": "table-derived",
+      "0x0290A8": "0x7D0",
+      "0x0290CC": "0x3E8",
+      "0x0290EA": "0xC8",
+      "0x02910A": "timer-expiry-derived"
+    }
+  },
+  "run": {
+    "input": "late_drive",
+    "frames": [1, 1800],
+    "writer_trace_result_sha256": "cbcdafa9349e4445356e92ad647a8d600b13bd90001a1aae15206b6162f80ebb",
+    "writer_trace_canonical_log_sha256": "2faa03fc0ad67cdf95a8b67eeb7cf84c98ee14d25f95a77ba8e82f4ddd3fef71",
+    "observed_address_counts": {
+      "0xFF9532": 4,
+      "0xFF9534": 4
+    },
+    "observed_writes": "Only initialization/clear writes were observed; no scoring event was reached by the bounded input schedule.",
+    "snapshot_result_sha256": "2b946a124c0b62be8ab13506954f3713fcb8810dfb936371a1d377e8aeb0c610"
+  },
+  "semantic_status": "strong live-score candidate; controlled scoring action still required for final confirmation",
+  "interpretation": "The field is not labeled as score solely from constants. The combination of repeated clear sites, UI reads, and point-shaped additions is strong static evidence; the dynamic run confirms the address is active but did not exercise an increment."
+}
