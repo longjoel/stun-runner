@@ -26,7 +26,7 @@ def main() -> int:
     parser.add_argument("output", type=pathlib.Path)
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--capture-start-frame", type=int, default=132)
-    parser.add_argument("--input", choices=("none", "coin_start", "sw_off", "sw_off_prestart", "sw_off_none"), default="none")
+    parser.add_argument("--input", choices=("none", "coin_start", "sw_off", "sw_off_prestart", "sw_off_none", "drive"), default="none")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0:

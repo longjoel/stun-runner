@@ -14,13 +14,35 @@
     "screenshot_sha256": "2445f5cb2f853ba1bdba477ecf55f7e82139e51ed8fe3046394988ee5d80f119",
     "observation": "The drive-input frame differs from the no-input/prestart rendered scene; the HUD speed is 605 rather than 620 while the vehicle/track scene remains visible."
   },
+  "checkpoint": {
+    "path": "reference/checkpoints/m1-input-delta/state.json",
+    "sha256": "f8ebd3b61fa08869adfe280fe29c952e8e78a42bb7961483c49dd133ad3c6926",
+    "run_result_sha256": "8820c668cb98979ef323bfc5f6038748bcf607a54c730e84c74372216168d8d3",
+    "fresh_configuration_runs": 2,
+    "repeatable": true,
+    "comparison_no_input": {
+      "sha256": "09f484b6b18e73c07bbae5d9e740088d10befcd361b290fccbafeaf9c4836e05",
+      "differences": ["maincpu", "gsp", "adsp", "soundcpu", "regions.adsp_program"]
+    }
+  },
+  "gsp_state_differential": {
+    "runner": "tools/mame-gsp-state-snapshot",
+    "targets": [600, 1200, 1800],
+    "none_result_sha256": "a2141581da0d2e620429071e838ed97a2ed0f162862641f20ecb710ece1aedf4",
+    "drive_result_sha256": "b685ad918ff175893f886ebb0e8d0008fd8a1ac65a4fb2c12dce45ecc68c7b15",
+    "observed": {
+      "frame_600": "identical",
+      "frame_1200": "GSP PC/ST differ; sampled control and VRAM sums remain equal",
+      "frame_1800": "GSP PC/ST, control_hi sum, and sparse high-VRAM sum differ"
+    }
+  },
   "input_schedule": [
     {"frame": 600, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "set", "value": 0},
     {"frame": 600, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 220},
     {"frame": 1200, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "set", "value": 1},
     {"frame": 1200, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 128}
   ],
-  "interpretation": "This is the first repeatable input-dependent rendered delta in the bounded M1 replay set. It establishes that the runtime analog/button path can affect the oracle image, but it does not yet prove a semantic gameplay state or identify the correct active-low digital helper contract.",
+  "interpretation": "This is the first repeatable input-dependent rendered delta in the bounded M1 replay set. The same schedule produces a repeatable normalized checkpoint and a late GSP state differential, establishing an input-dependent machine/rendering boundary without yet proving a semantic gameplay state or identifying the correct active-low digital helper contract.",
   "confidence": "OBSERVED-IN-REPLAY + REPEATABLE-EXACT-FRAME-IMAGE",
   "raw_artifacts_kept_local": true,
   "next_question": "Capture a normalized machine checkpoint and GSP/68010 trace differential for the same verified control schedule, then promote only an evidence-backed gameplay selector."

@@ -21,7 +21,16 @@ local sw_off_prefix = {
     {port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
     {port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
 }
-local events = input_mode == 'sw_off_prestart' and {
+local events = input_mode == 'drive' and {
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 0},
+    {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 1},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'set', value = 0},
+    {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start', action = 'set', value = 1},
+    {frame = 600, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'set', value = 0},
+    {frame = 600, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 1200, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'set', value = 1},
+    {frame = 1200, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128}
+} or input_mode == 'sw_off_prestart' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
@@ -41,7 +50,7 @@ local function apply_event(event)
     end
 end
 
-if input_mode == 'sw_off_prestart' then
+if input_mode == 'sw_off_prestart' or input_mode == 'drive' then
     emu.register_prestart(function()
         for _, event in ipairs(sw_off_prefix) do apply_event(event) end
     end)

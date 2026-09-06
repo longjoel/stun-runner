@@ -224,6 +224,14 @@ producer-side ADSP meaning of each block remains unresolved. See
   or screen-state differences, but it rules out promoting these sparse sums as
   a gameplay selector. See
   `reference/experiments/stunrun/gsp-state-snapshot.metadata.json`.
+- OBSERVED-IN-REPLAY + REPEATABLE-CHECKPOINT: the bounded AD Stick X/Button 1
+  schedule is identical through frame 600, then produces different GSP PC/ST
+  state at frame 1200 and different control/high-VRAM samples at frame 1800.
+  The normalized frame-1800 checkpoint and exact-frame image are repeatable in
+  two fresh configurations. This establishes an input-dependent rendering
+  boundary, not yet a semantic gameplay selector; the narrow 68010 FIFO tap
+  captures no post-frame-600 writes, so the changed path is outside that sink.
+  See `reference/experiments/stunrun/drive-input-rendered-delta.metadata.json`.
 
 The static/runtime GSP search is recorded in
 `reference/experiments/stunrun/gsp-handler-search.metadata.json`.
