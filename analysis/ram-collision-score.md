@@ -151,6 +151,12 @@ roughly three frames. The event consumer at `0x041606` first requires
 `0xFF954E/0xFF9550` effect bytes did not change at depletion. These six words
 are therefore event timers, not a confirmed shield or health store.
 
+The generated listing also shows `0x041606` called from multiple object/effect
+handlers, including `0x032ADE`, `0x03A14E`, `0x03A36A`, and `0x03A668`, with
+different small indices. This shared call pattern further rules out treating
+the timer bank as a six-item player inventory. The actual shield/armor search
+must follow a damage-specific object branch and its player-state writes.
+
 ## Sustained steering negative control
 
 The centered no-fire schedule was repeated with `AD Stick X=0` held from

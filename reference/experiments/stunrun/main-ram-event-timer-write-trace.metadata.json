@@ -22,7 +22,7 @@
     ]
   },
   "static_resolution": {
-    "0x041606": "indexed event consumer; requires 0xFF9550 == 1, decrements a selected timer, and on expiry updates 0xFF954E, 0xFF9550, 0xFFDE74, and 0xFFDD60",
+    "0x041606": "indexed event consumer; requires 0xFF9550 == 1, decrements a selected timer, and on expiry updates 0xFF954E, 0xFF9550, 0xFFDE74, and 0xFFDD60; called by multiple object/effect handlers including 0x032ADE, 0x03A14E, 0x03A36A, and 0x03A668",
     "0x041644": "decrements the selected 16-bit event timer",
     "0x0416D8": "reloads the selected timer from ROM table 0x4EF20"
   },
