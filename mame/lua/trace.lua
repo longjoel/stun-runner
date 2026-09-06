@@ -6,6 +6,7 @@ local output = assert(os.getenv('STUNRUN_TRACE_OUT'), 'STUNRUN_TRACE_OUT is requ
 local cpu = assert(os.getenv('STUNRUN_TRACE_CPU'), 'STUNRUN_TRACE_CPU is required')
 local limit = tonumber(os.getenv('STUNRUN_TRACE_FRAMES') or '60')
 local input_mode = os.getenv('STUNRUN_TRACE_INPUT') or 'none'
+local trace_start_frame = tonumber(os.getenv('STUNRUN_TRACE_START_FRAME') or '1')
 local frame = 0
 local sw_off_prefix = {
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', action = 'press'},
@@ -27,7 +28,32 @@ local drive_prefix = {
     {port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
     {port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
 }
-local events = input_mode == 'drive' and {
+local late_prefix = {
+    {port = ':mainpcb:SW1', field = 'SW1:1', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:2', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:3', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:4', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:5', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:6', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
+    {port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
+}
+print('MAME_TRACE_CONFIG start=' .. trace_start_frame .. ' cpu=' .. cpu .. ' output=' .. output)
+local events = (input_mode == 'late_drive' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', press = true},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start'},
+    {frame = 900, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', press = true},
+    {frame = 1500, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 1500, port = ':mainpcb:a80000', field = 'P1 Button 1'}
+} or input_mode == 'late' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', press = true},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start'}
+} or input_mode == 'drive' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 0},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 1},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'set', value = 0},
@@ -61,7 +87,7 @@ local events = input_mode == 'drive' and {
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
     {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start'}
-} or input_mode == 'sw_off_none' and sw_off_prefix or {}
+} or input_mode == 'sw_off_none' and sw_off_prefix or {})
 local next_event = 1
 
 local function apply_event(event)
@@ -71,16 +97,24 @@ local function apply_event(event)
     print('MAME_TRACE_INPUT frame=' .. frame .. ' field=' .. event.field)
 end
 
-if input_mode == 'drive' then
+if input_mode == 'drive' or input_mode == 'late' or input_mode == 'late_drive' then
     emu.register_prestart(function()
-        for _, event in ipairs(drive_prefix) do apply_event(event) end
+        local prefix = input_mode == 'drive' and drive_prefix or late_prefix
+        for _, event in ipairs(prefix) do apply_event(event) end
     end)
 end
 
-debugger:command('trace ' .. output .. ',' .. cpu .. ',noloop')
+if trace_start_frame <= 1 then
+    debugger:command('trace ' .. output .. ',' .. cpu .. ',noloop')
+else
+    debugger:command('trace off,' .. cpu)
+end
 
 emu.register_frame_done(function()
     frame = frame + 1
+    if frame == trace_start_frame and trace_start_frame > 1 then
+        debugger:command('trace ' .. output .. ',' .. cpu .. ',noloop')
+    end
     while next_event <= #events and events[next_event].frame == frame do
         apply_event(events[next_event])
         next_event = next_event + 1

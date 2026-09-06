@@ -271,6 +271,13 @@ producer-side ADSP meaning of each block remains unresolved. See
   expander color latch. This narrows the observed rendering boundary, but the
   latch value is a renderer input and does not prove a player-state meaning.
   See `reference/experiments/stunrun/late-control-boundary.metadata.json`.
+- OBSERVED-IN-BOUNDED-GSP-TRACE: a post-start trace window from frames 850 to
+  1200 adds two GSP-side writers to `@F4000000` on the late-drive path:
+  `0xFFF45330` (table-derived word) and `0xFFF479E0` (replicated byte value).
+  The matched late path contains neither writer in the same window. These are
+  the strongest current literal candidates for the input-dependent renderer
+  path; exact frame ownership and game semantics remain unresolved.
+  See `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 - BOUNDED NEGATIVE RESULT: the same late and late-drive schedules produce no
   68010 writes to the observed ADSP buffer window `0x810000–0x813FFF` through
   frame 1800. The changed path is therefore not established as a main-side

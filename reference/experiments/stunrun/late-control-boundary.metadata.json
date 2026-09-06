@@ -64,6 +64,30 @@
     "source_mapping": "MAME stores the low control window in gsp_control_lo; its offset-zero value supplies the GSP VRAM expander color latch. The repeated words are address-space aliases observed through direct TMS34010 reads, not eight independent semantic fields.",
     "interpretation": "The late drive path changes the GSP color latch after the input transition, providing a narrower rendering-state boundary. It is still not a semantic player-state selector."
   },
+  "gsp_trace_differential": {
+    "runner": "tools/mame-trace",
+    "cpu": ":mainpcb:gsp",
+    "trace_window": "frames 850-1200",
+    "trace_start_frame": 850,
+    "trace_flags": ["noloop"],
+    "late_trace_sha256": "c24bb0e17002a98bf8fc597fb4de68e9c13a63f4f287a92be6eec2952bcef8b8",
+    "late_drive_trace_sha256": "ef5f785592de5611107645d15ea3de39f796c1ac7452e239d704c4ec1e004a84",
+    "late_control_writer_pcs": {
+      "0xFFF42EB0": 117,
+      "0xFFF46370": 1638
+    },
+    "late_drive_control_writer_pcs": {
+      "0xFFF42EB0": 94,
+      "0xFFF45330": 26307,
+      "0xFFF46370": 1077,
+      "0xFFF479E0": 75
+    },
+    "new_drive_path_candidates": {
+      "0xFFF45330": "reads a word through A4 and writes it to @F4000000",
+      "0xFFF479E0": "builds a replicated byte value in B9 and writes it to @F4000000"
+    },
+    "interpretation": "The drive trace adds two GSP-side F4000000 writer routines in the bounded post-start trace window. They are strong literal candidates for the changed renderer path, but trace instruction counts do not establish exact frame ownership or player-state semantics."
+  },
   "adsp_buffer_probe": {
     "runner": "tools/mame-adsp-window --window buffer --access write",
     "window": "0x810000-0x813fff",

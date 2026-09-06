@@ -117,7 +117,10 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   is still unproven. The late-applied SW1-off experiment is a repeatable loading / blank
   negative control; applying the same DIP bank before reset now yields a
   repeatable exact-frame rendered-scene checkpoint, but the identical no-input
-  render means it is not yet a gameplay selector.
+  render means it is not yet a gameplay selector. A bounded post-start GSP trace
+  now identifies two additional drive-only writers to `@F4000000` (`0xFFF45330`
+  and `0xFFF479E0`), narrowing the renderer path while preserving the semantic
+  selector caveat.
 
 ## Completed baseline slices
 

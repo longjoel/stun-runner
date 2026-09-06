@@ -2,19 +2,21 @@
 set -euo pipefail
 
 usage() {
-    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY CPU_TAG [FRAMES] [MAME_EXE] [INPUT]" >&2
+    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY CPU_TAG [FRAMES] [MAME_EXE] [INPUT] [TRACE_START_FRAME]" >&2
     exit 2
 }
 
-[[ $# -ge 3 && $# -le 6 ]] || usage
+[[ $# -ge 3 && $# -le 7 ]] || usage
 rompath=$1
 output=$2
 cpu=$3
 frames=${4:-60}
 mame_exe=${5:-mame}
 input_mode=${6:-none}
+trace_start_frame=${7:-1}
 [[ "$frames" =~ ^[1-9][0-9]*$ ]] || { echo "frames must be a positive integer" >&2; exit 2; }
-[[ "$input_mode" == "none" || "$input_mode" == "coin_start" || "$input_mode" == "coin2_start" || "$input_mode" == "coin2_early" || "$input_mode" == "service" || "$input_mode" == "sw_off" || "$input_mode" == "sw_off_none" || "$input_mode" == "drive" ]] || { echo "unsupported input mode: $input_mode" >&2; exit 2; }
+[[ "$trace_start_frame" =~ ^[1-9][0-9]*$ && "$trace_start_frame" -le "$frames" ]] || { echo "trace start frame must be in 1..frames" >&2; exit 2; }
+[[ "$input_mode" == "none" || "$input_mode" == "coin_start" || "$input_mode" == "coin2_start" || "$input_mode" == "coin2_early" || "$input_mode" == "service" || "$input_mode" == "sw_off" || "$input_mode" == "sw_off_none" || "$input_mode" == "drive" || "$input_mode" == "late" || "$input_mode" == "late_drive" ]] || { echo "unsupported input mode: $input_mode" >&2; exit 2; }
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
 mkdir -p "$output"
@@ -32,6 +34,7 @@ STUNRUN_TRACE_OUT="$trace" \
 STUNRUN_TRACE_CPU="$cpu" \
 STUNRUN_TRACE_FRAMES="$frames" \
 STUNRUN_TRACE_INPUT="$input_mode" \
+STUNRUN_TRACE_START_FRAME="$trace_start_frame" \
 SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" \
 "$mame_exe" -rompath "$rompath" stunrun \
     -video none -sound none -skip_gameinfo -noreadconfig -nowriteconfig \
