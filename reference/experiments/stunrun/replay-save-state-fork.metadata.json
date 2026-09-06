@@ -1,0 +1,26 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "replay_save_state_fork",
+  "runner": "tools/mame-replay --load-state",
+  "source_experiment": "experiments/stunrun/coin_start.json",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "capture_description": "late_drive live checkpoint at setup frame 2400; local regenerable artifact, not committed"
+  },
+  "fork": {
+    "relative_terminal_frame": 600,
+    "events_applied": 4,
+    "exact_frame_screenshot_sha256": "bf4ce0ae87bb7f1a4df8e0e450e398e7d683b83ca737d9612ffeee37c678fda9",
+    "result_sha256": "19b8cca853c26b514fdba73cb37bf94e35e1513dd6dbceb56e9e8c9983696434",
+    "mame_log_sha256": "75fc2ec9c533cc863422c7890ea979968cc64d9c3e27c99295dcdace5a082e1f"
+  },
+  "observation": "The high-level replay adapter resumed a live saved state, applied the common experiment events at relative frames, and emitted a successful terminal result without replaying boot or setup.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME",
+  "caveats": [
+    "The saved state is local and depends on the pinned MAME build and validated ROM set.",
+    "initial_events are rejected with --load-state because they belong to pre-reset configuration."
+  ]
+}

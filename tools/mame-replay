@@ -6,6 +6,7 @@ import json
 import math
 import os
 import pathlib
+import shutil
 import subprocess
 import tempfile
 
@@ -139,22 +140,43 @@ def main() -> int:
     parser.add_argument("--cfg-dir", type=pathlib.Path, default=pathlib.Path("/tmp/stunrun-mame-cfg"))
     parser.add_argument("--exact-frame", action="store_true",
                         help="snapshot and stop on the experiment's expected frame")
+    parser.add_argument("--load-state", type=pathlib.Path,
+                        help="load a MAME state before starting relative frames")
     args = parser.parse_args()
     experiment = json.loads(args.experiment.read_text(encoding="utf-8"))
     validate(experiment)
+    if args.load_state:
+        if not args.load_state.is_file():
+            raise SystemExit(f"save state does not exist: {args.load_state}")
+        if experiment.get("initial_events"):
+            raise SystemExit(
+                "initial_events cannot be used with --load-state; use relative events")
     args.output.mkdir(parents=True, exist_ok=True)
-    seconds = max(2, math.ceil((experiment["expect"]["frame"] + (1 if args.exact_frame else 120)) / 60))
+    seconds = (86400 if args.load_state else
+               max(2, math.ceil((experiment["expect"]["frame"] +
+                                 (1 if args.exact_frame else 120)) / 60)))
 
     with tempfile.TemporaryDirectory(prefix="stunrun-replay-") as temp_dir:
         script = pathlib.Path(temp_dir) / "replay.lua"
         log = pathlib.Path(temp_dir) / "mame.log"
         snapshot = args.output / f"{experiment['id']}-exact.png" if args.exact_frame else None
         script.write_text(lua_script(experiment, snapshot), encoding="utf-8")
+        state_directory = pathlib.Path(temp_dir) / "states"
+        if args.load_state:
+            slot_directory = state_directory / "stunrun"
+            slot_directory.mkdir(parents=True)
+            shutil.copy2(args.load_state, slot_directory / "1.sta")
         command = [
             args.mame, "-rompath", str(args.rompath), "stunrun",
             "-video", "soft", "-sound", "none", "-skip_gameinfo",
             "-noreadconfig", "-nowriteconfig", "-cfg_directory", str(args.cfg_dir),
-            "-nonvram_save", "-seconds_to_run", str(seconds),
+            "-nonvram_save", "-debug", "-debugger", "none",
+        ]
+        if args.load_state:
+            command += ["-state_directory", str(state_directory),
+                        "-statename", "%g", "-state", "1"]
+        command += [
+            "-seconds_to_run", str(seconds),
             "-snapname", experiment["id"], "-snapshot_directory", str(args.output),
             "-autoboot_script", str(script),
         ]
@@ -172,10 +194,14 @@ def main() -> int:
                 "returncode": completed.returncode,
                 "reason": "mame_exit" if completed.returncode else "missing_result",
                 "log": str(args.output / "mame.log"),
+                "load_state": str(args.load_state) if args.load_state else None,
             }
             (args.output / "failure.json").write_text(json.dumps(failure, indent=2) + "\n", encoding="utf-8")
             raise SystemExit(f"replay failed; see {args.output / 'mame.log'}")
-        (args.output / "result.json").write_text(result_lines[-1] + "\n", encoding="utf-8")
+        result = json.loads(result_lines[-1])
+        result["load_state"] = str(args.load_state) if args.load_state else None
+        (args.output / "result.json").write_text(
+            json.dumps(result, separators=(",", ":")) + "\n", encoding="utf-8")
         print(result_lines[-1])
 
 

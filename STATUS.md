@@ -46,6 +46,13 @@ registers remain zero. The public test parses the emitted JSON and checks its
 schema, terminal frame, and selector; rendering remains scaffolding for the
 next step.
 
+`tools/mame-replay` now supports `--load-state`: it stages a saved checkpoint
+in an isolated MAME slot, uses a long bounded allowance for states whose
+emulated time is already advanced, and records relative experiment frames in
+the result. A live installed-MAME fork from the frame-2400 `late_drive` state
+applied the common `coin_start` schedule through relative frame 600; provenance
+is in `reference/experiments/stunrun/replay-save-state-fork.metadata.json`.
+
 ### M3 completion evidence
 
 Two fresh C-emitter/MAME runs reproduce the fixed `init-state` image
@@ -96,7 +103,7 @@ The source-defined init/control/upload slices are now also emitted by a
 dependency-free C99 implementation shared by the reproduction and native
 targets. A deterministic native shell parses the common experiment schema,
 dispatches replay events, and checks the verified title-path contracts; its
-12 CTest targets and 27 ROM-free repository tests pass. This is integration
+12 CTest targets and 30 ROM-free repository tests pass. This is integration
 scaffolding and a source-emission proof. The C-produced `init-state` image has
 also passed the existing MAME replacement loader with zero readback
 mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
@@ -120,7 +127,7 @@ The ADSP-buffer to GSP-FIFO block framing is now also represented as a literal
 C slice: the observed length/terminator formula, transfer shape, and 1200-frame
 summary are covered without assigning payload semantics. With these slices
 integrated, the native build passes 12 CTest targets and the ROM-free
-repository suite passes 27 tests.
+repository suite passes 30 tests.
 
 ## Working processor inventory
 

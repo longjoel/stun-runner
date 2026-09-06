@@ -374,6 +374,18 @@ initialization. Frame-numbered `events` are applied after frame boundaries.
 The replay adapter also supports an exact-frame capture mode that snapshots
 and exits on the expected frame instead of taking a post-marker screenshot.
 
+The high-level replay adapter also accepts `--load-state STATE`. In that mode
+the state is staged into an isolated MAME slot, the experiment's numbered
+events are relative to the loaded checkpoint, and boot/pre-start setup is not
+replayed. `initial_events` are rejected in this mode because they belong to
+pre-reset configuration and would be superseded by state restoration. The
+result records the loaded state path; the state itself remains a local,
+ROM/MAME-specific artifact with provenance metadata.
+
+The high-level fork was verified with `experiments/stunrun/coin_start.json`
+from the saved `late_drive` frame-2400 state; see
+`reference/experiments/stunrun/replay-save-state-fork.metadata.json`.
+
 ## Test runner
 
 The eventual command-line experience should be intentionally boring and familiar.
