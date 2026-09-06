@@ -56,6 +56,13 @@ Two 1,800-frame relative steering forks from that same state now produce
 different exact-frame screenshots with `--nothrottle`; the schedules and
 hashes are recorded in
 `reference/experiments/stunrun/saved-state-render-differential.metadata.json`.
+The reusable `stunrun-known-regions/v1` mask and
+`tools/mask-memory-snapshot` were then applied to full work-RAM snapshots from
+center/left forks of the same state. The frame-600 differential contains 118
+changed cells; one is already explained and 117 remain as 39 literal residue
+ranges. The strongest cluster is the known `0xFFDD86–0xFFDD91`
+object/animation record, so no new craft-status semantic is promoted. See
+`reference/experiments/stunrun/saved-state-ram-mask-differential.metadata.json`.
 
 ### M3 completion evidence
 
@@ -107,7 +114,7 @@ The source-defined init/control/upload slices are now also emitted by a
 dependency-free C99 implementation shared by the reproduction and native
 targets. A deterministic native shell parses the common experiment schema,
 dispatches replay events, and checks the verified title-path contracts; its
-12 CTest targets and 30 ROM-free repository tests pass. This is integration
+12 CTest targets and 39 ROM-free repository tests pass. This is integration
 scaffolding and a source-emission proof. The C-produced `init-state` image has
 also passed the existing MAME replacement loader with zero readback
 mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
@@ -131,7 +138,7 @@ The ADSP-buffer to GSP-FIFO block framing is now also represented as a literal
 C slice: the observed length/terminator formula, transfer shape, and 1200-frame
 summary are covered without assigning payload semantics. With these slices
 integrated, the native build passes 12 CTest targets and the ROM-free
-repository suite passes 30 tests.
+repository suite passes 39 tests.
 
 ## Working processor inventory
 

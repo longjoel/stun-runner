@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""Mask explained regions out of a memory snapshot to expose residue.
+
+Two modes:
+  mask-only:  report nonzero cells outside explained mask ranges;
+  diff-mask:  with --baseline, report cells differing from the baseline
+              snapshot, then mask explained ranges out of the changes.
+
+Cells in 'tracked' (unresolved-consumer) ranges are reported separately,
+never silently dropped. Empty residue is a finding, not an error.
+"""
+
+import argparse
+import json
+import pathlib
+
+
+def load_snapshot(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    required = ("schema", "device", "space", "base", "count", "width",
+                "values")
+    if any(key not in value for key in required):
+        raise SystemExit(f"{path}: not a memory snapshot")
+    if value["schema"] != "stunrun-memory-snapshot/v1":
+        raise SystemExit(f"{path}: unsupported schema {value['schema']!r}")
+    if value["width"] not in (8, 16, 32):
+        raise SystemExit(f"{path}: unsupported width {value['width']!r}")
+    if len(value["values"]) != value["count"]:
+        raise SystemExit(f"{path}: value count does not match metadata")
+    return value
+
+
+def load_mask(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-known-regions/v1":
+        raise SystemExit(f"{path}: unsupported mask schema")
+    regions = []
+    for entry in value.get("regions", []):
+        try:
+            regions.append({
+                "label": entry["label"],
+                "base": int(entry["base"], 0),
+                "last": int(entry["last"], 0),
+                "category": entry["category"],
+            })
+        except (KeyError, ValueError, TypeError):
+            raise SystemExit(f"{path}: malformed region {entry!r}")
+        if entry["category"] not in ("explained", "tracked"):
+            raise SystemExit(f"{path}: bad category {entry['category']!r}")
+    return value, regions
+
+
+def check_compatible(first, second, name):
+    for key in ("device", "space", "base", "count", "width"):
+        if first[key] != second[key]:
+            raise SystemExit(f"incompatible {name}: {key} differs")
+
+
+def cell_address(snapshot, index):
+    return snapshot["base"] + index * (snapshot["width"] // 8)
+
+
+def classify(address, regions):
+    """Return 'explained', 'tracked', or 'residue' for a byte address."""
+    seen_tracked = False
+    for region in regions:
+        if region["base"] <= address <= region["last"]:
+            if region["category"] == "explained":
+                return "explained"
+            seen_tracked = True
+    return "tracked" if seen_tracked else "residue"
+
+
+def coalesce(items):
+    """Merge consecutive (address, value) cells into byte ranges."""
+    ranges = []
+    for address, value in items:
+        if ranges and address == ranges[-1]["address"] + ranges[-1]["length"]:
+            ranges[-1]["length"] += 1
+            ranges[-1]["cells"] += 1
+            if len(ranges[-1]["sample"]) < 8:
+                ranges[-1]["sample"].append(value)
+        else:
+            ranges.append({"address": address, "length": 1, "cells": 1,
+                           "sample": [value]})
+    return ranges
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mask", type=pathlib.Path, required=True)
+    parser.add_argument("--snapshot", type=pathlib.Path, required=True)
+    parser.add_argument("--baseline", type=pathlib.Path, default=None)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+
+    mask_doc, regions = load_mask(args.mask)
+    snapshot = load_snapshot(args.snapshot)
+    if snapshot["device"] != mask_doc.get("device") or \
+            snapshot["space"] != mask_doc.get("space"):
+        raise SystemExit("mask device/space does not match snapshot")
+
+    if args.baseline is not None:
+        baseline = load_snapshot(args.baseline)
+        check_compatible(snapshot, baseline, "baseline")
+        interesting = [(cell_address(snapshot, i), value)
+                       for i, (old, value)
+                       in enumerate(zip(baseline["values"],
+                                        snapshot["values"]))
+                       if old != value]
+        mode = "diff-mask"
+    else:
+        interesting = [(cell_address(snapshot, i), value)
+                       for i, value in enumerate(snapshot["values"])
+                       if value != 0]
+        mode = "mask-only"
+        baseline = None
+
+    residue_cells = []
+    tracked_cells = []
+    explained = 0
+    for address, value in interesting:
+        verdict = classify(address, regions)
+        if verdict == "explained":
+            explained += 1
+        elif verdict == "tracked":
+            tracked_cells.append((address, value))
+        else:
+            residue_cells.append((address, value))
+
+    residue = coalesce(residue_cells)
+    tracked = coalesce(tracked_cells)
+    report = {
+        "schema": "stunrun-masked-snapshot/v1",
+        "mode": mode,
+        "snapshot": str(args.snapshot),
+        "baseline": str(args.baseline) if args.baseline else None,
+        "mask": str(args.mask),
+        "residue_ranges": residue,
+        "tracked_ranges": tracked,
+        "summary": {
+            "interesting_cells": len(interesting),
+            "explained_cells": explained,
+            "tracked_cells": len(tracked_cells),
+            "tracked_ranges": len(tracked),
+            "residue_cells": len(residue_cells),
+            "residue_ranges": len(residue),
+        },
+    }
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residue.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8")
+    summary = report["summary"]
+    print(f"mode={mode} interesting={summary['interesting_cells']} "
+          f"explained={summary['explained_cells']} "
+          f"tracked={summary['tracked_cells']} "
+          f"in {summary['tracked_ranges']} ranges "
+          f"residue={summary['residue_cells']} "
+          f"in {summary['residue_ranges']} ranges")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

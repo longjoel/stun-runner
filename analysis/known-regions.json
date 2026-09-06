@@ -1,0 +1,134 @@
+{
+  "schema": "stunrun-known-regions/v1",
+  "description": "68010-visible address ranges already explained by frozen evidence, for masking memory snapshots down to unexplained residue. Byte extents are conservative: only bytes the evidence pins are 'explained'; anything width-unresolved is 'tracked', never silently masked.",
+  "device": ":mainpcb:maincpu",
+  "space": "program",
+  "regions": [
+    {
+      "label": "adsp-program-window",
+      "base": "0x800000",
+      "last": "0x807FFF",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/adsp-program-upload.metadata.json",
+      "confidence": "OBSERVED-IN-TRACE",
+      "note": "ADSP program upload target; title-path coverage observed through 0x8048D6."
+    },
+    {
+      "label": "adsp-control-window",
+      "base": "0x818000",
+      "last": "0x81801F",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/adsp-control-window.metadata.json",
+      "confidence": "OBSERVED-IN-TRACE",
+      "note": "11 control ops, 73 all-zero writes per 600-frame title run."
+    },
+    {
+      "label": "adsp-irq-clear",
+      "base": "0x818060",
+      "last": "0x818061",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/adsp-control-window.metadata.json",
+      "confidence": "OBSERVED-IN-TRACE",
+      "note": "Two repeatable writes per title run from PCs 0x021426/0x02C234."
+    },
+    {
+      "label": "gsp-fifo-submit",
+      "base": "0xC0000C",
+      "last": "0xC0000F",
+      "category": "explained",
+      "provenance": "analysis/interconnect.md",
+      "confidence": "OBSERVED-IN-TRACE",
+      "note": "GSP FIFO submit longword; one write per ADSP-buffer count unit."
+    },
+    {
+      "label": "jsa-command-window",
+      "base": "0x600000",
+      "last": "0x600001",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/sound-boundary-tap.metadata.json",
+      "confidence": "OBSERVED-IN-TRACE",
+      "note": "68010 sound command/response byte lane."
+    },
+    {
+      "label": "zram-view",
+      "base": "0xFF4000",
+      "last": "0xFF4FFF",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/main-nvram-high-score-table.metadata.json",
+      "confidence": "SNAPSHOT",
+      "note": "M48T02/EEPROM persistent view; contains the high-score table below."
+    },
+    {
+      "label": "nvram-high-score-table",
+      "base": "0xFF4410",
+      "last": "0xFF44FF",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/main-nvram-high-score-table.metadata.json",
+      "confidence": "SNAPSHOT",
+      "note": "Ten 24-byte records; kept as its own entry for decoder provenance."
+    },
+    {
+      "label": "input-mirror",
+      "base": "0xFF9000",
+      "last": "0xFF900F",
+      "category": "explained",
+      "provenance": "analysis/m1-landmarks.md",
+      "confidence": "OBSERVED-IN-TRACE",
+      "note": "Input-trace write range mirroring the IN0/IN1/DSW/event-scanner state."
+    },
+    {
+      "label": "live-score-accumulator",
+      "base": "0xFF9532",
+      "last": "0xFF9535",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/main-ram-score-candidate.metadata.json",
+      "confidence": "DYNAMIC-SCORE-CONFIRMED",
+      "note": "Longword accumulator; +50/+500 awards via 0x03A2EC."
+    },
+    {
+      "label": "time-remaining",
+      "base": "0xFF9568",
+      "last": "0xFF9569",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json",
+      "confidence": "DYNAMIC-TIME-REMAINING-CONFIRMED",
+      "note": "u16 assumed from observed range 8540-7966; wider extent unresolved, so only these two bytes mask."
+    },
+    {
+      "label": "course-index",
+      "base": "0xFF9578",
+      "last": "0xFF9579",
+      "category": "explained",
+      "provenance": "analysis/ram-map.md",
+      "confidence": "STATIC-PLUS-OBSERVED-IN-TRACE",
+      "note": "Course/track index, observed 0/3/6; ROM-table selector."
+    },
+    {
+      "label": "object-hit-counter",
+      "base": "0xFFDD02",
+      "last": "0xFFDD03",
+      "category": "explained",
+      "provenance": "reference/experiments/stunrun/main-ram-center-object-score.metadata.json",
+      "confidence": "OBJECT-HIT-AND-SCORE-CONFIRMED",
+      "note": "Counter width unresolved; only the observed bytes mask."
+    },
+    {
+      "label": "object-records",
+      "base": "0xFFDD00",
+      "last": "0xFFDD60",
+      "category": "tracked",
+      "provenance": "reference/experiments/stunrun/main-ram-center-object-score.metadata.json",
+      "confidence": "OBSERVED-IN-TRACE",
+      "note": "Known consumer traffic with unresolved ownership; reported separately, never silently masked."
+    },
+    {
+      "label": "ram-structure-candidate",
+      "base": "0xFF9498",
+      "last": "0xFF94C5",
+      "category": "tracked",
+      "provenance": "reference/experiments/stunrun/main-ram-pointer-trace.metadata.json",
+      "confidence": "STATIC-CANDIDATE",
+      "note": "Structure base with pointer writes; semantic ownership unresolved."
+    }
+  ]
+}

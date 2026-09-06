@@ -1,0 +1,41 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "saved_state_ram_mask_differential",
+  "tools": ["tools/mame-memory-snapshot", "tools/analyze-memory-candidates", "tools/mask-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "capture_description": "late_drive live checkpoint at setup frame 2400; local regenerable artifact, not committed"
+  },
+  "snapshots": {
+    "center": {
+      "input": "fork_center",
+      "range": "0xFF8000–0xFFFFFF",
+      "frames": [2, 300, 600],
+      "result_sha256": "a9589f815b85177053e54578f39546dfbdf5f5b8855e061a47478318e05ef9d4"
+    },
+    "left": {
+      "input": "fork_hold_left",
+      "range": "0xFF8000–0xFFFFFF",
+      "frames": [2, 300, 600],
+      "result_sha256": "ae7a88eff0d352f6058791d6869bea75dc39a4da72cc4c2e619b043eac76a550"
+    }
+  },
+  "comparison": {
+    "frame": 600,
+    "mask": "analysis/known-regions.json",
+    "mask_result_sha256": "9d0c28e323ae1313cc7a8d0ed214771afa3af47c347fe0360b41fe8b6e25f615",
+    "candidate_report_sha256": "6452b62cfa2da73125baae0b59a4847fbb718ceee2358b726f089a4ca919605c",
+    "interesting_cells": 118,
+    "explained_cells": 1,
+    "residue_cells": 117,
+    "residue_ranges": 39,
+    "tracked_cells": 0,
+    "strongest_known_cluster": "0xFFDD86–0xFFDD91"
+  },
+  "observation": "Two relative steering forks from one saved gameplay state remain deterministic and expose a bounded RAM differential after known regions are masked.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + MASKED-DIFFERENTIAL",
+  "limitation": "Residue ranges are candidates only; this experiment does not establish armor, weapon, ammunition, track, or player ownership semantics."
+}
