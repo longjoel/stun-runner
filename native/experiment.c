@@ -191,7 +191,7 @@ static int skip_value(stunrun_exp_cursor_t *c)
         if (take(c, '}'))
             return 1;
         for (;;) {
-            char key[8];
+            char key[STUNRUN_EXP_STR_LEN];
             if (!first && !take(c, ','))
                 return 0;
             first = 0;

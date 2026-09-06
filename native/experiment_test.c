@@ -150,6 +150,96 @@ int main(void)
         "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":"));
     check(parse_fixture("trunc", &exp) == STUNRUN_EXP_SYNTAX);
 
+    /* Escape handling: \" \\\\ newline and \\u0041 decode; a bad escape,
+     * a non-ASCII \\u, and an unterminated string are SYNTAX. */
+    check(write_fixture("escapes",
+        "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":\"s\","
+        "\"events\":[{\"frame\":1,\"port\":\"p\",\"field\":\"f\","
+        "\"action\":\"press\",\"label\":\"a\\\"b\\\\c\\nd\\u0041\"}],"
+        "\"expect\":{\"kind\":\"frame\",\"frame\":1}}"));
+    check(parse_fixture("escapes", &exp) == STUNRUN_EXP_OK);
+    check(strcmp(exp.events[0].label, "a\"b\\c\ndA") == 0);
+
+    check(write_fixture("badesc",
+        "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":\"s\","
+        "\"events\":[{\"frame\":1,\"port\":\"p\",\"field\":\"f\","
+        "\"action\":\"press\",\"label\":\"a\\xb\"}],"
+        "\"expect\":{\"kind\":\"frame\",\"frame\":1}}"));
+    check(parse_fixture("badesc", &exp) == STUNRUN_EXP_SYNTAX);
+
+    check(write_fixture("nonascii",
+        "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":\"s\","
+        "\"events\":[{\"frame\":1,\"port\":\"p\",\"field\":\"f\","
+        "\"action\":\"press\",\"label\":\"caf\\u00e9\"}],"
+        "\"expect\":{\"kind\":\"frame\",\"frame\":1}}"));
+    check(parse_fixture("nonascii", &exp) == STUNRUN_EXP_SYNTAX);
+
+    /* Integer bounds: overflowing values are SYNTAX, negatives are
+     * accepted data, and wrong-typed fields are SCHEMA. */
+    check(write_fixture("bigint",
+        "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":\"s\","
+        "\"events\":[{\"frame\":1,\"port\":\"p\",\"field\":\"f\","
+        "\"action\":\"set\",\"value\":9999999999}],"
+        "\"expect\":{\"kind\":\"frame\",\"frame\":1}}"));
+    check(parse_fixture("bigint", &exp) == STUNRUN_EXP_SYNTAX);
+
+    check(write_fixture("negvalue",
+        "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":\"s\","
+        "\"events\":[{\"frame\":1,\"port\":\"p\",\"field\":\"f\","
+        "\"action\":\"set\",\"value\":-5}],"
+        "\"expect\":{\"kind\":\"frame\",\"frame\":1}}"));
+    check(parse_fixture("negvalue", &exp) == STUNRUN_EXP_OK);
+    check(exp.events[0].has_value && exp.events[0].value == -5);
+
+    check(write_fixture("wrongtype",
+        "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":\"s\","
+        "\"events\":[{\"frame\":\"1\",\"port\":\"p\",\"field\":\"f\","
+        "\"action\":\"press\"}],"
+        "\"expect\":{\"kind\":\"frame\",\"frame\":1}}"));
+    check(parse_fixture("wrongtype", &exp) == STUNRUN_EXP_SCHEMA);
+
+    /* Opaque instrumentation accepts nested objects, arrays, and
+     * literals without interpretation. */
+    check(write_fixture("nested",
+        "{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\",\"start\":\"s\","
+        "\"events\":[],\"expect\":{\"kind\":\"frame\",\"frame\":1},"
+        "\"instrumentation\":{\"tool\":\"t\",\"window\":\"w\","
+        "\"accesses\":[\"r\",\"w\"],\"detail\":{\"ok\":true,"
+        "\"flags\":[null,false,7]}}}"));
+    check(parse_fixture("nested", &exp) == STUNRUN_EXP_OK);
+
+    /* Resource bounds: oversized files and over-long event lists fail
+     * as LIMIT/TOO_BIG instead of overrunning. */
+    {
+        FILE *fp = fopen("/tmp/stunrun-exp-test-big.json", "wb");
+        unsigned i;
+        check(fp != NULL);
+        if (fp != NULL) {
+            for (i = 0; i < 300u * 1024u; i++)
+                fputc(' ', fp);
+            fclose(fp);
+            check(parse_fixture("big", &exp) == STUNRUN_EXP_TOO_BIG);
+        }
+    }
+    {
+        FILE *fp = fopen("/tmp/stunrun-exp-test-many.json", "wb");
+        unsigned i;
+        check(fp != NULL);
+        if (fp != NULL) {
+            fputs("{\"schema\":\"arcade-experiment/v1\",\"id\":\"x\","
+                  "\"start\":\"s\",\"events\":[", fp);
+            for (i = 0; i < 1030u; i++) {
+                if (i > 0)
+                    fputc(',', fp);
+                fprintf(fp, "{\"frame\":%u,\"port\":\"p\",\"field\":\"f\","
+                            "\"action\":\"press\"}", i);
+            }
+            fputs("],\"expect\":{\"kind\":\"frame\",\"frame\":1}}", fp);
+            fclose(fp);
+            check(parse_fixture("many", &exp) == STUNRUN_EXP_LIMIT);
+        }
+    }
+
     check(parse_fixture("missing-file-xyz", &exp) == STUNRUN_EXP_IO);
     check(stunrun_experiment_parse(NULL, &exp) == STUNRUN_EXP_IO);
     check(stunrun_experiment_parse("/tmp/stunrun-exp-test-valid.json",

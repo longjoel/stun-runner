@@ -99,6 +99,42 @@ int main(void)
     check(dm[0x0959u] == 0x7FFFu, "dm-0959", dm[0x0959u], 0x7FFFu);
     check(dm[0x095Au] == 0xFFFFu, "dm-095a", dm[0x095Au], 0xFFFFu);
 
+    /* Short reads observe the image prefix: the first seven init-prefix
+     * words carry the reset entry and its two calls. */
+    n = stunrun_adsp_emit(STUNRUN_ADSP_FIXTURE_INIT_PREFIX, img, 7u);
+    check(n == 7u, "short-read-length", (unsigned)n, 7u);
+    check(img[0x0004u] == 0x001C780Fu, "short-read-call-0780",
+          img[0x0004u], 0x001C780Fu);
+    check(img[0x0005u] == 0x001C834Fu, "short-read-call-0834",
+          img[0x0005u], 0x001C834Fu);
+    check(img[0x0006u] == 0x0018006Fu, "short-read-loop",
+          img[0x0006u], 0x0018006Fu);
+
+    /* Oversized reads clamp to the fixture length. */
+    n = stunrun_adsp_emit(STUNRUN_ADSP_FIXTURE_NOP, img, 100u);
+    check(n == 5u, "clamped-length", (unsigned)n, 5u);
+
+    /* Unknown fixture emits nothing; NULL output is a safe no-op. */
+    check(stunrun_adsp_emit((stunrun_adsp_fixture_t)99, img, 100u) == 0u,
+          "unknown-emit-zero", 1u, 1u);
+    check(stunrun_adsp_emit(STUNRUN_ADSP_FIXTURE_NOP, NULL, 100u) == 0u,
+          "null-emit-zero", 1u, 1u);
+
+    /* Landmark table accessor matches the applied values. */
+    {
+        const stunrun_adsp_dm_landmark_t *marks =
+            stunrun_adsp_dm_landmarks();
+        check(marks[0].addr == 0x0955u && marks[0].value == 0x1242u,
+              "marks-0955", 1u, 1u);
+        check(marks[1].addr == 0x0956u && marks[1].value == 0x124Eu,
+              "marks-0956", 1u, 1u);
+        check(marks[2].addr == 0x0959u && marks[2].value == 0x7FFFu,
+              "marks-0959", 1u, 1u);
+        check(marks[3].addr == 0x095Au && marks[3].value == 0xFFFFu,
+              "marks-095a", 1u, 1u);
+    }
+    stunrun_adsp_apply_dm_landmarks(NULL);
+
     /* Unknown fixture is a clean no-op, never a partial write. */
     check(stunrun_adsp_fixture_words((stunrun_adsp_fixture_t)99) == 0u,
           "unknown-fixture-words", 1u, 1u);

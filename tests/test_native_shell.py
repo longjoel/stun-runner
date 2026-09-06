@@ -140,6 +140,34 @@ class NativeShellTests(unittest.TestCase):
                                      check=False)
             self.assertEqual(refused.returncode, 2)
             self.assertIn("unsupported terminal kind", refused.stderr)
+            usage = subprocess.run(
+                [str(binary), str(obs), "extra-arg"],
+                capture_output=True, text=True, check=False)
+            self.assertEqual(usage.returncode, 2)
+            self.assertIn("usage:", usage.stderr)
+
+    def test_shell_reports_events_beyond_terminal(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = self.compile_shell(directory)
+            path = pathlib.Path(directory) / "late.json"
+            path.write_text(json.dumps({
+                "schema": "arcade-experiment/v1",
+                "id": "late-event",
+                "start": "power_on",
+                "events": [
+                    {"frame": 5, "port": ":mainpcb:IN0",
+                     "field": "Coin 1", "action": "press"},
+                    {"frame": 50, "port": ":mainpcb:IN0",
+                     "field": "Coin 1", "action": "release"},
+                ],
+                "expect": {"kind": "frame", "frame": 30},
+            }), encoding="utf-8")
+            run = subprocess.run([str(binary), str(path)],
+                                 capture_output=True, text=True, check=False)
+            self.assertEqual(run.returncode, 0,
+                             f"shell failed:\n{run.stdout}\n{run.stderr}")
+            self.assertIn("events=1 pending=1", run.stdout)
+            self.assertIn("RESULT PASS", run.stdout)
 
 
 if __name__ == "__main__":

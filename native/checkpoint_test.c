@@ -80,6 +80,14 @@ int main(void)
     /* Contract: too-small buffers fail instead of truncating. */
     check(stunrun_checkpoint_emit(&cp, tiny, sizeof(tiny)) == 0u);
 
+    /* Contract: a buffer that fits the header but not the body also
+     * fails cleanly — no truncated document escapes mid-emit. */
+    {
+        static char partial[256];
+        memset(partial, 0xAA, sizeof(partial));
+        check(stunrun_checkpoint_emit(&cp, partial, sizeof(partial)) == 0u);
+    }
+
     /* Contract: exact-fit buffer succeeds. */
     len = stunrun_checkpoint_emit(&cp, doc, sizeof(doc));
     check(len > 0u && len < sizeof(doc));
