@@ -116,6 +116,17 @@
         "followup": "0x02804A calls 0x0387B0 to reset the trajectory timers"
       },
       "static_resolution": "0x02ECF0 maps an ID below 0x13A to a fixed 20-byte ROM descriptor at 0x048F9C + ID*0x14; ID 0xD2 resolves to 0x04A004, matching the observed pointer.",
+      "descriptor_family": {
+        "table_base": "0x048F9C",
+        "entry_size": "0x14",
+        "snapshot_result_sha256": "4ccadcd2b12eea6a1348801fa97cd3f9a8e1d91da7e78e85ff196bc4bd1832e9",
+        "entries": {
+          "0xCF": {"address": "0x049FC8", "bytes": "01 32 01 32 00 CF 04 6B 00 00 E1 00 00 01 77 00 00 60 00 A0"},
+          "0xD0": {"address": "0x049FDC", "bytes": "01 33 01 33 00 D0 04 6B 00 00 E1 00 00 01 77 00 00 60 00 A0"},
+          "0xD1": {"address": "0x049FF0", "bytes": "01 34 01 34 00 D1 04 6B 00 00 E1 00 00 01 77 00 00 60 00 A0"},
+          "0xD2": {"address": "0x04A004", "bytes": "01 35 01 35 00 D2 04 6B 00 00 E1 00 00 01 77 00 00 60 00 A0"}
+        }
+      },
       "interpretation": "The paired-input path selects a fixed ROM effect/object descriptor before the moving trajectory begins. The pointer is a descriptor selector, not a RAM allocation and not evidence of armor, ammunition, or persistent weapon inventory."
     }
   },
