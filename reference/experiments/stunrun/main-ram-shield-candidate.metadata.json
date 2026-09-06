@@ -1,0 +1,58 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_six_counter_transition_probe",
+  "tools": ["tools/mame-memory-snapshot", "tools/mame-listings"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/collision_probe_center.json",
+  "snapshots": [
+    {
+      "range": "0xFFDE8A–0xFFDE99",
+      "width": 16,
+      "frames": [2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100],
+      "canonical_log_sha256": "50c98dd42314113c9cef154d76f400ebf09f02ac48d89f3600c8db0c332f5f2b",
+      "snapshot_sha256": {
+        "2400": "46adc6638b022a23ca6f9132a016d1cccb104dfe778d61c1e034e6fb329483e1",
+        "2500": "cf33b5d7d31ec352df4540a29d3552df94fb62bd45075affe19e9ce2f4a6b3a8",
+        "2600": "6ae070a09b66dc9f92f843dae02e485fc1ebf8fabbf7282aa30ea33a1f0ab388",
+        "2700": "956d03900d584514e779aabe5a4af5d3d50cd12fddebcb47d07e282a6f0bbeb6",
+        "2800": "15b38d9c26ac20d45af7f74a2b429804e0af164be37556b7f551d521565b02bb",
+        "2900": "43a902f160d70435e4177fff26df9b0f0444b4cf0457f12ab28529700cec64",
+        "3000": "d37042d665e806308c05b4b218dd1a4aa36d781b906f3cff26d1c2d2df31a13f",
+        "3100": "cb72e9dddd1ff6a67b4995905696c53519264574b3e7979430acda9b00d34533"
+      },
+      "even_word_values": {
+        "2400": [20, 15, 20, 1, 1, 1],
+        "2500": [20, 15, 20, 1, 1, 1],
+        "2600": [20, 15, 20, 1, 1, 1],
+        "2700": [6, 15, 20, 1, 1, 1],
+        "2800": [0, 15, 20, 1, 1, 1],
+        "2900": [0, 15, 20, 1, 1, 1],
+        "3000": [0, 15, 20, 1, 1, 1],
+        "3100": [0, 15, 20, 1, 1, 1]
+      }
+    },
+    {
+      "range": "0xFF9540–0xFF957F",
+      "width": 8,
+      "frames": [2400, 2500, 2600, 2650, 2700, 2750, 2800, 2900, 3000],
+      "canonical_log_sha256": "8c6829f5e130d6b004f607976f1b2c51ac970f4a6862f68a0541d1b89734fcb4",
+      "snapshot_sha256": {
+        "2400": "de661fc1b7df51dd20b0560949073be21b810511085d12d47c845c95d306d7d6",
+        "2500": "ad1c962305c8ade02db3d434b5d7c39a3ce226fb7eb835740f0ac3666eec5737",
+        "2600": "2494e784935676c45422858c6359fa221ed3ceee513fda09274dd9762b2ced6b",
+        "2650": "df1f8ee1c50b20aeba0e66cda357c528d867d40e3b0b1cecf59b9637e17357cc",
+        "2700": "375b368739e63156f92a6939c5ce975b31913d7fb44748c770a44adc480bf480",
+        "2750": "857592fcf7b8e92bb691d2bd5a6ee324e5f456356d98a2f50dcaed539e3c4843",
+        "2800": "a403df6066fb5d8486456058be14ee16eae908d850b9b2a489d1ecb7e73ffdd0",
+        "2900": "609582b5b8fb01744fe1fbb2834d666db7b52e71fd97a4be6945eb59957f680d",
+        "3000": "8649bb6aab589663727dac710d1dcf4964a4d99cafd2e2ed1d337000dd1a99fa"
+      },
+      "transition_observation": "0xFF954E and 0xFF9550 remain zero at all sampled frames; no direct damage-effect transition was captured."
+    }
+  ],
+  "static_resolution": {
+    "0xFFDE8A–0xFFDE94": "six 16-bit counters loaded from 0x4EF20 at 0x0416D8 and decremented at 0x041644; zero enters the event/effect path at 0x041606"
+  },
+  "semantic_status": "SIX_COUNTER_BANK_CONFIRMED; SHIELD_CANDIDATE; CRAFT_HEALTH_UNRESOLVED"
+}

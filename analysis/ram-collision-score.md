@@ -132,16 +132,22 @@ The canonical log hash is:
 cb8d846869915ac424a3aeabbef648f6aaad92aab93c506ffd94e30a7d454dc6
 ```
 
-It captured 258 writes. The seven 16-bit words at `0xFFDE8A–0xFFDE96` are
-repeatedly written by `0x0416D8` from the fixed table at `0x4EF20` and
-decremented by `0x041644`; when a slot reaches zero, `0x041606` consumes the
-associated table entry and updates event/effect state. The byte table
+It captured 258 writes. Static inspection resolves six 16-bit words at
+`0xFFDE8A–0xFFDE94`; they are repeatedly written by `0x0416D8` from the fixed
+table at `0x4EF20` and decremented by `0x041644`. When a slot reaches zero,
+`0x041606` consumes the associated table entry and updates event/effect state.
+The byte table
 `0xFFDE9A–0xFFDEBA` is initialized/cleared by `0x04171C` and receives indexed
 ones from `0x03A084` when an object record carries bit `0x4000` at offset
 `0x18`.
 
-This is a bounded object-event/effect subsystem. It is not evidence of a
-persistent armor, health, or weapon-inventory field; those remain open.
+The focused center-run snapshot campaign gives the six words the values
+`20, 15, 20, 1, 1, 1` at frame 2400. The first word changes to `6` by frame
+2700 and `0` by frame 2800, while the other five remain unchanged. This makes
+the bank a strong six-entry shield/depletion candidate, consistent with the
+gameplay description that the craft has six shields, but the sampled
+`0xFF954E/0xFF9550` effect bytes do not change at the transition. The RAM
+meaning therefore remains `SHIELD-CANDIDATE`, not a confirmed health field.
 
 ## Sustained steering negative control
 
