@@ -1,0 +1,11 @@
+{
+  "schema": "stunrun-checkpoint-metadata/v1",
+  "checkpoint": "m3-upload-boundary",
+  "runner": "tools/mame-checkpoint",
+  "frames": 411,
+  "input": "none",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "state_sha256": "fe98464a6b09cadfc7f8cd578955e1afa8f144748a10d0db7c17cca532ab3891",
+  "interpretation": "Original-code oracle immediately after the repeatable ADSP upload boundary: the image is complete and ADSP execution is at PC 0x0014. This is the comparison target for the source-produced initialization slice; it is not an implementation expectation to be altered for convenience."
+}
