@@ -278,6 +278,13 @@ producer-side ADSP meaning of each block remains unresolved. See
   the strongest current literal candidates for the input-dependent renderer
   path; exact frame ownership and game semantics remain unresolved.
   See `reference/experiments/stunrun/late-control-boundary.metadata.json`.
+- BOUNDED-TRANSITION: direct control-window samples every 10 frames locate the
+  first sampled GSP PC/ST difference at frame 910, followed by the first
+  sampled color-latch difference at frame 930 (`0x1212` late versus `0x1313`
+  late-drive). The input event is applied at frame 900, so the execution
+  divergence is temporally constrained to the next sample interval; no exact
+  instruction timestamp is inferred. See
+  `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 - BOUNDED NEGATIVE RESULT: the same late and late-drive schedules produce no
   68010 writes to the observed ADSP buffer window `0x810000–0x813FFF` through
   frame 1800. The changed path is therefore not established as a main-side

@@ -88,6 +88,24 @@
     },
     "interpretation": "The drive trace adds two GSP-side F4000000 writer routines in the bounded post-start trace window. They are strong literal candidates for the changed renderer path, but trace instruction counts do not establish exact frame ownership or player-state semantics."
   },
+  "gsp_transition_detail": {
+    "runner": "tools/mame-gsp-state-snapshot --detail",
+    "targets": "every 10 frames from 850 through 1200",
+    "late_result_sha256": "ba34008b410dfacdb429d7da76d6ce113d29f01904f0765d79f8fbfd5046a05c",
+    "late_drive_result_sha256": "22b7f53cc1038e04d8a1ad4a489d58346fa71af52173f3c7be83db53765ecf80",
+    "first_gsp_pc_st_difference": {
+      "frame": 910,
+      "late": {"pc": "0xFFF414C0", "st": "0x00200010"},
+      "late_drive": {"pc": "0xFFF41070", "st": "0x60200010"}
+    },
+    "first_color_latch_difference": {
+      "sampled_frame": 930,
+      "late": "0x1212",
+      "late_drive": "0x1313",
+      "sampling_limit": "first differing sample is bounded to the 10-frame grid; exact instruction/frame transition is not claimed"
+    },
+    "interpretation": "The GSP execution path diverges one sampled interval after the frame-900 input event, and the color latch diverges by the next sampled interval. This establishes a tighter synchronized machine/rendering boundary without assigning player-state semantics."
+  },
   "adsp_buffer_probe": {
     "runner": "tools/mame-adsp-window --window buffer --access write",
     "window": "0x810000-0x813fff",

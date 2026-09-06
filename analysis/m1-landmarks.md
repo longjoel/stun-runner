@@ -125,6 +125,12 @@ offset-zero value into the VRAM-expander color latch. These are literal
 renderer-path candidates, not player-state names. Trace hashes and counts are
 recorded in `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 
+Sampling the same control window every 10 frames tightens the timing: the first
+sampled GSP PC/ST difference is at frame 910, after the frame-900 input event,
+and the first sampled color-latch difference is at frame 930 (`0x1212` versus
+`0x1313`). This is a bounded machine/rendering transition, not an exact
+instruction timestamp or a semantic player-state selector.
+
 An early 30-frame Coin 1 pulse followed by Start produces the same result as
 the later two-frame pulse. In the static listing, the only direct references to
 coin bits 7/6 are in the `0x043590` candidate; its six direct callers remain
