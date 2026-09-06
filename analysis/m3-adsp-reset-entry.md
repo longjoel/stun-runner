@@ -76,3 +76,10 @@ slice; the source-defined loop begins at the observed mailbox boundary
 without assigning it semantics. Later wait/interrupt behavior and the
 canonical title checkpoint remain open. Its provenance is recorded in
 `reference/experiments/stunrun/m3-adsp-init-state-long.metadata.json`.
+
+At the frame-61 pre-upload boundary, the replacement run matches the original
+checkpoint's main CPU, GSP, and sound CPU fields exactly. The intentional
+difference is isolated to the ADSP: the oracle remains at reset `PC=0x0004`
+with empty program RAM, while the source-defined slice is executing at
+`PC=0x0050` with zero loader read-back mismatches. This is a machine-boundary
+comparison, not a claim of title-path equivalence.

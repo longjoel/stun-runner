@@ -96,6 +96,33 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(diff["changed_ranges"], [{"start": 0x12, "end": 0x13, "count": 2}])
             self.assertEqual(diff["changes"][0]["before"], 2)
 
+    def test_analyze_memory_candidates_ranks_persistent_diffs(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            baseline, variant = temp / "baseline", temp / "variant"
+            baseline.mkdir()
+            variant.mkdir()
+            for frame, base_values, variant_values in (
+                (10, [0, 0, 1, 2], [0, 0, 1, 2]),
+                (20, [0, 0, 1, 2], [4, 0, 1, 3]),
+                (30, [0, 0, 1, 2], [4, 0, 1, 3]),
+            ):
+                for directory, values in ((baseline, base_values), (variant, variant_values)):
+                    (directory / f"snapshot-{frame}.json").write_text(json.dumps({
+                        "schema": "stunrun-memory-snapshot/v1",
+                        "frame": frame, "base": 0x100, "count": len(values),
+                        "width": 8, "device": ":mainpcb:maincpu",
+                        "space": "program", "values": values,
+                    }), encoding="utf-8")
+            report = temp / "report.json"
+            self.run_tool("analyze-memory-candidates", baseline, variant,
+                          "--output", report, "--top", "10")
+            result = json.loads(report.read_text())
+            self.assertEqual(result["common_frames"], [10, 20, 30])
+            self.assertEqual(result["candidates"][0]["address"], 0x100)
+            self.assertEqual(result["candidates"][0]["first_diff_frame"], 20)
+            self.assertEqual(result["candidates"][0]["persistence_after_first"], 1.0)
+
     def test_diff_ram_write_trace_reports_first_mismatch(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

@@ -1,0 +1,25 @@
+{
+  "description": "S.T.U.N. Runner (rev 6)",
+  "frame": 61,
+  "mame": "0.289 (mame0289-dirty)",
+  "processors": {
+    "adsp": {"astat": 0, "pc": 4, "tag": ":mainpcb:adsp"},
+    "gsp": {"pc": 0, "st": 16, "tag": ":mainpcb:gsp"},
+    "maincpu": {"pc": 140312, "sp": 4294967292, "sr": 9988, "tag": ":mainpcb:maincpu"},
+    "soundcpu": {"p": 241, "pc": 21771, "tag": ":mainpcb:jsa:cpu"}
+  },
+  "regions": {
+    "adsp_program": {
+      "first_nonzero_words": [],
+      "nonzero_words": 0,
+      "range": "0x0000-0x1fff",
+      "space": "program",
+      "sum32": 0,
+      "word_width": 32
+    }
+  },
+  "schema": "stunrun-checkpoint/v1",
+  "selectors": {"adsp_program_loaded": false},
+  "system": "stunrun",
+  "time_seconds": 1.0132588
+}

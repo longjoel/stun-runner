@@ -16,7 +16,7 @@
     "settle_frames": 60,
     "observed_frame": 61,
     "fresh_configuration_runs": 2,
-    "result_sha256": "a7d4d56ca35aca3fe0a593b1bc23e3d909b555e6ad99d11862a9f5c63cae6232",
+    "result_sha256": "641812356f00746c7c54f11173fcd25285270005ad6e2312f80e31b5b26ed05c",
     "repeatable_result": true,
     "installed": true,
     "readback_mismatches": 0,
@@ -32,6 +32,18 @@
       "0x0959": "0x7FFF",
       "0x095A": "0xFFFF"
     }
+  },
+  "checkpoint_comparison": {
+    "oracle": "reference/checkpoints/m3-frame-61/state.json",
+    "oracle_state_sha256": "f7bbb658a5c2013b849f6e4611474ea3428f42e6109f5f37298c893d5d980817",
+    "matching_processor_fields": ["maincpu", "gsp", "soundcpu"],
+    "expected_adsp_difference": {
+      "oracle_pc": "0x0004",
+      "replacement_pc": "0x0050",
+      "reason": "source-defined initialization slice is intentionally installed before the original upload"
+    },
+    "oracle_adsp_program_loaded": false,
+    "replacement_readback_mismatches": 0
   },
   "interpretation": "The source-defined initialization slice remains in its bounded mailbox loop through a 60-frame post-install interval with repeatable read-back and runtime state. The observed DM 0x001B value is recorded without semantic interpretation; interrupt and mailbox behavior beyond this loop remain open."
 }

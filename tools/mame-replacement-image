@@ -14,7 +14,11 @@ import tempfile
 RESULT = re.compile(
     r"M2_REPLACEMENT_RESULT frame=(\d+) installed=(true|false) "
     r"first=([0-9A-Fa-f]+) entry_word=([0-9A-Fa-f]+) "
-    r"mismatches=(\d+) final_pc=([0-9A-Fa-f]+)(?: probes=([0-9A-Fa-f,:]+))?"
+    r"mismatches=(\d+) final_pc=([0-9A-Fa-f]+) "
+    r"main_pc=([0-9A-Fa-f]+) main_sr=([0-9A-Fa-f]+) main_sp=([0-9A-Fa-f]+) "
+    r"gsp_pc=([0-9A-Fa-f]+) gsp_st=([0-9A-Fa-f]+) "
+    r"sound_pc=([0-9A-Fa-f]+) sound_p=([0-9A-Fa-f]+)"
+    r"(?: probes=([0-9A-Fa-f,:]+))?"
 )
 
 
@@ -92,8 +96,13 @@ emu.register_frame_done(function()
         for _, address in ipairs(probe_addresses) do
             probe_values[#probe_values + 1] = string.format('%04X:%04X', address, data_space:read_u16(address))
         end
-        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X entry_word=%08X mismatches=%d final_pc=%04X'{probe_output},
-            frame, tostring(installed), first, entry_word, readback_mismatches, cpu.state['PC'].value))
+        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X entry_word=%08X mismatches=%d final_pc=%04X main_pc=%08X main_sr=%08X main_sp=%08X gsp_pc=%08X gsp_st=%08X sound_pc=%08X sound_p=%08X'{probe_output},
+            frame, tostring(installed), first, entry_word, readback_mismatches, cpu.state['PC'].value,
+            maincpu.state['PC'].value, maincpu.state['SR'].value, maincpu.state['SP'].value,
+            machine.devices[':mainpcb:gsp'].state['PC'].value,
+            machine.devices[':mainpcb:gsp'].state['ST'].value,
+            machine.devices[':mainpcb:jsa:cpu'].state['PC'].value,
+            machine.devices[':mainpcb:jsa:cpu'].state['P'].value))
         machine:exit()
     end
 end)
@@ -141,7 +150,9 @@ def main() -> int:
     matches = RESULT.findall(text)
     if completed.returncode or not matches:
         raise SystemExit(f"replacement image validation failed; see {log}")
-    frame, installed, first, entry_word, mismatches, final_pc, probe_values = matches[-1]
+    (frame, installed, first, entry_word, mismatches, final_pc,
+     main_pc, main_sr, main_sp, gsp_pc, gsp_st, sound_pc, sound_p,
+     probe_values) = matches[-1]
     result = {
         "schema": "stunrun-replacement-image-result/v1",
         "image": args.image.name,
@@ -156,6 +167,16 @@ def main() -> int:
         "entry_word": int(entry_word, 16),
         "readback_mismatches": int(mismatches),
         "final_pc": int(final_pc, 16),
+        "checkpoint": {
+            "schema": "stunrun-checkpoint/v1",
+            "frame": int(frame),
+            "processors": {
+                "maincpu": {"pc": int(main_pc, 16), "sr": int(main_sr, 16), "sp": int(main_sp, 16)},
+                "gsp": {"pc": int(gsp_pc, 16), "st": int(gsp_st, 16)},
+                "adsp": {"pc": int(final_pc, 16)},
+                "soundcpu": {"pc": int(sound_pc, 16), "p": int(sound_p, 16)}
+            }
+        },
         "returncode": completed.returncode,
     }
     if probe_values:

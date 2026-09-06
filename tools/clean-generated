@@ -18,7 +18,7 @@ PRESERVED_TMP_NAMES = {"stunrun-roms-system"}
 
 def targets() -> list[pathlib.Path]:
     result = []
-    for relative in ("tests/__pycache__", "tools/__pycache__"):
+    for relative in ("tests/__pycache__", "tools/__pycache__", "snap/stunrun"):
         path = ROOT / relative
         if path.exists() or path.is_symlink():
             result.append(path)

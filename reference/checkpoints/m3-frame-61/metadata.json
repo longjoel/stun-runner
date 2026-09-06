@@ -1,0 +1,11 @@
+{
+  "schema": "stunrun-checkpoint-metadata/v1",
+  "checkpoint": "m3-frame-61",
+  "runner": "tools/mame-checkpoint",
+  "frames": 61,
+  "input": "none",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "state_sha256": "f7bbb658a5c2013b849f6e4611474ea3428f42e6109f5f37298c893d5d980817",
+  "interpretation": "Original-code pre-upload oracle captured at the same bounded frame as the source-defined ADSP initialization probe. It is a comparison boundary, not a title or gameplay checkpoint."
+}
