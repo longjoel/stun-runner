@@ -110,6 +110,15 @@ unchanged. This is stronger evidence for a motion/object/renderer record than
 for armor or weapon state. The schedules and hashes are preserved in
 `reference/experiments/stunrun/main-ram-live-fork-extremes.metadata.json`.
 
+Finally, a full-work-RAM scan (`0xFF8000–0xFFFFFFFF`) compared a centered
+fork against the Button 2 sweep from the same center-run checkpoint. The
+highest persistent differences were the raw input mirrors at `0xFF8000` and
+`0xFF8004`, the already-known `0xFFDD86–0xFFDD8A` object/renderer cluster, and
+short-lived high-address clusters around `0xFFFBED–0xFFFC19` and
+`0xFFFC12–0xFFFDA1`. No new persistent candidate in the status region or a
+weapon/ammunition semantic field was isolated. The full scan is retained as
+`reference/experiments/stunrun/main-ram-full-button2-differential.metadata.json`.
+
 ## Longitudinal status control
 
 The weapon schedule and a matching `late_drive` control were extended to

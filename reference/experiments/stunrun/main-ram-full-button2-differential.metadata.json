@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_full_workram_button2_differential",
+  "tools": ["tools/mame-memory-snapshot", "tools/analyze-memory-candidates"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "base_checkpoint": {
+    "input": "collision_probe_center",
+    "setup_frame": 3000,
+    "state_artifact": "/tmp/stunrun-center3000.sta",
+    "note": "Local regenerable state; not committed"
+  },
+  "range": {
+    "base": "0xFF8000",
+    "end": "0xFFFFFF",
+    "count": "0x8000",
+    "width": 8,
+    "relative_frames": [2, 300, 600, 900, 1200, 1500, 1800]
+  },
+  "control": {
+    "input": "fork_center",
+    "canonical_log_sha256": "a078e57252b63e7e8b8bfa643f4b377e82803efd352123ced05febe861d1c428"
+  },
+  "variant": {
+    "input": "fork_button2_sweep",
+    "canonical_log_sha256": "b3fa8ea1b30f03502d138c9556e72f2fbc23f16ec382808d984e1c97ce09a420"
+  },
+  "top_differential_clusters": [
+    "0xFF8000",
+    "0xFF8004",
+    "0xFFDD86–0xFFDD8A",
+    "0xFFFBED–0xFFFC19",
+    "0xFFFC12–0xFFFDA1"
+  ],
+  "semantic_status": "NO-NEW-ARMOR-WEAPON-AMMO-CANDIDATE; RAW-INPUT-AND-OBJECT-RENDERER-DIFFERENCES-OBSERVED",
+  "negative_claims": [
+    "The full scan does not prove that the high-address clusters are gameplay state.",
+    "No weapon or ammunition field is promoted from this Button 2 differential."
+  ]
+}
