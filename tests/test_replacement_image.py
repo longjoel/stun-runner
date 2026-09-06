@@ -23,6 +23,19 @@ class ReplacementImageTests(unittest.TestCase):
             self.assertEqual(image["bytes_hex"], "0000000000000000000000000000000000000000")
             self.assertEqual((output / image["binary"]).read_bytes(), b"\0" * 20)
 
+    def test_adsp_reset_loop_has_independent_fixed_encoding(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = pathlib.Path(directory)
+            subprocess.run([
+                str(ROOT / "tools/build-replacement-image"),
+                "--processor", "adsp2100", "--fixture", "reset-loop",
+                "--output", str(output),
+            ], check=True, capture_output=True, text=True)
+            image = json.loads((output / "image.json").read_text())
+            self.assertEqual(image["entry"], "0x4")
+            self.assertEqual(image["bytes_hex"][-8:], "0018004f")
+            self.assertEqual(image["length"], 20)
+
 
 if __name__ == "__main__":
     unittest.main()

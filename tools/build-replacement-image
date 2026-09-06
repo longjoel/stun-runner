@@ -8,25 +8,32 @@ import pathlib
 
 
 FIXTURES = {
-    "maincpu-68010": ("4e71", 0xFF8000),
-    "gsp-tms34010": ("0003", 0xFF800000),
+    "maincpu-68010": {"nop": ("4e71", 0xFF8000)},
+    "gsp-tms34010": {"nop": ("0003", 0xFF800000)},
     # ADSP reset enters program word 4. Keep the reset-vector words present
     # and place the known NOP at the first executed word.
-    "adsp2100": ("0000000000000000000000000000000000000000", 0x0000),
-    "sound-6502": ("ea", 0x1000),
+    "adsp2100": {
+        "nop": ("0000000000000000000000000000000000000000", 0x0000),
+        # MAME's 2100 executor encodes unconditional JUMP as the 0x18
+        # opcode class, target in bits 4..17, and condition 0xf.
+        "reset-loop": ("00000000000000000000000000000000" "0018004f", 0x0000),
+    },
+    "sound-6502": {"nop": ("ea", 0x1000)},
 }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--processor", choices=sorted(FIXTURES), required=True)
-    parser.add_argument("--fixture", choices=("nop",), default="nop")
+    parser.add_argument("--fixture", choices=("nop", "reset-loop"), default="nop")
     parser.add_argument("--origin", type=lambda value: int(value, 0))
     parser.add_argument("--entry", type=lambda value: int(value, 0))
     parser.add_argument("--output", type=pathlib.Path, required=True)
     args = parser.parse_args()
 
-    hex_bytes, default_origin = FIXTURES[args.processor]
+    if args.fixture not in FIXTURES[args.processor]:
+        parser.error(f"fixture {args.fixture!r} is not available for {args.processor}")
+    hex_bytes, default_origin = FIXTURES[args.processor][args.fixture]
     payload = bytes.fromhex(hex_bytes)
     origin = default_origin if args.origin is None else args.origin
     entry = (origin + 4) if args.entry is None and args.processor == "adsp2100" else (origin if args.entry is None else args.entry)

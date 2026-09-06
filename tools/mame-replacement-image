@@ -13,7 +13,8 @@ import tempfile
 
 RESULT = re.compile(
     r"M2_REPLACEMENT_RESULT frame=(\d+) installed=(true|false) "
-    r"first=([0-9A-Fa-f]+) mismatches=(\d+) final_pc=([0-9A-Fa-f]+)"
+    r"first=([0-9A-Fa-f]+) entry_word=([0-9A-Fa-f]+) "
+    r"mismatches=(\d+) final_pc=([0-9A-Fa-f]+)"
 )
 
 
@@ -40,6 +41,8 @@ local words = {{{values}}}
 local frame = 0
 local installed = false
 local first = 0
+local entry_word = 0
+local fetch_reads = 0
 local readback_mismatches = 0
 local install_frame = {install_frame}
 local settle_frame = {install_frame + settle}
@@ -51,6 +54,7 @@ local function install()
         space:write_u32(index - 1, word)
     end
     first = space:read_u32(0)
+    entry_word = space:read_u32({entry})
     for index, word in ipairs(words) do
         if space:read_u32(index - 1) ~= word then
             readback_mismatches = readback_mismatches + 1
@@ -65,15 +69,30 @@ local function install()
     installed = true
 end
 
+space:install_read_tap(0, 0x1fff, 'stunrun_replacement_fetch',
+    function(offset, data, mask)
+        if fetch_reads < 16 then
+            print(string.format('M2_REPLACEMENT_FETCH pc=%04X addr=%04X data=%08X mask=%08X',
+                cpu.state['PC'].value, offset, data, mask))
+        end
+        fetch_reads = fetch_reads + 1
+    end)
+
+if install_frame == 0 then
+    -- Install before the first frame so the ADSP opcode cache cannot retain
+    -- the original title-path image.
+    install()
+end
+
 emu.register_frame_done(function()
     frame = frame + 1
-    if frame == install_frame then install() end
+    if install_frame > 0 and frame == install_frame then install() end
     if installed and frame <= settle_frame then
         print(string.format('M2_REPLACEMENT_PROGRESS frame=%d pc=%04X', frame, cpu.state['PC'].value))
     end
     if frame == settle_frame then
-        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X mismatches=%d final_pc=%04X',
-            frame, tostring(installed), first, readback_mismatches, cpu.state['PC'].value))
+        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X entry_word=%08X mismatches=%d final_pc=%04X',
+            frame, tostring(installed), first, entry_word, readback_mismatches, cpu.state['PC'].value))
         machine:exit()
     end
 end)
@@ -89,8 +108,8 @@ def main() -> int:
     parser.add_argument("--settle-frames", type=int, default=2)
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
-    if args.install_frame <= 0 or args.settle_frames <= 0:
-        parser.error("install and settle frames must be positive")
+    if args.install_frame < 0 or args.settle_frames <= 0:
+        parser.error("install frame must be nonnegative and settle frames positive")
     image = json.loads(args.image.read_text(encoding="utf-8"))
     binary = args.image.parent / image["binary"]
     payload = binary.read_bytes()
@@ -115,7 +134,7 @@ def main() -> int:
     matches = RESULT.findall(text)
     if completed.returncode or not matches:
         raise SystemExit(f"replacement image validation failed; see {log}")
-    frame, installed, first, mismatches, final_pc = matches[-1]
+    frame, installed, first, entry_word, mismatches, final_pc = matches[-1]
     result = {
         "schema": "stunrun-replacement-image-result/v1",
         "image": args.image.name,
@@ -127,6 +146,7 @@ def main() -> int:
         "observed_frame": int(frame),
         "installed": installed == "true",
         "first_word": int(first, 16),
+        "entry_word": int(entry_word, 16),
         "readback_mismatches": int(mismatches),
         "final_pc": int(final_pc, 16),
         "returncode": completed.returncode,

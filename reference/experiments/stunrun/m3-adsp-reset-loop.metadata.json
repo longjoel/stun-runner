@@ -1,0 +1,29 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/m3-adsp-reset-entry.md",
+  "builder": "tools/build-replacement-image --processor adsp2100 --fixture reset-loop",
+  "loader": "tools/mame-replacement-image",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "image": {
+    "processor": "adsp2100",
+    "origin": "0x0",
+    "entry": "0x4",
+    "length": 20,
+    "bytes_hex": "000000000000000000000000000000000018004f",
+    "payload_sha256": "4b4294e0fd40c96e65555c8410be752ba273449a74a5dbe01ab48ed2ddb8a1c5"
+  },
+  "runtime": {
+    "install_frame": 140,
+    "settle_frames": 2,
+    "result_sha256": "3d19f89dbafb2e69a95d9291fc9878a48f6c5019275bcf2b14c2211f55cea864",
+    "observed_frame": 142,
+    "installed": true,
+    "readback_first_word": "0x00000000",
+    "readback_entry_word": "0x0018004F",
+    "readback_mismatches": 0,
+    "final_pc": "0x0004",
+    "repeatable": true
+  },
+  "interpretation": "A source-defined unconditional jump at the MAME-confirmed ADSP reset entry remains at PC 0x0004 after bounded execution. This proves the fixed-origin encoder, word-addressed loader, reset/control release, and a stable execution loop; it is not a game-semantic implementation."
+}

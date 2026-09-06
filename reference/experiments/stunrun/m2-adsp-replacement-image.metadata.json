@@ -17,12 +17,13 @@
   "runtime": {
     "install_frame": 140,
     "settle_frames": 2,
-    "result_sha256": "fb3867f11dd6f52d8a721084e064c42e85cd9959afc05004727c7594afaf4640",
+    "result_sha256": "a44ee967f4bd35d8844d9a0812535ceecd2ee9302acfceec3e9a03498407347e",
     "fresh_configuration_runs": 2,
     "repeatable_result": true,
     "observed_frame": 142,
     "installed": true,
     "readback_first_word": "0x00000000",
+    "readback_entry_word": "0x00000000",
     "readback_mismatches": 0,
     "final_pc": "0x0E30"
   },
