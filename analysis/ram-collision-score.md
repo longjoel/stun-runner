@@ -79,6 +79,25 @@ It narrows the next experiment: a damage probe must place the craft in a
 different interaction state, rather than simply changing X input during this
 road segment.
 
+## Save-state fork at a live checkpoint
+
+The reusable save-state path was exercised from a live `late_drive` checkpoint
+captured at relative setup frame 2400. A no-input fork and the
+`fork_lateral_sweep` input fork both advanced beyond the loaded state, proving
+that the checkpoint can be used without replaying coin/start/setup. The status
+window `0xFF9500–0xFF95FF` produced no value differential between the two
+forks at relative frames 2, 300, 600, 1200, and 1800; in particular, this
+control did not isolate armor, weapon, ammunition, score, time, or track state.
+
+The craft/object window `0xFFDD00–0xFFDE00` did produce persistent
+input-dependent differences. The strongest cluster was `0xFFDD85–0xFFDD90`,
+first differing at relative frame 300 and remaining different through frame
+1800. The motion field `0xFFDD16` and nearby movement fields also differed at
+the later sample. These results promote the cluster as a useful fork-sensitive
+object/renderer candidate, not as a health or weapon field. Full hashes and
+the exact relative input schedule are recorded in
+`reference/experiments/stunrun/main-ram-live-fork-differential.metadata.json`.
+
 ## Longitudinal status control
 
 The weapon schedule and a matching `late_drive` control were extended to

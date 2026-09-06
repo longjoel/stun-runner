@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_live_save_state_fork_differential",
+  "tools": ["tools/mame-memory-snapshot", "tools/analyze-memory-candidates"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "base_checkpoint": {
+    "input": "late_drive",
+    "setup_frame": 2400,
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "note": "Local regenerable state; not committed"
+  },
+  "fork": {
+    "relative_frames": [2, 300, 600, 1200, 1800],
+    "control_input": "none",
+    "variant_input": "fork_lateral_sweep",
+    "status_range": {
+      "base": "0xFF9500",
+      "count": "0x100",
+      "width": 8,
+      "control_canonical_log_sha256": "dc9c53bf8b0b8b88d52afed00b3052ad79716d33b6cc3a4c5856dd625cf1540b",
+      "variant_canonical_log_sha256": "ed00174787be8f14b1b7a34c41287753cb9f8f08603ab4de6534be6aaaf6f551",
+      "value_differential": false
+    },
+    "craft_range": {
+      "base": "0xFFDD00",
+      "count": "0x100",
+      "width": 16,
+      "control_canonical_log_sha256": "2785efb7958289e1a6130c2f711eebb3d41faf9fdfa2b40815ff652c3e64f6cc",
+      "variant_canonical_log_sha256": "4bd3b5db78188389692007f4a71c0ff95cf61d48e0d168d66dbd92d397ce83bd",
+      "candidate_report": "/tmp/stunrun-fork2400-craft-diff.json",
+      "persistent_candidate_ranges": ["0xFFDD85–0xFFDD90"],
+      "semantic_status": "INPUT-DEPENDENT-CANDIDATE; OBJECT/RENDERER OWNERSHIP UNRESOLVED; NOT-HEALTH-OR-WEAPON-CONFIRMED"
+    }
+  },
+  "negative_claims": [
+    "The status fork did not identify armor, weapon, ammunition, score, time, or track transitions.",
+    "The 0xFFDD85–0xFFDD90 cluster is not proven to belong to the player craft."
+  ]
+}
