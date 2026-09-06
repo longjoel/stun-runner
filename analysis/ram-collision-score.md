@@ -119,6 +119,16 @@ short-lived high-address clusters around `0xFFFBED–0xFFFC19` and
 weapon/ammunition semantic field was isolated. The full scan is retained as
 `reference/experiments/stunrun/main-ram-full-button2-differential.metadata.json`.
 
+A focused Button 2 write tap over `0xFFDD80–0xFFDDA5` then resolved the
+strongest apparent candidate. It captured 4,647 non-truncated writes, with
+the high-volume writers at PCs `0x03D18C`, `0x03D1B2`, `0x03D208`, and
+`0x03D248`. The static listing shows `0xFFDD86` as the base of 16-byte
+records, indexed by `0x03D012`, with the cited routines adjusting bounded
+interpolation fields. The persistent lateral differential is therefore an
+object/animation/renderer record, not armor, weapon, or ammunition state.
+Trace provenance is in
+`reference/experiments/stunrun/main-ram-button2-dd80-write-trace.metadata.json`.
+
 ## Longitudinal status control
 
 The weapon schedule and a matching `late_drive` control were extended to

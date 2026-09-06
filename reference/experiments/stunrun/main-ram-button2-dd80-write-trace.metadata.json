@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_button2_object_animation_write_trace",
+  "tools": ["tools/mame-ram-write-trace", "tools/mame-listings"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "input": "button2_probe",
+  "capture": {
+    "base": "0xFFDD80",
+    "end": "0xFFDDA5",
+    "frames": [1500, 1800],
+    "event_count": 4647,
+    "truncated": false,
+    "canonical_log_sha256": "567992439f6ad9327ef7860306eba0653d7ffc270ab692bdfeb497649a0c50f7"
+  },
+  "writer_pcs": {
+    "record_index_and_copy": "0x03D012",
+    "record_field_updates": ["0x03D18C", "0x03D1B2", "0x03D208", "0x03D248"],
+    "other_observed": ["0x02719C", "0x03CFCC", "0x03D002"]
+  },
+  "static_resolution": {
+    "base": "0xFFDD86",
+    "record_size": 16,
+    "mechanism": "0x03D012 indexes the record array by record_index * 0x10; 0x03D18C updates fields +0/+1/+2, while 0x03D1B2 and 0x03D208 advance bounded interpolation counters and 0x03D248 resets one counter",
+    "semantic_status": "OBJECT-ANIMATION-INTERPOLATION-RECORD; NOT-HEALTH-WEAPON-AMMO"
+  },
+  "address_counts": {
+    "0xFFDD86": 608,
+    "0xFFDD88": 608,
+    "0xFFDD8A": 404,
+    "0xFFDD8C": 101,
+    "0xFFDD90": 304,
+    "0xFFDD92": 304,
+    "0xFFDD96": 608,
+    "0xFFDD98": 608,
+    "0xFFDD9A": 406,
+    "0xFFDDA0": 304,
+    "0xFFDDA2": 304
+  }
+}
