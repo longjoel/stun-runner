@@ -1,0 +1,54 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_collision_steering_differential",
+  "tools": ["tools/mame-memory-snapshot", "tools/mame-replay"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedules": {
+    "control": "late_drive",
+    "steering_left": "experiments/stunrun/collision_probe_left.json"
+  },
+  "ram_snapshots": {
+    "object_window": {
+      "range": "0xFFDD00–0xFFDD5F",
+      "width": 16,
+      "frames": [900, 1200, 1500, 1800],
+      "control_result_sha256": [
+        "fb5959831e55f57ba7c6184b5fcd5dd9d05f6a727a233a0a3ffe4191ae8b8563",
+        "7b5307a3787a94afe51639cbd15d7dffbaee9b0da589d32cc2c4279ea5fee491",
+        "5078c47b55e5a57242cdc187cd514d74ee9288c2743ad8793d912a01d4f49c41",
+        "52524ac27e8a3cea1eed65a6caeb6ce99526fe4a5a75dc4fd53a54b34be91fae"
+      ],
+      "steering_left_result_sha256": [
+        "21f43e3229266deed59ff6f83caf95c87d42bc7401a14b4bbb61c01884f3247f",
+        "1668c678155a815b15ebcd6e0bad778ab4d20c2dcc931d6bbbb6845c2ec3d2c1",
+        "742de2c896652527f874a566fb3402a51c96a0e19f4016eceae91a8a9d81debb",
+        "18ad6fc84e2eee07de8277aa648f093714a49dfb787503dd84ddbcdee96f32c1"
+      ],
+      "differences_at_1800": ["0xFFDD24", "0xFFDD26", "0xFFDD4E"]
+    },
+    "status_window": {
+      "range": "0xFF9500–0xFF95FF",
+      "width": 8,
+      "frames": [900, 1200, 1500, 1800],
+      "control_result_sha256": [
+        "af7f706c520a47e168a231f58698d23658096bc68ab16f33d2d2572a55547dc1",
+        "6a2290fa722a3c86ea2552f8e65e0751f9e01a56ec08c28a00ba63e830fa60d6",
+        "1331dcc4f44bc4bb8174ee0635aa8ea69e4169e89b8a2daba5a39eeba5e38f21",
+        "f1a08445028a13ecc2bf9aa7eca9767235e0a12bc874f2caf3fe0ce64ff76398"
+      ],
+      "steering_left_result_sha256": [
+        "9dc9cbd2f1ac890d150af0333c48d5dcda51d7f07783bda121513b16bfb89d29",
+        "0ad8b9b762eca70f84ac7176de18afc51ee61a199a008b83a7b210df288fa9ab",
+        "6e82eca773f297f0d1c0433eb588ac0ef328ea34c0ba829078f92fa67901b933",
+        "c3149acf11d140ef2b326f55233afcab5ca199605ce91e3a4050ff545283561d"
+      ],
+      "differences_at_1800": [
+        "0xFF9531", "0xFF9544", "0xFF9567", "0xFF956B",
+        "0xFF957B", "0xFF957D", "0xFF9582"
+      ]
+    }
+  },
+  "interpretation": "The steering differential changes only movement/event-adjacent state at frame 1800. It does not identify a craft health, armor, weapon, or ammunition field.",
+  "semantic_status": "STEERING_DIFFERENTIAL_ONLY"
+}

@@ -58,6 +58,27 @@ The most active adjacent fields were `0xFFDD10`, `0xFFDD12`, `0xFFDD14`,
 The trace confirms an active object/physics record but does not isolate an
 armor, weapon, or ammunition transition.
 
+## Steering differential control
+
+To separate a putative collision from ordinary steering, the same start and
+Button 1 schedule was rerun with the analog X value set to `0` at frame 900
+instead of `220`; both schedules returned to centered input at frame 1500.
+The reusable schedule is `experiments/stunrun/collision_probe_left.json` and
+the snapshot mode is `collision_probe_left`.
+
+In `0xFFDD00–0xFFDD5F`, the two runs are identical at frames 900, 1200, and
+1500. At frame 1800 only `0xFFDD24`, `0xFFDD26`, and `0xFFDD4E` differ. In the
+status window `0xFF9500–0xFF95FF`, the runs are identical through frame 1500;
+at frame 1800 only seven bytes differ: `0xFF9531`, `0xFF9544`, `0xFF9567`,
+`0xFF956B`, `0xFF957B`, `0xFF957D`, and `0xFF9582`. The confirmed score
+(`0xFF9532–0xFF9535`), time (`0xFF9568–0xFF956B` as a word mechanism), and
+track candidate (`0xFF9578`) do not show a new steering-specific transition.
+
+This is a steering/physics control result, not a collision or damage result.
+It narrows the next experiment: a damage probe must place the craft in a
+different interaction state, rather than simply changing X input during this
+road segment.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal
