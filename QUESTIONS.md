@@ -130,3 +130,140 @@ title artifact remains preserved as legacy evidence. Semantic gameplay fields
 are intentionally not promoted because the frame-600 image is not yet a proven
 gameplay selector. See
 `analysis/checkpoint-schema.md`.
+
+---
+
+## IRQ-0004
+
+Status: OPEN
+From: Agent 2 (Implementer)
+To: Investigator
+Priority: HIGH
+
+### Question
+
+Is track progression driven by a work-RAM position cursor walking a
+control-point stream (Agent-2 hypothesis H2), and if so, where is the
+cursor and what is the record stride?
+
+### Background (speculation, not evidence)
+
+`0xFF9578` indexes several ROM tables and `0x028CA8` mixes it with the
+timer for the HUD, but no track-position word or geometry format is
+established. H2 proposes tunnel geometry as sequential segment records
+consumed per-frame under a monotonically advancing cursor. The
+alternative is indexed jumps (see IRQ-0005), so the distinguishing
+evidence is sequential-march versus indexed-access ROM traffic during
+drive runs.
+
+### Required output
+
+- address and width of any work-RAM word that advances monotonically
+  with distance driven and resets per course (or an explicit negative:
+  no such word found in the driven range);
+- whether 68010 ROM reads during a drive run march sequentially through
+  a region (record base, stride, extent) or jump by index;
+- the drive-run schedule(s) used, with frames and inputs, following the
+  existing experiment-metadata provenance pattern.
+
+### Kill criterion
+
+Hold the craft stationary while time advances: if the cursor candidate
+still advances, it is clock-driven and H2 is dead — report that
+instead.
+
+### Why it matters
+
+The Implementer cannot model track state, spawn timing, or the HUD
+course field without a frozen progression mechanism; this is the
+sharpest falsifiable entry point into level storage.
+
+### Investigation update
+
+Status remains OPEN. Repeated full-work-RAM title/`late_drive` captures and
+masked comparisons are now recorded in
+`reference/experiments/stunrun/geometry-residue-capture.metadata.json`.
+The first drive-relative differential is zero at frame 600, then grows to
+662 residue cells at frame 1200 and 2,956 at frame 1800. The largest ranges
+are display/progression neighborhoods already present in earlier evidence;
+no monotonic cursor has been promoted. ROM-read sequencing and writer-PC
+attribution are still required before H2 can be accepted or killed.
+
+---
+
+## IRQ-0005
+
+Status: OPEN
+From: Agent 2 (Implementer)
+To: Investigator
+Priority: MEDIUM
+
+### Question
+
+Do the ROM tables indexed by the course word `0xFF9578` follow a fixed
+`base + course x stride + field` layout (Agent-2 hypothesis H1), and
+what are the bases, strides, and field meanings?
+
+### Background (speculation, not evidence)
+
+H1 proposes course-parameterized parallel tables (geometry parameters,
+timer values, difficulty, palette). The observed course values `0`, `3`,
+`6` may imply groups of three or stride-3 records — or may be three
+unrelated course IDs with no arithmetic meaning. Either outcome is
+useful; a bare table dump without stride semantics is not.
+
+### Required output
+
+- for each table read indexed by `0xFF9578`: reader PC, table base,
+  stride, and the fields consumed (or UNKNOWN per field);
+- a course-3 vs course-6 differential trace showing which read
+  addresses shift by a course-proportional stride and which do not;
+- confidence per table (OBSERVED-IN-TRACE vs STATIC-CANDIDATE).
+
+### Kill criterion
+
+If no read address shifts by a course-proportional stride between the
+two runs, H1 is dead — report the actual indexing pattern found.
+
+### Why it matters
+
+Award selection (`0x03A2E2`: 500 vs 50 on `0xFF9578` nonzero) is
+already reproduced in C, but its course-numbering semantic and every
+sibling table lookup remain unmodelable until strides are frozen.
+
+---
+
+## IRQ-0006
+
+Status: OPEN
+From: Agent 2 (Implementer)
+To: Investigator
+Priority: MEDIUM
+
+### Question
+
+Are object spawns (the `0xFFDD00` record range, `0xFFDD02` hit counter)
+triggered by track position or by wall-clock frames (Agent-2 hypothesis
+H3: position-triggered spawn tables)?
+
+### Background (speculation, not evidence)
+
+H3 proposes `(track_position, object_type, params)` spawn rows feeding
+the object records. Position-locking vs frame-locking decides whether
+the reproduction needs a track cursor (depends on IRQ-0004) or a timer.
+
+### Required output
+
+- a deterministic-replay experiment using the existing harness:
+  (a) the same input file twice, (b) the same inputs with a deliberate
+  mid-run delay injected;
+- spawn event frames/positions in each run for the `0xFFDD00` range;
+- verdict: position-locked, frame-locked, or run-varying (the last
+  kills determinism assumptions for all three level-storage hypotheses
+  at once — report it plainly).
+
+### Why it matters
+
+Spawn timing determines the shape of the first gameplay-state model the
+Implementer can write without inventing semantics; a run-varying result
+is equally valuable because it stops a wrong model from being built.

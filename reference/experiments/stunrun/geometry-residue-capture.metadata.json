@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "geometry_residue_capture",
+  "runner": "tools/mame-memory-snapshot + tools/mask-memory-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "snapshot_window": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "range": "0xFF8000–0xFFFFFF",
+    "width": 8
+  },
+  "repeatability": {
+    "title_frames": [600],
+    "title_snapshot_sha256": "b90ce2e2480d105eb1343f34e88fd58f916e8cd43f81ab940eecd69187b4be26",
+    "drive_frames": [600, 1200, 1800],
+    "drive_snapshot_sha256": {
+      "600": "13d6aab8c84ffbee09be80ed76b6f35c5052aef8aab6471b2b8fa38f728beabe",
+      "1200": "70557a7d9b34d2a8f54f81e72b1fbfc650c7fde4fc492450faab2dd7a36e5287",
+      "1800": "ed79052befd6a728b48a3930ea738d376a8f5198bfe1120fd928bde67862bcec"
+    },
+    "independent_runs": 2,
+    "capture_result_sha256": {
+      "title_a": "ebf15d0931ca0c08b2b426d7c7b9162872d630c4ce841c61985ae6ef8076d9ff",
+      "title_b": "1f275b9e01d13f91055bf239f3b6ae3e167cb8e2405c227021911c40e5db3d3a",
+      "drive_a": "32922fd6043a422c513303104933274e4063438403e7c584fb40300f57bc97c3",
+      "drive_b": "c41cbb659332e1363032ed4c86a629de861fb2101f59f6d4a2ea93e22872131a"
+    }
+  },
+  "mask": "analysis/known-regions.json",
+  "masked_differential": {
+    "baseline": "title_a/snapshot-600.json",
+    "frame_600": {"interesting_cells": 0, "explained_cells": 0, "tracked_cells": 0, "residue_cells": 0, "residue_ranges": 0},
+    "frame_1200": {"interesting_cells": 675, "explained_cells": 4, "tracked_cells": 9, "residue_cells": 662, "residue_ranges": 288, "residue_sha256": "f9d8dca6e24ccf1da3376777919020ac399f6091e2fb0c9e55b6185f7990c067"},
+    "frame_1800": {"interesting_cells": 2989, "explained_cells": 4, "tracked_cells": 29, "residue_cells": 2956, "residue_ranges": 599, "residue_sha256": "749b6ffa3431837b222cb0ab8815fae82c8c48fd7b81940d8f5d6bdf1f0ce676"}
+  },
+  "observation": "The repeated drive capture is deterministic and produces a growing masked RAM differential, but no monotonic track cursor or ROM record stride is established by snapshots alone.",
+  "confidence": "OBSERVED-IN-TWO-INDEPENDENT-MAME-CAPTURES",
+  "next_question": "Trace writer PCs for persistent residue and pair them with 68010 ROM reads to test sequential versus indexed geometry access."
+}
