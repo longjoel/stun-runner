@@ -1,0 +1,36 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/ram-map.md",
+  "runner": "tools/mame-ram-write-trace",
+  "differ": "tools/diff-ram-write-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "trace": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "range": "0xFF9498-0xFF94C0",
+    "frames": "640-805",
+    "max_events": 20000
+  },
+  "runs": {
+    "none": {"event_count": 84, "writer_pcs": ["0x0206CC"], "canonical_log_sha256": "f2730af8040ff3c7d10d354c7d0c0a68d3c46da5d6eca7310665c9ee4641246a"},
+    "late_drive": {
+      "event_count": 122,
+      "writer_pcs": ["0x020586", "0x0205C0", "0x0205E2", "0x020606", "0x02060C", "0x020616", "0x02061A", "0x02061E", "0x020634", "0x02063A", "0x020680", "0x0206BE", "0x0206C8", "0x0206CC", "0x020CA6"],
+      "canonical_log_sha256": "6a313247980067e7b6765c5c4809ecc84722b92061c7c7d33496a18835ebd750"
+    }
+  },
+  "differential": {
+    "first_structure_mismatch": {"frame": 681, "pc": "0x020CA6", "address": "0xFF949A", "data": "0x0404", "mask": "0x00FF"},
+    "drive_only_writer_pcs": ["0x020586", "0x0205C0", "0x0205E2", "0x020606", "0x02060C", "0x020616", "0x02061A", "0x02061E", "0x020634", "0x02063A", "0x020680", "0x0206BE", "0x0206C8", "0x020CA6"],
+    "address_count_deltas": {
+      "0xFF9498": 1, "0xFF949A": 2, "0xFF949C": 2,
+      "0xFF94A2": 1, "0xFF94A4": 1,
+      "0xFF94AE": 17, "0xFF94B0": 1,
+      "0xFF94B2": 2, "0xFF94B4": 2, "0xFF94B6": 2,
+      "0xFF94B8": 2, "0xFF94BA": 2, "0xFF94BC": 2,
+      "0xFF94BE": 2, "0xFF94C0": -1
+    }
+  },
+  "interpretation": "The no-input path only writes the periodic 0xFF94C0 field from 0x0206CC in this range. The late-drive path enters the 0x020586-0x0206C8 structure-processing path at frame 681 and adds the repeated 0x0205E2 derived-byte stores across 0xFF94AE-0xFF94BE. These are mechanism-level observations; the structure's game semantics remain unknown."
+}

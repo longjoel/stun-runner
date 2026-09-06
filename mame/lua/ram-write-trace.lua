@@ -10,6 +10,10 @@ local device_tag = assert(os.getenv('STUNRUN_RAM_TRACE_DEVICE'), 'STUNRUN_RAM_TR
 local space_name = os.getenv('STUNRUN_RAM_TRACE_SPACE') or 'program'
 local start_address = assert(tonumber(os.getenv('STUNRUN_RAM_TRACE_BASE')), 'base is required')
 local end_address = assert(tonumber(os.getenv('STUNRUN_RAM_TRACE_END_ADDRESS')), 'end address is required')
+-- MAME's 68010 write-tap API requires an inclusive range ending on the
+-- final byte of a bus word. Keep the requested range exact in the callback,
+-- but widen an even end by one byte for tap installation.
+local tap_end_address = end_address + (end_address % 2 == 0 and 1 or 0)
 local max_events = tonumber(os.getenv('STUNRUN_RAM_TRACE_MAX_EVENTS') or '50000')
 local frame = 0
 local events = {}
@@ -37,9 +41,10 @@ local function install_tap()
     local device = assert(machine.devices[device_tag], 'unknown device: ' .. device_tag)
     local space = assert(device.spaces[space_name], 'unknown space: ' .. space_name)
     local pc = device.state['CURPC'] or device.state['PC']
-    tap = space:install_write_tap(start_address, end_address, 'stunrun_ram_write_trace',
+    tap = space:install_write_tap(start_address, tap_end_address, 'stunrun_ram_write_trace',
         function(offset, data, mask)
-            if frame < start_frame or frame > end_frame or #events >= max_events then return end
+            if frame < start_frame or frame > end_frame or offset < start_address or
+                offset > end_address or #events >= max_events then return end
             events[#events + 1] = {frame = frame, pc = pc.value, address = offset,
                                    data = data, mask = mask}
         end)

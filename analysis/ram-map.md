@@ -50,6 +50,13 @@ The structure and counters are not yet assigned game meanings. In particular,
 the repeated `0x0205E2` stores may be a decoded/cache or renderer-support
 operation; the current evidence does not justify calling them player fields.
 
+A structure-only trace confirms the separation: the no-input run records only
+84 periodic `0x0206CC → 0xFF94C0` writes, while late-drive records 122 writes
+and enters the `0x020586–0x0206C8` path at frame 681. The first new store is
+`0x020CA6 → 0xFF949A`; the repeated derived-byte stores cover
+`0xFF94AE–0xFF94BE`. See
+`reference/experiments/stunrun/main-ram-structure-trace.metadata.json`.
+
 ## Snapshot-diff clusters
 
 The first full-RAM input comparison used identical clean boots and captured
