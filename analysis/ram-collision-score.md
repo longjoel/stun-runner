@@ -143,11 +143,13 @@ ones from `0x03A084` when an object record carries bit `0x4000` at offset
 
 The focused center-run snapshot campaign gives the six words the values
 `20, 15, 20, 1, 1, 1` at frame 2400. The first word changes to `6` by frame
-2700 and `0` by frame 2800, while the other five remain unchanged. This makes
-the bank a strong six-entry shield/depletion candidate, consistent with the
-gameplay description that the craft has six shields, but the sampled
-`0xFF954E/0xFF9550` effect bytes do not change at the transition. The RAM
-meaning therefore remains `SHIELD-CANDIDATE`, not a confirmed health field.
+2700 and `0` by frame 2800, while the other five remain unchanged. A follow-up
+write trace resolves that transition as timer activity: repeated reloads at
+`0x0416D8` write `20`, then `0x041644` decrements the first slot once per
+roughly three frames. The event consumer at `0x041606` first requires
+`0xFF9550 == 1`; that state word stayed zero in the sampled run, and the
+`0xFF954E/0xFF9550` effect bytes did not change at depletion. These six words
+are therefore event timers, not a confirmed shield or health store.
 
 ## Sustained steering negative control
 

@@ -1,0 +1,30 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_event_timer_write_trace",
+  "tools": ["tools/mame-ram-write-trace", "tools/mame-listings"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/collision_probe_center.json",
+  "trace": {
+    "range": "0xFFDE8A–0xFFDE94",
+    "frames": [2350, 2850],
+    "event_count": 95,
+    "canonical_log_sha256": "aa91f3004a186f03f666898f863d4b9d41856a95a638692785207eb543103239",
+    "writer_pcs": ["0x041644", "0x0416D8"],
+    "address_counts": {
+      "0xFFDE8A": 88,
+      "0xFFDE8E": 7
+    },
+    "observations": [
+      "0x0416D8 repeatedly reloads 0xFFDE8A with 20 and 0xFFDE8E with 20.",
+      "0x041644 decrements 0xFFDE8A from 19 through 0 between frames 2658 and 2715.",
+      "No writes to 0xFFDE8C, 0xFFDE90, 0xFFDE92, or 0xFFDE94 occurred in this window."
+    ]
+  },
+  "static_resolution": {
+    "0x041606": "indexed event consumer; requires 0xFF9550 == 1, decrements a selected timer, and on expiry updates 0xFF954E, 0xFF9550, 0xFFDE74, and 0xFFDD60",
+    "0x041644": "decrements the selected 16-bit event timer",
+    "0x0416D8": "reloads the selected timer from ROM table 0x4EF20"
+  },
+  "semantic_status": "EVENT_TIMER_WRITERS_CONFIRMED; NOT_CRAFT_HEALTH"
+}

@@ -54,5 +54,5 @@
   "static_resolution": {
     "0xFFDE8A–0xFFDE94": "six 16-bit counters loaded from 0x4EF20 at 0x0416D8 and decremented at 0x041644; zero enters the event/effect path at 0x041606"
   },
-  "semantic_status": "SIX_COUNTER_BANK_CONFIRMED; SHIELD_CANDIDATE; CRAFT_HEALTH_UNRESOLVED"
+  "semantic_status": "SIX_EVENT_TIMERS_CONFIRMED; SHIELD_HYPOTHESIS_REJECTED_FOR_THIS_BANK; CRAFT_HEALTH_UNRESOLVED"
 }
