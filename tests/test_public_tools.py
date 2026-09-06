@@ -120,6 +120,7 @@ class PublicToolTests(unittest.TestCase):
             result = json.loads(report.read_text())
             self.assertEqual(result["common_frames"], [10, 20, 30])
             self.assertEqual(result["candidates"][0]["address"], 0x100)
+            self.assertEqual(result["candidates"][0]["address_hex"], "0x100")
             self.assertEqual(result["candidates"][0]["first_diff_frame"], 20)
             self.assertEqual(result["candidates"][0]["persistence_after_first"], 1.0)
 

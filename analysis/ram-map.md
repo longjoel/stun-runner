@@ -30,6 +30,8 @@ not ordinary 68010 work RAM.
 | `0xFF9004–0xFF9007` | adjacent sampled record; no late-control differential in the tested schedules | `OBSERVED-NEGATIVE` |
 | `0xFFDB4A` | byte advanced by the static input candidate; late-control landmark sample | `STATIC-CANDIDATE` |
 | `0xFFDAEE` | sampled update flag; no late-control differential in the tested schedules | `OBSERVED-NEGATIVE` |
+| `0xFF948C–0xFF948E` | input-dependent counter/accumulator neighborhood used by `0x0418B8`; late-drive adds writes from `0x041956` and `0x04195A` | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFFDBA4` | one byte in an indexed table written by `0x030212` from table base `0xFFDB64`; semantic ownership unresolved | `STATIC + OBSERVED-IN-TRACE` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
 ## ROM-to-RAM mechanism annotations
@@ -54,6 +56,14 @@ instructions and observed writes:
 The structure and counters are not yet assigned game meanings. In particular,
 the repeated `0x0205E2` stores may be a decoded/cache or renderer-support
 operation; the current evidence does not justify calling them player fields.
+
+The three-way snapshot campaign (`none`, coin/start-only `late`, and
+coin/start plus steering/button `late_drive`) is recorded in
+`reference/experiments/stunrun/main-ram-candidate-ranking.metadata.json`.
+It separates raw input plumbing at `0xFF8000–0xFF8004` from persistent
+coin/start-dependent candidates, but does not identify score, timer, track,
+craft, armor, or weapon semantics. Those labels require controlled gameplay
+events and writer attribution for each candidate.
 
 The adjacent pointer trace confirms the structure layout at runtime:
 `0x0206CC` writes `A1` to `+0x28` (`0xFF94C0`), and `0x0206D0` writes `A0`

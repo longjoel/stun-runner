@@ -1,0 +1,31 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_candidate_ranking",
+  "tools": ["tools/mame-memory-snapshot", "tools/analyze-memory-candidates", "tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "snapshot_window": {"device": ":mainpcb:maincpu", "space": "program", "base": "0xff8000", "count": "0x8000", "width": 8, "frames": [600, 650, 700, 750, 800, 850, 900, 1200, 1500, 1800]},
+  "runs": {
+    "none": {"input": "none", "result_sha256": "e1b8d54b8482d121744b3b935de28a88d501fd4e7888cbaa932b4894f121583d"},
+    "late": {"input": "late", "result_sha256": "5dc645c5c6656be7b7084b33c3bc2d3fbc3b29d5fdb577fe588460271d98093c"},
+    "late_drive": {"input": "late_drive", "result_sha256": "5638aff8f438c1dbbea092ba9845314fff13e904a0398735dd7ab91e8b41c88e"}
+  },
+  "reports": {
+    "none_vs_late": "b61f4a7ae57c9a79ef6f45196b6e4660208e7da251c845df46f6cfdade819356",
+    "late_vs_late_drive": "5404ba9dff5a55bffae0a90e627ea29717916e25c630132d8ee513ce75d9a24a",
+    "ranking_none_vs_late_drive": "9deb23f5d1c62306034ab634c2dd73fde2b5ab192785135f10ee48664c736780"
+  },
+  "observations": {
+    "input_plumbing": [{"range": "0xff8000-0xff8004", "finding": "late-drive values 0x80 -> 0xdc at frame 1200; raw AD-stick candidate, not promoted as craft state"}],
+    "persistent_coin_start_candidates": ["0xff948d", "0xff949c-0xff94b4", "0xffdba4"],
+    "scratch_candidate": "0xfffdxx cluster is write-dense and not promoted"
+  },
+  "writer_followups": {
+    "948d_none": "8a8b3d03f4b913734fa6b241ba9085b294a8c97c19d832bde2d9ce2cd1a7404a",
+    "948d_late_drive": "3489733f4ae95b6e607ea0cb61effeac8d8f0363227d7c05eb734002b3913cdf",
+    "dba4_none": "0e766a316b1c6cb8df6bb0991c9005a2f7e6d529067a6afe46f5fdad62064001",
+    "dba4_late_drive": "01bba454cb665e3401dab4629555899b3eae361b735a918925cb7d2d4afc15ee"
+  },
+  "interpretation": "This is a candidate-discovery campaign, not semantic identification. The 0xff948d neighborhood is an input-dependent counter/accumulator path at 0x0418b8; 0xffdba4 is one byte in an indexed table written by 0x030212. Neither is labeled time, score, track, craft, armor, or weapon without a targeted state-changing experiment.",
+  "raw_snapshots_kept_local": true
+}

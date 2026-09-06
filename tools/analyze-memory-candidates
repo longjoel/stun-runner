@@ -59,6 +59,7 @@ def rank(baseline: dict[int, dict], variant: dict[int, dict], top: int) -> list[
         score = persistence * 100.0 + (1.0 / (1 + first_index)) * 10.0
         candidates.append({
             "address": first["base"] + offset,
+            "address_hex": f"0x{first['base'] + offset:X}",
             "offset": offset,
             "first_diff_frame": first_diff,
             "last_diff_frame": diffs[-1][0],
