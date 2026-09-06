@@ -40,7 +40,7 @@
       "vram_high_sum32": 9729924
     }
   },
-  "observation": "All sampled GSP state values are identical between the no-input title run and the pre-start-SW1 gameplay run at both target frames.",
+  "observation": "All sampled GSP state values are identical between the no-input title run and the pre-start-SW1 rendered-scene run at both target frames.",
   "limitation": "Sparse samples do not characterize unsampled GSP VRAM, palette RAM, screen timing, or GSP write provenance; no gameplay selector is promoted.",
   "confidence": "OBSERVED-IN-REPLAY bounded negative result",
   "raw_logs_kept_local": true,

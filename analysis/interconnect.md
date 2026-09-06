@@ -227,7 +227,7 @@ producer-side ADSP meaning of each block remains unresolved. See
 
 - BOUNDED NEGATIVE RESULT: low-rate samples of GSP control windows and two
   sparse VRAM ranges at frames 600 and 1800 are identical between no-input and
-  pre-start-SW1 gameplay runs. This does not rule out unsampled VRAM, palette,
+  pre-start-SW1 rendered-scene runs. This does not rule out unsampled VRAM, palette,
   or screen-state differences, but it rules out promoting these sparse sums as
   a gameplay selector. See
   `reference/experiments/stunrun/gsp-state-snapshot.metadata.json`.
