@@ -46,6 +46,7 @@ local width = tonumber(os.getenv('STUNRUN_MEMORY_WIDTH') or '8')
 local limit = tonumber(os.getenv('STUNRUN_MEMORY_FRAMES') or '600')
 local target_text = os.getenv('STUNRUN_MEMORY_TARGETS') or tostring(limit)
 local output = assert(os.getenv('STUNRUN_MEMORY_OUT'), 'STUNRUN_MEMORY_OUT is required')
+local input_mode = os.getenv('STUNRUN_MEMORY_INPUT') or 'none'
 local frame = 0
 local targets = {}
 
@@ -57,6 +58,29 @@ for value in string.gmatch(target_text, '[^,]+') do targets[tonumber(value)] = t
 local device = assert(machine.devices[device_tag], 'unknown device: ' .. device_tag)
 local space = assert(device.spaces[space_name], 'unknown space: ' .. space_name)
 local reader = width == 8 and space.read_u8 or width == 16 and space.read_u16 or space.read_u32
+
+local events = input_mode == 'late_drive' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'}
+} or input_mode == 'late' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or {}
+local next_event = 1
+
+local function apply_event(event)
+    local port = assert(machine.ioport.ports[event.port], 'unknown input port: ' .. event.port)
+    local field = assert(port.fields[event.field], 'unknown input field: ' .. event.port .. '/' .. event.field)
+    if event.action == 'press' then field:set_value(1)
+    elseif event.action == 'release' then field:set_value(0)
+    else field:set_value(event.value) end
+end
 
 local function capture()
     local values = {}
@@ -77,6 +101,7 @@ local function capture()
         base = base,
         count = count,
         width = width,
+        input = input_mode,
         nonzero = nonzero,
         values = values
     }
@@ -89,6 +114,10 @@ end
 
 emu.register_frame_done(function()
     frame = frame + 1
+    while next_event <= #events and events[next_event].frame == frame do
+        apply_event(events[next_event])
+        next_event = next_event + 1
+    end
     if targets[frame] then capture() end
     if frame >= limit then
         print('MAME_MEMORY_SNAPSHOT_DONE frames=' .. frame)

@@ -54,6 +54,8 @@ def main() -> int:
         "width": before["width"],
         "before_frame": before.get("frame"),
         "after_frame": after.get("frame"),
+        "before_input": before.get("input", "none"),
+        "after_input": after.get("input", "none"),
         "changed_count": len(changes),
         "changed_ranges": ranges,
         "changes": changes,

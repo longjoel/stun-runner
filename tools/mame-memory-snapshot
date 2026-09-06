@@ -24,6 +24,7 @@ def main() -> int:
     parser.add_argument("--width", type=int, choices=(8, 16, 32), default=8)
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--targets", default=None)
+    parser.add_argument("--input", choices=("none", "late", "late_drive"), default="none")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0 or args.count <= 0 or args.base < 0:
@@ -50,6 +51,7 @@ def main() -> int:
         "STUNRUN_MEMORY_FRAMES": str(args.frames),
         "STUNRUN_MEMORY_TARGETS": targets,
         "STUNRUN_MEMORY_OUT": str(args.output),
+        "STUNRUN_MEMORY_INPUT": args.input,
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     with log.open("w", encoding="utf-8") as handle:
@@ -78,6 +80,7 @@ def main() -> int:
         "base": args.base,
         "count": args.count,
         "width": args.width,
+        "input": args.input,
         "returncode": completed.returncode,
         "snapshots": [{"frame": item["frame"], "sha256": item["sha256"],
                        "nonzero": item["nonzero"]} for item in snapshots],

@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/ram-map.md",
+  "runner": "tools/mame-memory-snapshot",
+  "differ": "tools/diff-memory-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "snapshot": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "base": "0xFF8000",
+    "count": 32768,
+    "width": 8,
+    "frames": [600, 900]
+  },
+  "inputs": ["none", "late_drive"],
+  "results": {
+    "none": {
+      "frame_600": {"sha256": "1e523e9cff8fadca02cc1515fa21c0f2ba94c1fac0261e32959b5428de07cc7e", "nonzero": 4630},
+      "frame_900": {"sha256": "23caa0a89569fd054e6a087780893e817798602c4d7327a4e921fcc469057955", "nonzero": 5156}
+    },
+    "late_drive": {
+      "frame_600": {"sha256": "953a6a625741e990539b248654d5e64ed873e3120394b3e988f9cbf9bcbcc294", "nonzero": 4630},
+      "frame_900": {"sha256": "5183ee0cbb82063ec1d8bd2664050831c2c38f9685be3477f3449f4e6d4cd55d", "nonzero": 4653}
+    }
+  },
+  "differential": {
+    "frame_600_changed_bytes": 0,
+    "frame_900_changed_bytes": 3163,
+    "frame_900_changed_address_min": "0xFF8017",
+    "frame_900_changed_address_max": "0xFFFF2E",
+    "largest_ranges": [
+      {"start": "0xFF95E3", "end": "0xFF970A", "count": 296},
+      {"start": "0xFF98E3", "end": "0xFF9A0A", "count": 296},
+      {"start": "0xFF97A0", "end": "0xFF9850", "count": 177},
+      {"start": "0xFF9AA0", "end": "0xFF9B50", "count": 177}
+    ]
+  },
+  "interpretation": "The late-drive schedule has no main-RAM effect by frame 600 but produces a broad differential by frame 900. These clusters are retained as literal candidates; no semantic field names are assigned from this comparison alone. Raw snapshots are regenerable and remain outside the repository."
+}
