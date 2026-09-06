@@ -2,11 +2,14 @@
 
 ## Current milestone
 
-**M1 — Machine map**
+**M2 — Reproduction image/toolchain integration**
 
 ## State
 
 M0: **complete** — reproducible machine, harness, evidence, coverage, and emission baseline committed
+
+M1: **complete** — evidence-backed machine/interconnect contract and bounded
+input-dependent renderer boundary committed
 
 Original in MAME: **ROM-validated and runtime-inventoried; title checkpoint established**
 
@@ -16,18 +19,17 @@ Reproduction target: **not started**
 
 Native target: **smoke coverage baseline only; implementation not started**
 
-Verification harness: **bounded replay/checkpoint/trace path implemented; M1 will promote machine facts into selectors**
+Verification harness: **bounded replay/checkpoint/trace path implemented; M1 machine facts are promoted into selectors and evidence fixtures**
 
-## Immediate objective — M1 machine map
+## Immediate objective — M2 reproduction image/toolchain integration
 
-Turn the frozen M0 laboratory into an evidence-backed machine/interconnect map without beginning broad decompilation:
+Use the frozen M0 laboratory and completed M1 contract to produce the smallest
+replacement/rebuilt image accepted by the original/emulated environment:
 
-1. Close the remaining IRQ-0002 questions: source-buffer ownership, post-gameplay ADSP traffic, and the gameplay boundary.
-2. Preserve IRQ-0003's normalized checkpoint schema as a cross-target contract and extend it only when repeatable evidence supports new fields.
-3. Run bounded experiments for input polling, synchronized gameplay-boundary traffic, the first input-dependent GSP submission, and any remaining sound/ADSP edges.
-4. Record exact runtime memory spaces, writer PCs, reader/writer processors, and observed state transitions.
-5. Maintain `analysis/interconnect.md` with confidence labels and evidence links.
-6. Promote only justified machine-state selectors into the replay contract.
+1. Choose the first reconstruction slice from the verified ADSP upload and GSP renderer boundaries.
+2. Prove fixed placement, linking, and image layout for each active replacement target involved in that slice.
+3. Validate the emitted image under the pinned MAME machine with bounded startup/checkpoint assertions.
+4. Preserve the M1 selectors, provenance, and unresolved questions; do not reinterpret the oracle to fit the replacement.
 
 The first useful output is not decompiled C. It is a repeatable laboratory plus a box of provenance-labeled puzzle pieces.
 
