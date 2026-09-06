@@ -123,6 +123,26 @@ The center run still leaves `0xFFDD0C`, `0xFFDD10`, and `0xFFDD50` at zero;
 those remain candidates for a different collision/object class. Nothing in
 this successful object-hit path is evidence of craft armor or health.
 
+## Object-event slot control
+
+The same center run was traced over `0xFFDE00–0xFFDEB0` for frames 2200–3600.
+The canonical log hash is:
+
+```text
+cb8d846869915ac424a3aeabbef648f6aaad92aab93c506ffd94e30a7d454dc6
+```
+
+It captured 258 writes. The seven 16-bit words at `0xFFDE8A–0xFFDE96` are
+repeatedly written by `0x0416D8` from the fixed table at `0x4EF20` and
+decremented by `0x041644`; when a slot reaches zero, `0x041606` consumes the
+associated table entry and updates event/effect state. The byte table
+`0xFFDE9A–0xFFDEBA` is initialized/cleared by `0x04171C` and receives indexed
+ones from `0x03A084` when an object record carries bit `0x4000` at offset
+`0x18`.
+
+This is a bounded object-event/effect subsystem. It is not evidence of a
+persistent armor, health, or weapon-inventory field; those remain open.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

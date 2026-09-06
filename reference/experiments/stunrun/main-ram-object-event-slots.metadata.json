@@ -1,0 +1,26 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_object_event_slot_trace",
+  "tools": ["tools/mame-ram-write-trace", "tools/mame-listings"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/collision_probe_center.json",
+  "trace": {
+    "range": "0xFFDE00–0xFFDEB0",
+    "frames": [2200, 3600],
+    "event_count": 258,
+    "canonical_log_sha256": "cb8d846869915ac424a3aeabbef648f6aaad92aab93c506ffd94e30a7d454dc6",
+    "writer_pcs": ["0x03A084", "0x041644", "0x0416D8", "0x04171C"],
+    "address_counts": {
+      "0xFFDE8A": 88,
+      "0xFFDE8E": 129,
+      "0xFFDE9A": 10,
+      "0xFFDE9C–0xFFDEAE": 29
+    }
+  },
+  "static_resolution": {
+    "0xFFDE8A–0xFFDE96": "seven 16-bit event counters loaded from 0x4EF20 at 0x0416D8 and decremented at 0x041644",
+    "0xFFDE9A–0xFFDEBA": "32-byte object-event flags cleared at 0x04171C and set indexed at 0x03A084 from object record bit 0x4000"
+  },
+  "semantic_status": "OBJECT_EVENT_SLOTS_CONFIRMED; CRAFT_HEALTH_UNRESOLVED"
+}
