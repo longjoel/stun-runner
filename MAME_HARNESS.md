@@ -257,6 +257,10 @@ The same reuse contract is available for processor-level samples with
 relative to the loaded checkpoint, so renderer/control-state experiments can
 resume from a live state without replaying setup.
 
+Main-CPU landmark samples support the same mode through
+`tools/mame-main-state-snapshot --load-state STATE --input none`, allowing
+score/time/track-adjacent RAM checks to begin at a saved gameplay boundary.
+
 A fixture establishes a known starting state that many tests can reuse.
 
 Conceptually:

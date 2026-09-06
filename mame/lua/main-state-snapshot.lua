@@ -12,6 +12,9 @@ local targets = {}
 for value in string.gmatch(target_text, '[^,]+') do targets[tonumber(value)] = true end
 
 local function events_for(mode)
+    if mode == 'none' then
+        return {}
+    end
     if mode == 'late_drive' then
         return {
             {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},

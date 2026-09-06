@@ -1,0 +1,28 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_state_save_state_reuse",
+  "runner": "tools/mame-main-state-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "capture_description": "late_drive live checkpoint at setup frame 2400; local regenerable artifact, not committed"
+  },
+  "fork": {
+    "frames": 120,
+    "targets": [30, 120],
+    "input": "none"
+  },
+  "result": {
+    "sha256": "8720330cf23fde50fdf595ef9c2dc384c28c7769e54c36475cefefbb4fb68f88",
+    "canonical_log_sha256": "d827a96a5208803c79597e9cbd1af30294cb802e2b3bcd4d99485f0d1407f407",
+    "returncode": 0,
+    "samples": {
+      "30": {"pc": "0x02120A", "record": [200, 200, 200, 0], "update_flag": 1},
+      "120": {"pc": "0x02120A", "record": [200, 200, 200, 0], "update_flag": 1}
+    }
+  },
+  "observation": "The main-CPU state sampler loads the saved live checkpoint and emits bounded relative-frame landmark samples without replaying coin/start/setup.",
+  "confidence": "OBSERVED-IN-SAVED-STATE-FORK"
+}
