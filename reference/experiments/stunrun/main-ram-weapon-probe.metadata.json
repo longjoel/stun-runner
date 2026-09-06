@@ -115,7 +115,8 @@
         "value": "0x0004A004",
         "followup": "0x02804A calls 0x0387B0 to reset the trajectory timers"
       },
-      "interpretation": "The paired-input path establishes a resource/object handle before the moving trajectory begins. This is an effect allocation candidate; it is not evidence of armor, ammunition, or persistent weapon inventory."
+      "static_resolution": "0x02ECF0 maps an ID below 0x13A to a fixed 20-byte ROM descriptor at 0x048F9C + ID*0x14; ID 0xD2 resolves to 0x04A004, matching the observed pointer.",
+      "interpretation": "The paired-input path selects a fixed ROM effect/object descriptor before the moving trajectory begins. The pointer is a descriptor selector, not a RAM allocation and not evidence of armor, ammunition, or persistent weapon inventory."
     }
   },
   "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. The extended 0xFFDC00–0xFFDD90 tap likewise shows 0xFFDC1C/0xFFDC1E flag traffic and continuous 0xFFDD82–0xFFDD90 object/renderer writes, but no isolated armor, weapon, or ammunition transition.",
