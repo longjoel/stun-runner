@@ -69,6 +69,13 @@
       "canonical_log_sha256": "68067d33e0a342cd5de219c94d260eb068289d8f4122c6913633de28c6eb05fd",
       "event_count": 130,
       "writer_pcs": ["0x035CC2", "0x035CCA", "0x035CD6", "0x0388DE", "0x0388F4", "0x03893C", "0x038942", "0x03899C", "0x038A12", "0x038A14"],
+      "static_callgraph": {
+        "0x0387C6": "initializes the trajectory state and copies the object template from 0xFF9C80 into 0xFFDAF0",
+        "0x03887A": "integrates the trajectory using 0xFFDD16 and updates the position/velocity fields",
+        "0x038D94": "rebuilds an object record from 0xFF9C94 and sets its object flag bit",
+        "0x038E20": "rebuilds a second object variant from 0xFF9C94 and sets its object flag bit",
+        "0x0387B0": "resets the trajectory animation timers"
+      },
       "address_counts": {
         "0xFFDCC0": 2,
         "0xFFDCC2": 2,
@@ -82,7 +89,7 @@
         "0xFFDCDC": 7,
         "0xFFDCDE": 17
       },
-      "observation": "The first updates occur at frame 1560, ten frames after Button 2 at 1550. The fields advance as a coherent trajectory across 17 writer passes; this is stronger evidence for a spawned/moving effect record than for a persistent armor or inventory field, but its game object identity remains unresolved."
+      "observation": "The first updates occur at frame 1560, ten frames after Button 2 at 1550. The fields advance as a coherent trajectory across 17 writer passes. Static call-graph evidence places the block in the object/effect animation subsystem rather than a persistent armor or inventory record; the upstream event identity remains unresolved."
     },
     "isolated_button_controls": {
       "range": "0xFFDCC0–0xFFDCE0",
