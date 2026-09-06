@@ -166,6 +166,12 @@ however, distinguish the center-run object-hit/score path from sustained
 steering and narrows the remaining health search to object-record types and
 flag branches not reached by these schedules.
 
+The symmetric right-held control (`experiments/stunrun/collision_probe_hold_right.json`)
+also produces no score, track change, or sampled effect-state transition
+through frame 3600. This rules out a simple left/right wall interaction in
+the tube segment; the next damage probe must target an identifiable moving
+object or later non-tube segment.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

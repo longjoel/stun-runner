@@ -1,0 +1,23 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_hold_right_collision_negative",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/collision_probe_hold_right.json",
+  "status_snapshot": {
+    "range": "0xFF9500–0xFF95FF",
+    "frames": [1800, 2400, 3000, 3600],
+    "canonical_log_sha256": "e3f2d657c673319001aa1672ecc0a613f57861fd42acd12a78d22dd228f4bf36",
+    "result_sha256_by_frame": {
+      "1800": "8755a82855defee894f72d51873b647b0ba8dd830eeb372ac226a1beee331abf",
+      "2400": "4bdeda4425f4010880eda32d449b501199461416fc31b6ea70865a620442f840",
+      "3000": "8db38f40470f98b0691885d01a15a1c05a6cd7fb7494d2ea6c6f3e69508c5c29",
+      "3600": "20006f0768102b253b175dc468f82e785e7d3a3eff6af91a3cd2b14d545ba161"
+    },
+    "score": "0 through frame 3600",
+    "track_word": "0xFF9578 remains zero",
+    "effect_state": "0xFF954E and 0xFF9550 remain zero at sampled frames"
+  },
+  "semantic_status": "SUSTAINED_RIGHT_STEERING_NEGATIVE; CRAFT_HEALTH_UNRESOLVED"
+}
