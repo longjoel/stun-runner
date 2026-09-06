@@ -7,9 +7,7 @@ import json
 import os
 import pathlib
 import re
-import shutil
 import subprocess
-import tempfile
 
 
 MARKER = re.compile(r"MAME_MEMORY_SNAPSHOT frame=(\d+) path=(.+) nonzero=(\d+)")
@@ -39,32 +37,20 @@ def main() -> int:
         parser.error("targets must be positive frames no greater than --frames")
     args.output.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
-    state_stage = None
-    state_directory = "/tmp/stunrun-state-dir"
     if args.load_state:
         if not args.load_state.is_file():
             raise SystemExit(f"save state does not exist: {args.load_state}")
-        state_stage = pathlib.Path(tempfile.mkdtemp(prefix="stunrun-state-fork-"))
-        slot_directory = state_stage / "stunrun"
-        slot_directory.mkdir()
-        shutil.copy2(args.load_state, slot_directory / "1.sta")
-        state_directory = str(state_stage)
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
         "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
         "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save",
-        "-state_directory", state_directory, "-statename", "%g",
         "-seconds_to_run",
-        str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
+        str(86400 if args.load_state else max(2, (args.frames + 59) // 60 + 1)),
+        "-autoboot_script",
         str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/memory-snapshot.lua"),
     ]
     if args.nothrottle:
         command.insert(command.index("-seconds_to_run"), "-nothrottle")
-    if args.load_state:
-        seconds_index = command.index("-seconds_to_run") + 1
-        command[seconds_index] = "86400"
-        command.insert(command.index("-seconds_to_run"), "-state")
-        command.insert(command.index("-seconds_to_run"), "1")
     environment = {
         **os.environ,
         "STUNRUN_MEMORY_DEVICE": args.device,
@@ -80,29 +66,29 @@ def main() -> int:
         "STUNRUN_MEMORY_LOAD_STATE": str(args.load_state) if args.load_state else "",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
-    try:
-        with log.open("w", encoding="utf-8") as handle:
-            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
-                                       env=environment, check=False)
-        text = log.read_text(encoding="utf-8")
-    finally:
-        if state_stage is not None:
-            shutil.rmtree(state_stage, ignore_errors=True)
+    with log.open("w", encoding="utf-8") as handle:
+        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                   env=environment, check=False)
+    text = log.read_text(encoding="utf-8")
     matches = MARKER.findall(text)
     expected = [int(value) for value in targets.split(',')]
     snapshots = []
-    seen_frames = set()
+    # During state loading MAME can emit the same early frame more than once.
+    # The Lua callback reuses that frame's path, so the later marker describes
+    # the bytes that are actually left on disk.
+    last_markers = {}
     for frame_text, path_text, nonzero_text in matches:
-        frame_number = int(frame_text)
-        if frame_number in seen_frames:
+        last_markers[int(frame_text)] = (path_text, int(nonzero_text))
+    for frame_number in expected:
+        if frame_number not in last_markers:
             continue
-        seen_frames.add(frame_number)
+        path_text, nonzero_number = last_markers[frame_number]
         path = pathlib.Path(path_text)
         if not path.is_file():
             raise SystemExit(f"MAME reported missing snapshot: {path}")
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
-        if payload["frame"] != frame_number or payload["nonzero"] != int(nonzero_text):
+        if payload["frame"] != frame_number or payload["nonzero"] != nonzero_number:
             raise SystemExit(f"snapshot marker mismatch: {path}")
         snapshots.append(payload)
     canonical = re.sub(r"path=.*? nonzero=", "path=<snapshot> nonzero=", text)

@@ -231,12 +231,15 @@ tools/mame-memory-snapshot ... --frames 300 --targets 2,60,300 \
   --load-state /tmp/stunrun-gameplay.sta --input none --nothrottle
 ```
 
-The loader stages the state into MAME's command-line slot before Lua starts,
-so the fork does not replay boot, coin/start, or the setup schedule. Fork
-frame numbers are relative to the loaded state. MAME may emit duplicate early
-markers because the capture callback is part of the serialized machine state;
-the tool normalizes identical duplicate frame captures. Frame `2` is the
-first reliable fork sample; use later bounded targets for experiments.
+The loader requests the state through the Lua machine API before applying the
+fork's relative input schedule, so the fork does not replay boot, coin/start,
+or the setup schedule. Fork frame numbers are relative to the loaded state.
+MAME may emit duplicate early markers while the state load settles; the tool
+keeps the final marker for each frame because its snapshot path is reused.
+Frame `2` is the first reliable fork sample; use later bounded targets for
+experiments. A saved checkpoint must still be taken during live gameplay;
+loading a title/game-over or otherwise quiescent state will faithfully restore
+that inactive behavior.
 
 Save states are local regenerable artifacts and must carry the ROM/MAME,
 experiment schedule, capture frame, and checkpoint hashes in metadata before
