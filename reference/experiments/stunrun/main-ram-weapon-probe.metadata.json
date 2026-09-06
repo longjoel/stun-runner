@@ -83,6 +83,17 @@
         "0xFFDCDE": 17
       },
       "observation": "The first updates occur at frame 1560, ten frames after Button 2 at 1550. The fields advance as a coherent trajectory across 17 writer passes; this is stronger evidence for a spawned/moving effect record than for a persistent armor or inventory field, but its game object identity remains unresolved."
+    },
+    "isolated_button_controls": {
+      "range": "0xFFDCC0–0xFFDCE0",
+      "frames": [1540, 1620],
+      "button1_only_result_sha256": "49170ea1f11bb62bc975fc3a861c4e2d2f3773f1657d1a1c8ff8033181b0009e",
+      "button1_only_canonical_log_sha256": "156b0fa82a6614511cf276bf1c683304c0914e839ca66e63dfff0aed621f9009",
+      "button1_only_event_count": 7,
+      "button2_only_result_sha256": "fba585e45dfc447aeeba19b2a69cd1a5c308a612924eb4b71487aef2ccf838a4",
+      "button2_only_canonical_log_sha256": "e1c353b3ac6180a11a57cbfbc7b4897a02b8cd6b2cdda456c19434c9ddfbb541",
+      "button2_only_event_count": 8,
+      "interpretation": "Neither isolated button schedule produces the moving 17-pass trajectory. Button 1 followed by Button 2 does, so the effect requires a paired control sequence or a state established by the first button. This is a paired-action/effect candidate, not yet a proven weapon or armor semantic."
     }
   },
   "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. The extended 0xFFDC00–0xFFDD90 tap likewise shows 0xFFDC1C/0xFFDC1E flag traffic and continuous 0xFFDD82–0xFFDD90 object/renderer writes, but no isolated armor, weapon, or ammunition transition.",
