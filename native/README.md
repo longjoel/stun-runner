@@ -12,6 +12,12 @@ evidence-anchored frame — startup response at 1, upload states at
 command at 447, the control/counts match at 600 — and prints a
 machine-readable `checkpoint` line plus `RESULT PASS`/`RESULT FAIL`.
 
+The shell also emits a one-line `checkpoint-json=` document using the shared
+`stunrun-checkpoint/v1` emitter. It is explicitly a
+`native-shell-transport-model` checkpoint: CPU register fields remain zero
+until a native CPU model exists, while the ADSP image-region summary and
+`adsp_program_loaded` boundary are derived from the verified shell model.
+
 Deliberate limits (see `shell.c` header): the `0x00` command reads are
 telemetry, the second IRQ4 response is order-only without frame
 attribution, and there is no speculative game logic. Output is fully

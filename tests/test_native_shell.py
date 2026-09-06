@@ -25,6 +25,7 @@ SOUND = ROOT / "reproduction" / "sound"
 
 SOURCES = [
     str(ROOT / "native" / "shell.c"),
+    str(ROOT / "native" / "checkpoint.c"),
     str(ROOT / "native" / "experiment.c"),
     str(ADSP / "adsp_init_image.c"),
     str(ADSP / "adsp_control_seq.c"),
@@ -66,6 +67,17 @@ class NativeShellTests(unittest.TestCase):
                              "shell output is not deterministic")
             self.assertIn("RESULT PASS", first.stdout)
             self.assertIn("checkpoint frames=600", first.stdout)
+            self.assertIn('checkpoint-json={', first.stdout)
+            self.assertIn('"description": "native-shell-transport-model"',
+                          first.stdout)
+            checkpoint_line = next(
+                line for line in first.stdout.splitlines()
+                if line.startswith("shell: checkpoint-json="))
+            checkpoint = json.loads(
+                checkpoint_line.split("=", 1)[1])
+            self.assertEqual(checkpoint["schema"], "stunrun-checkpoint/v1")
+            self.assertEqual(checkpoint["frame"], 600)
+            self.assertTrue(checkpoint["selectors"]["adsp_program_loaded"])
 
     def test_shell_replays_canonical_coin_start(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -169,6 +181,24 @@ class NativeShellTests(unittest.TestCase):
             self.assertEqual(run.returncode, 0,
                              f"shell failed:\n{run.stdout}\n{run.stderr}")
             self.assertIn("events=1 pending=1", run.stdout)
+            self.assertIn("RESULT PASS", run.stdout)
+
+    def test_shell_reports_populating_upload_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = self.compile_shell(directory)
+            path = pathlib.Path(directory) / "mid.json"
+            path.write_text(json.dumps({
+                "schema": "arcade-experiment/v1",
+                "id": "mid-upload",
+                "start": "power_on",
+                "events": [],
+                "expect": {"kind": "frame", "frame": 409},
+            }), encoding="utf-8")
+            run = subprocess.run([str(binary), str(path)],
+                                 capture_output=True, text=True, check=False)
+            self.assertEqual(run.returncode, 0,
+                             f"shell failed:\n{run.stdout}\n{run.stderr}")
+            self.assertIn("upload=populating install_ready=0", run.stdout)
             self.assertIn("RESULT PASS", run.stdout)
 
 

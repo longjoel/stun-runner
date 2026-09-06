@@ -36,6 +36,16 @@ host-side timing/input/rendering boundary needed before visible-output work.
 Keep all game semantics evidence-backed and leave the current five verified
 transport slices intact.
 
+### M4 progress
+
+The native shell now emits both its deterministic transport summary and a
+one-line `stunrun-checkpoint/v1` document. The checkpoint is explicitly a
+`native-shell-transport-model` artifact: its ADSP image-region summary and
+install selector are derived from the shell model, while unimplemented CPU
+registers remain zero. The public test parses the emitted JSON and checks its
+schema, terminal frame, and selector; rendering remains scaffolding for the
+next step.
+
 ### M3 completion evidence
 
 Two fresh C-emitter/MAME runs reproduce the fixed `init-state` image
@@ -86,7 +96,7 @@ The source-defined init/control/upload slices are now also emitted by a
 dependency-free C99 implementation shared by the reproduction and native
 targets. A deterministic native shell parses the common experiment schema,
 dispatches replay events, and checks the verified title-path contracts; its
-12 CTest targets and 26 ROM-free repository tests pass. This is integration
+12 CTest targets and 27 ROM-free repository tests pass. This is integration
 scaffolding and a source-emission proof. The C-produced `init-state` image has
 also passed the existing MAME replacement loader with zero readback
 mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
@@ -110,7 +120,7 @@ The ADSP-buffer to GSP-FIFO block framing is now also represented as a literal
 C slice: the observed length/terminator formula, transfer shape, and 1200-frame
 summary are covered without assigning payload semantics. With these slices
 integrated, the native build passes 12 CTest targets and the ROM-free
-repository suite passes 26 tests.
+repository suite passes 27 tests.
 
 ## Working processor inventory
 

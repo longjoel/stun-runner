@@ -3,7 +3,7 @@
  * Agent 2 (Implementer). Two modes:
  *
  * - compiled-in (no argv): the fixed 600-frame title-path walk over the
- *   four verified C slices at their evidence-anchored frames.
+ *   five verified C slices at their evidence-anchored frames.
  * - file mode (one argv: path to an arcade-experiment/v1 JSON file): the
  *   walk length comes from expect.frame and the file's input events are
  *   dispatched at their frames as telemetry. Only the "frame" expect kind
@@ -36,6 +36,7 @@
  * deterministic: same bytes on every run (no addresses, no timing).
  */
 #include <stdio.h>
+#include <string.h>
 
 #include "adsp_control_seq.h"
 #include "adsp_init_image.h"
@@ -43,6 +44,7 @@
 #include "fifo_block.h"
 #include "experiment.h"
 #include "jsa_latch.h"
+#include "checkpoint.h"
 
 static int g_failures = 0;
 static unsigned frame = 0;
@@ -120,6 +122,54 @@ static const char *upload_name(stunrun_adsp_upload_state_t state)
     default:
         return "unknown";
     }
+}
+
+/* Emit the shared checkpoint shape for the native transport model.  CPU
+ * registers are deliberately zero because this shell models verified
+ * interconnect contracts, not a CPU interpreter.  Keeping those fields
+ * explicit prevents the output from being mistaken for an oracle match. */
+static void emit_model_checkpoint(const uint32_t *image, size_t image_words)
+{
+    stunrun_checkpoint_t cp;
+    char document[4096];
+    unsigned i;
+    unsigned nonzero = 0;
+    uint32_t sum32 = 0;
+    unsigned first = 0;
+    memset(&cp, 0, sizeof(cp));
+    snprintf(cp.system, sizeof(cp.system), "stunrun");
+    snprintf(cp.description, sizeof(cp.description),
+             "native-shell-transport-model");
+    snprintf(cp.mame, sizeof(cp.mame), "native-model");
+    cp.frame = g_terminal;
+    cp.time_seconds = (double)g_terminal / 60.0;
+    snprintf(cp.maincpu_tag, sizeof(cp.maincpu_tag), ":mainpcb:maincpu");
+    snprintf(cp.gsp_tag, sizeof(cp.gsp_tag), ":mainpcb:gsp");
+    snprintf(cp.adsp_tag, sizeof(cp.adsp_tag), ":mainpcb:adsp");
+    snprintf(cp.soundcpu_tag, sizeof(cp.soundcpu_tag), ":mainpcb:jsa:cpu");
+    snprintf(cp.region_space, sizeof(cp.region_space), "program");
+    snprintf(cp.region_range, sizeof(cp.region_range), "0x0000-0x1FFF");
+    cp.region_word_width = 24;
+    for (i = 0; i < image_words; i++) {
+        if (image[i] != 0u) {
+            if (first < STUNRUN_CHECKPOINT_FIRST_WORDS)
+                cp.region_first_words[first++] = image[i];
+            nonzero++;
+        }
+        sum32 += image[i];
+    }
+    cp.region_nonzero_words = nonzero;
+    cp.region_sum32 = sum32;
+    cp.adsp_program_loaded = g_terminal >= 412u;
+    if (stunrun_checkpoint_emit(&cp, document, sizeof(document)) == 0u) {
+        printf("shell: checkpoint-json=emit-failed\n");
+        g_failures++;
+        return;
+    }
+    printf("shell: checkpoint-json=");
+    for (i = 0; document[i] != '\0'; i++)
+        putchar(document[i] == '\n' ? ' ' : document[i]);
+    putchar('\n');
 }
 
 static int run_walk(void)
@@ -239,6 +289,7 @@ static int run_walk(void)
            control_state, counts_state,
            latches.nmi_asserted ? 1 : 0,
            latches.irq4_asserted ? 1 : 0);
+    emit_model_checkpoint(image, STUNRUN_ADSP_INIT_STATE_WORDS);
     if (g_failures == 0)
         printf("RESULT PASS\n");
     else
