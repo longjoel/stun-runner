@@ -100,3 +100,11 @@ target_include_directories(stunrun-nvram-scores-slice-test PRIVATE
   ../reproduction/maincpu)
 set_target_properties(stunrun-nvram-scores-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME nvram-scores-slice-c COMMAND stunrun-nvram-scores-slice-test)
+# ADSP-buffer to GSP-FIFO block framing and transfer-shape contract.
+add_executable(stunrun-fifo-block-slice-test
+  ../reproduction/maincpu/fifo_block.c
+  ../reproduction/maincpu/fifo_block_test.c)
+target_include_directories(stunrun-fifo-block-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-fifo-block-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME fifo-block-slice-c COMMAND stunrun-fifo-block-slice-test)

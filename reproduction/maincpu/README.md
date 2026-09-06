@@ -20,8 +20,13 @@ semantics Agent 1 left open.
   exact score bytes and the recorded name prefix only: name
   termination/padding is unestablished and the padding filler is
   arbitrary. Source: `main-nvram-high-score-table.metadata.json`.
+- `fifo_block.h` / `fifo_block.c` — length/terminator framing and literal
+  transfer shape from the ADSP serial buffer (`0x810000`) to the GSP FIFO
+  (`0xC0000C`). Payload semantics remain unresolved. Sources:
+  `adsp-buffer-window.metadata.json` and `adsp-interface-map.metadata.json`.
 
 The native target compiles these same sources (`native/CMakeLists.txt`:
-`score-slice-c`, `nvram-scores-slice-c`). Public ROM-free checks:
-`tests/test_maincpu_c_score.py`, `tests/test_maincpu_c_nvram.py`, and
+`score-slice-c`, `nvram-scores-slice-c`, `fifo-block-slice-c`). Public
+ROM-free checks: `tests/test_maincpu_c_score.py`,
+`tests/test_maincpu_c_nvram.py`, `tests/test_maincpu_c_fifo_block.py`, and
 the compiled self-checks `score_test.c` / `nvram_scores_test.c`.

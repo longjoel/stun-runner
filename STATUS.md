@@ -78,8 +78,11 @@ The first evidence-backed main-CPU state slices are also present: the live
 score/object-hit accumulator and the persistent ten-entry high-score table
 decoder. Their C self-checks use the frozen score and NVRAM findings without
 claiming unresolved score promotion, name padding, or counter-wrap semantics.
-With those slices integrated, the native build passes 10 CTest targets and
-the ROM-free repository suite passes 23 tests.
+The ADSP-buffer to GSP-FIFO block framing is now also represented as a literal
+C slice: the observed length/terminator formula, transfer shape, and 1200-frame
+summary are covered without assigning payload semantics. With these slices
+integrated, the native build passes 12 CTest targets and the ROM-free
+repository suite passes 25 tests.
 
 ## Working processor inventory
 
