@@ -1,0 +1,36 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_save_state_reuse",
+  "runner": "tools/mame-memory-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-center900.sta",
+    "sha256": "fc3b4ef05099cf233dfbd9a4f9c329504a53de231c909e766afc479dd6ec536a",
+    "capture_description": "collision_probe_center state saved at setup frame 900; local regenerable artifact, not committed"
+  },
+  "fork": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "base": "0xFF9500",
+    "count": "0x86",
+    "width": 8,
+    "frames": 240,
+    "targets": [60, 120, 240],
+    "input": "fork_center",
+    "nothrottle": true
+  },
+  "independent_loads": 2,
+  "snapshot_sha256_by_relative_frame": {
+    "60": "ae0d2e95059a05632191eba75b2f2971364193c140f3a3cffdd8f1debf63519b",
+    "120": "15ee0c4ee1de26c3662e5588bb36fc2e2782b85311bad47429445397d034c1c5",
+    "240": "393b4b8b0738e7a625de1e576b18451c91e80c12789c5906e4ad831fe6544bb3"
+  },
+  "repeat_snapshot_hashes_equal": true,
+  "observation": "The same saved machine state can be loaded independently and resumed with identical RAM at each sampled relative frame; experiments need not replay from reset.",
+  "caveats": [
+    "Relative frame 1 can be duplicated during command-line state loading; later targets are used.",
+    "The state is local and depends on the pinned MAME build and validated ROM set."
+  ],
+  "confidence": "OBSERVED-IN-TWO-INDEPENDENT-FORKS"
+}
