@@ -143,6 +143,21 @@ ones from `0x03A084` when an object record carries bit `0x4000` at offset
 This is a bounded object-event/effect subsystem. It is not evidence of a
 persistent armor, health, or weapon-inventory field; those remain open.
 
+## Sustained steering negative control
+
+The centered no-fire schedule was repeated with `AD Stick X=0` held from
+frame 900 through frame 3600 (`experiments/stunrun/collision_probe_hold_left.json`).
+The status snapshots show no score writes through frame 3600, while the timer
+and surrounding progression state continue. The event table remains quiet
+until indexed flags appear at `0xFFDE9A` and `0xFFDE9C` around frames 3000–3270;
+these are the same object-event table mechanisms above, not a new craft-status
+transition.
+
+This control does not demonstrate a wall-crash or damage state. It does,
+however, distinguish the center-run object-hit/score path from sustained
+steering and narrows the remaining health search to object-record types and
+flag branches not reached by these schedules.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

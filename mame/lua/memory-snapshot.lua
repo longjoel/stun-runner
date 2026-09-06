@@ -59,7 +59,13 @@ local device = assert(machine.devices[device_tag], 'unknown device: ' .. device_
 local space = assert(device.spaces[space_name], 'unknown space: ' .. space_name)
 local reader = width == 8 and space.read_u8 or width == 16 and space.read_u16 or space.read_u32
 
-local events = input_mode == 'collision_probe_center' and {
+local events = input_mode == 'collision_probe_hold_left' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0}
+} or input_mode == 'collision_probe_center' and {
     {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},

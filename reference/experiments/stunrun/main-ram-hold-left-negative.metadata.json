@@ -1,0 +1,38 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_hold_left_collision_negative",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/collision_probe_hold_left.json",
+  "status_snapshot": {
+    "range": "0xFF9500–0xFF95FF",
+    "frames": [1800, 2400, 3000, 3270, 3400, 3600],
+    "canonical_log_sha256": "5e8fc8d998e1fdd39a12f0a5af3df45e1527409de26db44c3bdaaa5f1ff41a6c",
+    "result_sha256_by_frame": {
+      "1800": "0fec8891fe06c0064e9a180aa78cfb281e4b95177a99b188e8bfb9ab54ae7370",
+      "2400": "a9dc56ea4bfad8bcc8b18227f937aaaf8ca38ad4ee6e598a4dd6b5077a0ad5ed",
+      "3000": "57d5e092b56b99f728a38a9589841d5aad7bde0dd2a3c654b929ff85ba4ef4ad",
+      "3270": "a6a3350e679100fa25c037b4a7fd0c8ef0e84bd7344f41bad761de0feeb60262",
+      "3400": "cf7cde0de8412d5adb5990037fefaee7d2d189f123a274de8b932f1575ba2f51",
+      "3600": "d667288137d37b9ae29afc5d46a3b6567ebaf3216d7d732bb0883c9342435a23"
+    },
+    "score": "0 through frame 3600",
+    "track_word": "0xFF9578 remains zero"
+  },
+  "object_event_snapshot": {
+    "range": "0xFFDE00–0xFFDEAF",
+    "frames": [1800, 2400, 3000, 3270, 3400, 3600],
+    "canonical_log_sha256": "80c0b7c242b9679aaff85d4d206832776b955dd880439f49fa5af4658b480d83",
+    "result_sha256_by_frame": {
+      "1800": "2c740273ec7044495fe7c3d5bbc9adafe23a183b1cee2580a0ce19a80eb77c5c",
+      "2400": "2f4c4d23d8e23763e52b95fe0cd3c7820bec43041598e0b0b3a5801d106deeb8",
+      "3000": "923fe3c190e2b63b15962045cff50eeee64f8b27cd1bc1462c5d7d30025b49ec",
+      "3270": "7854e5d0a76a23521d78cdddcbe976a6ffdaa8071782cc5e7f6e53b7c45e9512",
+      "3400": "d42ff3fde60d96883d1c433e418477936bf00e38439f3a92eb32f96bd6bd17dd",
+      "3600": "d898322ef93fe1abe9428e87d29968b761f0373815c910e14e789135f3bc2ae7"
+    },
+    "observed_flags": ["0xFFDE9A", "0xFFDE9C"]
+  },
+  "semantic_status": "SUSTAINED_STEERING_NEGATIVE; CRAFT_HEALTH_UNRESOLVED"
+}
