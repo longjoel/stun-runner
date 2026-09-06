@@ -245,6 +245,11 @@ producer-side ADSP meaning of each block remains unresolved. See
   1200. This is stronger than the earlier attract/demo delta, but no semantic
   field or ROM-side state meaning is promoted yet. See
   `reference/experiments/stunrun/late-control-boundary.metadata.json`.
+- BOUNDED NEGATIVE RESULT: the same late and late-drive schedules produce no
+  68010 writes to the observed ADSP buffer window `0x810000–0x813FFF` through
+  frame 1800. The changed path is therefore not established as a main-side
+  buffer producer; ADSP-internal activity and other shared windows remain open.
+  See `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 
 The static/runtime GSP search is recorded in
 `reference/experiments/stunrun/gsp-handler-search.metadata.json`.

@@ -49,6 +49,15 @@
       "frame_1800": "drive path remains distinct in GSP PC/ST and sparse high-VRAM sum"
     }
   },
+  "adsp_buffer_probe": {
+    "runner": "tools/mame-adsp-window --window buffer --access write",
+    "window": "0x810000-0x813fff",
+    "frames": 1800,
+    "late_result_sha256": "d92dc877984fbd107d483bcfbae98c045389e46c411b71970611f578aaad8400",
+    "late_drive_result_sha256": "f1ea7ee0698985b77fdde037afeb91adb4fa47c989eb41078da4b3bf6b596216",
+    "observations": 0,
+    "interpretation": "The late control transition adds no 68010 writes to the observed ADSP buffer window; this does not characterize ADSP-internal writes or other shared windows."
+  },
   "interpretation": "This is the strongest current candidate for a synchronized player-control boundary: late coin/start reaches a roadway state, and the verified drive schedule changes both the rendered result and machine/GSP state after a bounded delay. It remains a candidate rather than a semantic gameplay selector until the input transition and state fields are tied to ROM-side meaning.",
   "confidence": "OBSERVED-IN-REPLAY + REPEATABLE-CHECKPOINT + OBSERVED-IN-GSP-SNAPSHOT",
   "raw_artifacts_kept_local": true,

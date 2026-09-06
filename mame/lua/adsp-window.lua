@@ -18,7 +18,21 @@ local sw_off_prefix = {
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
 }
-local events = input_mode == 'coin_start' and {
+local events = input_mode == 'late_drive' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 1500, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 1500, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'}
+} or input_mode == 'late' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'coin_start' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
@@ -36,7 +50,7 @@ local function apply_event(event)
     assert(port ~= nil, 'unknown input port: ' .. event.port)
     local field = port.fields[event.field]
     assert(field ~= nil, 'unknown input field: ' .. event.port .. '/' .. event.field)
-    if event.action == 'press' then field:set_value(1) else field:set_value(0) end
+    if event.action == 'press' then field:set_value(1) elseif event.action == 'release' then field:set_value(0) else field:set_value(event.value) end
     print('M1_ADSP_INPUT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action)
 end
 
