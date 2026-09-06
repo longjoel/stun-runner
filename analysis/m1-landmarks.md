@@ -115,6 +115,16 @@ input reads feed the `0xFF9000–0xFF9003` records; `0x0109EC` separately uses
 that region while emitting GSP command/FIFO writes. This is a useful literal
 mechanism to investigate next, not a promoted interpretation of the records.
 
+A bounded TMS34010 trace from frames 850–1200 adds a narrower runtime
+correlation. The matched late coin/start path writes `@F4000000` from
+`0xFFF42EB0` and `0xFFF46370`; the late-drive path additionally executes
+`0xFFF45330` and `0xFFF479E0`. The first reads a table-derived word through
+`A4`, while the second constructs a replicated byte in `B9`; both write the
+MAME-mapped GSP low control window. The pinned MAME source maps that window's
+offset-zero value into the VRAM-expander color latch. These are literal
+renderer-path candidates, not player-state names. Trace hashes and counts are
+recorded in `reference/experiments/stunrun/late-control-boundary.metadata.json`.
+
 An early 30-frame Coin 1 pulse followed by Start produces the same result as
 the later two-frame pulse. In the static listing, the only direct references to
 coin bits 7/6 are in the `0x043590` candidate; its six direct callers remain
@@ -144,7 +154,7 @@ of these routines rather than infer credit semantics from the event codes.
 
 ## Next targeted experiment
 
-Run controlled coin-pulse timing variants and compare the resulting HUD/state
-before promoting a gameplay selector. Keep the six-caller `0x043590` path as a
-separate unresolved branch; do not assign input or credit semantics from the
-listing alone.
+Correlate the drive-only GSP writers with an exact frame-level control-latch
+transition and a main-CPU input-polling trace. Keep the six-caller `0x043590`
+path and the ADSP producer semantics as separate unresolved branches; do not
+assign input, credit, or player-state semantics from the renderer trace alone.
