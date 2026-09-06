@@ -176,6 +176,12 @@ producer-side ADSP meaning of each block remains unresolved. See
   strongest current ROM-side input-to-state candidate for the late transition,
   and the pinned `driver_68k_map` confirms the records reside in 68010 RAM
   (`0xFF8000–0xFFFFFF`); their runtime field meaning is not established.
+- BOUNDED NEGATIVE RESULT: direct frame-landmark reads show the candidate
+  `0xFF9000–0xFF9003` records, adjacent `0xFF9004–0xFF9007`, `0xFFDB4A`, and
+  `0xFFDAEE` are identical between late coin/start and late-drive schedules at
+  frames 600, 750, 900, 1200, and 1800. These bytes are not promoted as the
+  gameplay selector. See
+  `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 - OBSERVED-IN-TRACE: an early Coin 2 variant enters a bounded trace dominated
   by `0x0013EC` → `0x0013FC`/`0x001404`, polling `0x60C001`.
 - OBSERVED-IN-REPLAY: the normal and early Coin 1/start sequences both reach

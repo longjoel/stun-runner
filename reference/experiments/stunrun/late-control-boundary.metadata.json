@@ -58,6 +58,14 @@
     "observations": 0,
     "interpretation": "The late control transition adds no 68010 writes to the observed ADSP buffer window; this does not characterize ADSP-internal writes or other shared windows."
   },
+  "main_state_snapshot": {
+    "runner": "tools/mame-main-state-snapshot",
+    "targets": [600, 750, 900, 1200, 1800],
+    "late_result_sha256": "80ad330017ef1488114d235359801fa94e4e8b741f8841df0ba0d357dbef19da",
+    "late_drive_result_sha256": "33ffb87cfaab04402aa103a52c959d9f3240ef3a4c89652067cbccb2469fa5e9",
+    "observed": "0xFF9000-0xFF9003, 0xFF9004-0xFF9007, 0xFFDB4A, and 0xFFDAEE are identical at every sampled landmark in both schedules.",
+    "interpretation": "The statically identified input-adjacent record window is not sufficient as a late-control selector; the observed GSP and checkpoint divergence occurs through another state path."
+  },
   "interpretation": "This is the strongest current candidate for a synchronized player-control boundary: late coin/start reaches a roadway state, and the verified drive schedule changes both the rendered result and machine/GSP state after a bounded delay. It remains a candidate rather than a semantic gameplay selector until the input transition and state fields are tied to ROM-side meaning.",
   "confidence": "OBSERVED-IN-REPLAY + REPEATABLE-CHECKPOINT + OBSERVED-IN-GSP-SNAPSHOT",
   "raw_artifacts_kept_local": true,
