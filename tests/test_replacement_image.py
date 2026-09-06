@@ -62,10 +62,14 @@ class ReplacementImageTests(unittest.TestCase):
             ], check=True, capture_output=True, text=True)
             image = json.loads((output / "image.json").read_text())
             payload = (output / image["binary"]).read_bytes()
-            self.assertEqual(image["length"], (0x834 + 1) * 4)
+            self.assertEqual(image["length"], (0x846 + 1) * 4)
             self.assertEqual(payload[0x6 * 4:0x10 * 4].hex(),
                              "00340008003400090034000a0034000b00380008003800090038000a0038000b0034001500380017")
             self.assertEqual(payload[0x3f * 4:0x40 * 4].hex(), "001803ff")
+            self.assertEqual(payload[0x780 * 4:0x781 * 4].hex(), "00380014")
+            self.assertEqual(payload[0x7a1 * 4:0x7a2 * 4].hex(), "000a000f")
+            self.assertEqual(payload[0x834 * 4:0x835 * 4].hex(), "00340014")
+            self.assertEqual(payload[0x846 * 4:0x847 * 4].hex(), "000a000f")
 
 
 if __name__ == "__main__":

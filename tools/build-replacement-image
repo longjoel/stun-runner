@@ -38,7 +38,7 @@ def adsp_init_prefix() -> bytes:
 
 def adsp_init_state() -> bytes:
     """Preserve the observed reset-side PM/DM setup through a bounded loop."""
-    words = [0] * (0x834 + 1)
+    words = [0] * (0x846 + 1)
     words[0x0004] = 0x001C780F
     words[0x0005] = 0x001C834F
     observed = [
@@ -62,8 +62,26 @@ def adsp_init_state() -> bytes:
     words[0x003D] = 0x001C780F
     words[0x003E] = 0x001C834F
     words[0x003F] = 0x001803FF
-    words[0x0780] = 0x000A000F
-    words[0x0834] = 0x000A000F
+    routine_0780 = [
+        0x00380014, 0x00380035, 0x00340014, 0x00340037,
+        0x00380008, 0x00340009, 0x004FFFF0, 0x0047FFF1,
+        0x00412485, 0x004123C4, 0x0041236A, 0x00412422,
+        0x00400003, 0x00480006, 0x00392360, 0x00580000,
+        0x00580010, 0x00580050, 0x00580041, 0x00580000,
+        0x00580010, 0x005800A0, 0x00580021, 0x00989550,
+        0x00580030, 0x00580060, 0x00580040, 0x00580051,
+        0x00580030, 0x00580060, 0x00580020, 0x005800A1,
+        0x00989560, 0x000A000F,
+    ]
+    routine_0834 = [
+        0x00340014, 0x00340087, 0x00340009, 0x00340008,
+        0x00349590, 0x003495A1, 0x00AFFFF7, 0x00AFFFF7,
+        0x00AFFFF7, 0x00AFFFF7, 0x00AFFFF7, 0x00AFFFF7,
+        0x00A7FFF3, 0x00A7FFF3, 0x00A7FFF3, 0x00A7FFF3,
+        0x00A7FFF3, 0x00A7FFF3, 0x000A000F,
+    ]
+    words[0x0780:0x0780 + len(routine_0780)] = routine_0780
+    words[0x0834:0x0834 + len(routine_0834)] = routine_0834
     return b"".join(struct.pack(">I", word) for word in words)
 
 
