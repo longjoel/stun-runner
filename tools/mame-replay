@@ -140,6 +140,8 @@ def main() -> int:
     parser.add_argument("--cfg-dir", type=pathlib.Path, default=pathlib.Path("/tmp/stunrun-mame-cfg"))
     parser.add_argument("--exact-frame", action="store_true",
                         help="snapshot and stop on the experiment's expected frame")
+    parser.add_argument("--nothrottle", action="store_true",
+                        help="run MAME as fast as possible")
     parser.add_argument("--load-state", type=pathlib.Path,
                         help="load a MAME state before starting relative frames")
     args = parser.parse_args()
@@ -175,6 +177,8 @@ def main() -> int:
         if args.load_state:
             command += ["-state_directory", str(state_directory),
                         "-statename", "%g", "-state", "1"]
+        if args.nothrottle:
+            command.append("-nothrottle")
         command += [
             "-seconds_to_run", str(seconds),
             "-snapname", experiment["id"], "-snapshot_directory", str(args.output),

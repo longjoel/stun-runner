@@ -1,0 +1,33 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "saved_state_render_differential",
+  "runner": "tools/mame-replay --load-state --exact-frame --nothrottle",
+  "inputs": [
+    "experiments/stunrun/saved-state-center.json",
+    "experiments/stunrun/saved-state-left.json"
+  ],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "capture_description": "late_drive live checkpoint at setup frame 2400; local regenerable artifact, not committed"
+  },
+  "forks": {
+    "center": {
+      "relative_terminal_frame": 1800,
+      "events_applied": 3,
+      "screenshot_sha256": "f2af2bb773850ebfcf1f1609870ed626fadb0090a5d55277f7553e7d8489a3fb",
+      "mame_log_sha256": "95d5a4277ba70f1947ecc177fa1b34cc158abf117d186f9930267818645cdbc7"
+    },
+    "left": {
+      "relative_terminal_frame": 1800,
+      "events_applied": 3,
+      "screenshot_sha256": "7ebd0c597ab53ee4a0a956f2ca3dce9905039180f51c73bc576da05e02198f2e",
+      "mame_log_sha256": "943d7c971928fa4df089e5fbfa0b756636874d294e2e8eeb3d566d273bc70dee"
+    }
+  },
+  "observation": "Identical saved gameplay state plus distinct relative steering schedules reaches the same bounded terminal frame and produces different 512x240 screenshots.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME",
+  "limitation": "This proves an input-dependent rendered differential, not the semantic identity of the displayed scene or player-state fields."
+}

@@ -52,6 +52,10 @@ emulated time is already advanced, and records relative experiment frames in
 the result. A live installed-MAME fork from the frame-2400 `late_drive` state
 applied the common `coin_start` schedule through relative frame 600; provenance
 is in `reference/experiments/stunrun/replay-save-state-fork.metadata.json`.
+Two 1,800-frame relative steering forks from that same state now produce
+different exact-frame screenshots with `--nothrottle`; the schedules and
+hashes are recorded in
+`reference/experiments/stunrun/saved-state-render-differential.metadata.json`.
 
 ### M3 completion evidence
 

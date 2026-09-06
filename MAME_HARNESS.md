@@ -382,6 +382,9 @@ pre-reset configuration and would be superseded by state restoration. The
 result records the loaded state path; the state itself remains a local,
 ROM/MAME-specific artifact with provenance metadata.
 
+Use `--nothrottle` for bounded fork campaigns when wall-clock speed matters;
+the experiment's frame terminal remains the stopping condition.
+
 The high-level fork was verified with `experiments/stunrun/coin_start.json`
 from the saved `late_drive` frame-2400 state; see
 `reference/experiments/stunrun/replay-save-state-fork.metadata.json`.
