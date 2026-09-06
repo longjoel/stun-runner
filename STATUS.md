@@ -18,9 +18,9 @@ Original in MAME: **ROM-validated and runtime-inventoried; title checkpoint esta
 
 Step 0 driver mining: **worked example retained; runtime tags reconciled against system MAME 0.289**
 
-Reproduction target: **not started**
+Reproduction target: **initial ADSP replacement slice only; gameplay reproduction not started**
 
-Native target: **smoke coverage baseline only; implementation not started**
+Native target: **deterministic replay/checkpoint scaffolding and evidence-backed slices; game implementation not started**
 
 Verification harness: **bounded replay/checkpoint/trace path implemented; M1 machine facts are promoted into selectors and evidence fixtures**
 
@@ -45,8 +45,8 @@ program word `0x0004` (the prior `0x0000` probe executed the reset-vector
 verification and advances repeatably to `0x004F` after the bounded settle
 interval. These results establish image transport and a stable execution
 loop, but not behavioral equivalence or a source-produced initialization slice.
-The next experiment is to replace the captured image with a minimal
-independently encoded ADSP initialization routine. The first source-defined
+The captured image has since been replaced with a minimal independently
+encoded ADSP initialization routine. The first source-defined
 prefix now preserves the observed calls to `0x0780` and `0x0834`, returns from
 both stubs, and settles at PC `0x0004` after two fresh MAME runs. A second
 literal setup slice reproduces the observed PM/DM initialization range and
@@ -62,7 +62,7 @@ The source-defined init/control/upload slices are now also emitted by a
 dependency-free C99 implementation shared by the reproduction and native
 targets. A deterministic native shell parses the common experiment schema,
 dispatches replay events, and checks the verified title-path contracts; its
-ten CTest targets and 23 ROM-free repository tests pass. This is integration
+12 CTest targets and 25 ROM-free repository tests pass. This is integration
 scaffolding and a source-emission proof. The C-produced `init-state` image has
 also passed the existing MAME replacement loader with zero readback
 mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
