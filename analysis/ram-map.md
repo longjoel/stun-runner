@@ -32,6 +32,24 @@ not ordinary 68010 work RAM.
 | `0xFFDAEE` | sampled update flag; no late-control differential in the tested schedules | `OBSERVED-NEGATIVE` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
+## ROM-to-RAM mechanism annotations
+
+These entries are intentionally literal descriptions of the disassembled
+instructions and observed writes:
+
+| RAM location | ROM mechanism | Confidence |
+|---|---|---|
+| `0xFF9000–0xFF9003` | routine `0x020430` derives four byte positions from input/status reads; `0x020494` and `0x020498` store the derived bytes | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9006` | `0x02048C` increments the byte at offset `+6` from the `0xFF9000` base while processing a nonzero input byte | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF948F` | `0x0204B8` increments this byte after the `0x0418B8` helper returns | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9490` | `0x020510` increments this byte before calling `0x02053C`; `0x020544` increments it again inside that routine | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9498` | `0x02053C` uses this as a base pointer for a state/cache structure; offsets `+0x16`, `+0x17`, `+0x19`, `+0x1C–0x21`, `+0x28`, and `+0x2A` are accessed | `STATIC-CANDIDATE` |
+| `0xFF94AE–0xFF94BE` | the `0x0205E2–0x02061E` subpath stores source bytes and derived XOR bytes at offsets from the `0xFF9498` structure base; the late-drive trace adds these writers | `STATIC + OBSERVED-IN-TRACE` |
+
+The structure and counters are not yet assigned game meanings. In particular,
+the repeated `0x0205E2` stores may be a decoded/cache or renderer-support
+operation; the current evidence does not justify calling them player fields.
+
 ## Snapshot-diff clusters
 
 The first full-RAM input comparison used identical clean boots and captured
