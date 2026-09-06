@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+"""Trace bounded writes to a selected MAME memory-space window."""
+
+import argparse
+import collections
+import hashlib
+import json
+import os
+import pathlib
+import re
+import subprocess
+
+
+EVENT = re.compile(
+    r"M1_RAM_WRITE frame=(\d+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
+    r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
+)
+DONE = re.compile(r"M1_RAM_WRITE_DONE frames=(\d+) events=(\d+) truncated=(true|false) output=(.+)")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rompath", type=pathlib.Path)
+    parser.add_argument("output", type=pathlib.Path)
+    parser.add_argument("--device", required=True)
+    parser.add_argument("--space", default="program")
+    parser.add_argument("--base", type=lambda value: int(value, 0), required=True)
+    parser.add_argument("--end", type=lambda value: int(value, 0), required=True)
+    parser.add_argument("--frames", type=int, default=705)
+    parser.add_argument("--start-frame", type=int, default=680)
+    parser.add_argument("--end-frame", type=int, default=705)
+    parser.add_argument("--max-events", type=int, default=50000)
+    parser.add_argument("--input", choices=("none", "late_drive"), default="none")
+    parser.add_argument("--mame", default="mame")
+    args = parser.parse_args()
+    if not (0 <= args.base <= args.end and args.end_frame >= args.start_frame > 0):
+        parser.error("invalid address or frame range")
+    args.output.mkdir(parents=True, exist_ok=True)
+    log = args.output / "mame.log"
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
+        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-seconds_to_run",
+        str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
+        str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/ram-write-trace.lua"),
+    ]
+    environment = {
+        **os.environ,
+        "STUNRUN_RAM_TRACE_OUT": str(args.output),
+        "STUNRUN_RAM_TRACE_FRAMES": str(args.frames),
+        "STUNRUN_RAM_TRACE_START": str(args.start_frame),
+        "STUNRUN_RAM_TRACE_END": str(args.end_frame),
+        "STUNRUN_RAM_TRACE_INPUT": args.input,
+        "STUNRUN_RAM_TRACE_DEVICE": args.device,
+        "STUNRUN_RAM_TRACE_SPACE": args.space,
+        "STUNRUN_RAM_TRACE_BASE": str(args.base),
+        "STUNRUN_RAM_TRACE_END_ADDRESS": str(args.end),
+        "STUNRUN_RAM_TRACE_MAX_EVENTS": str(args.max_events),
+        "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
+    }
+    with log.open("w", encoding="utf-8") as handle:
+        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                   env=environment, check=False)
+    text = log.read_text(encoding="utf-8")
+    events = [{"frame": int(m.group(1)), "pc": int(m.group(2), 16),
+               "address": int(m.group(3), 16), "data": int(m.group(4), 16),
+               "mask": int(m.group(5), 16)} for m in EVENT.finditer(text)]
+    done = DONE.findall(text)
+    result = {
+        "schema": "stunrun-ram-write-trace-result/v1",
+        "device": args.device, "space": args.space,
+        "base": args.base, "end": args.end,
+        "frames": args.frames, "capture_start_frame": args.start_frame,
+        "capture_end_frame": args.end_frame, "input": args.input,
+        "returncode": completed.returncode, "events": events,
+        "event_count": len(events),
+        "writer_pcs": sorted({event["pc"] for event in events}),
+        "address_counts": {f"0x{address:X}": count for address, count in
+                            collections.Counter(event["address"] for event in events).items()},
+        "canonical_log_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+    }
+    if done:
+        result["truncated"] = done[-1][2] == "true"
+    (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    if completed.returncode or not done:
+        raise SystemExit(f"RAM write trace failed; see {log}")
+    print(json.dumps(result, separators=(",", ":")))
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

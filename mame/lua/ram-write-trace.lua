@@ -1,0 +1,64 @@
+-- Trace bounded writes to a selected memory-space window.
+
+local machine = manager.machine
+local output = assert(os.getenv('STUNRUN_RAM_TRACE_OUT'), 'STUNRUN_RAM_TRACE_OUT is required')
+local limit = tonumber(os.getenv('STUNRUN_RAM_TRACE_FRAMES') or '705')
+local start_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_START') or '680')
+local end_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_END') or tostring(limit))
+local input_mode = os.getenv('STUNRUN_RAM_TRACE_INPUT') or 'none'
+local device_tag = assert(os.getenv('STUNRUN_RAM_TRACE_DEVICE'), 'STUNRUN_RAM_TRACE_DEVICE is required')
+local space_name = os.getenv('STUNRUN_RAM_TRACE_SPACE') or 'program'
+local start_address = assert(tonumber(os.getenv('STUNRUN_RAM_TRACE_BASE')), 'base is required')
+local end_address = assert(tonumber(os.getenv('STUNRUN_RAM_TRACE_END_ADDRESS')), 'end address is required')
+local max_events = tonumber(os.getenv('STUNRUN_RAM_TRACE_MAX_EVENTS') or '50000')
+local frame = 0
+local events = {}
+local next_event = 1
+local tap
+
+local input_events = input_mode == 'late_drive' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'}
+} or {}
+
+local function apply_event(event)
+    local port = assert(machine.ioport.ports[event.port], 'unknown input port: ' .. event.port)
+    local field = assert(port.fields[event.field], 'unknown input field: ' .. event.port .. '/' .. event.field)
+    if event.action == 'press' then field:set_value(1)
+    elseif event.action == 'release' then field:set_value(0)
+    else field:set_value(event.value) end
+end
+
+local function install_tap()
+    local device = assert(machine.devices[device_tag], 'unknown device: ' .. device_tag)
+    local space = assert(device.spaces[space_name], 'unknown space: ' .. space_name)
+    local pc = device.state['CURPC'] or device.state['PC']
+    tap = space:install_write_tap(start_address, end_address, 'stunrun_ram_write_trace',
+        function(offset, data, mask)
+            if frame < start_frame or frame > end_frame or #events >= max_events then return end
+            events[#events + 1] = {frame = frame, pc = pc.value, address = offset,
+                                   data = data, mask = mask}
+        end)
+end
+
+emu.register_frame_done(function()
+    frame = frame + 1
+    if frame == 10 then install_tap() end
+    while next_event <= #input_events and input_events[next_event].frame == frame do
+        apply_event(input_events[next_event])
+        next_event = next_event + 1
+    end
+    if frame >= limit then
+        for _, event in ipairs(events) do
+            print(string.format('M1_RAM_WRITE frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
+                event.frame, event.pc, event.address, event.data, event.mask))
+        end
+        print(string.format('M1_RAM_WRITE_DONE frames=%d events=%d truncated=%s output=%s',
+            frame, #events, tostring(#events >= max_events), output))
+        machine:exit()
+    end
+end)

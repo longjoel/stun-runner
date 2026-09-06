@@ -54,6 +54,17 @@ These are candidate state/working regions only. The snapshot diff establishes
 coincident change, not ownership or meaning. Provenance is recorded in
 `reference/experiments/stunrun/main-ram-snapshot-diff.metadata.json`.
 
+## Writer-PC attribution
+
+A bounded write trace over `0xFF9000–0xFF9FFF` from frames 680–705 narrows the
+cause of the first divergence. The first event mismatch occurs at frame 680;
+the first writer present only in the late-drive run is `0x02048C` at frame 681,
+writing `0xFF9006`. A concentrated follow-on path in `0x0205E2–0x02063A`
+writes `0xFF94AE–0xFF94BE`, with `0x0205E2` as the repeated writer. These are
+the first RAM annotations tied to input-differential writer PCs rather than
+only to final snapshot contents. See
+`reference/experiments/stunrun/main-ram-write-trace-differential.metadata.json`.
+
 ## Open annotation work
 
 - correlate changed RAM clusters with writer PCs and exact input events;

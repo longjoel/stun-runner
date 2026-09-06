@@ -1,0 +1,31 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/ram-map.md",
+  "runner": "tools/mame-ram-write-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "trace": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "range": "0xFF9000-0xFF9FFF",
+    "frames": "680-705",
+    "max_events": 10000
+  },
+  "runs": {
+    "none": {"event_count": 1237, "canonical_log_sha256": "37c1839b9ff31c9dc0384c1bbe578dc642639e426ec461db24361fefd6487522"},
+    "late_drive": {"event_count": 1288, "canonical_log_sha256": "b7ed13a06f76fff23acd3a99dcf7021e68d642b7a00f5912feb2c110b6f67b5b"}
+  },
+  "differential": {
+    "first_event_mismatch_frame": 680,
+    "first_drive_only_writer_pc": {"pc": "0x02048C", "frame": 681, "address": "0xFF9006"},
+    "drive_only_writer_pcs": [
+      "0x02048C", "0x0204B8", "0x0204DE", "0x0204EA", "0x020586",
+      "0x0205C0", "0x0205E2", "0x020606", "0x02060C", "0x020616",
+      "0x02061A", "0x02061E", "0x020634", "0x02063A", "0x020680",
+      "0x0206BE", "0x0206C8", "0x020CA6", "0x024524", "0x041956", "0x04195A"
+    ],
+    "concentrated_range": "0xFF94AE-0xFF94BE",
+    "concentrated_writer_pc": "0x0205E2"
+  },
+  "interpretation": "The late-drive input path changes RAM writes beginning with the Coin 1 release frame, before the first frame-level full-RAM snapshot divergence at frame 700. New writer PCs are concentrated in the 0x02048C-0x0206C8 region, with a repeated subpath at 0x0205E2 writing 0xFF94AE-0xFF94BE. This is a ROM-to-RAM attribution candidate, not a semantic field naming claim."
+}
