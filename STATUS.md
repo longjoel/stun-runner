@@ -151,7 +151,9 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   ADSP program image at frame 600 (2,718 nonzero words); the same local image
   runs through the M2 loader and reaches PC `0x275D` at frame 142. Frame 136 is
   retained as an all-zero negative boundary. This is reference-image transport,
-  not yet reconstructed ADSP behavior.
+  not yet reconstructed ADSP behavior. An immediate frame-1 installation also
+  reaches PC `0x27A2` at frame 142, so the next replacement task is isolating
+  the original upload/control path rather than proving image placement again.
 
 ## Last verified checkpoint
 

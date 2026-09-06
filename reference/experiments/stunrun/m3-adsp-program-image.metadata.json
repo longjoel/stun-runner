@@ -32,7 +32,23 @@
     "readback_first_word": "0x00000000",
     "final_pc": "0x275D"
   },
-  "interpretation": "The full captured ADSP program image is fixed-placed at 0x0000 and executes under the MAME-modeled ADSP control release. This proves image transport for an active program, but it is ROM-derived reference data and not a reconstructed implementation; it must remain local and uncommitted.",
+  "earliest_install_probe": {
+    "install_frame": 1,
+    "settle_frames": 2,
+    "result_sha256": "dca94c9b96651d59af0e62d56c47339c25c50304ef1029c7f8f810df7fde67d2",
+    "observed_frame": 3,
+    "final_pc": "0x275E",
+    "interpretation": "The full image can be installed immediately after reset and executes under the modeled control release."
+  },
+  "early_install_long_probe": {
+    "install_frame": 1,
+    "settle_frames": 141,
+    "result_sha256": "1e092aad3dc25bf2deef01508eaca5507666c1d6679302ce40d8333a008197b6",
+    "observed_frame": 142,
+    "final_pc": "0x27A2",
+    "interpretation": "The image remains executable through the bounded early-init interval; this does not establish equivalence to the original machine checkpoint."
+  },
+  "interpretation": "The full captured ADSP program image is fixed-placed at 0x0000 and executes under the MAME-modeled ADSP control release, including an immediate post-reset installation probe. This proves image transport for an active program, but it is ROM-derived reference data and not a reconstructed implementation; it must remain local and uncommitted.",
   "raw_artifacts_kept_local": true,
   "next_question": "Replace the ROM-derived image with a source/encoder-produced initialization slice and compare its earliest checkpoint against the original upload path."
 }
