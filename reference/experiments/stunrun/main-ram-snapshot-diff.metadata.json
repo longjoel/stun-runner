@@ -11,20 +11,31 @@
     "base": "0xFF8000",
     "count": 32768,
     "width": 8,
-    "frames": [600, 900]
+    "frames": [600, 650, 700, 750, 800, 850, 900]
   },
   "inputs": ["none", "late_drive"],
   "results": {
     "none": {
       "frame_600": {"sha256": "1e523e9cff8fadca02cc1515fa21c0f2ba94c1fac0261e32959b5428de07cc7e", "nonzero": 4630},
+      "frame_650": {"sha256": "2375020469feef623fe3d3cd2d391902dcd9d9bd19e26f33861092ee46d15520", "nonzero": 4622},
+      "frame_700": {"sha256": "029dd2b36c3bde8e75114426775a4f60b79b5728f624b56bb8faa989215db4e9", "nonzero": 4622},
+      "frame_750": {"sha256": "1f22a587917f114d77d8a5d9b487a81347d433c6758853912bb9e490fc6a72f1", "nonzero": 4623},
+      "frame_800": {"sha256": "e8dfa7934dfceb8dc6504d6579b5adcc455d123e9a1e10cfaa7445668c08b3f9", "nonzero": 4602},
+      "frame_850": {"sha256": "0c0c1df85c0c4757c136a0acbcfeae7fdaa817b41976307cf2093fde8e0c177d", "nonzero": 4608},
       "frame_900": {"sha256": "23caa0a89569fd054e6a087780893e817798602c4d7327a4e921fcc469057955", "nonzero": 5156}
     },
     "late_drive": {
       "frame_600": {"sha256": "953a6a625741e990539b248654d5e64ed873e3120394b3e988f9cbf9bcbcc294", "nonzero": 4630},
+      "frame_650": {"sha256": "958818e9be97eff66ba8e5fa91b81a3cb0e51eb92f5a50d5bae4dfb3326d265a", "nonzero": 4622},
+      "frame_700": {"sha256": "ef755e109b49c7487f3ba052d49c335f822947cd467beca9522845452e42f833", "nonzero": 4635},
+      "frame_750": {"sha256": "4ec68d2366ab01a67e781a2bf97ad248d78555a33c4bdc06e25e3eed97edd627", "nonzero": 4624},
+      "frame_800": {"sha256": "b473107ff509849ac07319fe6e20c676dce4634b84df40114849d67cacb484f6", "nonzero": 4652},
+      "frame_850": {"sha256": "98858f9b40295838ef61942db83790462102393189da4715d5665736af9b2884", "nonzero": 4654},
       "frame_900": {"sha256": "5183ee0cbb82063ec1d8bd2664050831c2c38f9685be3477f3449f4e6d4cd55d", "nonzero": 4653}
     }
   },
   "differential": {
+    "changed_bytes_by_frame": {"600": 0, "650": 0, "700": 61, "750": 27, "800": 1875, "850": 2528, "900": 3163},
     "frame_600_changed_bytes": 0,
     "frame_900_changed_bytes": 3163,
     "frame_900_changed_address_min": "0xFF8017",
@@ -36,5 +47,5 @@
       {"start": "0xFF9AA0", "end": "0xFF9B50", "count": 177}
     ]
   },
-  "interpretation": "The late-drive schedule has no main-RAM effect by frame 600 but produces a broad differential by frame 900. These clusters are retained as literal candidates; no semantic field names are assigned from this comparison alone. Raw snapshots are regenerable and remain outside the repository."
+  "interpretation": "The late-drive schedule has no main-RAM effect through frame 650, first diverges by 61 bytes at frame 700 after Coin 1/Start, contracts to 27 bytes at frame 750, and expands to 1875 bytes at frame 800 after steering/Button 1. The broad differential reaches 3163 bytes by frame 900. These clusters are retained as literal candidates; no semantic field names are assigned from this comparison alone. Raw snapshots are regenerable and remain outside the repository."
 }

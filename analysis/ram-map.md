@@ -35,9 +35,11 @@ not ordinary 68010 work RAM.
 ## Snapshot-diff clusters
 
 The first full-RAM input comparison used identical clean boots and captured
-the 68010 work-RAM range at frames 600 and 900. No bytes differ at frame 600.
-At frame 900, the late-drive schedule differs from no input in 3,163 bytes;
-large changed clusters include:
+the 68010 work-RAM range at frames 600, 650, 700, 750, 800, 850, and 900.
+There are no differences at frames 600 or 650. The first divergence is 61
+bytes at frame 700, after the Coin 1/Start events; it is 27 bytes at frame
+750, then expands to 1,875 bytes at frame 800 after the steering/Button 1
+event and reaches 3,163 bytes at frame 900. Large frame-900 clusters include:
 
 ```text
 0xFF95E3–0xFF970A   296 bytes
