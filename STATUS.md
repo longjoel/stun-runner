@@ -147,6 +147,11 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   the original upload, releases the MAME-modeled ADSP reset/`/BR`/`/HALT`
   controls, and observes a repeatable PC advance to `0x0E2C` at frame 142.
   Evidence: `reference/experiments/stunrun/m2-adsp-replacement-image.metadata.json`.
+- M3 investigation: `tools/mame-adsp-program-dump` captures a repeatable full
+  ADSP program image at frame 600 (2,718 nonzero words); the same local image
+  runs through the M2 loader and reaches PC `0x275D` at frame 142. Frame 136 is
+  retained as an all-zero negative boundary. This is reference-image transport,
+  not yet reconstructed ADSP behavior.
 
 ## Last verified checkpoint
 

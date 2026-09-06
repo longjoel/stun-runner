@@ -27,3 +27,18 @@ image into the MAME-mapped ADSP program RAM, resets the ADSP PC to the image
 entry, and records the read-back word and post-settle PC. This is an image
 placement/runtime-integration proof, not yet a behavioral replacement for the
 original ADSP program.
+
+For a local, ROM-derived full-image experiment, capture the active ADSP RAM at
+the established populated boundary (frame 136 is retained as an all-zero
+negative control; the first captured populated image is frame 600):
+
+```sh
+tools/mame-adsp-program-dump /path/to/private/stunrun-roms \
+  /tmp/stunrun-m3-adsp-original --frame 600
+tools/mame-replacement-image \
+  /tmp/stunrun-m3-adsp-original/image.json \
+  --rompath /path/to/private/stunrun-roms \
+  --output /tmp/stunrun-m3-adsp-run
+```
+
+The captured binary is local reference evidence and must not be committed.

@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""Capture a local ADSP program-RAM image at a bounded MAME frame."""
+
+import argparse
+import hashlib
+import json
+import os
+import pathlib
+import re
+import struct
+import subprocess
+
+
+WORD = re.compile(r"M3_ADSP_WORD address=([0-9A-Fa-f]+) value=([0-9A-Fa-f]+)")
+DUMP = re.compile(r"M3_ADSP_DUMP frame=(\d+) pc=([0-9A-Fa-f]+)")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rompath", type=pathlib.Path)
+    parser.add_argument("output", type=pathlib.Path)
+    parser.add_argument("--frame", type=int, default=136)
+    parser.add_argument("--mame", default="mame")
+    args = parser.parse_args()
+    if args.frame <= 0:
+        parser.error("--frame must be positive")
+    args.output.mkdir(parents=True, exist_ok=True)
+    log = args.output / "mame.log"
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
+        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-seconds_to_run",
+        str(max(3, (args.frame + 59) // 60 + 1)), "-autoboot_script",
+        str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/adsp-program-dump.lua"),
+    ]
+    environment = {
+        **os.environ,
+        "STUNRUN_ADSP_DUMP_FRAMES": str(args.frame),
+        "STUNRUN_ADSP_DUMP_TARGET": str(args.frame),
+        "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
+    }
+    with log.open("w", encoding="utf-8") as handle:
+        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                   env=environment, check=False)
+    text = log.read_text(encoding="utf-8")
+    words = {int(match.group(1), 16): int(match.group(2), 16)
+             for match in WORD.finditer(text)}
+    dumps = DUMP.findall(text)
+    if completed.returncode or len(words) != 0x2000 or not dumps:
+        raise SystemExit(f"ADSP program dump failed; see {log}")
+    if sorted(words) != list(range(0x2000)):
+        raise SystemExit("ADSP program dump has non-contiguous addresses")
+    payload = b"".join(struct.pack(">I", words[address]) for address in range(0x2000))
+    binary = args.output / "adsp2100.bin"
+    binary.write_bytes(payload)
+    image = {
+        "schema": "stunrun-replacement-image/v1",
+        "processor": "adsp2100",
+        "fixture": "captured-original-program-ram",
+        "origin": "0x0",
+        "entry": "0x0",
+        "length": len(payload),
+        "nonzero_words": sum(value != 0 for value in words.values()),
+        "capture_frame": int(dumps[-1][0]),
+        "capture_pc": f"0x{int(dumps[-1][1], 16):04X}",
+        "sha256": hashlib.sha256(payload).hexdigest(),
+        "binary": binary.name,
+        "layout": "single fixed-origin section captured from ADSP program RAM",
+    }
+    (args.output / "image.json").write_text(json.dumps(image, indent=2) + "\n", encoding="utf-8")
+    canonical = re.sub(r"output=[^\n]+", "output=<output>", text)
+    result = {
+        "schema": "stunrun-adsp-program-dump-result/v1",
+        "frame": args.frame,
+        "image": "image.json",
+        "image_sha256": image["sha256"],
+        "nonzero_words": image["nonzero_words"],
+        "capture_pc": image["capture_pc"],
+        "canonical_log_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+        "returncode": completed.returncode,
+    }
+    (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(result, indent=2))
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

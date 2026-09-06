@@ -1,0 +1,38 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "reproduction/adsp/README.md",
+  "dump_runner": "tools/mame-adsp-program-dump",
+  "replacement_runner": "tools/mame-replacement-image",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "negative_boundary": {
+    "frame": 136,
+    "dump_result_sha256": "c35020473aed1b4642cd726cad727b63fff2824ad68cedd7ffb73c7cbd890479",
+    "nonzero_words": 0,
+    "capture_pc": "0x0004",
+    "interpretation": "The ADSP program RAM is still all zero at this sampled boundary; frame 136 is not promoted as a populated replacement-image source."
+  },
+  "captured_image": {
+    "frame": 600,
+    "program_words": 8192,
+    "nonzero_words": 2718,
+    "payload_length": 32768,
+    "payload_sha256": "821f3478ef4de4deb67c2b492fc726aaa73351d240b037e46b9f0d23014cecc4",
+    "dump_result_sha256": "9a6a8470dfa4487370f91d76c7d4ee70b68066b52bc63d4f36624c5aa74c1854",
+    "fresh_dump_runs": 2,
+    "repeatable_payload": true,
+    "capture_pc": "0x0014"
+  },
+  "replacement_run": {
+    "install_frame": 140,
+    "settle_frames": 2,
+    "result_sha256": "0b77d26f3f50e062cb3339ebba143b4584e1ecd719889e205c4fc800e3eff2d7",
+    "fresh_configuration_runs": 2,
+    "repeatable_result": true,
+    "readback_first_word": "0x00000000",
+    "final_pc": "0x275D"
+  },
+  "interpretation": "The full captured ADSP program image is fixed-placed at 0x0000 and executes under the MAME-modeled ADSP control release. This proves image transport for an active program, but it is ROM-derived reference data and not a reconstructed implementation; it must remain local and uncommitted.",
+  "raw_artifacts_kept_local": true,
+  "next_question": "Replace the ROM-derived image with a source/encoder-produced initialization slice and compare its earliest checkpoint against the original upload path."
+}
