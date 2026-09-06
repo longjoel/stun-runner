@@ -2,6 +2,7 @@
   "schema": "stunrun-experiment-metadata/v1",
   "experiment": "analysis/ram-map.md",
   "runner": "tools/mame-ram-write-trace",
+  "differ": "tools/diff-ram-write-trace",
   "mame": "0.289 (mame0289-dirty)",
   "rom_manifest": "roms/stunrun.manifest.json",
   "trace": {

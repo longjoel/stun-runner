@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Compare two bounded RAM write-trace result JSON files."""
+
+import argparse
+import collections
+import json
+import pathlib
+
+
+def load(path: pathlib.Path) -> dict:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-ram-write-trace-result/v1":
+        raise SystemExit(f"{path}: unsupported RAM write-trace schema")
+    return value
+
+
+def event_key(event: dict) -> tuple[int, int, int, int, int]:
+    return (event["frame"], event["pc"], event["address"], event["data"], event["mask"])
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("before", type=pathlib.Path)
+    parser.add_argument("after", type=pathlib.Path)
+    parser.add_argument("-o", "--output", type=pathlib.Path)
+    args = parser.parse_args()
+    before, after = load(args.before), load(args.after)
+    for key in ("device", "space", "base", "end", "capture_start_frame", "capture_end_frame"):
+        if before.get(key) != after.get(key):
+            raise SystemExit(f"incompatible traces: {key} differs")
+    before_events, after_events = before["events"], after["events"]
+    first_mismatch = None
+    for index, (left, right) in enumerate(zip(before_events, after_events)):
+        if event_key(left) != event_key(right):
+            first_mismatch = {"index": index, "before": left, "after": right}
+            break
+    if first_mismatch is None and len(before_events) != len(after_events):
+        index = min(len(before_events), len(after_events))
+        first_mismatch = {"index": index,
+                          "before": before_events[index] if index < len(before_events) else None,
+                          "after": after_events[index] if index < len(after_events) else None}
+    before_pcs = {event["pc"] for event in before_events}
+    after_pcs = {event["pc"] for event in after_events}
+    before_addresses = collections.Counter(event["address"] for event in before_events)
+    after_addresses = collections.Counter(event["address"] for event in after_events)
+    result = {
+        "schema": "stunrun-ram-write-trace-diff/v1",
+        "before": str(args.before), "after": str(args.after),
+        "before_input": before.get("input", "none"),
+        "after_input": after.get("input", "none"),
+        "before_event_count": len(before_events),
+        "after_event_count": len(after_events),
+        "first_event_mismatch": first_mismatch,
+        "before_only_writer_pcs": sorted(before_pcs - after_pcs),
+        "after_only_writer_pcs": sorted(after_pcs - before_pcs),
+        "address_count_deltas": {
+            f"0x{address:X}": after_addresses[address] - before_addresses[address]
+            for address in sorted(set(before_addresses) | set(after_addresses))
+            if after_addresses[address] != before_addresses[address]
+        },
+    }
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

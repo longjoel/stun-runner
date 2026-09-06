@@ -96,6 +96,29 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(diff["changed_ranges"], [{"start": 0x12, "end": 0x13, "count": 2}])
             self.assertEqual(diff["changes"][0]["before"], 2)
 
+    def test_diff_ram_write_trace_reports_first_mismatch(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            before = temp / "before.json"
+            after = temp / "after.json"
+            common = {
+                "schema": "stunrun-ram-write-trace-result/v1",
+                "device": ":mainpcb:maincpu", "space": "program",
+                "base": 0xFF9000, "end": 0xFF9FFF,
+                "capture_start_frame": 680, "capture_end_frame": 705,
+            }
+            before.write_text(json.dumps({**common, "input": "none", "events": [
+                {"frame": 680, "pc": 0x100, "address": 0xFF9000, "data": 1, "mask": 0xFF}
+            ]}))
+            after.write_text(json.dumps({**common, "input": "late_drive", "events": [
+                {"frame": 680, "pc": 0x100, "address": 0xFF9000, "data": 2, "mask": 0xFF},
+                {"frame": 681, "pc": 0x200, "address": 0xFF9006, "data": 1, "mask": 0xFF}
+            ]}))
+            result = self.run_tool("diff-ram-write-trace", before, after)
+            diff = json.loads(result.stdout)
+            self.assertEqual(diff["first_event_mismatch"]["index"], 0)
+            self.assertEqual(diff["after_only_writer_pcs"], [0x200])
+
 
 if __name__ == "__main__":
     unittest.main()
