@@ -30,6 +30,29 @@
     "observed_writes": "Only initialization/clear writes were observed; no scoring event was reached by the bounded input schedule.",
     "snapshot_result_sha256": "2b946a124c0b62be8ab13506954f3713fcb8810dfb936371a1d377e8aeb0c610"
   },
-  "semantic_status": "strong live-score candidate; controlled scoring action still required for final confirmation",
-  "interpretation": "The field is not labeled as score solely from constants. The combination of repeated clear sites, UI reads, and point-shaped additions is strong static evidence; the dynamic run confirms the address is active but did not exercise an increment."
+  "scoring_run": {
+    "input": "weapon_probe",
+    "frames": [1800, 6000],
+    "writer_trace_result_sha256": "5552414ba5dd3f0b3e1b86edd59dfb21f63d17cc369e5581aa13e39947aeb39c",
+    "writer_trace_canonical_log_sha256": "28ac734155b973368685b53b1c0455601a2a7e81cd708c5c16c8d886322822d1",
+    "observed_address_counts": {
+      "0xFF9532": 10,
+      "0xFF9534": 10
+    },
+    "observed_scoring_writes": [
+      {"frame": 3277, "pc": "0x03A2EC", "address": "0xFF9534", "value": 50},
+      {"frame": 3289, "pc": "0x03A2EC", "address": "0xFF9534", "value": 100},
+      {"frame": 3295, "pc": "0x03A2EC", "address": "0xFF9534", "value": 150},
+      {"frame": 3307, "pc": "0x03A2EC", "address": "0xFF9534", "value": 200},
+      {"frame": 3316, "pc": "0x03A2EC", "address": "0xFF9534", "value": 250},
+      {"frame": 3325, "pc": "0x03A2EC", "address": "0xFF9534", "value": 300},
+      {"frame": 3334, "pc": "0x03A2EC", "address": "0xFF9534", "value": 350},
+      {"frame": 3343, "pc": "0x03A2EC", "address": "0xFF9534", "value": 400},
+      {"frame": 3352, "pc": "0x03A2EC", "address": "0xFF9534", "value": 450},
+      {"frame": 3361, "pc": "0x03A2EC", "address": "0xFF9534", "value": 500}
+    ],
+    "interpretation": "A controlled scoring sequence produced monotonic 50-point writes in the low word at 0xFF9534 while the high word at 0xFF9532 remained zero. This confirms 0xFF9532–0xFF9535 as the live score accumulator; the longword is currently in the low-word range."
+  },
+  "semantic_status": "DYNAMIC-SCORE-CONFIRMED",
+  "interpretation": "Repeated clear sites, UI reads, point-shaped additions, and the controlled monotonic scoring writes identify 0xFF9532–0xFF9535 as the live score accumulator. The high word remained zero during this run, while the low word advanced from 50 through 500."
 }

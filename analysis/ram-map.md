@@ -36,7 +36,7 @@ not ordinary 68010 work RAM.
 | `0xFF9564–0xFF9567` | elapsed-update counter candidate; `0x024506` increments the longword continuously during the gameplay window | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9568–0xFF956B` | countdown candidate initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
-| `0xFF9532–0xFF9535` | live score accumulator candidate; cleared at several game-state entries, formatted/displayed by nearby UI paths, and incremented by point-shaped constants (`0xC8`, `0x3E8`, `0x7D0`, `0x4E20`) plus table-derived values | `STATIC-CANDIDATE; DYNAMIC CLEAR-ONLY` |
+| `0xFF9532–0xFF9535` | live score accumulator; cleared at several game-state entries, formatted/displayed by nearby UI paths, and observed receiving monotonic 50-point increments at `0xFF9534` from PC `0x03A2EC` | `DYNAMIC-SCORE-CONFIRMED` |
 | `0xFF4410–0xFF44FF` | ten-entry persistent high-score table in the mapped ZRAM view; 24-byte records contain a big-endian score at `+0` and a display name beginning at `+2` | `SNAPSHOT + PERSISTENT-NVRAM + STATIC` |
 | `0xFFDD16–0xFFDD17` | speed/velocity candidate; reset to zero, increased in `0x02820A` by `0x20`, bounded at `0x3C0`/`0x500`, displayed through the nearby HUD path, and consumed by motion math at `0x039E04` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFFDD02`, `0xFFDD06`, `0xFFDD08` | three coordinate/position candidates; passed through collision/bounds checks and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570` | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
