@@ -38,9 +38,17 @@ def validate(experiment: dict) -> None:
         raise ValueError("unsupported experiment schema")
     if not experiment.get("id") or not experiment.get("start"):
         raise ValueError("experiment requires id and start")
+    initial_events = experiment.get("initial_events", [])
+    if not isinstance(initial_events, list):
+        raise ValueError("initial_events must be a list")
     expect = experiment.get("expect", {})
     if expect.get("kind") != "frame" or not isinstance(expect.get("frame"), int):
         raise ValueError("experiment expect must define a frame")
+    for event in initial_events:
+        if event.get("action") not in {"press", "release", "set"}:
+            raise ValueError("unsupported initial input action")
+        if event.get("action") == "set" and "value" not in event:
+            raise ValueError("initial set events require value")
     last_frame = -1
     for event in experiment.get("events", []):
         if not isinstance(event.get("frame"), int) or event["frame"] < last_frame:
@@ -52,10 +60,15 @@ def validate(experiment: dict) -> None:
             raise ValueError("set events require value")
 
 
-def lua_script(experiment: dict) -> str:
+def lua_script(experiment: dict, exact_snapshot: pathlib.Path | None = None) -> str:
     events = lua_literal(experiment.get("events", []))
+    initial_events = lua_literal(experiment.get("initial_events", []))
     terminal = experiment["expect"]["frame"]
+    exact_capture = ""
+    if exact_snapshot is not None:
+        exact_capture = f'''\n        machine.video:frame_update()\n        machine.video:snapshot()\n        machine:exit()'''
     return f'''local events = {events}
+local initial_events = {initial_events}
 local machine = manager.machine
 local frame = 0
 local next_event = 1
@@ -95,6 +108,12 @@ local function apply_event(event)
     print('MAME_REPLAY_EVENT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action .. ' port_value=' .. string.format('%08X', port:read()))
 end
 
+emu.register_prestart(function()
+    for _, event in ipairs(initial_events) do
+        apply_event(event)
+    end
+end)
+
 emu.register_frame_done(function()
     while next_event <= #events and events[next_event].frame == frame do
         apply_event(events[next_event])
@@ -104,6 +123,7 @@ emu.register_frame_done(function()
         captured = true
         local result = {{schema='arcade-replay-result/v1', frame=frame, events_applied=next_event - 1, expected_events=#events}}
         print('MAME_REPLAY_JSON ' .. json(result))
+        {exact_capture}
     end
     frame = frame + 1
 end)
@@ -117,16 +137,19 @@ def main() -> int:
     parser.add_argument("--mame", default="mame")
     parser.add_argument("--output", type=pathlib.Path, required=True)
     parser.add_argument("--cfg-dir", type=pathlib.Path, default=pathlib.Path("/tmp/stunrun-mame-cfg"))
+    parser.add_argument("--exact-frame", action="store_true",
+                        help="snapshot and stop on the experiment's expected frame")
     args = parser.parse_args()
     experiment = json.loads(args.experiment.read_text(encoding="utf-8"))
     validate(experiment)
     args.output.mkdir(parents=True, exist_ok=True)
-    seconds = max(2, math.ceil((experiment["expect"]["frame"] + 120) / 60))
+    seconds = max(2, math.ceil((experiment["expect"]["frame"] + (1 if args.exact_frame else 120)) / 60))
 
     with tempfile.TemporaryDirectory(prefix="stunrun-replay-") as temp_dir:
         script = pathlib.Path(temp_dir) / "replay.lua"
         log = pathlib.Path(temp_dir) / "mame.log"
-        script.write_text(lua_script(experiment), encoding="utf-8")
+        snapshot = args.output / f"{experiment['id']}-exact.png" if args.exact_frame else None
+        script.write_text(lua_script(experiment, snapshot), encoding="utf-8")
         command = [
             args.mame, "-rompath", str(args.rompath), "stunrun",
             "-video", "soft", "-sound", "none", "-skip_gameinfo",

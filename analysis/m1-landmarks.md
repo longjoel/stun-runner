@@ -75,13 +75,19 @@ is a reproducible attract/demo boundary, not yet a player-gameplay selector.
 See
 `reference/experiments/stunrun/coin-start-gameplay.metadata.json`.
 
-The default SW1 setting is not the only machine path. A paired replay that sets
-all eight `SW1` fields Off before the same Coin 1/Start schedule produces an
-identical rendered gameplay image in two fresh MAME configurations: track,
-player vehicle, HUD, speed, level, and credits are visible. The fixture is a
-visual gameplay-boundary observation, not yet an exact numeric checkpoint,
-because the replay runner's screenshot is captured after its frame-1800 JSON
-marker. See
+The all-SW1-Off variant is retained as a negative control, not a gameplay
+fixture. Exact-frame snapshots in fresh configurations show `DOWNLOADING GSP`
+at frame 720 and a blank image at frames 900–1500; the former visual result
+was caused by the replay runner's post-marker snapshot timing and is not a
+gameplay selector. See
+`reference/experiments/stunrun/sw-off-loading-boundary.metadata.json`.
+
+The corrected pre-start variant applies the SW1 DIP bank before reset rather
+than at frame 1. At exact frame 1800 it produces an identical rendered
+gameplay image and an identical normalized checkpoint in two fresh
+configurations. This is the current strongest gameplay boundary fixture; it
+still promotes only the existing `adsp_program_loaded` selector, not a guessed
+semantic game-state field. See
 `reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json`.
 
 An early 30-frame Coin 1 pulse followed by Start produces the same result as

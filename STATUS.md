@@ -109,8 +109,10 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   control/reset/bank handlers, and the title-path JSA command-byte pairing.
   Remaining questions are source-buffer ownership, post-gameplay traffic, the
   first input-dependent GSP submission, and a synchronized semantic gameplay
-  selector; a repeatable visual gameplay boundary now exists, while the
-  normalized M1 checkpoint extension remains repeatable for the title path.
+  selector. The late-applied SW1-off experiment is a repeatable loading / blank
+  negative control; applying the same DIP bank before reset now yields a
+  repeatable exact-frame gameplay checkpoint, while the normalized M1
+  checkpoint extension remains repeatable for both title and gameplay paths.
 
 ## Completed baseline slices
 

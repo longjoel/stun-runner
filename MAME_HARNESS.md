@@ -307,12 +307,23 @@ events:
     control: START1
     action: release
 
+initial_events:
+  - control: CABINET_DIP_BANK
+    action: set
+    value: 0xff
+
 expect:
   selector: gameplay
   timeout_frames: 600
 ```
 
 The harness adapter translates this into MAME input actions. The native runner later consumes the same experiment definition.
+
+`initial_events` are applied during MAME pre-start, before the machine reset;
+they are required for DIP/configuration values that the ROM samples during
+initialization. Frame-numbered `events` are applied after frame boundaries.
+The replay adapter also supports an exact-frame capture mode that snapshots
+and exits on the expected frame instead of taking a post-marker screenshot.
 
 ## Test runner
 

@@ -26,7 +26,7 @@ def main() -> int:
     parser.add_argument("output", type=pathlib.Path)
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--capture-start-frame", type=int, default=132)
-    parser.add_argument("--input", choices=("none", "coin_start", "sw_off", "sw_off_none"), default="none")
+    parser.add_argument("--input", choices=("none", "coin_start", "sw_off", "sw_off_prestart", "sw_off_none"), default="none")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0:
@@ -45,6 +45,7 @@ def main() -> int:
         "STUNRUN_GSP_BOUNDARY_FRAMES": str(args.frames),
         "STUNRUN_GSP_BOUNDARY_CAPTURE_START": str(args.capture_start_frame),
         "STUNRUN_GSP_BOUNDARY_INPUT": args.input,
+        "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     with log.open("w", encoding="utf-8") as handle:
         completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,

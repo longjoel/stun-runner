@@ -1,0 +1,37 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/coin_start_sw_off_long.json",
+  "runner": "tools/mame-replay",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "events": "SW1:1-8 set Off at frame 1; Coin 1 frames 120-122; 1 Player Start frames 300-302",
+  "exact_frame_snapshots": {
+    "720": {
+      "sha256": "f7e89f2bd2f76d6dea35623b00df909b8f8edebae4ca2cbd4e583465e4ce211a",
+      "observation": "DOWNLOADING GSP image"
+    },
+    "900": {
+      "sha256": "4e32e52b8cd82f64bacb28001abb7d1e4786d021690b60a7e1175b221dc17c54",
+      "observation": "blank image"
+    },
+    "1200": {
+      "sha256": "4e32e52b8cd82f64bacb28001abb7d1e4786d021690b60a7e1175b221dc17c54",
+      "observation": "blank image"
+    },
+    "1500": {
+      "sha256": "4e32e52b8cd82f64bacb28001abb7d1e4786d021690b60a7e1175b221dc17c54",
+      "observation": "blank image"
+    }
+  },
+  "fresh_configuration_runs": 4,
+  "gsp_post_loading_probe": {
+    "frames": 1800,
+    "capture_start_frame": 600,
+    "fifo_writes_captured": 0,
+    "command_writes_captured": 0,
+    "interpretation": "No writes to the two narrow GSP host registers were observed after frame 600; other GSP VRAM/control paths remain outside this probe."
+  },
+  "confidence": "OBSERVED-IN-REPLAY negative control",
+  "raw_artifacts_kept_local": true,
+  "next_question": "Use the default SW1 configuration with an exact-frame checkpoint and input-dependent trace to identify the first real gameplay transition."
+}

@@ -39,6 +39,12 @@ reproduction and native gameplay checkpoints. M1 has now supplied repeatable
 region/access observations that are eligible inputs to that extension—ADSP
 program upload, serial-buffer block/FIFO transfer, and control/IRQ writes—but
 no semantic gameplay field has been promoted. The SW1-off replay fixture in
-`reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json` is
-repeatable visual evidence of a gameplay path, not a canonical numeric
-checkpoint; its screenshot timing is intentionally recorded as a limitation.
+`reference/experiments/stunrun/sw-off-loading-boundary.metadata.json` is a
+repeatable loading/blank negative control, not a gameplay path or canonical
+numeric checkpoint. The replay harness now supports an exact-frame snapshot
+and exit, so future visual and numeric captures can share a frame boundary.
+
+The frame-1800 gameplay fixture in
+`reference/checkpoints/m1-gameplay/state.json` uses the same compact schema and
+is byte-for-byte repeatable across two fresh configurations. It is a
+provenance-backed gameplay boundary, not yet a semantic `game_state` contract.

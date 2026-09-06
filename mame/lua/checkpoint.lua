@@ -48,7 +48,7 @@ local frame = 0
 local captured = false
 local checkpoint_frame = tonumber(os.getenv('STUNRUN_CHECKPOINT_FRAME') or '600')
 local input_mode = os.getenv('STUNRUN_CHECKPOINT_INPUT') or 'none'
-local events = input_mode == 'sw_off' and {
+local sw_off_prefix = {
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', action = 'set', value = 1},
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:2', action = 'set', value = 1},
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:3', action = 'set', value = 1},
@@ -56,7 +56,17 @@ local events = input_mode == 'sw_off' and {
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:5', action = 'set', value = 1},
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:6', action = 'set', value = 1},
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
-    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
+}
+local initial_events = input_mode == 'sw_off_prestart' and sw_off_prefix or {}
+local events = input_mode == 'sw_off' and {
+    sw_off_prefix[1], sw_off_prefix[2], sw_off_prefix[3], sw_off_prefix[4],
+    sw_off_prefix[5], sw_off_prefix[6], sw_off_prefix[7], sw_off_prefix[8],
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw_off_prestart' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
@@ -69,6 +79,12 @@ local function apply_event(event)
     local field = assert(port.fields[event.field], 'unknown input field: ' .. event.port .. '/' .. event.field)
     field:set_value(event.action == 'press' and 1 or event.action == 'release' and 0 or event.value)
 end
+
+emu.register_prestart(function()
+    for _, event in ipairs(initial_events) do
+        apply_event(event)
+    end
+end)
 
 local function capture()
     local devices = machine.devices

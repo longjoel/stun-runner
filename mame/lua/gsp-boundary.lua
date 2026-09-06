@@ -30,6 +30,11 @@ local events = input_mode == 'coin_start' and {
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
     {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw_off_prestart' and {
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
 } or input_mode == 'sw_off_none' and sw_off_prefix or {}
 local next_event = 1
 
@@ -40,6 +45,14 @@ local function apply_event(event)
     assert(field ~= nil, 'unknown input field: ' .. event.port .. '/' .. event.field)
     if event.action == 'press' then field:set_value(1) else field:set_value(0) end
     print('M1_GSP_INPUT frame=' .. frame .. ' field=' .. event.field .. ' action=' .. event.action)
+end
+
+if input_mode == 'sw_off_prestart' then
+    emu.register_prestart(function()
+        for _, event in ipairs(sw_off_prefix) do
+            apply_event(event)
+        end
+    end)
 end
 
 local function install_tap()

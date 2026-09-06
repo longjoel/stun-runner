@@ -176,11 +176,18 @@ producer-side ADSP meaning of each block remains unresolved. See
   is missing, or because the installed MAME input model differs from the ROM's
   expected environment. The current evidence does not justify treating the
   input checks as a credit-state contract.
-- NARROWED UNKNOWN: setting all eight SW1 fields Off before the same Coin 1/Start
-  schedule produces a repeatable rendered gameplay image in two fresh MAME
-  configurations. This establishes an input/configuration-dependent visual
-  boundary, but the exact numeric transition and corresponding interconnect
-  traffic remain to be synchronized. See
+- NEGATIVE CONTROL: setting all eight SW1 fields Off before the same Coin 1/Start
+  schedule does not establish gameplay. Exact-frame snapshots show the
+  repeatable `DOWNLOADING GSP` image at frame 720 and a blank image at frames
+  900–1500 in fresh configurations; no narrow GSP host writes occur after
+  frame 600 in the bounded probe. This path is retained to prevent promoting
+  the wrong input/DIP configuration as a gameplay selector. See
+  `reference/experiments/stunrun/sw-off-loading-boundary.metadata.json`.
+- OBSERVED-IN-REPLAY + REPEATABLE-CHECKPOINT: establishing the same SW1 values
+  before reset, then applying the Coin 1/Start schedule, produces a rendered
+  gameplay frame and an identical frame-1800 numeric checkpoint in two fresh
+  configurations. This proves an input/configuration-dependent gameplay
+  boundary, but does not yet assign semantics to the visible state fields. See
   `reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json`.
 - UNKNOWN: interrupt/flag direction and acknowledgement sequence.
 

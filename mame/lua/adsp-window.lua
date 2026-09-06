@@ -8,7 +8,22 @@ local label = assert(os.getenv('STUNRUN_ADSP_WINDOW_LABEL'), 'STUNRUN_ADSP_WINDO
 local input_mode = os.getenv('STUNRUN_ADSP_WINDOW_INPUT') or 'none'
 local access = os.getenv('STUNRUN_ADSP_WINDOW_ACCESS') or 'write'
 local frame = 0
+local sw_off_prefix = {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:2', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:3', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:4', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:5', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:6', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
+}
 local events = input_mode == 'coin_start' and {
+    {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw_off_prestart' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
@@ -23,6 +38,14 @@ local function apply_event(event)
     assert(field ~= nil, 'unknown input field: ' .. event.port .. '/' .. event.field)
     if event.action == 'press' then field:set_value(1) else field:set_value(0) end
     print('M1_ADSP_INPUT frame=' .. frame .. ' port=' .. event.port .. ' field=' .. event.field .. ' action=' .. event.action)
+end
+
+if input_mode == 'sw_off_prestart' then
+    emu.register_prestart(function()
+        for _, event in ipairs(sw_off_prefix) do
+            apply_event(event)
+        end
+    end)
 end
 
 local tap
