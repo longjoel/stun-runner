@@ -68,8 +68,11 @@ also passed the existing MAME replacement loader with zero readback
 mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
 observed DM landmarks; the runtime result is recorded in
 `reference/experiments/stunrun/m3-adsp-c-init-state-runtime.metadata.json`.
-This still does not establish full behavioral equivalence to the original
-initialization checkpoint.
+At frame 3, the replacement and original match in GSP, sound CPU, main SR/SP,
+and the original ADSP reset PC before the replacement image runs; the main PC
+has a two-byte observed divergence and the loaded ADSP program necessarily
+differs from the original empty frame-3 program. This still does not establish
+full behavioral equivalence to the original initialization checkpoint.
 
 ## Working processor inventory
 

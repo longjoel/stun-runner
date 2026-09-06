@@ -30,6 +30,20 @@
       "0x095A": "0xFFFF"
     }
   },
+  "original_frame3_checkpoint": {
+    "state_sha256": "ce5acdc77273b0e956a8993e40e6f769f8b9110f44fa8da81c3d2c97c92dcaae",
+    "processors_matching_replacement": [
+      "gsp.pc",
+      "gsp.st",
+      "soundcpu.pc",
+      "soundcpu.p",
+      "maincpu.sr",
+      "maincpu.sp"
+    ],
+    "adsp": "original PC 0x0004; replacement reaches 0x0050 after its bounded init loop",
+    "maincpu": "original PC 0x069A; replacement PC 0x069C (two-byte observed divergence during the replacement run)",
+    "adsp_program_loaded": false
+  },
   "observation": "The shared C emitter produces an image accepted by the pinned MAME ADSP runtime; fixed-origin placement, reset entry, bounded execution, and observed DM landmarks all pass.",
   "confidence": "OBSERVED-IN-MAME-RUNTIME",
   "limitation": "This proves source-emitted image transport and the bounded init slice only; it does not establish full behavioral equivalence to the original ADSP program or title checkpoint."
