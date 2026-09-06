@@ -1,0 +1,14 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "fork_lateral_sweep",
+  "start": "saved_state",
+  "events": [
+    {"frame": 2, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 0},
+    {"frame": 2, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "press"},
+    {"frame": 600, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 255},
+    {"frame": 1200, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 0},
+    {"frame": 1800, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 255},
+    {"frame": 2400, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 128}
+  ],
+  "expect": {"kind": "frame", "frame": 3000, "timeout_frames": 3120}
+}

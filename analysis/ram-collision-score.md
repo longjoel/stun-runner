@@ -201,6 +201,14 @@ zeroing writes from `0x02B9E0`, `0x02719C`, or `0x024BE0`; no increment ever
 occurred. This capped counter is therefore not an observed shield transition
 and remains an unexercised object-class candidate.
 
+The save-state fork was then used to apply `fork_lateral_sweep` from a saved
+center-run checkpoint without replaying setup. The branch remained
+deterministic and produced no persistent damage transition: `0xFF954E` was
+nonzero only in the first fork sample, consistent with a load/state-boundary
+artifact, and returned to zero thereafter; `0xFF9550`, `0xFF9578`, and the
+score remained unchanged. The checkpoint is valid as a fork-control fixture,
+but not yet a confirmed active enemy-impact frame.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

@@ -26,7 +26,7 @@ def main() -> int:
     parser.add_argument("--width", type=int, choices=(8, 16, 32), default=8)
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--targets", default=None)
-    parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center", "collision_probe_hold_left", "collision_probe_hold_right", "damage_probe_sweep"), default="none")
+    parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center", "collision_probe_hold_left", "collision_probe_hold_right", "damage_probe_sweep", "fork_lateral_sweep"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--save-state", type=pathlib.Path, help="save a MAME state at the final requested frame")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")

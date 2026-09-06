@@ -1,0 +1,29 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_fork_lateral_sweep_negative",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/fork_lateral_sweep.json",
+  "base_state": {
+    "source_input": "collision_probe_center",
+    "source_frame": 1800,
+    "state_file": "local-only /tmp/stunrun-fork-test2.sta",
+    "status_snapshot_sha256": "3fa97c9c4a67d7bbab41492dee89f409faa2482aec1d5608b9e555637663ba38"
+  },
+  "fork": {
+    "range": "0xFF9500–0xFF95FF",
+    "targets": [2, 600, 1200, 1800, 2400, 3000],
+    "result_sha256_by_frame": {
+      "2": "85a3430fda787e4997eb08baab72c4d1bc5f27914d0821a964bd33827772beea",
+      "600": "0f0579aac4a652e4bb78b3904906e37c9f198f7c0754c19b69122a165f5bc08a",
+      "1200": "39ab57a2bc9f7a3bbf5f2d643825a4de813944eca1544379562894b891c07d85",
+      "1800": "5a4c548f93ef7895205a74dbaf58bb5509ff1bfae0ae249590d4240034559cbf",
+      "2400": "d5d9987c26ab5f74760feb7a5d81e340f828dc9643edf6f6d23679947b592c7e",
+      "3000": "b43232b357f24139f7d62b74663ecc5ba32e44cd78b860042cc2c35303372bb6"
+    },
+    "canonical_log_sha256": "fd5558cf976f931dce6f1c9487f3a8f8a193ee1291dd7b32269230a9f5ee735e",
+    "observation": "0xFF954E is nonzero only at the first fork sample; 0xFF9550, 0xFF9578, and score bytes remain unchanged."
+  },
+  "semantic_status": "SAVE_STATE_FORK_CONTROL_CONFIRMED; DAMAGE_TRANSITION_NOT_REACHED"
+}
