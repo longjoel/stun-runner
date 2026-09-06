@@ -73,6 +73,10 @@ and the original ADSP reset PC before the replacement image runs; the main PC
 has a two-byte observed divergence and the loaded ADSP program necessarily
 differs from the original empty frame-3 program. This still does not establish
 full behavioral equivalence to the original initialization checkpoint.
+The synchronized frame-61 comparison now has a dedicated provenance record in
+`reference/experiments/stunrun/m3-adsp-c-init-state-frame61.metadata.json`:
+main CPU, GSP, and sound CPU registers match exactly while the intentional
+ADSP replacement difference is isolated.
 
 The first evidence-backed main-CPU state slices are also present: the live
 score/object-hit accumulator and the persistent ten-entry high-score table

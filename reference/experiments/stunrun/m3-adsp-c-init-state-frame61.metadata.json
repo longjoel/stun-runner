@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m3_adsp_c_init_state_frame61_comparison",
+  "original_runner": "tools/mame-checkpoint",
+  "replacement_builder": "tools/build-c-replacement-image",
+  "replacement_runner": "tools/mame-replacement-image",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "boundary": {
+    "frame": 61,
+    "original_state_sha256": "fe0454f5327dc2f9abfc523ac6ff29323cbdcf26d7a05f9a30f4606d9976c76d",
+    "replacement_result_sha256": "641812356f00746c7c54f11173fcd25285270005ad6e2312f80e31b5b26ed05c",
+    "image_sha256": "ddbe84919c7120f970fc5e635979ec5b4fd1fd55da8a991f9a5076e9f9668fe1",
+    "install_frame": 1,
+    "settle_frames": 60,
+    "readback_mismatches": 0
+  },
+  "matching_original_registers": [
+    "maincpu.pc",
+    "maincpu.sr",
+    "maincpu.sp",
+    "gsp.pc",
+    "gsp.st",
+    "soundcpu.pc",
+    "soundcpu.p"
+  ],
+  "intentional_difference": {
+    "original": {"adsp.pc": "0x0004", "adsp_program_loaded": false},
+    "replacement": {"adsp.pc": "0x0050", "adsp_program_loaded": true},
+    "observed_dm_landmarks": {
+      "0x0955": "0x1242",
+      "0x0956": "0x124E",
+      "0x0959": "0x7FFF",
+      "0x095A": "0xFFFF"
+    }
+  },
+  "observation": "At the synchronized frame-61 boundary, source-defined C ADSP initialization preserves the original non-ADSP machine registers while executing its bounded init loop.",
+  "confidence": "OBSERVED-IN-SYNCHRONIZED-MAME-COMPARISON",
+  "limitation": "This is an early initialization boundary proof, not full ADSP behavioral or title-path equivalence."
+}
