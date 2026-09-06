@@ -42,6 +42,21 @@ self-check) and the extended `tests/test_native_shell.py` (compiled-in,
 canonical `coin_start`, synthetic `set`/short-terminal, and refusal
 paths).
 
+## Checkpoint emitter (`stunrun-checkpoint/v1`)
+
+`checkpoint.h` / `checkpoint.c` render the Verifier-owned checkpoint
+schema in C (machine identity, frame/time, four processor register
+sets, ADSP program-region summary, `adsp_program_loaded` selector — no
+gameplay fields, per `analysis/checkpoint-schema.md`). The emitter never
+truncates (NULL/undersized buffer yields 0) and is deterministic.
+`native/testdata/checkpoint_m1.json` is the frozen golden document;
+`tests/test_checkpoint_golden.py` requires the C self-check to pass,
+the emitted bytes to equal the golden file, *and* the golden file to be
+semantically equal to the oracle
+`reference/checkpoints/m1-machine-map/state.json` via an independent
+JSON parser — so a mistranscribed constant fails even though the C side
+alone would pass.
+
 Build and run:
 
 ```sh

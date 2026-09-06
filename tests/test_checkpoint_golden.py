@@ -35,10 +35,14 @@ class CheckpointGoldenTests(unittest.TestCase):
                 run.stdout, re.DOTALL)
             self.assertIsNotNone(match, "checkpoint JSON markers missing")
             emitted = json.loads(match.group(1))
+            golden = json.loads(
+                (ROOT / "native/testdata/checkpoint_m1.json")
+                .read_text(encoding="utf-8"))
             expected = json.loads(
                 (ROOT / "reference/checkpoints/m1-machine-map/state.json")
                 .read_text(encoding="utf-8"))
-            self.assertEqual(emitted, expected)
+            self.assertEqual(golden, expected)
+            self.assertEqual(emitted, golden)
 
 
 if __name__ == "__main__":
