@@ -124,6 +124,25 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(result["candidates"][0]["first_diff_frame"], 20)
             self.assertEqual(result["candidates"][0]["persistence_after_first"], 1.0)
 
+    def test_analyze_memory_series_finds_monotonic_word(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            for frame, word in ((10, 100), (20, 90), (30, 80), (40, 80)):
+                values = [word >> 8, word & 0xFF, 0xAA, 0x55]
+                (temp / f"snapshot-{frame}.json").write_text(json.dumps({
+                    "schema": "stunrun-memory-snapshot/v1", "frame": frame,
+                    "base": 0x200, "count": 4, "width": 8,
+                    "device": ":mainpcb:maincpu", "space": "program",
+                    "values": values,
+                }), encoding="utf-8")
+            report = temp / "report.json"
+            self.run_tool("analyze-memory-series", temp, "--output", report, "--top", "10")
+            result = json.loads(report.read_text())
+            candidate = next(item for item in result["candidates"]
+                             if item["address"] == 0x200 and item["width_bytes"] == 2)
+            self.assertEqual(candidate["direction"], "decreasing")
+            self.assertEqual(candidate["monotonicity"], 1.0)
+
     def test_diff_ram_write_trace_reports_first_mismatch(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

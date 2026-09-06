@@ -32,6 +32,9 @@ not ordinary 68010 work RAM.
 | `0xFFDAEE` | sampled update flag; no late-control differential in the tested schedules | `OBSERVED-NEGATIVE` |
 | `0xFF948C–0xFF948E` | input-dependent counter/accumulator neighborhood used by `0x0418B8`; late-drive adds writes from `0x041956` and `0x04195A` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFFDBA4` | one byte in an indexed table written by `0x030212` from table base `0xFFDB64`; semantic ownership unresolved | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9564–0xFF9567` | elapsed-update counter candidate; `0x024506` increments the longword continuously during the gameplay window | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9568–0xFF956B` | countdown candidate initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
 ## ROM-to-RAM mechanism annotations
@@ -69,6 +72,16 @@ The adjacent pointer trace confirms the structure layout at runtime:
 `0x0206CC` writes `A1` to `+0x28` (`0xFF94C0`), and `0x0206D0` writes `A0`
 to `+0x2A` (`0xFF94C2–0xFF94C5`). See
 `reference/experiments/stunrun/main-ram-pointer-trace.metadata.json`.
+
+Temporal correlation provides the first high-value gameplay-state candidates.
+`0xFF9568` is initialized from ROM at `0x024372`, decremented through the
+`0x02907E–0x029132` timer/expiry path, and checked against `0x988` at
+`0x032F78`; its observed value falls from `8540` to `7966` in the bounded
+late-drive run. `0xFF9578` is repeatedly used as an index into several ROM
+tables and course/state branches, with observed values `0`, `3`, and `6`.
+These are strong countdown and course/track candidates, not yet confirmed HUD
+labels. Full provenance is in
+`reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
 A structure-only trace confirms the separation: the no-input run records only
 84 periodic `0x0206CC → 0xFF94C0` writes, while late-drive records 122 writes

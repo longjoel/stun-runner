@@ -1,0 +1,43 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_temporal_candidate_correlation",
+  "tools": ["tools/mame-memory-snapshot", "tools/analyze-memory-series", "tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "run": {
+    "input": "late_drive",
+    "frames": [600, 650, 700, 750, 800, 850, 900, 1200, 1500, 1800],
+    "snapshot_result_sha256": "5638aff8f438c1dbbea092ba9845314fff13e904a0398735dd7ab91e8b41c88e",
+    "series_report_sha256": "a402f2447d23be7a3e45c3bad1a4b4ebfa4badccf1f34267f39c09428c9feec7"
+  },
+  "candidates": {
+    "0xff8014_0xff8016": {
+      "classification": "elapsed-update-counter",
+      "observed_values": {"frame_600": 826, "frame_1800": 5687},
+      "writer_trace_sha256": "c5c77d1c99a739b59d72ddd75a7a2152301153339a2afb5066b002d878aac179",
+      "writer_pc": "0x0222DE",
+      "static_mechanism": "0x0222DE performs repeated addq.l #1 writes to 0xff9564",
+      "semantic_status": "mechanism-confirmed; display/game meaning unresolved"
+    },
+    "0xff9568": {
+      "classification": "countdown-candidate",
+      "observed_values": {"frame_600": 8540, "frame_1500": 8540, "frame_1800": 7966},
+      "writer_trace_sha256": "ec8b026a24e90373ac5d694198ac1c35be112dbadab1c9f378761edfb73bd3bd",
+      "static_mechanism": [
+        "0x024372 initializes from ROM table address 0x4EDE6",
+        "0x02909E/0x0290C2/0x0290E4 subtract threshold-dependent amounts",
+        "0x02907E tests the value and 0x029110/0x029132 clear it on expiry",
+        "0x032F78 checks threshold 0x988"
+      ],
+      "semantic_status": "high-confidence countdown mechanism; exact displayed unit and HUD ownership unresolved"
+    },
+    "0xff9578": {
+      "classification": "course-track-index-candidate",
+      "observed_values": {"frame_600": 0, "frame_800": 3, "frame_1200": 6, "frame_1800": 6},
+      "writer_trace_sha256": "0c2b70d12a99237fedd9b746fd92b3b9c8648dd7b92b5e6117f8a74e5606cd0a",
+      "static_mechanism": "used to index multiple ROM tables and course/state branches; writes include explicit course-like constants and increment/decrement paths",
+      "semantic_status": "strong course/track candidate; exact user-visible track numbering unresolved"
+    }
+  },
+  "interpretation": "The temporal and writer evidence supports promoting mechanisms and candidate roles, not final game labels. Score, high-score, craft, armor, and weapon fields remain open targeted experiments."
+}
