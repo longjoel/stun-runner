@@ -40,6 +40,7 @@
 #include "adsp_control_seq.h"
 #include "adsp_init_image.h"
 #include "adsp_upload_stream.h"
+#include "fifo_block.h"
 #include "experiment.h"
 #include "jsa_latch.h"
 
@@ -128,6 +129,7 @@ static int run_walk(void)
     stunrun_jsa_latches_t latches;
     stunrun_adsp_control_tally_t tally;
     stunrun_jsa_title_counts_t counts;
+    stunrun_fifo_run_summary_t fifo_summary;
     const char *control_state = "skipped";
     const char *counts_state = "skipped";
     size_t emitted;
@@ -199,10 +201,12 @@ static int run_walk(void)
             expect(stunrun_adsp_control_tally_matches(&tally));
             counts = stunrun_jsa_observed_title_counts();
             expect(stunrun_jsa_title_counts_match(&counts));
+            fifo_summary = stunrun_fifo_observed_run();
+            expect(stunrun_fifo_run_matches(&fifo_summary));
             control_state = "match";
             counts_state = "match";
             printf("shell: frame=600 control-tally=match "
-                   "title-counts=match\n");
+                   "title-counts=match fifo-block=match\n");
         }
     }
 

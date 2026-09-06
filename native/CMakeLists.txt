@@ -51,7 +51,7 @@ target_include_directories(stunrun-jsa-latch-slice-test PRIVATE
 set_target_properties(stunrun-jsa-latch-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME jsa-latch-slice-c COMMAND stunrun-jsa-latch-slice-test)
 # Agent 2 M4 step 1: deterministic native shell. Fixed 600-frame walk over
-# the four verified slices, checkpoint on stdout, exit 0 iff all asserts
+# the five verified slices, checkpoint on stdout, exit 0 iff all asserts
 # hold. No speculative game logic.
 add_executable(stunrun-native-shell
   shell.c
@@ -59,9 +59,10 @@ add_executable(stunrun-native-shell
   ../reproduction/adsp/adsp_init_image.c
   ../reproduction/adsp/adsp_control_seq.c
   ../reproduction/adsp/adsp_upload_stream.c
+  ../reproduction/maincpu/fifo_block.c
   ../reproduction/sound/jsa_latch.c)
 target_include_directories(stunrun-native-shell PRIVATE
-  ../reproduction/adsp ../reproduction/sound)
+  ../reproduction/adsp ../reproduction/maincpu ../reproduction/sound)
 set_target_properties(stunrun-native-shell PROPERTIES C_STANDARD 99)
 add_test(NAME native-shell COMMAND stunrun-native-shell)
 # arcade-experiment/v1 parser self-check (valid, corrupt, and schema-

@@ -20,6 +20,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ADSP = ROOT / "reproduction" / "adsp"
+MAINCPU = ROOT / "reproduction" / "maincpu"
 SOUND = ROOT / "reproduction" / "sound"
 
 SOURCES = [
@@ -28,6 +29,7 @@ SOURCES = [
     str(ADSP / "adsp_init_image.c"),
     str(ADSP / "adsp_control_seq.c"),
     str(ADSP / "adsp_upload_stream.c"),
+    str(ROOT / "reproduction" / "maincpu" / "fifo_block.c"),
     str(SOUND / "jsa_latch.c"),
 ]
 
@@ -39,7 +41,7 @@ class NativeShellTests(unittest.TestCase):
         binary = pathlib.Path(directory) / "native-shell"
         compile_proc = subprocess.run(
             [cc, "-std=c99", "-Wall", "-Wextra",
-             "-I", str(ADSP), "-I", str(SOUND),
+             "-I", str(ADSP), "-I", str(MAINCPU), "-I", str(SOUND),
              "-o", str(binary), *SOURCES],
             capture_output=True, text=True, check=False,
         )

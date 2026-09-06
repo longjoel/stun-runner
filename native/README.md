@@ -4,9 +4,9 @@
 
 ## Deterministic shell (first M4 scaffolding step)
 
-`shell.c` is a fixed 600-frame title-path walk over the four verified
-reproduction slices (ADSP init image, control/IRQ contract, upload
-framing, JSA latch transport). It drives each slice at its
+`shell.c` is a fixed 600-frame title-path walk over the five verified
+reproduction slices (ADSP init image, control/IRQ contract, upload framing,
+ADSP-buffer/GSP-FIFO framing, JSA latch transport). It drives each slice at its
 evidence-anchored frame — startup response at 1, upload states at
 407/408/411, install-ready plus image/landmarks at 412, the `0x1E`
 command at 447, the control/counts match at 600 — and prints a
