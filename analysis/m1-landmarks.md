@@ -91,6 +91,15 @@ landmark rather than a gameplay boundary and promotes no semantic game-state
 field. See
 `reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json`.
 
+The bounded `coin_start_sw_off_drive_logical` replay then holds P1 Button 1 and
+sets `AD Stick X` to 220 from frames 600–1200 before returning it to 128. Two
+fresh configurations produce the same exact-frame image, and that image differs
+from the no-input scene (HUD speed 605 versus 620). This is the first
+input-dependent rendered delta in the current replay set; it is not yet a
+semantic gameplay checkpoint because the normalized machine/GSP differential
+has not been captured. See
+`reference/experiments/stunrun/drive-input-rendered-delta.metadata.json`.
+
 An early 30-frame Coin 1 pulse followed by Start produces the same result as
 the later two-frame pulse. In the static listing, the only direct references to
 coin bits 7/6 are in the `0x043590` candidate; its six direct callers remain

@@ -1,0 +1,26 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "coin_start_sw_off_drive_logical",
+  "start": "power_on",
+  "initial_events": [
+    {"port": ":mainpcb:SW1", "field": "SW1:1", "action": "set", "value": 1},
+    {"port": ":mainpcb:SW1", "field": "SW1:2", "action": "set", "value": 1},
+    {"port": ":mainpcb:SW1", "field": "SW1:3", "action": "set", "value": 1},
+    {"port": ":mainpcb:SW1", "field": "SW1:4", "action": "set", "value": 1},
+    {"port": ":mainpcb:SW1", "field": "SW1:5", "action": "set", "value": 1},
+    {"port": ":mainpcb:SW1", "field": "SW1:6", "action": "set", "value": 1},
+    {"port": ":mainpcb:SW1", "field": "SW1:7", "action": "set", "value": 1},
+    {"port": ":mainpcb:SW1", "field": "SW1:8", "action": "set", "value": 1}
+  ],
+  "events": [
+    {"frame": 120, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "set", "value": 0},
+    {"frame": 122, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "set", "value": 1},
+    {"frame": 300, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "set", "value": 0},
+    {"frame": 302, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "set", "value": 1},
+    {"frame": 600, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "set", "value": 0},
+    {"frame": 600, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 220},
+    {"frame": 1200, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "set", "value": 1},
+    {"frame": 1200, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 128}
+  ],
+  "expect": {"kind": "frame", "frame": 1800, "timeout_frames": 1920}
+}

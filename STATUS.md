@@ -109,7 +109,9 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   control/reset/bank handlers, and the title-path JSA command-byte pairing.
   Remaining questions are upload-stream semantics, post-gameplay traffic, the
   first input-dependent GSP submission, and a synchronized semantic gameplay
-  selector. The late-applied SW1-off experiment is a repeatable loading / blank
+  selector. A bounded AD Stick X/Button 1 replay now produces a repeatable
+  input-dependent rendered delta at frame 1800, but its normalized checkpoint
+  and GSP/68010 differential still need to be captured. The late-applied SW1-off experiment is a repeatable loading / blank
   negative control; applying the same DIP bank before reset now yields a
   repeatable exact-frame rendered-scene checkpoint, but the identical no-input
   render means it is not yet a gameplay selector.

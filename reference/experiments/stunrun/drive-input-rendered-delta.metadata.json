@@ -1,0 +1,27 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/coin_start_sw_off_drive_logical.json",
+  "runner": "tools/mame-replay --exact-frame",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "exact_frame": 1800,
+  "fresh_configuration_runs": 2,
+  "screenshot_sha256": [
+    "6ba5cec2cdb8a02bbe52f70df5deaa92bdaca12b5a09602e4dd633ad1a879cab",
+    "6ba5cec2cdb8a02bbe52f70df5deaa92bdaca12b5a09602e4dd633ad1a879cab"
+  ],
+  "comparison_no_input": {
+    "screenshot_sha256": "2445f5cb2f853ba1bdba477ecf55f7e82139e51ed8fe3046394988ee5d80f119",
+    "observation": "The drive-input frame differs from the no-input/prestart rendered scene; the HUD speed is 605 rather than 620 while the vehicle/track scene remains visible."
+  },
+  "input_schedule": [
+    {"frame": 600, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "set", "value": 0},
+    {"frame": 600, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 220},
+    {"frame": 1200, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "set", "value": 1},
+    {"frame": 1200, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 128}
+  ],
+  "interpretation": "This is the first repeatable input-dependent rendered delta in the bounded M1 replay set. It establishes that the runtime analog/button path can affect the oracle image, but it does not yet prove a semantic gameplay state or identify the correct active-low digital helper contract.",
+  "confidence": "OBSERVED-IN-REPLAY + REPEATABLE-EXACT-FRAME-IMAGE",
+  "raw_artifacts_kept_local": true,
+  "next_question": "Capture a normalized machine checkpoint and GSP/68010 trace differential for the same verified control schedule, then promote only an evidence-backed gameplay selector."
+}
