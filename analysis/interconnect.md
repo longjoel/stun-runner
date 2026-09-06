@@ -174,7 +174,8 @@ producer-side ADSP meaning of each block remains unresolved. See
   `0x023D8C`, reads `0x60C001` and `0xA80001`, then updates the three-byte
   records at `0xFF9000–0xFF9003` while advancing `0xFFDB4A`. This is the
   strongest current ROM-side input-to-state candidate for the late transition,
-  but its runtime field meaning is not established.
+  and the pinned `driver_68k_map` confirms the records reside in 68010 RAM
+  (`0xFF8000–0xFFFFFF`); their runtime field meaning is not established.
 - OBSERVED-IN-TRACE: an early Coin 2 variant enters a bounded trace dominated
   by `0x0013EC` → `0x0013FC`/`0x001404`, polling `0x60C001`.
 - OBSERVED-IN-REPLAY: the normal and early Coin 1/start sequences both reach
