@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-**M2 — Reproduction image/toolchain integration**
+**M3 — Reset and initialization**
 
 ## State
 
@@ -10,6 +10,9 @@ M0: **complete** — reproducible machine, harness, evidence, coverage, and emis
 
 M1: **complete** — evidence-backed machine/interconnect contract and bounded
 input-dependent renderer boundary committed
+
+M2: **complete** — fixed-origin ADSP replacement image is built, placed, and
+executed in the pinned MAME runtime with repeatable read-back and PC advance
 
 Original in MAME: **ROM-validated and runtime-inventoried; title checkpoint established**
 
@@ -21,14 +24,14 @@ Native target: **smoke coverage baseline only; implementation not started**
 
 Verification harness: **bounded replay/checkpoint/trace path implemented; M1 machine facts are promoted into selectors and evidence fixtures**
 
-## Immediate objective — M2 reproduction image/toolchain integration
+## Immediate objective — M3 reset and initialization
 
-Use the frozen M0 laboratory and completed M1 contract to produce the smallest
-replacement/rebuilt image accepted by the original/emulated environment:
+Use the M2 image loader and the frozen M1 contract to move the replacement slice
+to the earliest reproducible initialization boundary:
 
-1. Choose the first reconstruction slice from the verified ADSP upload and GSP renderer boundaries.
-2. Prove fixed placement, linking, and image layout for each active replacement target involved in that slice.
-3. Validate the emitted image under the pinned MAME machine with bounded startup/checkpoint assertions.
+1. Identify the earliest bounded point at which the replacement ADSP image can be installed without relying on the original upload.
+2. Preserve the verified ADSP reset/control sequence and establish a stable replacement execution loop.
+3. Compare the resulting machine boundary against the canonical title-path checkpoint.
 4. Preserve the M1 selectors, provenance, and unresolved questions; do not reinterpret the oracle to fit the replacement.
 
 The first useful output is not decompiled C. It is a repeatable laboratory plus a box of provenance-labeled puzzle pieces.
@@ -139,6 +142,11 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
 - Bounded debugger traces: `tools/mame-trace` and `mame/lua/trace.lua`; six-frame trace metadata is under `reference/traces/stunrun/`.
 - Trace-to-LCOV prototype: `tools/trace-to-lcov`; first standard `.info` report is hash-recorded under `reference/coverage/original/`.
 - Minimal code-emission proof: `tools/emit-proof`; all four active processors decode emitted NOP fixtures through MAME.
+- M2 first image slice: `tools/build-replacement-image` emits a fixed-origin ADSP
+  NOP image, and `tools/mame-replacement-image` installs it at frame 140 after
+  the original upload, releases the MAME-modeled ADSP reset/`/BR`/`/HALT`
+  controls, and observes a repeatable PC advance to `0x0E2C` at frame 142.
+  Evidence: `reference/experiments/stunrun/m2-adsp-replacement-image.metadata.json`.
 
 ## Last verified checkpoint
 

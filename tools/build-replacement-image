@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""Build a fixed-placement minimal replacement image manifest."""
+
+import argparse
+import hashlib
+import json
+import pathlib
+
+
+FIXTURES = {
+    "maincpu-68010": ("4e71", 0xFF8000),
+    "gsp-tms34010": ("0003", 0xFF800000),
+    "adsp2100": ("00000000", 0x0000),
+    "sound-6502": ("ea", 0x1000),
+}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--processor", choices=sorted(FIXTURES), required=True)
+    parser.add_argument("--fixture", choices=("nop",), default="nop")
+    parser.add_argument("--origin", type=lambda value: int(value, 0))
+    parser.add_argument("--entry", type=lambda value: int(value, 0))
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+
+    hex_bytes, default_origin = FIXTURES[args.processor]
+    payload = bytes.fromhex(hex_bytes)
+    origin = default_origin if args.origin is None else args.origin
+    entry = origin if args.entry is None else args.entry
+    if origin < 0 or entry < origin or entry >= origin + len(payload):
+        parser.error("entry must fall inside the emitted image")
+    args.output.mkdir(parents=True, exist_ok=True)
+    binary = args.output / f"{args.processor}.bin"
+    binary.write_bytes(payload)
+    image = {
+        "schema": "stunrun-replacement-image/v1",
+        "processor": args.processor,
+        "fixture": args.fixture,
+        "origin": f"0x{origin:X}",
+        "entry": f"0x{entry:X}",
+        "length": len(payload),
+        "bytes_hex": payload.hex(),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+        "binary": binary.name,
+        "layout": "single fixed-origin section; no relocation",
+    }
+    (args.output / "image.json").write_text(json.dumps(image, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(image, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

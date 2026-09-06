@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "reproduction/adsp/README.md",
+  "builder": "tools/build-replacement-image --processor adsp2100 --fixture nop",
+  "loader": "tools/mame-replacement-image",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "image": {
+    "schema": "stunrun-replacement-image/v1",
+    "processor": "adsp2100",
+    "origin": "0x0",
+    "entry": "0x0",
+    "length": 4,
+    "bytes_hex": "00000000",
+    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119"
+  },
+  "runtime": {
+    "install_frame": 140,
+    "settle_frames": 2,
+    "result_sha256": "32f9400551d9c4fce846a9f4c0c60d6af3516191070952cb6eac8e23e7eaebec",
+    "fresh_configuration_runs": 2,
+    "repeatable_result": true,
+    "observed_frame": 142,
+    "installed": true,
+    "readback_first_word": "0x00000000",
+    "final_pc": "0x0E2C"
+  },
+  "hardware_integration": {
+    "program_space": "ADSP-2100 program RAM at 0x0000",
+    "release_sequence": [
+      "68010-visible 0x81801E: release ADSP reset",
+      "68010-visible 0x81801A: release ADSP /BR",
+      "68010-visible 0x81801C: release ADSP /HALT"
+    ],
+    "mame_source": "third_party/mame-master/src/mame/atari/harddriv_m.cpp:685-748",
+    "interpretation": "The image is placed at a fixed origin, read back through the ADSP program space, and executes far enough for the PC to advance from entry 0x0000 to 0x0E2C. This proves image placement and bounded runtime integration, not behavioral equivalence to the original ADSP program."
+  },
+  "confidence": "REPEATABLE-MAME-RUNTIME-INTEGRATION",
+  "next_question": "Replace the one-word NOP fixture with the smallest evidence-backed ADSP routine whose bytes and entry behavior can be independently validated."
+}
