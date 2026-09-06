@@ -79,6 +79,21 @@ It narrows the next experiment: a damage probe must place the craft in a
 different interaction state, rather than simply changing X input during this
 road segment.
 
+## Longitudinal status control
+
+The weapon schedule and a matching `late_drive` control were extended to
+frame 6000 with status snapshots at frames 1800, 3000, 3270, 3300, 3400,
+4000, 5000, and 6000. The weapon schedule reaches the already confirmed
+50-point scoring sequence (`0xFF9534` reaches `0x01F4` by frame 3400), while
+the control does not. The confirmed track word `0xFF9578` remains zero in
+both runs at all sampled points.
+
+The large differences beginning at frame 4000 are concentrated in the
+adjacent display/progression area, not a newly isolated craft-status byte.
+Static listing inspection resolves two tempting bytes: `0xFF9544` is copied
+from object-record attribute bit 7 by `0x0323A4`/`0x03244A`, and `0xFF9582` is
+the five-bit cyclic counter updated at `0x0268EC`. Neither is armor or health.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

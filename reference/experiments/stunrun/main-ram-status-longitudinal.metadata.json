@@ -1,0 +1,51 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_status_longitudinal_weapon_control",
+  "tools": ["tools/mame-memory-snapshot", "tools/mame-listings"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "window": {
+    "range": "0xFF9500–0xFF95FF",
+    "width": 8,
+    "frames": [1800, 3000, 3270, 3300, 3400, 4000, 5000, 6000]
+  },
+  "runs": {
+    "weapon_probe": {
+      "input": "weapon_probe",
+      "last_snapshot_sha256": "11f9d6d6dbe1091c1d8240c99c1fef295e5fb585e251fc86e01ec769316f4f04",
+      "canonical_log_sha256": "d092bedccc27925f01c0786a1246bca5efb48f1291e827e879b4a575f4fbc813",
+      "snapshot_result_sha256_by_frame": {
+        "1800": "6360010aac3e3f13553e5cb1cbe2bb4a582ce48d40aaa985f521c5b2441036cf",
+        "3000": "5b2dfcbf7450b781ed70b720da5ee254db7a48222005aff3e73da7d7423bae7a",
+        "3270": "9b6658e65ecf7f2a4412906c9cee4f5f57a211c71479dee35b99eb7ef63f2681",
+        "3300": "e777bed747365d5834a340c3c1eae5518a9d0deebd853dcc2155e273b2ecbefa",
+        "3400": "6c3922be376963fa660a624486f3ad36dd3889a94dba1733ce27967c88dfe121",
+        "4000": "5eed8ba66d2c3ec6510df51a09ec77be0b8b0268e7e80f328242b6acfaf2347b",
+        "5000": "a71346321f273429b348788b01efb86114e224ec00a9ec14897fe4048786cc90",
+        "6000": "11f9d6d6dbe1091c1d8240c99c1fef295e5fb585e251fc86e01ec769316f4f04"
+      },
+      "score_at_3400": "0x000001F4"
+    },
+    "late_drive": {
+      "input": "late_drive",
+      "last_snapshot_sha256": "229f27bab85c7cf9c360721576397b9dce600143d6de68d2de9841757c23fb4d",
+      "canonical_log_sha256": "610d36bfcdbc7b890893238b225bcfedb7dd578ed18a97a57c4eaf764b3f1872",
+      "snapshot_result_sha256_by_frame": {
+        "1800": "f1a08445028a13ecc2bf9aa7eca9767235e0a12bc874f2caf3fe0ce64ff76398",
+        "3000": "2d60ea0097b10ac3c7e9004a8cb6d4d513308643a3d0e1cddd477180c8cf2f15",
+        "3270": "286a1dc37a5d66a13bc8103da3a3494d77c48e9fb6ee4d0dd2c7027080602ee2",
+        "3300": "9d71875d3d76fbef159903ed7c5043c553e5de32ca2e6d472d69ef5ffffd765f",
+        "3400": "c135cea0b466b68464e28d14afc17d9ff5dcf360315a641b9da51f419d0de018",
+        "4000": "fe914ee3288233a6db020a2a3805a6e170354e82418f0808c665eb4e74e8a97d",
+        "5000": "dc2f70f2447b452a4cf190eb8c6f7fc20c34e1d28b63cbad0c72df4710c1e43a",
+        "6000": "229f27bab85c7cf9c360721576397b9dce600143d6de68d2de9841757c23fb4d"
+      },
+      "score_at_3400": "0x00000000"
+    }
+  },
+  "static_resolutions": {
+    "0xFF9544": "object-record bit-7 flag copied at 0x0323A4 and set/cleared at 0x03244A/0x032454",
+    "0xFF9582": "cyclic counter incremented and masked to five bits at 0x0268EC"
+  },
+  "semantic_status": "LONGITUDINAL_SCORE_AND_OBJECT_CONTROL; NO_ARMOR_FIELD"
+}

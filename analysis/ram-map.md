@@ -37,6 +37,7 @@ not ordinary 68010 work RAM.
 | `0xFF9568–0xFF956B` | displayed time-remaining mechanism; initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold, and combined with a track-indexed base by HUD routine `0x028CA8` | `DYNAMIC-TIME-REMAINING-CONFIRMED` |
 | `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9532–0xFF9535` | live score accumulator; cleared at several game-state entries, formatted/displayed by nearby UI paths, and observed receiving monotonic 50-point increments at `0xFF9534` from PC `0x03A2EC` | `DYNAMIC-SCORE-CONFIRMED` |
+| `0xFF9544` | object/event attribute flag; static paths derive it from bit 7 of active object-record fields at `0x0323A4`/`0x03244A`, rather than from a persistent craft-status record | `STATIC-RESOLVED-OBJECT-FLAG` |
 | `0xFF4410–0xFF44FF` | ten-entry persistent high-score table in the mapped ZRAM view; 24-byte records contain a big-endian score at `+0` and a display name beginning at `+2` | `SNAPSHOT + PERSISTENT-NVRAM + STATIC` |
 | `0xFFDD16–0xFFDD17` | speed/velocity candidate; reset to zero, increased in `0x02820A` by `0x20`, bounded at `0x3C0`/`0x500`, displayed through the nearby HUD path, and consumed by motion math at `0x039E04` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFFDD02`, `0xFFDD06`, `0xFFDD08` | three coordinate/position candidates; passed through collision/bounds checks and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570` | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
@@ -48,6 +49,7 @@ not ordinary 68010 work RAM.
 | `0xFFDD52–0xFFDD5A` | adjacent event/object state words with repeated writers during the scoring window; individual meanings are unresolved | `WRITER-TRACE-OBSERVED` |
 | `0xFFDCC0–0xFFDCE0` | transient object/effect trajectory state; `0x0387C6` initializes the template, `0x03887A` integrates it using `0xFFDD16`, and writers `0x0388DE–0x038A14` produce a coherent 17-pass record after the paired Button 1 → Button 2 sequence | `STATIC + WRITER-TRACE + PAIRED-INPUT-DIFFERENTIAL` |
 | `0xFF9E96–0xFF9E99` | paired-input ROM effect/object descriptor pointer; PC `0x02803A` writes `0x0004A004` (ID `0xD2` at `0x048F9C + id*0x14`) before calling the trajectory-timer reset at `0x02804A` | `DYNAMIC + MAME-LISTING-RESOLVED` |
+| `0xFF9582` | 5-bit cyclic animation/state counter; `0x0268EC` increments it and masks with `0x1F`, while UI/object paths read it | `STATIC-RESOLVED-ANIMATION-COUNTER` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
 ## ROM-to-RAM mechanism annotations
