@@ -262,6 +262,11 @@ Main-CPU landmark samples support the same mode through
 allowing score/time/track-adjacent RAM checks to begin at a saved gameplay
 boundary.
 
+ADSP program-RAM landmarks likewise accept
+`tools/mame-adsp-program-snapshot --load-state STATE --nothrottle`; its frame
+zero is the loaded machine boundary, making program contents and PC evolution
+available without replaying the original upload path.
+
 A fixture establishes a known starting state that many tests can reuse.
 
 Conceptually:
