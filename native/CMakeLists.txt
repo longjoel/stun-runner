@@ -14,6 +14,12 @@ add_executable(stunrun-adsp-init-slice-test
 target_include_directories(stunrun-adsp-init-slice-test PRIVATE
   ../reproduction/adsp)
 set_target_properties(stunrun-adsp-init-slice-test PROPERTIES C_STANDARD 99)
+add_executable(stunrun-adsp-image-dump
+  ../reproduction/adsp/adsp_init_image.c
+  ../reproduction/adsp/adsp_image_dump.c)
+target_include_directories(stunrun-adsp-image-dump PRIVATE
+  ../reproduction/adsp)
+set_target_properties(stunrun-adsp-image-dump PROPERTIES C_STANDARD 99)
 # Agent 2 M3 slice 2: 68010-visible ADSP control/IRQ contract plus the
 # upload/install frame boundary. Same single-implementation rule as above.
 add_executable(stunrun-adsp-control-slice-test

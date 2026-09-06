@@ -1,0 +1,36 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m3_adsp_c_init_state_runtime",
+  "builder": "tools/build-c-replacement-image",
+  "emitter": "reproduction/adsp/adsp_image_dump.c",
+  "loader": "tools/mame-replacement-image",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "image": {
+    "fixture": "init-state",
+    "length_bytes": 8476,
+    "word_count": 2119,
+    "origin": "0x0000",
+    "entry": "0x0004",
+    "sha256": "ddbe84919c7120f970fc5e635979ec5b4fd1fd55da8a991f9a5076e9f9668fe1"
+  },
+  "run": {
+    "install_frame": 1,
+    "settle_frames": 2,
+    "observed_frame": 3,
+    "installed": true,
+    "readback_mismatches": 0,
+    "first_word": "0x00000000",
+    "entry_word": "0x001C780F",
+    "final_adsp_pc": "0x0050",
+    "data_words": {
+      "0x0955": "0x1242",
+      "0x0956": "0x124E",
+      "0x0959": "0x7FFF",
+      "0x095A": "0xFFFF"
+    }
+  },
+  "observation": "The shared C emitter produces an image accepted by the pinned MAME ADSP runtime; fixed-origin placement, reset entry, bounded execution, and observed DM landmarks all pass.",
+  "confidence": "OBSERVED-IN-MAME-RUNTIME",
+  "limitation": "This proves source-emitted image transport and the bounded init slice only; it does not establish full behavioral equivalence to the original ADSP program or title checkpoint."
+}

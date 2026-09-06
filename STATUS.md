@@ -62,9 +62,14 @@ The source-defined init/control/upload slices are now also emitted by a
 dependency-free C99 implementation shared by the reproduction and native
 targets. A deterministic native shell parses the common experiment schema,
 dispatches replay events, and checks the verified title-path contracts; its
-six CTest targets and 20 ROM-free repository tests pass. This is integration
-scaffolding and a source-emission proof, not yet evidence that the C slice
-reproduces the full original initialization checkpoint in MAME.
+eight CTest targets and 21 ROM-free repository tests pass. This is integration
+scaffolding and a source-emission proof. The C-produced `init-state` image has
+also passed the existing MAME replacement loader with zero readback
+mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
+observed DM landmarks; the runtime result is recorded in
+`reference/experiments/stunrun/m3-adsp-c-init-state-runtime.metadata.json`.
+This still does not establish full behavioral equivalence to the original
+initialization checkpoint.
 
 ## Working processor inventory
 
