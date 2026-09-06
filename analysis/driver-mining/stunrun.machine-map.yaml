@@ -114,6 +114,30 @@ rom_regions:
         sha1: 574e5f3758ac2e18423ca4f7d076baded7330376a
 
 regions:
+  - name: main_work_ram
+    processor: maincpu
+    start: 0xff8000
+    end: 0xffffff
+    access: rw
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-SNAPSHOT-DIFF
+    candidate_selector: maincpu.work_ram
+    notes:
+      - pinned driver_68k_map identifies 0xff8000-0xffffff as 68010 work RAM
+      - full byte snapshots are repeatable and support bounded no-input versus late-drive comparisons
+      - mechanism-level subregions and unresolved field meanings are maintained in analysis/ram-map.md
+
+  - name: main_ram_structure_candidate
+    processor: maincpu
+    start: 0xff9498
+    end: 0xff94c5
+    access: rw
+    evidence: STATIC-CANDIDATE plus OBSERVED-IN-TRACE
+    candidate_selector: maincpu.ram_structure_candidate
+    notes:
+      - 0x02053c-0x0206d6 uses 0xff9498 as a structure base and accesses offsets through 0x2a
+      - 0x0206cc writes the plus-0x28 field at 0xff94c0; 0x0206d0 writes the plus-0x2a long pointer at 0xff94c2
+      - late-drive writer traces enter this path at frame 681; semantic ownership remains unresolved
+
   - name: main_input_in0
     processor: maincpu
     start: 0x60c000
