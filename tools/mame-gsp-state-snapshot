@@ -7,7 +7,9 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
+import tempfile
 
 
 SNAPSHOT = re.compile(
@@ -25,6 +27,8 @@ def main() -> int:
     parser.add_argument("--targets", default="600,1800")
     parser.add_argument("--input", choices=("none", "sw_off_prestart", "drive", "late", "late_drive"), default="none")
     parser.add_argument("--mame", default="mame")
+    parser.add_argument("--load-state", type=pathlib.Path,
+                        help="load a MAME state before starting the relative frame counter")
     parser.add_argument("--detail", action="store_true",
                         help="also record nonzero GSP control-register words")
     args = parser.parse_args()
@@ -32,13 +36,29 @@ def main() -> int:
         parser.error("--frames must be positive")
     args.output.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
+    state_stage = None
+    state_directory = "/tmp/stunrun-state-dir"
+    if args.load_state:
+        if not args.load_state.is_file():
+            raise SystemExit(f"save state does not exist: {args.load_state}")
+        state_stage = pathlib.Path(tempfile.mkdtemp(prefix="stunrun-gsp-state-fork-"))
+        slot_directory = state_stage / "stunrun"
+        slot_directory.mkdir()
+        shutil.copy2(args.load_state, slot_directory / "1.sta")
+        state_directory = str(state_stage)
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
         "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
-        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-seconds_to_run",
-        str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save",
+        "-state_directory", state_directory, "-statename", "%g",
+        "-seconds_to_run",
+        str(86400 if args.load_state else max(2, (args.frames + 59) // 60 + 1)),
+        "-autoboot_script",
         str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/gsp-state-snapshot.lua"),
     ]
+    if args.load_state:
+        command.insert(command.index("-seconds_to_run"), "-state")
+        command.insert(command.index("-seconds_to_run"), "1")
     environment = {
         **os.environ,
         "STUNRUN_GSP_STATE_OUT": str(args.output),
@@ -48,10 +68,14 @@ def main() -> int:
         "STUNRUN_GSP_STATE_DETAIL": "1" if args.detail else "0",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
-    with log.open("w", encoding="utf-8") as handle:
-        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
-                                   env=environment, check=False)
-    text = log.read_text(encoding="utf-8")
+    try:
+        with log.open("w", encoding="utf-8") as handle:
+            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                       env=environment, check=False)
+        text = log.read_text(encoding="utf-8")
+    finally:
+        if state_stage is not None:
+            shutil.rmtree(state_stage, ignore_errors=True)
     snapshots = [
         {"frame": int(match.group(1)), "pc": int(match.group(2), 16),
          "st": int(match.group(3), 16), "control_lo_sum32": int(match.group(4)),
@@ -72,6 +96,7 @@ def main() -> int:
     result = {
         "schema": "stunrun-gsp-state-snapshot-result/v1",
         "frames": args.frames, "targets": args.targets, "input": args.input,
+        "load_state": str(args.load_state) if args.load_state else None,
         "returncode": completed.returncode, "snapshots": snapshots,
         "canonical_log_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
     }

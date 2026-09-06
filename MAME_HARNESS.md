@@ -252,6 +252,11 @@ Writer traces can use the same saved checkpoints with
 relative to the loaded state and the tool stages the state in an isolated MAME
 slot before starting the bounded Lua tap.
 
+The same reuse contract is available for processor-level samples with
+`tools/mame-gsp-state-snapshot --load-state STATE`. Its reported GSP frames are
+relative to the loaded checkpoint, so renderer/control-state experiments can
+resume from a live state without replaying setup.
+
 A fixture establishes a known starting state that many tests can reuse.
 
 Conceptually:

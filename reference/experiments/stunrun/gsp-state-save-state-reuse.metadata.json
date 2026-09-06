@@ -1,0 +1,29 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "gsp_state_save_state_reuse",
+  "runner": "tools/mame-gsp-state-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "capture_description": "late_drive live checkpoint at setup frame 2400; local regenerable artifact, not committed"
+  },
+  "fork": {
+    "frames": 120,
+    "targets": [30, 120],
+    "input": "none",
+    "detail": true
+  },
+  "result": {
+    "sha256": "532d69c7b021199c3e8ef9cc2bc63aff54a57e3538294c397578a46204d254d3",
+    "canonical_log_sha256": "b61128a619ca8732f57111446b2a9df546d553e9bed93fe1fb1ee095a0ecca18",
+    "returncode": 0,
+    "samples": {
+      "30": {"pc": "0xFFF414B0", "st": "0x6024A420", "vram_high_sum32": 19091478},
+      "120": {"pc": "0xFFF414B0", "st": "0x6024A420", "vram_high_sum32": 19091478}
+    }
+  },
+  "observation": "The GSP sampler loads the saved live checkpoint and produces bounded relative-frame samples successfully; the GSP state remains stable across this no-input fork.",
+  "confidence": "OBSERVED-IN-SAVED-STATE-FORK"
+}
