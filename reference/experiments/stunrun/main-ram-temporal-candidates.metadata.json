@@ -39,5 +39,5 @@
       "semantic_status": "strong course/track candidate; exact user-visible track numbering unresolved"
     }
   },
-  "interpretation": "The temporal and writer evidence supports promoting mechanisms and candidate roles, not final game labels. Score, high-score, craft, armor, and weapon fields remain open targeted experiments."
+  "interpretation": "The temporal and writer evidence supports promoting the countdown and course-index mechanisms. The live score and persistent high-score table are now independently confirmed by targeted experiments; craft, armor, and weapon fields remain open targeted experiments."
 }

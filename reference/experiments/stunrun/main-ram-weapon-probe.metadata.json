@@ -34,8 +34,21 @@
       "result_sha256": "f8f1cae43e2b6945bfb6da830f37dad5677fe4fce845f9828e8bf5bbcc63f1d0",
       "canonical_log_sha256": "e92a1f27ee272c6a5eb6220c83ee8b8a12ed24929af905f18aa19ef35fe57f64",
       "event_count": 10485
+    },
+    "object_flag_range": {
+      "range": "0xFFDC00–0xFFDD90",
+      "frames": [600, 1800],
+      "result_sha256": "1f4deff6d3b77afbfd7acfe0c925fde30b619bb9894fbb9b489e96b6f9834d4d",
+      "canonical_log_sha256": "080f7ee92873346bff25cf93fe4311a189f757ab46fa5e0106b81256a4e8aff3",
+      "event_count": 13988,
+      "observed_status_writes": {
+        "0xFFDC1C": 240,
+        "0xFFDC1E": 40,
+        "0xFFDD80": 2,
+        "0xFFDD82–0xFFDD90": "continuous object/renderer traffic"
+      }
     }
   },
-  "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. New high-volume writes at 0xFFDD86–0xFFDD90 were present as continuous per-frame traffic and are therefore treated as object/renderer activity rather than fire-owned state.",
+  "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. The extended 0xFFDC00–0xFFDD90 tap likewise shows 0xFFDC1C/0xFFDC1E flag traffic and continuous 0xFFDD82–0xFFDD90 object/renderer writes, but no isolated armor, weapon, or ammunition transition.",
   "semantic_status": "negative control for simple weapon/status candidates; armor, weapon, and ammunition fields remain unresolved"
 }

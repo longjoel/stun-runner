@@ -89,14 +89,13 @@ These are strong countdown and course/track candidates, not yet confirmed HUD
 labels. Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
-The adjacent `0xFF9532` longword is a separate score candidate. Static
+The adjacent `0xFF9532` longword is the live score accumulator. Static
 listing evidence shows clears at `0x024334`, `0x024BE6`, `0x027196`, and
 `0x02B624`, display/formatting reads at `0x024CEA`, `0x024DA6`, `0x026A60`,
 and `0x042168`, and additions at `0x028DFA`, `0x028E54`, `0x028F1C`, and the
-timer path `0x0290A8–0x02910A`. The bounded late-drive trace observed four
-longword writes to this field, all clears or initialization; it did not reach
-a scoring event. This supports a live-score role without claiming that the
-field has been exercised by a verified scoring action. See
+timer path `0x0290A8–0x02910A`. A controlled weapon-input run then observed
+ten monotonic 50-point writes at `0xFF9534` from PC `0x03A2EC`, while the high
+word at `0xFF9532` remained zero. See
 `reference/experiments/stunrun/main-ram-score-candidate.metadata.json`.
 
 The persistent high-score table is now identified. The ZRAM view at
@@ -117,8 +116,13 @@ and `0x500`, passed to a HUD formatting path, and used in motion calculations.
 The synchronized late versus late-drive snapshots diverge first around the
 steering event, and the late-drive writer trace records repeated updates to
 `0xFFDD16`, `0xFFDD1A–0xFFDD26`, and the coordinate candidates. These are
-craft-motion candidates, not armor or weapon labels. Provenance is in
+craft-motion candidates, not armor or weapon labels. A subsequent extended
+object/flag trace found only renderer/object traffic and transient
+`0xFFDC1C/0xFFDC1E` updates under the repeated-fire schedule; it did not
+isolate a damage, armor, weapon, or ammunition transition. Provenance is in
 `reference/experiments/stunrun/main-ram-craft-state-candidates.metadata.json`.
+The negative control and extended tap are recorded in
+`reference/experiments/stunrun/main-ram-weapon-probe.metadata.json`.
 
 A structure-only trace confirms the separation: the no-input run records only
 84 periodic `0x0206CC → 0xFF94C0` writes, while late-drive records 122 writes
