@@ -55,6 +55,7 @@ add_test(NAME jsa-latch-slice-c COMMAND stunrun-jsa-latch-slice-test)
 # hold. No speculative game logic.
 add_executable(stunrun-native-shell
   shell.c
+  checkpoint.c
   experiment.c
   ../reproduction/adsp/adsp_init_image.c
   ../reproduction/adsp/adsp_control_seq.c
