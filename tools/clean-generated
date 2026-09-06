@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Remove narrowly scoped generated caches and temporary MAME artifacts.
+
+The command never traverses or deletes the repository root, a home directory,
+or the ROM directory. Use --dry-run to inspect the exact targets first.
+"""
+
+import argparse
+import pathlib
+import shutil
+import sys
+
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+TMP_ROOT = pathlib.Path("/tmp")
+PRESERVED_TMP_NAMES = {"stunrun-roms-system"}
+
+
+def targets() -> list[pathlib.Path]:
+    result = []
+    for relative in ("tests/__pycache__", "tools/__pycache__"):
+        path = ROOT / relative
+        if path.exists() or path.is_symlink():
+            result.append(path)
+    for path in sorted(TMP_ROOT.iterdir()):
+        if path.name.startswith("stunrun-") and path.name not in PRESERVED_TMP_NAMES:
+            if path.is_dir() and not path.is_symlink():
+                result.append(path)
+    return result
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--dry-run", action="store_true", help="list targets without removing them")
+    parser.add_argument("--yes", action="store_true", help="remove listed targets without prompting")
+    args = parser.parse_args()
+    selected = targets()
+    if not selected:
+        print("clean-generated: nothing to remove")
+        return 0
+    print("clean-generated targets:")
+    for path in selected:
+        print(f"  {path}")
+    if args.dry_run:
+        return 0
+    if not args.yes:
+        if not sys.stdin.isatty():
+            print("refusing deletion without --yes (or use --dry-run)", file=sys.stderr)
+            return 2
+        answer = input("Remove these generated artifacts? [y/N] ").strip().lower()
+        if answer not in {"y", "yes"}:
+            print("clean-generated: cancelled")
+            return 0
+    for path in selected:
+        # Re-check every target immediately before removal. This keeps the
+        # deletion scope explicit even if /tmp changes after enumeration.
+        if path == ROOT or path == TMP_ROOT or path.name in PRESERVED_TMP_NAMES:
+            raise SystemExit(f"unsafe cleanup target refused: {path}")
+        if path.is_symlink() or not path.exists():
+            continue
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+    print(f"clean-generated: removed {len(selected)} target(s)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
