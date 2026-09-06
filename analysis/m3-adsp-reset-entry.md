@@ -64,9 +64,11 @@ in two fresh configurations. The runtime evidence is recorded in
 `reference/experiments/stunrun/m3-adsp-init-prefix.metadata.json`.
 
 The follow-on `init-state` fixture keeps the decoded literal setup from
-`0x0006` through `0x003C` and the bounded decoded bodies at `0x0780–0x07A1`
+`0x0006` through `0x003C`, the mailbox prelude through `0x004F`, and the
+bounded decoded bodies at `0x0780–0x07A1`
 and `0x0834–0x0846`, then enters a source-defined bounded loop. Installed at
 frame 1, before the original upload, its opt-in data-space probe reproduces the observed setup landmarks
 `DM($0955)=0x1242`, `DM($0956)=0x124E`, `DM($0959)=0x7FFF`, and
 `DM($095A)=0xFFFF` in two fresh MAME runs. This is a literal reconstruction
-slice; later wait/interrupt behavior remains open.
+slice; the source-defined loop begins at the observed mailbox boundary
+`0x0050`, while later wait/interrupt behavior remains open.
