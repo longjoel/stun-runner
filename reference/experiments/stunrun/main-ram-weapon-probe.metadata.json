@@ -101,6 +101,21 @@
       "button2_only_canonical_log_sha256": "e1c353b3ac6180a11a57cbfbc7b4897a02b8cd6b2cdda456c19434c9ddfbb541",
       "button2_only_event_count": 8,
       "interpretation": "Neither isolated button schedule produces the moving 17-pass trajectory. Button 1 followed by Button 2 does, so the effect requires a paired control sequence or a state established by the first button. This is a paired-action/effect candidate, not yet a proven weapon or armor semantic."
+    },
+    "effect_allocation_trace": {
+      "range": "0xFF9E90–0xFF9EB0",
+      "frames": [1300, 1620],
+      "result_sha256": "01a0d775c756b42e1c0111d23128e65c8a13717de5922441fa3084fee12125d1",
+      "canonical_log_sha256": "9efbf2492b965cb113815812e212455ebc694b8dcee7c3d732832abc17d1a641",
+      "event_count": 128,
+      "allocation_event": {
+        "frame": 1530,
+        "pc": "0x02803A",
+        "address": "0xFF9E96–0xFF9E99",
+        "value": "0x0004A004",
+        "followup": "0x02804A calls 0x0387B0 to reset the trajectory timers"
+      },
+      "interpretation": "The paired-input path establishes a resource/object handle before the moving trajectory begins. This is an effect allocation candidate; it is not evidence of armor, ammunition, or persistent weapon inventory."
     }
   },
   "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. The extended 0xFFDC00–0xFFDD90 tap likewise shows 0xFFDC1C/0xFFDC1E flag traffic and continuous 0xFFDD82–0xFFDD90 object/renderer writes, but no isolated armor, weapon, or ammunition transition.",

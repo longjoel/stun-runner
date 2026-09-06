@@ -42,6 +42,7 @@ not ordinary 68010 work RAM.
 | `0xFFDD02`, `0xFFDD06`, `0xFFDD08` | three coordinate/position candidates; passed through collision/bounds checks and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570` | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
 | `0xFFDD1A–0xFFDD26` | active movement/physics cluster updated by the drive path; exact axis, steering, acceleration, and renderer roles remain unresolved | `OBSERVED-IN-TRACE` |
 | `0xFFDCC0–0xFFDCE0` | transient object/effect trajectory state; `0x0387C6` initializes the template, `0x03887A` integrates it using `0xFFDD16`, and writers `0x0388DE–0x038A14` produce a coherent 17-pass record after the paired Button 1 → Button 2 sequence | `STATIC + WRITER-TRACE + PAIRED-INPUT-DIFFERENTIAL` |
+| `0xFF9E96–0xFF9E99` | paired-input effect/resource handle candidate; PC `0x02803A` writes `0x0004A004` before calling the trajectory-timer reset at `0x02804A` | `OBSERVED-IN-TRACE + STATIC-CANDIDATE` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
 ## ROM-to-RAM mechanism annotations
