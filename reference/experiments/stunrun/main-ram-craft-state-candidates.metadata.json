@@ -1,0 +1,61 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_craft_state_candidate_correlation",
+  "tools": ["tools/mame-memory-snapshot", "tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "snapshot_campaign": {
+    "base": "0xFFDD00",
+    "count": "0x100",
+    "width": 16,
+    "frames": [600, 700, 800, 900, 1000, 1200, 1500, 1800],
+    "none_result_sha256": "81d57189b813e266f0eecac62d28f8300bcce25851174971a0dc3f18ade9f4ff",
+    "late_result_sha256": "b277f1faa91696271e503b58fe223c0bc2a49e41b6e0827dfd28133ab401ee33",
+    "late_drive_result_sha256": "b49ea586ba5d2981318b570f6aacf8b4d5f57c896f3898be859fa2457e32965e",
+    "observation": "late and late_drive remain identical through frame 900; the first persistent differences appear after steering/Button 1 and expand through the movement cluster by frame 1800"
+  },
+  "writer_trace": {
+    "range": "0xFFDD00–0xFFDD30",
+    "input": "late_drive",
+    "frames": [600, 1800],
+    "result_sha256": "20a6fb296cf7888bb9214536c8c369836d4653f4ac4ffe86ea22e8109885739d",
+    "canonical_log_sha256": "d612536ddfa60fa9935d7b0955d371316eff1a834708338bd8e237ddf311ed50",
+    "event_count": 591,
+    "address_counts": {
+      "0xFFDD02": 3,
+      "0xFFDD04": 3,
+      "0xFFDD06": 3,
+      "0xFFDD08": 3,
+      "0xFFDD16": 49,
+      "0xFFDD18": 43,
+      "0xFFDD1A": 22,
+      "0xFFDD1C": 80,
+      "0xFFDD1E": 60,
+      "0xFFDD20": 47,
+      "0xFFDD22": 89,
+      "0xFFDD24": 83,
+      "0xFFDD26": 56
+    }
+  },
+  "candidates": {
+    "0xFFDD16": {
+      "classification": "speed-velocity-candidate",
+      "static_mechanism": "reset to zero; increased by 0x20; compared with 0x3C0 and 0x500; formatted for HUD; consumed by motion math",
+      "semantic_status": "strong craft-motion candidate; displayed unit and exact ownership unresolved"
+    },
+    "0xFFDD02_0xFFDD06_0xFFDD08": {
+      "classification": "position-coordinate-candidates",
+      "static_mechanism": "passed to collision/bounds routines and copied into 0xFF9576/0xFF9574/0xFF9570 history fields",
+      "semantic_status": "strong positional candidates; axis assignment and player-vs-object ownership unresolved"
+    },
+    "0xFFDD1A_0xFFDD26": {
+      "classification": "movement-physics-cluster",
+      "semantic_status": "input-dependent active cluster; individual field meanings unresolved"
+    }
+  },
+  "negative_claims": [
+    "No armor field was identified.",
+    "No weapon/ammunition field was identified.",
+    "The trace does not prove that every field in the cluster belongs to the player craft rather than a related physics/object record."
+  ]
+}

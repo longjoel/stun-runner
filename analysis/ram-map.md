@@ -36,6 +36,9 @@ not ordinary 68010 work RAM.
 | `0xFF9568–0xFF956B` | countdown candidate initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9532–0xFF9535` | live score accumulator candidate; cleared at several game-state entries, formatted/displayed by nearby UI paths, and incremented by point-shaped constants (`0xC8`, `0x3E8`, `0x7D0`, `0x4E20`) plus table-derived values | `STATIC-CANDIDATE; DYNAMIC CLEAR-ONLY` |
+| `0xFFDD16–0xFFDD17` | speed/velocity candidate; reset to zero, increased in `0x02820A` by `0x20`, bounded at `0x3C0`/`0x500`, displayed through the nearby HUD path, and consumed by motion math at `0x039E04` | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFFDD02`, `0xFFDD06`, `0xFFDD08` | three coordinate/position candidates; passed through collision/bounds checks and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570` | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
+| `0xFFDD1A–0xFFDD26` | active movement/physics cluster updated by the drive path; exact axis, steering, acceleration, and renderer roles remain unresolved | `OBSERVED-IN-TRACE` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
 ## ROM-to-RAM mechanism annotations
@@ -93,6 +96,17 @@ longword writes to this field, all clears or initialization; it did not reach
 a scoring event. This supports a live-score role without claiming that the
 field has been exercised by a verified scoring action. See
 `reference/experiments/stunrun/main-ram-score-candidate.metadata.json`.
+
+The first drive-state cluster is now narrowed to `0xFFDD02/06/08` and
+`0xFFDD16–0xFFDD26`. The static code treats the first three as bounded
+coordinate-like values and stores their previous values at `0xFF9576/74/70`.
+`0xFFDD16` is stronger: it is reset, stepped by `0x20`, bounded at `0x3C0`
+and `0x500`, passed to a HUD formatting path, and used in motion calculations.
+The synchronized late versus late-drive snapshots diverge first around the
+steering event, and the late-drive writer trace records repeated updates to
+`0xFFDD16`, `0xFFDD1A–0xFFDD26`, and the coordinate candidates. These are
+craft-motion candidates, not armor or weapon labels. Provenance is in
+`reference/experiments/stunrun/main-ram-craft-state-candidates.metadata.json`.
 
 A structure-only trace confirms the separation: the no-input run records only
 84 periodic `0x0206CC → 0xFF94C0` writes, while late-drive records 122 writes
