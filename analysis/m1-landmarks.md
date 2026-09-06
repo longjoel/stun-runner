@@ -101,6 +101,15 @@ differential, and a first main-CPU trace divergence at `0x02046A`/`0x02046C`.
 It is still not a semantic gameplay checkpoint or selector. See
 `reference/experiments/stunrun/drive-input-rendered-delta.metadata.json`.
 
+The default-DIP `coin_start_late` schedule delays Coin 1 and Start until frames
+650 and 750. At frame 1800 it reaches a roadway scene with the vehicle
+stationary; adding the bounded steering/Button 1 schedule produces a second
+repeatable roadway image and a distinct normalized checkpoint. GSP samples are
+identical through frame 900 and diverge at frame 1200, after the control input
+has been applied. This is the strongest current synchronized player-control
+boundary candidate, but it remains a candidate rather than a semantic selector.
+See `reference/experiments/stunrun/late-control-boundary.metadata.json`.
+
 An early 30-frame Coin 1 pulse followed by Start produces the same result as
 the later two-frame pulse. In the static listing, the only direct references to
 coin bits 7/6 are in the `0x043590` candidate; its six direct callers remain

@@ -1,0 +1,56 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "experiments/stunrun/coin_start_late_drive.json",
+  "comparison_experiment": "experiments/stunrun/coin_start_late.json",
+  "runner": "tools/mame-replay --exact-frame",
+  "checkpoint_runner": "tools/mame-checkpoint --input late_drive",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "exact_frame": 1800,
+  "input_schedule": [
+    {"frame": 650, "field": "Coin 1", "action": "press"},
+    {"frame": 680, "field": "Coin 1", "action": "release"},
+    {"frame": 750, "field": "1 Player Start", "action": "press"},
+    {"frame": 780, "field": "1 Player Start", "action": "release"},
+    {"frame": 900, "field": "AD Stick X", "action": "set", "value": 220},
+    {"frame": 900, "field": "P1 Button 1", "action": "press"},
+    {"frame": 1500, "field": "AD Stick X", "action": "set", "value": 128},
+    {"frame": 1500, "field": "P1 Button 1", "action": "release"}
+  ],
+  "driven_render": {
+    "screenshot_sha256": "51fc16bd8d9940fa1452c7c8148d0a804d50f8c60f3f25416459e8173e99f12e",
+    "fresh_configuration_runs": 2,
+    "repeatable": true,
+    "observation": "Open roadway, vehicle, speed HUD, and roadway objects are visible at the exact frame."
+  },
+  "coin_start_comparison": {
+    "experiment": "experiments/stunrun/coin_start_late.json",
+    "screenshot_sha256": "5765db11e00420ecbe08c3b730056839597286f0915499482a8dbe45ecde4717",
+    "checkpoint_sha256": "c54cc19263379d8c29850fea6bda29f7f8fef34bcd1adbbadd224236ab0c99ee",
+    "observation": "The matched late coin/start path reaches the roadway scene with the vehicle stationary; adding the drive schedule changes the exact-frame image and normalized machine state."
+  },
+  "checkpoint": {
+    "path": "reference/checkpoints/m1-late-control/state.json",
+    "sha256": "b522da52dba3c47d7ab3ff15a90d3af22560e4888dbb0dd9d172fa3b5705f515",
+    "run_result_sha256": "8377d440822addadfcfd73314c838dc8824c587ab8e4d0a68ae96cb8542da1a4",
+    "fresh_configuration_runs": 2,
+    "repeatable": true,
+    "state_differences_vs_late_coin_start": ["maincpu", "gsp", "adsp", "soundcpu", "regions.adsp_program"]
+  },
+  "gsp_state_differential": {
+    "runner": "tools/mame-gsp-state-snapshot",
+    "targets": [600, 750, 900, 1200, 1800],
+    "late_result_sha256": "360ea4ee4b19712e78d28660ab4a6142472c147c1fb179d42c14a8594c391069",
+    "late_drive_result_sha256": "06399857a10d443268cc7f7378b8ecb4f3aeca04791c2948305bc92f7b2219d1",
+    "observed": {
+      "frames_600_750": "identical",
+      "frame_900": "identical after coin/start transition",
+      "frame_1200": "drive path diverges in GSP PC/ST, control_lo, and sparse high-VRAM sum",
+      "frame_1800": "drive path remains distinct in GSP PC/ST and sparse high-VRAM sum"
+    }
+  },
+  "interpretation": "This is the strongest current candidate for a synchronized player-control boundary: late coin/start reaches a roadway state, and the verified drive schedule changes both the rendered result and machine/GSP state after a bounded delay. It remains a candidate rather than a semantic gameplay selector until the input transition and state fields are tied to ROM-side meaning.",
+  "confidence": "OBSERVED-IN-REPLAY + REPEATABLE-CHECKPOINT + OBSERVED-IN-GSP-SNAPSHOT",
+  "raw_artifacts_kept_local": true,
+  "next_question": "Correlate the late transition with main-CPU input polling and ADSP/GSP submission telemetry, then promote only a selector supported by a stable state predicate."
+}

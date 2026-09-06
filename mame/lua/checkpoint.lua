@@ -59,7 +59,21 @@ local sw_off_prefix = {
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
 }
 local initial_events = (input_mode == 'sw_off_prestart' or input_mode == 'drive') and sw_off_prefix or {}
-local events = input_mode == 'drive' and {
+local events = input_mode == 'late_drive' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 1500, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 1500, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'}
+} or input_mode == 'late' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'drive' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 0},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'set', value = 1},
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', action = 'set', value = 0},

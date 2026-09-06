@@ -15,7 +15,7 @@ def main() -> int:
     parser.add_argument("rompath", type=pathlib.Path)
     parser.add_argument("output", type=pathlib.Path)
     parser.add_argument("--frames", type=int, default=600)
-    parser.add_argument("--input", choices=("none", "sw_off", "sw_off_prestart", "drive"), default="none")
+    parser.add_argument("--input", choices=("none", "sw_off", "sw_off_prestart", "drive", "late", "late_drive"), default="none")
     parser.add_argument("--cfg-dir", type=pathlib.Path, default=pathlib.Path("/tmp/stunrun-mame-cfg"))
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()

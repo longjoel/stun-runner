@@ -111,7 +111,10 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   first input-dependent GSP submission, and a synchronized semantic gameplay
   selector. A bounded AD Stick X/Button 1 replay now produces a repeatable
   input-dependent rendered delta at frame 1800, a normalized checkpoint, a
-  late GSP differential, and a first main-CPU input-path divergence. The late-applied SW1-off experiment is a repeatable loading / blank
+  late GSP differential, and a first main-CPU input-path divergence. A later
+  default-DIP coin/start schedule now reaches a repeatable roadway/control
+  boundary with a second normalized checkpoint, but semantic selector meaning
+  is still unproven. The late-applied SW1-off experiment is a repeatable loading / blank
   negative control; applying the same DIP bank before reset now yields a
   repeatable exact-frame rendered-scene checkpoint, but the identical no-input
   render means it is not yet a gameplay selector.

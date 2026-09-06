@@ -1,0 +1,25 @@
+{
+  "schema": "stunrun-checkpoint/v1",
+  "system": "stunrun",
+  "description": "S.T.U.N. Runner (rev 6)",
+  "mame": "0.289 (mame0289-dirty)",
+  "frame": 1800,
+  "time_seconds": 29.89944,
+  "processors": {
+    "maincpu": {"tag": ":mainpcb:maincpu", "pc": 141158, "sr": 8192, "sp": 4294966810},
+    "gsp": {"tag": ":mainpcb:gsp", "pc": 4294186224, "st": 2097168},
+    "adsp": {"tag": ":mainpcb:adsp", "pc": 20, "astat": 48},
+    "soundcpu": {"tag": ":mainpcb:jsa:cpu", "pc": 18542, "p": 241}
+  },
+  "regions": {
+    "adsp_program": {
+      "space": "program",
+      "range": "0x0000-0x1fff",
+      "word_width": 32,
+      "nonzero_words": 4795,
+      "sum32": 1223730505,
+      "first_nonzero_words": [655391, 655391, 655391, 655391, 1865743, 1868623, 3407880, 3407881, 3407882, 3407883, 3670024, 3670025, 3670026, 3670027, 3407893, 3670039]
+    }
+  },
+  "selectors": {"adsp_program_loaded": true}
+}

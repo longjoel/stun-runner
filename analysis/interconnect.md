@@ -239,6 +239,12 @@ producer-side ADSP meaning of each block remains unresolved. See
   boundary, not yet a semantic gameplay selector; the narrow 68010 FIFO tap
   captures no post-frame-600 writes, so the changed path is outside that sink.
   See `reference/experiments/stunrun/drive-input-rendered-delta.metadata.json`.
+- CANDIDATE SYNCHRONIZED CONTROL BOUNDARY: the default-DIP late Coin 1/Start
+  schedule reaches a roadway state; adding AD Stick X/Button 1 at frame 900
+  produces a distinct normalized checkpoint and GSP samples beginning at frame
+  1200. This is stronger than the earlier attract/demo delta, but no semantic
+  field or ROM-side state meaning is promoted yet. See
+  `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 
 The static/runtime GSP search is recorded in
 `reference/experiments/stunrun/gsp-handler-search.metadata.json`.
