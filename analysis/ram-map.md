@@ -49,10 +49,16 @@ instructions and observed writes:
 | `0xFF94AE` | repeated high-byte writes from the `0x020586`/`0x020634`/`0x02063A` path form a descending pattern beginning `0x0F`, `0x0E`, `0x0D`, …, `0x05` in the captured window | `OBSERVED-IN-TRACE` |
 | `0xFF94B0–0xFF94BE` | one captured derived-byte pass writes `0xFE`, `0x01`, then zero-valued low/high-byte components under the masks recorded by the tap | `OBSERVED-IN-TRACE` |
 | `0xFF94C0` | periodic `0x0206CC` writes are `0x0010` in no-input; the late-drive sequence begins `0x0010`, `0xFF1A`, `0x421D`, `0x421F`, `0x4221`, … | `OBSERVED-IN-TRACE` |
+| `0xFF94C2–0xFF94C5` | `0x0206D0` writes the long pointer at structure offset `+0x2A`; no-input remains zero, while late-drive points into the derived-byte area beginning at `0xFF94B1` | `STATIC + OBSERVED-IN-TRACE` |
 
 The structure and counters are not yet assigned game meanings. In particular,
 the repeated `0x0205E2` stores may be a decoded/cache or renderer-support
 operation; the current evidence does not justify calling them player fields.
+
+The adjacent pointer trace confirms the structure layout at runtime:
+`0x0206CC` writes `A1` to `+0x28` (`0xFF94C0`), and `0x0206D0` writes `A0`
+to `+0x2A` (`0xFF94C2–0xFF94C5`). See
+`reference/experiments/stunrun/main-ram-pointer-trace.metadata.json`.
 
 A structure-only trace confirms the separation: the no-input run records only
 84 periodic `0x0206CC → 0xFF94C0` writes, while late-drive records 122 writes

@@ -1,0 +1,18 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/ram-map.md",
+  "runner": "tools/mame-ram-write-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "trace": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "range": "0xFF94C0-0xFF94C5",
+    "frames": "640-805"
+  },
+  "runs": {
+    "none": {"event_count": 252, "canonical_log_sha256": "3478251250b79b63a1c0fe5561782de585fffd425f3b2a48606cd4af919f13f4", "values": {"0xFF94C0": "0x0010", "0xFF94C2": "0x00000000", "0xFF94C4": "0x00000000"}},
+    "late_drive": {"event_count": 249, "canonical_log_sha256": "8e5c602be9bcb51f291c57eb5c82c67aa17bde49443af4d2a31e32c7b3f7537f", "values": {"0xFF94C0": ["0x0010", "0xFF1A", "0x421D", "0x421F", "0x4221"], "0xFF94C2": "0x000000FF", "0xFF94C4": ["0x94B1", "0x94B2", "0x94B3", "0x94B4"]}}
+  },
+  "interpretation": "The static offsets are runtime-confirmed: 0x0206CC writes the word field at structure base plus 0x28, and 0x0206D0 writes the long pointer at plus 0x2A. The late-drive pointer values target the structure's derived-byte area; no-input leaves the pointer fields zero. These are literal layout facts, not semantic field names."
+}
