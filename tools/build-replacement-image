@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import pathlib
+import struct
 
 
 FIXTURES = {
@@ -17,15 +18,27 @@ FIXTURES = {
         # MAME's 2100 executor encodes unconditional JUMP as the 0x18
         # opcode class, target in bits 4..17, and condition 0xf.
         "reset-loop": ("00000000000000000000000000000000" "0018004f", 0x0000),
+        "init-prefix": (None, 0x0000),
     },
     "sound-6502": {"nop": ("ea", 0x1000)},
 }
 
 
+def adsp_init_prefix() -> bytes:
+    """Encode the observed reset calls with source-defined return stubs."""
+    words = [0] * (0x834 + 1)
+    words[0x0004] = 0x001C780F  # CALL $0780, condition 0xf (always)
+    words[0x0005] = 0x001C834F  # CALL $0834, condition 0xf (always)
+    words[0x0006] = 0x0018006F  # JUMP $0006, condition 0xf (always)
+    words[0x0780] = 0x000A000F  # RTS, condition 0xf (always)
+    words[0x0834] = 0x000A000F  # RTS, condition 0xf (always)
+    return b"".join(struct.pack(">I", word) for word in words)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--processor", choices=sorted(FIXTURES), required=True)
-    parser.add_argument("--fixture", choices=("nop", "reset-loop"), default="nop")
+    parser.add_argument("--fixture", choices=("nop", "reset-loop", "init-prefix"), default="nop")
     parser.add_argument("--origin", type=lambda value: int(value, 0))
     parser.add_argument("--entry", type=lambda value: int(value, 0))
     parser.add_argument("--output", type=pathlib.Path, required=True)
@@ -34,7 +47,7 @@ def main() -> int:
     if args.fixture not in FIXTURES[args.processor]:
         parser.error(f"fixture {args.fixture!r} is not available for {args.processor}")
     hex_bytes, default_origin = FIXTURES[args.processor][args.fixture]
-    payload = bytes.fromhex(hex_bytes)
+    payload = adsp_init_prefix() if args.fixture == "init-prefix" else bytes.fromhex(hex_bytes)
     origin = default_origin if args.origin is None else args.origin
     entry = (origin + 4) if args.entry is None and args.processor == "adsp2100" else (origin if args.entry is None else args.entry)
     if origin < 0 or entry < origin or entry >= origin + len(payload):

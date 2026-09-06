@@ -42,3 +42,23 @@ The fixture is accepted only when both conditions hold:
    target `0x0004`.
 
 This is an encoder/control-path fixture, not a claim about game semantics.
+
+## First source-defined initialization prefix
+
+The retained startup landmarks identify the original reset path as:
+
+```text
+0x0004: CALL $0780
+0x0005: CALL $0834
+```
+
+The `init-prefix` fixture preserves those two call encodings, places
+unconditional `RTS` stubs at both observed targets, and then loops at `0x0006`.
+The calls and returns are encoded from the same MAME executor rules as the
+reset loop; the stubs are deliberately source-defined and do not claim to
+reproduce the original PM/DM side effects.
+
+It installs after the repeatable original upload boundary at frame 412, reads
+back every word with zero mismatches, and reaches the stable loop at `PC=0x4`
+in two fresh configurations. The runtime evidence is recorded in
+`reference/experiments/stunrun/m3-adsp-init-prefix.metadata.json`.

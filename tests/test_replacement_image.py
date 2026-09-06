@@ -36,6 +36,22 @@ class ReplacementImageTests(unittest.TestCase):
             self.assertEqual(image["bytes_hex"][-8:], "0018004f")
             self.assertEqual(image["length"], 20)
 
+    def test_adsp_init_prefix_encodes_observed_calls(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = pathlib.Path(directory)
+            subprocess.run([
+                str(ROOT / "tools/build-replacement-image"),
+                "--processor", "adsp2100", "--fixture", "init-prefix",
+                "--output", str(output),
+            ], check=True, capture_output=True, text=True)
+            image = json.loads((output / "image.json").read_text())
+            payload = (output / image["binary"]).read_bytes()
+            self.assertEqual(image["entry"], "0x4")
+            self.assertEqual(image["length"], (0x834 + 1) * 4)
+            self.assertEqual(payload[0x4 * 4:0x7 * 4].hex(), "001c780f001c834f0018006f")
+            self.assertEqual(payload[0x780 * 4:0x781 * 4].hex(), "000a000f")
+            self.assertEqual(payload[0x834 * 4:0x835 * 4].hex(), "000a000f")
+
 
 if __name__ == "__main__":
     unittest.main()

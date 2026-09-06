@@ -1,0 +1,38 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/m3-adsp-reset-entry.md",
+  "builder": "tools/build-replacement-image --processor adsp2100 --fixture init-prefix",
+  "loader": "tools/mame-replacement-image",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "source_landmarks": {
+    "entry": "0x0004",
+    "first_call": "CALL $0780",
+    "second_call": "CALL $0834",
+    "evidence": "reference/experiments/stunrun/processor-startup-landmarks.metadata.json"
+  },
+  "image": {
+    "origin": "0x0",
+    "entry": "0x4",
+    "length": 8404,
+    "payload_sha256": "027a422ecfb39c85cc851f8348e2478537879c614e47b23481e5a3d68dc08282",
+    "encoded_words": {
+      "0x0004": "0x001C780F",
+      "0x0005": "0x001C834F",
+      "0x0006": "0x0018006F",
+      "0x0780": "0x000A000F",
+      "0x0834": "0x000A000F"
+    }
+  },
+  "runtime": {
+    "install_frame": 412,
+    "settle_frames": 2,
+    "observed_frame": 414,
+    "result_sha256": "555c253b7b9e2ff7696a182d71deff9324a42cf7ce674ef5bda75065dcf2f1dc",
+    "fresh_configuration_runs": 2,
+    "repeatable_result": true,
+    "readback_mismatches": 0,
+    "final_pc": "0x0004"
+  },
+  "interpretation": "This source-defined prefix preserves the two observed startup call targets, provides independently encoded return stubs, and enters a stable loop. It proves a source/encoder-produced initialization control slice, but the stubs do not yet reproduce the original PM/DM side effects or canonical title checkpoint."
+}
