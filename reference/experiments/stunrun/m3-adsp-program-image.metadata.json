@@ -26,29 +26,35 @@
   "replacement_run": {
     "install_frame": 140,
     "settle_frames": 2,
-    "result_sha256": "0b77d26f3f50e062cb3339ebba143b4584e1ecd719889e205c4fc800e3eff2d7",
+    "result_sha256": "7fe95e6ca69b6cd4a6b8ebefb27dff72680564e2af99b04120af6fd847ab31d2",
     "fresh_configuration_runs": 2,
     "repeatable_result": true,
-    "readback_first_word": "0x00000000",
-    "final_pc": "0x275D"
+    "readback_first_word": "0x000A001F",
+    "readback_mismatches": 0,
+    "final_pc": "0x0000",
+    "interpretation": "The corrected loader places the nonzero image and verifies every mapped word by read-back. The replacement remains at PC 0x0000 after the bounded settle interval; the prior PC-advance claim was invalid because the loader addressed the ADSP window in the wrong units."
   },
   "earliest_install_probe": {
     "install_frame": 1,
     "settle_frames": 2,
-    "result_sha256": "dca94c9b96651d59af0e62d56c47339c25c50304ef1029c7f8f810df7fde67d2",
+    "result_sha256": "fcd1854d27d6d95ea8fdfe8466e7f3fcb6e806deed6ff6ec95dbb8f44f13a2ff",
     "observed_frame": 3,
-    "final_pc": "0x275E",
-    "interpretation": "The full image can be installed immediately after reset and executes under the modeled control release."
+    "final_pc": "0x0000",
+    "readback_first_word": "0x000A001F",
+    "readback_mismatches": 0,
+    "interpretation": "The full image can be installed immediately after reset and is verified in place, but this probe does not establish replacement execution; PC remains at the entry boundary."
   },
   "early_install_long_probe": {
     "install_frame": 1,
     "settle_frames": 141,
-    "result_sha256": "1e092aad3dc25bf2deef01508eaca5507666c1d6679302ce40d8333a008197b6",
+    "result_sha256": "32b82e1f96005a0ce69683dd69de3f483cb3a439a27a23ae625c931c30d1945b",
     "observed_frame": 142,
-    "final_pc": "0x27A2",
-    "interpretation": "The image remains executable through the bounded early-init interval; this does not establish equivalence to the original machine checkpoint."
+    "final_pc": "0x0000",
+    "readback_first_word": "0x000A001F",
+    "readback_mismatches": 0,
+    "interpretation": "The image remains present through the bounded early-init interval, but PC remains at entry; execution/control release still requires investigation."
   },
-  "interpretation": "The full captured ADSP program image is fixed-placed at 0x0000 and executes under the MAME-modeled ADSP control release, including an immediate post-reset installation probe. This proves image transport for an active program, but it is ROM-derived reference data and not a reconstructed implementation; it must remain local and uncommitted.",
+  "interpretation": "The full captured ADSP program image is fixed-placed at 0x0000 with complete nonzero read-back verification, including an immediate post-reset installation probe. Replacement execution has not yet been established: PC remains at entry. This is ROM-derived reference data and not a reconstructed implementation; it must remain local and uncommitted.",
   "raw_artifacts_kept_local": true,
-  "next_question": "Replace the ROM-derived image with a source/encoder-produced initialization slice and compare its earliest checkpoint against the original upload path."
+  "next_question": "Determine why the verified replacement remains at PC 0x0000 after the modeled reset/control release, then validate a minimal independently encoded ADSP instruction sequence before attempting an initialization slice."
 }

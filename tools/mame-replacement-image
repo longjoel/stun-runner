@@ -13,7 +13,7 @@ import tempfile
 
 RESULT = re.compile(
     r"M2_REPLACEMENT_RESULT frame=(\d+) installed=(true|false) "
-    r"first=([0-9A-Fa-f]+) final_pc=([0-9A-Fa-f]+)"
+    r"first=([0-9A-Fa-f]+) mismatches=(\d+) final_pc=([0-9A-Fa-f]+)"
 )
 
 
@@ -37,14 +37,22 @@ local words = {{{values}}}
 local frame = 0
 local installed = false
 local first = 0
+local readback_mismatches = 0
 local install_frame = {install_frame}
 local settle_frame = {install_frame + settle}
 
 local function install()
     for index, word in ipairs(words) do
-        space:write_u32((index - 1) * 4, word)
+        -- The ADSP program address space is word-addressed. MAME's Lua
+        -- address-space API exposes the mapped ADSP word index directly.
+        space:write_u32(index - 1, word)
     end
     first = space:read_u32(0)
+    for index, word in ipairs(words) do
+        if space:read_u32(index - 1) ~= word then
+            readback_mismatches = readback_mismatches + 1
+        end
+    end
     -- Release the 68010-controlled ADSP reset, /BR, and /HALT lines so the
     -- replacement image is scheduled for execution after placement.
     main_space:write_u16(0x81801e, 0)
@@ -58,8 +66,8 @@ emu.register_frame_done(function()
     frame = frame + 1
     if frame == install_frame then install() end
     if frame == settle_frame then
-        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X final_pc=%04X',
-            frame, tostring(installed), first, cpu.state['PC'].value))
+        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X mismatches=%d final_pc=%04X',
+            frame, tostring(installed), first, readback_mismatches, cpu.state['PC'].value))
         machine:exit()
     end
 end)
@@ -101,7 +109,7 @@ def main() -> int:
     matches = RESULT.findall(text)
     if completed.returncode or not matches:
         raise SystemExit(f"replacement image validation failed; see {log}")
-    frame, installed, first, final_pc = matches[-1]
+    frame, installed, first, mismatches, final_pc = matches[-1]
     result = {
         "schema": "stunrun-replacement-image-result/v1",
         "image": args.image.name,
@@ -112,6 +120,7 @@ def main() -> int:
         "observed_frame": int(frame),
         "installed": installed == "true",
         "first_word": int(first, 16),
+        "readback_mismatches": int(mismatches),
         "final_pc": int(final_pc, 16),
         "returncode": completed.returncode,
     }
