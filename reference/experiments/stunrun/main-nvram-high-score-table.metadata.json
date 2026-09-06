@@ -1,0 +1,51 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_nvram_high_score_table_identification",
+  "tools": ["tools/mame-memory-snapshot", "tools/diff-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "machine_map": "analysis/driver-mining/stunrun.machine-map.yaml",
+  "mapped_view": {
+    "address_range": "0xFF4000–0xFF4FFF",
+    "devices": {
+      "high_byte_lane": ":mainpcb:200e M48T02",
+      "low_byte_lane": ":mainpcb:210e Parallel EEPROM 2816"
+    },
+    "mechanism": "hd68k_zram_r/w combines the two persistent byte lanes into the 68010 ZRAM view; writes are enabled only under the MAME-modeled ZRAM protection latch"
+  },
+  "snapshot": {
+    "input": "none",
+    "frames": [1, 600],
+    "base": "0xFF4000",
+    "count": "0x1000",
+    "width": 8,
+    "result_sha256": "9108872361a097bb0631d80e827d4742c679140ecf66d9d191d9dbc29aa25e7b",
+    "canonical_log_sha256": "193c3938adf1a5657ef1bee8af7fcfff67fda3554e361e56a738c45e24ead40f",
+    "frame_600_vs_late_frame_600_changed_count": 0
+  },
+  "table": {
+    "address_range": "0xFF4410–0xFF44FF",
+    "record_size": 24,
+    "record_count": 10,
+    "score_format": "big-endian unsigned 16-bit at record offset +0",
+    "name_format": "display bytes beginning at record offset +2",
+    "entries": [
+      {"address": "0xFF4410", "score": 15000, "name": "THE GONZ"},
+      {"address": "0xFF4428", "score": 12500, "name": "SMOKY"},
+      {"address": "0xFF4440", "score": 10000, "name": "GUNNER GLENN"},
+      {"address": "0xFF4458", "score": 8000, "name": "BAD BABE"},
+      {"address": "0xFF4470", "score": 7000, "name": "THE POTATOE"},
+      {"address": "0xFF4488", "score": 5000, "name": "SCOOTER"},
+      {"address": "0xFF44A0", "score": 4000, "name": "THE HOOPLE"},
+      {"address": "0xFF44B8", "score": 3000, "name": "RANGER RICK"},
+      {"address": "0xFF44D0", "score": 2000, "name": "BUGS"},
+      {"address": "0xFF44E8", "score": 1000, "name": "POGO"}
+    ]
+  },
+  "static_provenance": {
+    "zram_map": "driver_68k_map maps 0xFF4000–0xFF4FFF to hd68k_zram_r/w",
+    "persistent_access": ["0x02055A", "0x02062C", "0x02072C", "0x020A1C"],
+    "persistent_access_detail": "The ROM uses the 0xFF4001 lane as the low-byte base while the paired M48T02 lane supplies the high byte; the initialization/validation routines operate on fixed persistent records and checksums."
+  },
+  "semantic_status": "high-confidence persistent high-score table; live-score-to-table promotion path and game-over write event remain open"
+}

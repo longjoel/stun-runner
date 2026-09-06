@@ -10,6 +10,7 @@ field.
 | Address/range | Owner/view | Evidence | Status |
 |---|---|---|---|
 | `0xFF8000–0xFFFFFF` | 68010 work RAM | pinned `driver_68k_map` | `MAME-CONFIRMED` |
+| `0xFF4000–0xFF4FFF` | 68010 ZRAM view combining the M48T02 high byte and 2816 EEPROM low byte | pinned `driver_68k_map` / `hd68k_zram_r/w` | `MAME-CONFIRMED` |
 | `0x0000–0x1FFF` (ADSP data space) | ADSP-2100 internal data RAM | runtime ADSP address space and direct snapshots | `MAME-CONFIRMED` |
 | `0x0000–0x1FFF` (ADSP program space) | ADSP-2100 program RAM | runtime map, upload taps, program snapshots | `MAME-CONFIRMED` |
 | `0x800000–0x807FFF` | 68010 view of ADSP program RAM | `hd68k_adsp_program_r/w` | `MAME-CONFIRMED` |
@@ -36,6 +37,7 @@ not ordinary 68010 work RAM.
 | `0xFF9568–0xFF956B` | countdown candidate initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9532–0xFF9535` | live score accumulator candidate; cleared at several game-state entries, formatted/displayed by nearby UI paths, and incremented by point-shaped constants (`0xC8`, `0x3E8`, `0x7D0`, `0x4E20`) plus table-derived values | `STATIC-CANDIDATE; DYNAMIC CLEAR-ONLY` |
+| `0xFF4410–0xFF44FF` | ten-entry persistent high-score table in the mapped ZRAM view; 24-byte records contain a big-endian score at `+0` and a display name beginning at `+2` | `SNAPSHOT + PERSISTENT-NVRAM + STATIC` |
 | `0xFFDD16–0xFFDD17` | speed/velocity candidate; reset to zero, increased in `0x02820A` by `0x20`, bounded at `0x3C0`/`0x500`, displayed through the nearby HUD path, and consumed by motion math at `0x039E04` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFFDD02`, `0xFFDD06`, `0xFFDD08` | three coordinate/position candidates; passed through collision/bounds checks and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570` | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
 | `0xFFDD1A–0xFFDD26` | active movement/physics cluster updated by the drive path; exact axis, steering, acceleration, and renderer roles remain unresolved | `OBSERVED-IN-TRACE` |
@@ -96,6 +98,16 @@ longword writes to this field, all clears or initialization; it did not reach
 a scoring event. This supports a live-score role without claiming that the
 field has been exercised by a verified scoring action. See
 `reference/experiments/stunrun/main-ram-score-candidate.metadata.json`.
+
+The persistent high-score table is now identified. The ZRAM view at
+`0xFF4410–0xFF44FF` contains ten 24-byte records. Snapshot decoding gives
+scores `15000, 12500, 10000, 8000, 7000, 5000, 4000, 3000, 2000, 1000` and
+the names `THE GONZ`, `SMOKY`, `GUNNER GLENN`, `BAD BABE`, `THE POTATOE`,
+`SCOOTER`, `THE HOOPLE`, `RANGER RICK`, `BUGS`, and `POGO`. The table is
+backed by the two persistent byte lanes `:mainpcb:200e` (M48T02) and
+`:mainpcb:210e` (2816 EEPROM); neither lane should be treated as ordinary
+work RAM. See
+`reference/experiments/stunrun/main-nvram-high-score-table.metadata.json`.
 
 The first drive-state cluster is now narrowed to `0xFFDD02/06/08` and
 `0xFFDD16–0xFFDD26`. The static code treats the first three as bounded
