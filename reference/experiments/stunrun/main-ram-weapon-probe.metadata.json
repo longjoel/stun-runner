@@ -1,0 +1,41 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_repeated_fire_status_probe",
+  "tools": ["tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": {
+    "input": "weapon_probe",
+    "events": [
+      "coin/start at frames 650/750",
+      "AD Stick X=220 and Button 1 at frame 900; release frame 960",
+      "Button 2 at frame 1100; release frame 1160",
+      "AD Stick Y=220 at frame 1250; reset frame 1350",
+      "Button 1 at frame 1400; release frame 1460",
+      "Button 2 at frame 1550; release frame 1610"
+    ]
+  },
+  "runs": {
+    "status_range": {
+      "range": "0xFF9500–0xFF9580",
+      "frames": [600, 1800],
+      "result_sha256": "00a037c17d54389509af922a71fbaf9e0d732793d7bc38f7c9c2c32393a01e8c",
+      "canonical_log_sha256": "7a162a1a520ecd49450d1ad95f03dda7e35377aa31d4b93f3becedd23198037a",
+      "event_count": 2759,
+      "relevant_address_counts": {
+        "0xFF9532": 2,
+        "0xFF9568": 80,
+        "0xFF9578": 2
+      }
+    },
+    "craft_range": {
+      "range": "0xFFDD00–0xFFDD90",
+      "frames": [600, 1800],
+      "result_sha256": "f8f1cae43e2b6945bfb6da830f37dad5677fe4fce845f9828e8bf5bbcc63f1d0",
+      "canonical_log_sha256": "e92a1f27ee272c6a5eb6220c83ee8b8a12ed24929af905f18aa19ef35fe57f64",
+      "event_count": 10485
+    }
+  },
+  "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. New high-volume writes at 0xFFDD86–0xFFDD90 were present as continuous per-frame traffic and are therefore treated as object/renderer activity rather than fire-owned state.",
+  "semantic_status": "negative control for simple weapon/status candidates; armor, weapon, and ammunition fields remain unresolved"
+}
