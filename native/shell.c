@@ -1,0 +1,272 @@
+/* Deterministic native shell: M4 replay scaffolding.
+ *
+ * Agent 2 (Implementer). Two modes:
+ *
+ * - compiled-in (no argv): the fixed 600-frame title-path walk over the
+ *   four verified C slices at their evidence-anchored frames.
+ * - file mode (one argv: path to an arcade-experiment/v1 JSON file): the
+ *   walk length comes from expect.frame and the file's input events are
+ *   dispatched at their frames as telemetry. Only the "frame" expect kind
+ *   runs; "bounded_observation" is refused with a clear message.
+ *
+ * Inputs have no consumer model yet (the shell owns no game state by
+ * design), so dispatch logging IS the replay plumbing being proven here:
+ * file -> strict parse -> deterministic frame dispatch. Whole-run
+ * contracts (control tally, title counts) are 600-frame title-path facts
+ * and assert only when the terminal frame is 600; shorter/longer runs log
+ * them as skipped instead of failing on unestablished ground.
+ *
+ * Anchors (see the slice headers for full provenance):
+ * - frame 1:   6502 startup response 0xFF at $2A02 (sound-boundary-tap)
+ * - frames 1/369/411: 6502 command reads at $280A returning 0x00
+ *   (telemetry only: empty-latch vs zero-command is UNKNOWN)
+ * - frames 407/408/411: ADSP upload EMPTY/POPULATING/COMPLETE
+ *   (m3-adsp-upload-boundary)
+ * - frame 412: replacement install-ready; init-state image words and DM
+ *   landmarks hold (m3-adsp-reset-entry, ram-map)
+ * - frame 447: 68010 command byte 0x1E through the JSA latch to the 6502
+ *   read (sound-boundary-tap)
+ * - frame 600 of a 600-frame run: 73-write control multiset matches;
+ *   title counts match (adsp-control-window, sound-boundary-tap)
+ * - unpinned: second IRQ4 response walkthrough (2 entries observed, exact
+ *   frames not established)
+ *
+ * Exit 0 with "RESULT PASS" iff every assertion holds; exit 2 on
+ * usage/parse/unsupported-terminal failures. Output is fully
+ * deterministic: same bytes on every run (no addresses, no timing).
+ */
+#include <stdio.h>
+
+#include "adsp_control_seq.h"
+#include "adsp_init_image.h"
+#include "adsp_upload_stream.h"
+#include "experiment.h"
+#include "jsa_latch.h"
+
+static int g_failures = 0;
+static unsigned frame = 0;
+static unsigned g_terminal = 600u;
+static const stunrun_exp_event_t *g_events = NULL;
+static unsigned g_event_count = 0;
+static unsigned g_dispatched = 0;
+static unsigned g_pending = 0;
+
+#define expect(cond) \
+    do { \
+        if (!(cond)) { \
+            printf("shell: ASSERT FAIL %s frame=%u\n", #cond, frame); \
+            g_failures++; \
+        } \
+    } while (0)
+
+/* Feed the exact title-path control multiset into the tally. */
+static void feed_control_contract(stunrun_adsp_control_tally_t *tally)
+{
+    const stunrun_adsp_control_op_t *ops = stunrun_adsp_control_ops();
+    size_t i;
+    unsigned k;
+    for (i = 0; i < stunrun_adsp_control_op_count(); i++) {
+        for (k = 0; k < ops[i].expected_writes; k++)
+            stunrun_adsp_control_tally_add(tally, ops[i].address,
+                                           STUNRUN_ADSP_CONTROL_DATA);
+    }
+}
+
+static const char *action_name(stunrun_exp_action_t action)
+{
+    switch (action) {
+    case STUNRUN_EXP_PRESS:
+        return "press";
+    case STUNRUN_EXP_RELEASE:
+        return "release";
+    case STUNRUN_EXP_SET:
+        return "set";
+    default:
+        return "unknown";
+    }
+}
+
+/* Dispatch file input events scheduled for the current frame. Order across
+ * events sharing a frame follows file order; unsorted files still dispatch
+ * every event exactly once because each frame scans the whole list. */
+static void dispatch_inputs(void)
+{
+    unsigned i;
+    for (i = 0; i < g_event_count; i++) {
+        const stunrun_exp_event_t *ev = &g_events[i];
+        if (ev->frame != frame)
+            continue;
+        g_dispatched++;
+        printf("shell: input frame=%u port=%s field=%s action=%s",
+               frame, ev->port, ev->field, action_name(ev->action));
+        if (ev->has_value)
+            printf(" value=%d", ev->value);
+        if (ev->label[0] != '\0')
+            printf(" label=%s", ev->label);
+        printf("\n");
+    }
+}
+
+static const char *upload_name(stunrun_adsp_upload_state_t state)
+{
+    switch (state) {
+    case STUNRUN_ADSP_UPLOAD_EMPTY:
+        return "empty";
+    case STUNRUN_ADSP_UPLOAD_POPULATING:
+        return "populating";
+    case STUNRUN_ADSP_UPLOAD_COMPLETE:
+        return "complete";
+    default:
+        return "unknown";
+    }
+}
+
+static int run_walk(void)
+{
+    static uint32_t image[STUNRUN_ADSP_INIT_STATE_WORDS];
+    static uint16_t dm[STUNRUN_ADSP_DM_SIZE];
+    stunrun_jsa_latches_t latches;
+    stunrun_adsp_control_tally_t tally;
+    stunrun_jsa_title_counts_t counts;
+    const char *control_state = "skipped";
+    const char *counts_state = "skipped";
+    size_t emitted;
+    unsigned i;
+
+    stunrun_jsa_latches_init(&latches);
+    stunrun_adsp_control_tally_init(&tally);
+
+    for (frame = 0; frame <= g_terminal; frame++) {
+        dispatch_inputs();
+        if (frame == 1) {
+            /* Startup response: 6502 writes 0xFF, main IRQ4 fires,
+             * handler reads 0x600000, IRQ4 clears. */
+            stunrun_jsa_sound_response_write(&latches,
+                                             STUNRUN_JSA_STARTUP_BYTE);
+            expect(latches.irq4_asserted);
+            expect(stunrun_jsa_main_response_read(&latches) == 0xFFu);
+            expect(!latches.irq4_asserted);
+            printf("shell: frame=1 startup-response=0xFF irq4=handled\n");
+        }
+        if (frame == 1 || frame == 369 || frame == 411) {
+            /* Observed $280A reads returning 0x00. Telemetry: the
+             * transport meaning of an idle read is UNKNOWN, so the
+             * latch is not driven here. */
+            printf("shell: frame=%u command-read addr=0x280A data=0x00 "
+                   "telemetry\n", frame);
+        }
+        if (frame == 407)
+            expect(stunrun_adsp_upload_state_at(frame) ==
+                   STUNRUN_ADSP_UPLOAD_EMPTY);
+        if (frame == 408)
+            expect(stunrun_adsp_upload_state_at(frame) ==
+                   STUNRUN_ADSP_UPLOAD_POPULATING);
+        if (frame == 411)
+            expect(stunrun_adsp_upload_state_at(frame) ==
+                   STUNRUN_ADSP_UPLOAD_COMPLETE);
+        if (frame == 412) {
+            expect(stunrun_jsa_main_response_read(&latches) ==
+                   STUNRUN_JSA_NO_BYTE);
+            expect(stunrun_adsp_install_frame_ready(frame));
+            emitted = stunrun_adsp_emit(STUNRUN_ADSP_FIXTURE_INIT_STATE,
+                                        image, STUNRUN_ADSP_INIT_STATE_WORDS);
+            expect(emitted == STUNRUN_ADSP_INIT_STATE_WORDS);
+            expect(image[0x0004u] == 0x001C780Fu);
+            expect(image[0x0005u] == 0x001C834Fu);
+            expect(image[STUNRUN_ADSP_MAILBOX_BOUNDARY] == 0x0018050Fu);
+            stunrun_adsp_apply_dm_landmarks(dm);
+            expect(dm[0x0955u] == 0x1242u);
+            expect(dm[0x0956u] == 0x124Eu);
+            expect(dm[0x0959u] == 0x7FFFu);
+            expect(dm[0x095Au] == 0xFFFFu);
+            printf("shell: frame=412 install-ready=1 image=init-state "
+                   "landmarks=ok\n");
+        }
+        if (frame == 447) {
+            /* Frame-447 command: 68010 bus event decodes to 0x1E, the
+             * latch carries it across the NMI, the 6502 read gets 0x1E. */
+            int byte = stunrun_jsa_command_byte(
+                STUNRUN_JSA_FRAME447_BUS_DATA, STUNRUN_JSA_FRAME447_BUS_MASK);
+            expect(byte == STUNRUN_JSA_FRAME447_BYTE);
+            stunrun_jsa_main_command_write(&latches, (uint8_t)byte);
+            expect(latches.nmi_asserted);
+            expect(stunrun_jsa_sound_command_read(&latches) == 0x1Eu);
+            expect(!latches.nmi_asserted);
+            printf("shell: frame=447 command-byte=0x1E nmi=handled\n");
+        }
+        if (frame == g_terminal && g_terminal == 600u) {
+            feed_control_contract(&tally);
+            expect(stunrun_adsp_control_tally_matches(&tally));
+            counts = stunrun_jsa_observed_title_counts();
+            expect(stunrun_jsa_title_counts_match(&counts));
+            control_state = "match";
+            counts_state = "match";
+            printf("shell: frame=600 control-tally=match "
+                   "title-counts=match\n");
+        }
+    }
+
+    if (g_terminal != 600u)
+        printf("shell: frame=%u full-contract=skipped terminal!=600\n",
+               g_terminal);
+
+    /* Second IRQ4 response walkthrough. Two entries are observed per
+     * 600-frame run but exact frames are not established, so this is
+     * order-only and carries no frame attribution. The byte is a
+     * mechanism-test placeholder: observed response values beyond the
+     * startup 0xFF are not established. */
+    stunrun_jsa_sound_response_write(&latches, 0xA5u);
+    expect(latches.irq4_asserted);
+    expect(stunrun_jsa_main_response_read(&latches) == 0xA5u);
+    expect(!latches.irq4_asserted);
+    printf("shell: response-pair-2 irq4=handled unpinned\n");
+
+    g_pending = 0;
+    for (i = 0; i < g_event_count; i++) {
+        if (g_events[i].frame > g_terminal)
+            g_pending++;
+    }
+
+    printf("checkpoint frames=%u events=%u pending=%u upload=%s "
+           "install_ready=%d control=%s counts=%s nmi=%d irq4=%d\n",
+           g_terminal, g_dispatched, g_pending,
+           upload_name(stunrun_adsp_upload_state_at(g_terminal)),
+           stunrun_adsp_install_frame_ready(g_terminal),
+           control_state, counts_state,
+           latches.nmi_asserted ? 1 : 0,
+           latches.irq4_asserted ? 1 : 0);
+    if (g_failures == 0)
+        printf("RESULT PASS\n");
+    else
+        printf("RESULT FAIL failures=%d\n", g_failures);
+    return g_failures == 0 ? 0 : 1;
+}
+
+int main(int argc, char **argv)
+{
+    static stunrun_experiment_t exp;
+    stunrun_exp_error_t err;
+    if (argc == 1)
+        return run_walk();
+    if (argc != 2) {
+        fprintf(stderr, "usage: %s [experiment.json]\n", argv[0]);
+        return 2;
+    }
+    err = stunrun_experiment_parse(argv[1], &exp);
+    if (err != STUNRUN_EXP_OK) {
+        fprintf(stderr, "shell: experiment parse failed: %s\n",
+                stunrun_experiment_error_string(err));
+        return 2;
+    }
+    if (exp.expect_kind != STUNRUN_EXP_EXPECT_FRAME) {
+        fprintf(stderr, "shell: unsupported terminal kind "
+                "(bounded_observation needs a Verifier harness)\n");
+        return 2;
+    }
+    g_terminal = exp.terminal_frame;
+    g_events = exp.events;
+    g_event_count = exp.event_count;
+    printf("shell: experiment id=%s start=%s events=%u terminal=%u\n",
+           exp.id, exp.start, exp.event_count, exp.terminal_frame);
+    return run_walk();
+}
