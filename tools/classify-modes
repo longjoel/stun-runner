@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Tag residue ranges by the input modes whose runs touch them.
+
+Takes residue reports from several runs (--residues with --labels in the
+same order, first entry is the primary) and tags each primary range with
+the set of modes whose ranges overlap it by address: drive-specific
+(late_drive only: prime geometry candidacy), input-gated, shared, or
+primary-only. Writes an annotated copy of the primary (same schema).
+"""
+
+import argparse
+import json
+import pathlib
+
+
+def load_residue(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-masked-snapshot/v1":
+        raise SystemExit(f"{path}: not a masked-snapshot report")
+    return value
+
+
+def spans(entry):
+    return (entry["address"], entry["address"] + entry["length"])
+
+
+def overlaps(a, b):
+    return a[0] < b[1] and b[0] < a[1]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--residues", nargs="+", type=pathlib.Path,
+                        required=True)
+    parser.add_argument("--labels", nargs="+", required=True)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    if len(args.residues) < 2 or len(args.residues) != len(args.labels):
+        parser.error("need 2+ residues with one label each")
+
+    reports = [load_residue(path) for path in args.residues]
+    primary, others = reports[0], reports[1:]
+    other_labels = args.labels[1:]
+
+    for entry in primary.get("residue_ranges", []):
+        mine = spans(entry)
+        modes = [args.labels[0]]
+        for label, other in zip(other_labels, others):
+            if any(overlaps(mine, spans(o))
+                   for o in other.get("residue_ranges", [])):
+                modes.append(label)
+        if len(modes) == 1:
+            kind = "primary-only"
+        elif set(modes) == set(args.labels):
+            kind = "shared"
+        else:
+            kind = "mode-specific"
+        entry.setdefault("tags", {})["modes"] = {
+            "kind": kind, "modes": sorted(modes),
+            "all_modes": sorted(args.labels),
+        }
+
+    primary.setdefault("classifiers", []).append("modes")
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residue.json").write_text(
+        json.dumps(primary, indent=2), encoding="utf-8")
+    counts = {}
+    for entry in primary.get("residue_ranges", []):
+        name = entry["tags"]["modes"]["kind"]
+        counts[name] = counts.get(name, 0) + 1
+    print("modes: " + " ".join(f"{name}={count}"
+                               for name, count in sorted(counts.items())))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -123,6 +123,12 @@ residue, 29 tracked) at frame 1800. The largest late residue ranges are in
 RAM differentials. This capture does not identify a monotonic track cursor or
 ROM record stride; those remain open for writer/read tracing.
 
+The classifier pass over the same real capture series tagged 33 ranges as
+monotonic-up and 9 as monotonic-down, but these are byte/range behaviors over
+only three samples. Writer attribution resolves the most tempting periodic
+fields as elapsed/animation state rather than a track cursor; see
+`reference/experiments/stunrun/geometry-writer-attribution.metadata.json`.
+
 ## Recording
 
 Write the run up as `reference/experiments/stunrun/` metadata

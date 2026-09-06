@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+"""Infer field widths inside residue ranges from a diff pair.
+
+Reads residue.json plus before/after snapshots, finds the changed spans
+within each residue range, and reports whether they respect 2- and
+4-byte absolute alignment plus a suggested access width (4 when every
+span is 4-aligned with 4-multiple length, 2 when 2-aligned with even
+length, else 1). Alignment facts only — the suggestion prioritizes a
+width-16/32 re-snapshot, never a field layout. Writes an annotated copy
+(same schema + tags).
+"""
+
+import argparse
+import json
+import pathlib
+
+
+def load_residue(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-masked-snapshot/v1":
+        raise SystemExit(f"{path}: not a masked-snapshot report")
+    return value
+
+
+def load_snapshot(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-memory-snapshot/v1":
+        raise SystemExit(f"{path}: not a memory snapshot")
+    if value["width"] != 8:
+        raise SystemExit(f"{path}: width inference needs width-8 snapshots")
+    return value
+
+
+def check_compatible(first, second):
+    for key in ("device", "space", "base", "count", "width"):
+        if first[key] != second[key]:
+            raise SystemExit(f"incompatible snapshots: {key} differs")
+
+
+def changed_spans(before, after, address, length):
+    base = before["base"]
+    old, new = before["values"], after["values"]
+    spans = []
+    start = None
+    for offset in range(length):
+        index = address - base + offset
+        changed = (0 <= index < len(old) and old[index] != new[index])
+        if changed and start is None:
+            start = address + offset
+        if not changed and start is not None:
+            spans.append((start, address + offset))
+            start = None
+    if start is not None:
+        spans.append((start, address + length))
+    return spans
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--residue", type=pathlib.Path, required=True)
+    parser.add_argument("--before", type=pathlib.Path, required=True)
+    parser.add_argument("--after", type=pathlib.Path, required=True)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+
+    report = load_residue(args.residue)
+    before = load_snapshot(args.before)
+    after = load_snapshot(args.after)
+    check_compatible(before, after)
+
+    for entry in report.get("residue_ranges", []):
+        spans = changed_spans(before, after, entry["address"],
+                              entry["length"])
+        aligned2 = bool(spans) and all(a % 2 == 0 and b % 2 == 0
+                                       for a, b in spans)
+        aligned4 = bool(spans) and all(a % 4 == 0 and b % 4 == 0
+                                       for a, b in spans)
+        if aligned4 and all((b - a) % 4 == 0 for a, b in spans):
+            suggested = 4
+        elif aligned2 and all((b - a) % 2 == 0 for a, b in spans):
+            suggested = 2
+        else:
+            suggested = 1
+        entry.setdefault("tags", {})["width"] = {
+            "changed_spans": len(spans),
+            "max_span": max((b - a for a, b in spans), default=0),
+            "aligned2": aligned2,
+            "aligned4": aligned4,
+            "suggested_width": suggested,
+        }
+
+    report.setdefault("classifiers", []).append("width")
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residue.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8")
+    counts = {}
+    for entry in report.get("residue_ranges", []):
+        name = f"width{entry['tags']['width']['suggested_width']}"
+        counts[name] = counts.get(name, 0) + 1
+    print("width: " + " ".join(f"{name}={count}"
+                               for name, count in sorted(counts.items())))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

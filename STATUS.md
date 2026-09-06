@@ -114,7 +114,7 @@ The source-defined init/control/upload slices are now also emitted by a
 dependency-free C99 implementation shared by the reproduction and native
 targets. A deterministic native shell parses the common experiment schema,
 dispatches replay events, and checks the verified title-path contracts; its
-12 CTest targets and 39 ROM-free repository tests pass. This is integration
+12 CTest targets and 55 ROM-free repository tests pass. This is integration
 scaffolding and a source-emission proof. The C-produced `init-state` image has
 also passed the existing MAME replacement loader with zero readback
 mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
@@ -138,7 +138,7 @@ The ADSP-buffer to GSP-FIFO block framing is now also represented as a literal
 C slice: the observed length/terminator formula, transfer shape, and 1200-frame
 summary are covered without assigning payload semantics. With these slices
 integrated, the native build passes 12 CTest targets and the ROM-free
-repository suite passes 39 tests.
+repository suite passes 55 tests.
 
 ## Working processor inventory
 

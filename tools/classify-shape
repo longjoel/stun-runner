@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""Tag residue ranges with content-shape hints from a snapshot.
+
+Reads residue.json plus the snapshot behind it and tags each range:
+ascii (printable-ASCII dominated), sparse (few nonzero cells),
+dense (varied bytes throughout), periodic (a short byte pattern
+repeats: array-shaped). Shape prioritizes follow-ups only; it never
+identifies a range. Writes an annotated copy (same schema + tags).
+"""
+
+import argparse
+import json
+import pathlib
+
+
+def load_residue(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-masked-snapshot/v1":
+        raise SystemExit(f"{path}: not a masked-snapshot report")
+    return value
+
+
+def load_snapshot(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-memory-snapshot/v1":
+        raise SystemExit(f"{path}: not a memory snapshot")
+    return value
+
+
+def extract(snapshot, address, length):
+    width = snapshot["width"] // 8
+    base = snapshot["base"]
+    values = snapshot["values"]
+    out = bytearray()
+    offset = address
+    while offset < address + length:
+        index = (offset - base) // width
+        if index < 0 or index >= len(values):
+            return None
+        cell = values[index]
+        for shift in range(width - 1, -1, -1):
+            if offset < address + length:
+                out.append((cell >> (8 * shift)) & 0xFF)
+            offset += 1
+    return bytes(out)
+
+
+def period(data):
+    for size in (1, 2, 4, 8, 16):
+        if len(data) >= 2 * size and all(
+                data[i] == data[i % size] for i in range(len(data))):
+            return size
+    return 0
+
+
+def shape(data):
+    if not data:
+        return {"shape": "empty", "nonzero_ratio": 0.0, "period": 0}
+    if len(data) < 4:
+        # Too few bytes for a shape hint; say so instead of guessing.
+        return {"shape": "tiny",
+                "nonzero_ratio": sum(1 for byte in data if byte != 0)
+                / len(data),
+                "period": 0}
+    nonzero = sum(1 for byte in data if byte != 0)
+    ratio = nonzero / len(data)
+    printable = sum(1 for byte in data
+                    if byte == 10 or (32 <= byte < 127))
+    if printable / len(data) >= 0.8:
+        return {"shape": "ascii", "nonzero_ratio": ratio,
+                "period": period(data)}
+    if ratio <= 0.25:
+        return {"shape": "sparse", "nonzero_ratio": ratio,
+                "period": period(data)}
+    cycle = period(data)
+    if cycle:
+        return {"shape": "periodic", "nonzero_ratio": ratio,
+                "period": cycle}
+    return {"shape": "dense", "nonzero_ratio": ratio, "period": 0}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--residue", type=pathlib.Path, required=True)
+    parser.add_argument("--snapshot", type=pathlib.Path, required=True)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+
+    report = load_residue(args.residue)
+    snapshot = load_snapshot(args.snapshot)
+
+    for entry in report.get("residue_ranges", []):
+        data = extract(snapshot, entry["address"], entry["length"])
+        entry.setdefault("tags", {})["shape"] = (
+            shape(data) if data is not None else {"shape": "unsampled"})
+
+    report.setdefault("classifiers", []).append("shape")
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residue.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8")
+    counts = {}
+    for entry in report.get("residue_ranges", []):
+        name = entry["tags"]["shape"]["shape"]
+        counts[name] = counts.get(name, 0) + 1
+    print("shape: " + " ".join(f"{name}={count}"
+                               for name, count in sorted(counts.items())))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

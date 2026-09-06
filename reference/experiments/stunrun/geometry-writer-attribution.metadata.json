@@ -1,0 +1,30 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "geometry_writer_attribution",
+  "runner": "tools/mame-ram-write-trace + classifier pipeline",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "late_drive",
+  "trace": {
+    "range": "0xFF9500–0xFF9BFF",
+    "frames": [600, 1800],
+    "event_count": 40695,
+    "truncated": false,
+    "result_sha256": "cafa7cbec64f62e03f0bf9b7e1133346143e4d60644ddd2b4b0928c32e49a8a6",
+    "resolved_fields": {
+      "0xFF9564": {"writer_pcs": ["0x024506"], "observation": "351 periodic writes; paired elapsed-counter byte"},
+      "0xFF9566": {"writer_pcs": ["0x024506"], "observation": "351 periodic writes; increments through the drive window"},
+      "0xFF9578": {"writer_pcs": ["0x02B95E", "0x02B63E"], "observation": "two writes, both zero; no monotonic progression observed"},
+      "0xFF9582": {"writer_pcs": ["0x0268EC", "0x0268F2"], "observation": "604 writes; cyclic five-bit animation counter"}
+    }
+  },
+  "classifier_series": {
+    "snapshot_frames": [600, 1200, 1800],
+    "residue_ranges": 599,
+    "temporal_counts": {"monotonic-up": 33, "monotonic-down": 9, "oscillating": 65, "stepped": 180, "transient": 31, "write-once": 281},
+    "annotated_report_sha256": "a8ef05d3bfcb84e135e9eda38cdf405715fd2ce4865e5433bc0d414b0e062366"
+  },
+  "observation": "Writer attribution resolves the strongest periodic candidates as elapsed or animation state; no monotonic track cursor is established in the traced status window.",
+  "confidence": "OBSERVED-IN-BOUNDED-MAME-TRACE",
+  "limitation": "The trace records writes only. ROM-read sequencing, record stride, and course-3/course-6 differentials remain unmeasured."
+}

@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+"""Join residue ranges with a RAM write trace to attribute writer PCs.
+
+Reads residue.json (stunrun-masked-snapshot/v1) plus a write-trace
+result.json (stunrun-ram-write-trace-result/v1) and tags each range:
+single-writer (one PC owns every byte: attributable field),
+multi-writer (shared/mailbox), silent (no trace event touches it:
+pre-existing, DMA-fed, or outside the traced window — never a claim of
+unwritten-ness beyond the trace). Writes an annotated copy (same schema
++ tags).
+"""
+
+import argparse
+import json
+import pathlib
+
+
+def load_residue(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-masked-snapshot/v1":
+        raise SystemExit(f"{path}: not a masked-snapshot report")
+    return value
+
+
+def load_trace(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-ram-write-trace-result/v1":
+        raise SystemExit(f"{path}: not a write-trace result")
+    return value
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--residue", type=pathlib.Path, required=True)
+    parser.add_argument("--trace", type=pathlib.Path, required=True)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+
+    report = load_residue(args.residue)
+    trace = load_trace(args.trace)
+
+    by_address = {}
+    for event in trace.get("events", []):
+        by_address.setdefault(event["address"], set()).add(event["pc"])
+
+    for entry in report.get("residue_ranges", []):
+        writers = set()
+        for offset in range(entry["length"]):
+            writers |= by_address.get(entry["address"] + offset, set())
+        writers = sorted(writers)
+        if not writers:
+            tag = {"ownership": "silent", "writer_pcs": []}
+        elif len(writers) == 1:
+            tag = {"ownership": "single-writer", "writer_pcs": writers}
+        else:
+            tag = {"ownership": "multi-writer", "writer_pcs": writers}
+        entry.setdefault("tags", {})["writers"] = tag
+
+    report.setdefault("classifiers", []).append("writers")
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residue.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8")
+    counts = {}
+    for entry in report.get("residue_ranges", []):
+        name = entry["tags"]["writers"]["ownership"]
+        counts[name] = counts.get(name, 0) + 1
+    print("writers: " + " ".join(f"{name}={count}"
+                                 for name, count in sorted(counts.items())))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

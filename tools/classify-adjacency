@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""Tag residue ranges with their nearest explained neighbor.
+
+Reads residue.json plus the known-regions mask and tags each range with
+the closest explained region label and byte distance (0 when adjacent).
+Game state clusters in structs, so a residue neighbor of a frozen field
+is probably a sibling field — a prioritization hint, never an
+identification. Writes an annotated copy (same schema + tags).
+"""
+
+import argparse
+import json
+import pathlib
+
+
+def load_residue(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-masked-snapshot/v1":
+        raise SystemExit(f"{path}: not a masked-snapshot report")
+    return value
+
+
+def load_mask(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-known-regions/v1":
+        raise SystemExit(f"{path}: unsupported mask schema")
+    return [entry for entry in value.get("regions", [])
+            if entry.get("category") == "explained"]
+
+
+def distance(address, length, region):
+    base = int(region["base"], 0)
+    last = int(region["last"], 0)
+    end = address + length
+    if end <= base:
+        return base - end
+    if address > last:
+        return address - last - 1
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--residue", type=pathlib.Path, required=True)
+    parser.add_argument("--mask", type=pathlib.Path, required=True)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+
+    report = load_residue(args.residue)
+    explained = load_mask(args.mask)
+
+    for entry in report.get("residue_ranges", []):
+        best = None
+        for region in explained:
+            gap = distance(entry["address"], entry["length"], region)
+            if best is None or gap < best[0]:
+                best = (gap, region["label"])
+        entry.setdefault("tags", {})["adjacency"] = (
+            {"nearest": best[1], "gap_bytes": best[0]}
+            if best is not None else
+            {"nearest": None, "gap_bytes": None})
+
+    report.setdefault("classifiers", []).append("adjacency")
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residue.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8")
+    near = sum(1 for entry in report.get("residue_ranges", [])
+               if entry["tags"]["adjacency"]["gap_bytes"] is not None
+               and entry["tags"]["adjacency"]["gap_bytes"] <= 16)
+    print(f"adjacency: ranges={len(report.get('residue_ranges', []))} "
+          f"within16={near}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+"""Tag residue ranges with temporal behavior over a snapshot series.
+
+Reads residue.json (stunrun-masked-snapshot/v1) plus the ordered snapshot
+files behind it, samples each residue range across frames, and tags:
+constant, monotonic-up, monotonic-down, oscillating, write-once,
+transient. A monotonically changing range is a cursor/counter candidate.
+Writes an annotated copy of the residue document (same schema + tags).
+"""
+
+import argparse
+import json
+import pathlib
+import sys
+
+
+def load_snapshot(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-memory-snapshot/v1":
+        raise SystemExit(f"{path}: not a memory snapshot")
+    return value
+
+
+def load_residue(path):
+    value = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-masked-snapshot/v1":
+        raise SystemExit(f"{path}: not a masked-snapshot report")
+    return value
+
+
+def sample_range(snapshot, address, length):
+    width = snapshot["width"] // 8
+    base = snapshot["base"]
+    values = snapshot["values"]
+    out = []
+    offset = address
+    while offset < address + length:
+        index = (offset - base) // width
+        if index < 0 or index >= len(values):
+            return None
+        out.append(values[index])
+        offset += width
+    return out
+
+
+def classify(series):
+    """Classify one cell's value series across frames."""
+    if len(set(series)) == 1:
+        return "constant"
+    if all(b > a for a, b in zip(series, series[1:])):
+        return "monotonic-up"
+    if all(b < a for a, b in zip(series, series[1:])):
+        return "monotonic-down"
+    if series[0] == 0 and series[-1] != 0:
+        first = next(i for i, v in enumerate(series) if v != 0)
+        if all(v != 0 for v in series[first:]):
+            return "write-once"
+    if series[-1] == 0 and any(v != 0 for v in series[:-1]):
+        return "transient"
+    ups = sum(1 for a, b in zip(series, series[1:]) if b > a)
+    downs = sum(1 for a, b in zip(series, series[1:]) if b < a)
+    if ups > 0 and downs > 0:
+        return "oscillating"
+    return "stepped"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--residue", type=pathlib.Path, required=True)
+    parser.add_argument("--snapshots", nargs="+", type=pathlib.Path,
+                        required=True)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    if len(args.snapshots) < 2:
+        parser.error("need at least two snapshots for behavior")
+
+    report = load_residue(args.residue)
+    series = [load_snapshot(path) for path in args.snapshots]
+    first = series[0]
+    for other in series[1:]:
+        for key in ("device", "space", "base", "count", "width"):
+            if first[key] != other[key]:
+                raise SystemExit("snapshot series geometry differs: "
+                                 f"{key}")
+
+    for entry in report.get("residue_ranges", []):
+        samples = []
+        ok = True
+        for shot in series:
+            cells = sample_range(shot, entry["address"], entry["length"])
+            if cells is None:
+                ok = False
+                break
+            samples.append(cells)
+        if not ok or not samples:
+            entry.setdefault("tags", {})["temporal"] = {
+                "behavior": "unsampled",
+                "frames": len(series),
+            }
+            continue
+        width_cells = len(samples[0])
+        votes = [classify([frame[i] for frame in samples])
+                 for i in range(width_cells)]
+        entry.setdefault("tags", {})["temporal"] = {
+            "behavior": max(set(votes), key=votes.count),
+            "cell_behaviors": votes,
+            "frames": len(series),
+        }
+
+    report.setdefault("classifiers", []).append("temporal")
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residue.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8")
+    behaviors = {}
+    for entry in report.get("residue_ranges", []):
+        name = entry["tags"]["temporal"]["behavior"]
+        behaviors[name] = behaviors.get(name, 0) + 1
+    print("temporal: " + " ".join(f"{name}={count}"
+                                  for name, count in sorted(behaviors.items())))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

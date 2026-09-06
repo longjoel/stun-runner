@@ -189,6 +189,14 @@ are display/progression neighborhoods already present in earlier evidence;
 no monotonic cursor has been promoted. ROM-read sequencing and writer-PC
 attribution are still required before H2 can be accepted or killed.
 
+A follow-up writer trace over `0xFF9500–0xFF9BFF` (frames 600–1800,
+`late_drive`) captured 40,695 events without truncation. It attributes the
+elapsed counter bytes `0xFF9564/66` to PC `0x024506`, the cyclic animation
+counter `0xFF9582` to PCs `0x0268EC/0x0268F2`, and records only two zero writes
+to course word `0xFF9578` (PCs `0x02B95E` and `0x02B63E`). These observations
+strengthen the negative result for a cursor in this window but do not test
+68010 ROM-read sequencing; H2 remains OPEN.
+
 ---
 
 ## IRQ-0005
