@@ -47,8 +47,12 @@ local limit = tonumber(os.getenv('STUNRUN_MEMORY_FRAMES') or '600')
 local target_text = os.getenv('STUNRUN_MEMORY_TARGETS') or tostring(limit)
 local output = assert(os.getenv('STUNRUN_MEMORY_OUT'), 'STUNRUN_MEMORY_OUT is required')
 local input_mode = os.getenv('STUNRUN_MEMORY_INPUT') or 'none'
+local save_state_path = os.getenv('STUNRUN_MEMORY_SAVE_STATE') or ''
+local load_state_path = os.getenv('STUNRUN_MEMORY_LOAD_STATE') or ''
 local frame = 0
 local targets = {}
+local state_saved = false
+local load_requested = load_state_path == ''
 
 assert(width == 8 or width == 16 or width == 32, 'width must be 8, 16, or 32')
 assert(count > 0 and count % 1 == 0, 'count must be a positive integer')
@@ -169,12 +173,22 @@ end
 
 emu.register_frame_done(function()
     frame = frame + 1
+    if not load_requested then
+        machine:load(load_state_path)
+        load_requested = true
+        return
+    end
     while next_event <= #events and events[next_event].frame == frame do
         apply_event(events[next_event])
         next_event = next_event + 1
     end
     if targets[frame] then capture() end
-    if frame >= limit then
+    if frame >= limit and save_state_path ~= '' and not state_saved then
+        machine:save(save_state_path)
+        state_saved = true
+        print('MAME_MEMORY_STATE_SAVE path=' .. save_state_path .. ' frame=' .. frame)
+    end
+    if frame >= limit + (save_state_path ~= '' and 2 or 0) then
         print('MAME_MEMORY_SNAPSHOT_DONE frames=' .. frame)
         machine:exit()
     end

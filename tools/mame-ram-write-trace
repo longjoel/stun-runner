@@ -31,6 +31,7 @@ def main() -> int:
     parser.add_argument("--end-frame", type=int, default=705)
     parser.add_argument("--max-events", type=int, default=50000)
     parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center"), default="none")
+    parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if not (0 <= args.base <= args.end and args.end_frame >= args.start_frame > 0):
@@ -44,6 +45,8 @@ def main() -> int:
         str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
         str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/ram-write-trace.lua"),
     ]
+    if args.nothrottle:
+        command.insert(command.index("-seconds_to_run"), "-nothrottle")
     environment = {
         **os.environ,
         "STUNRUN_RAM_TRACE_OUT": str(args.output),

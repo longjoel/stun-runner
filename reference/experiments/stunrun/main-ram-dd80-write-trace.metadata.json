@@ -1,0 +1,34 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_dd80_capped_count_write_trace",
+  "tools": ["tools/mame-ram-write-trace", "tools/mame-listings"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "input": "weapon_probe",
+  "launch": "tools/mame-ram-write-trace --nothrottle",
+  "trace": {
+    "range": "0xFFDD78–0xFFDD84",
+    "frames": [600, 9000],
+    "event_count": 5613,
+    "canonical_log_sha256": "c8b5ad9e11a50482dc968a0c6499fdc66388346ed4fa24bd0afe9128cf7ef31e",
+    "address_counts": {
+      "0xFFDD80": 5,
+      "0xFFDD78": 1052,
+      "0xFFDD7A": 1052,
+      "0xFFDD7C": 1055,
+      "0xFFDD7E": 1055,
+      "0xFFDD82–0xFFDD84": 1394
+    },
+    "dd80_writes": [
+      {"frame": 767, "pc": "0x02B9E0", "value": 0},
+      {"frame": 904, "pc": "0x02719C", "value": 0},
+      {"frame": 4905, "pc": "0x02B9E0", "value": 0},
+      {"frame": 4909, "pc": "0x02B9E0", "value": 0},
+      {"frame": 6470, "pc": "0x024BE0", "value": 0}
+    ]
+  },
+  "static_resolution": {
+    "0x03A31E": "object branch tests 0xFFDD80 against 6, then increments it after a successful object check and stores the last object pointer at 0xFFDD7C"
+  },
+  "semantic_status": "NO_INCREMENT_OBSERVED; CAPPED_OBJECT_COUNT_UNEXERCISED; CRAFT_HEALTH_UNRESOLVED"
+}

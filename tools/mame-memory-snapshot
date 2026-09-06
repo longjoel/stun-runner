@@ -7,7 +7,9 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
+import tempfile
 
 
 MARKER = re.compile(r"MAME_MEMORY_SNAPSHOT frame=(\d+) path=(.+) nonzero=(\d+)")
@@ -26,6 +28,8 @@ def main() -> int:
     parser.add_argument("--targets", default=None)
     parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center", "collision_probe_hold_left", "collision_probe_hold_right", "damage_probe_sweep"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
+    parser.add_argument("--save-state", type=pathlib.Path, help="save a MAME state at the final requested frame")
+    parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0 or args.count <= 0 or args.base < 0:
@@ -35,15 +39,32 @@ def main() -> int:
         parser.error("targets must be positive frames no greater than --frames")
     args.output.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
+    state_stage = None
+    state_directory = "/tmp/stunrun-state-dir"
+    if args.load_state:
+        if not args.load_state.is_file():
+            raise SystemExit(f"save state does not exist: {args.load_state}")
+        state_stage = pathlib.Path(tempfile.mkdtemp(prefix="stunrun-state-fork-"))
+        slot_directory = state_stage / "stunrun"
+        slot_directory.mkdir()
+        shutil.copy2(args.load_state, slot_directory / "1.sta")
+        state_directory = str(state_stage)
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
         "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
-        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-seconds_to_run",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save",
+        "-state_directory", state_directory, "-statename", "%g",
+        "-seconds_to_run",
         str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
         str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/memory-snapshot.lua"),
     ]
     if args.nothrottle:
         command.insert(command.index("-seconds_to_run"), "-nothrottle")
+    if args.load_state:
+        seconds_index = command.index("-seconds_to_run") + 1
+        command[seconds_index] = "86400"
+        command.insert(command.index("-seconds_to_run"), "-state")
+        command.insert(command.index("-seconds_to_run"), "1")
     environment = {
         **os.environ,
         "STUNRUN_MEMORY_DEVICE": args.device,
@@ -55,22 +76,33 @@ def main() -> int:
         "STUNRUN_MEMORY_TARGETS": targets,
         "STUNRUN_MEMORY_OUT": str(args.output),
         "STUNRUN_MEMORY_INPUT": args.input,
+        "STUNRUN_MEMORY_SAVE_STATE": str(args.save_state) if args.save_state else "",
+        "STUNRUN_MEMORY_LOAD_STATE": str(args.load_state) if args.load_state else "",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
-    with log.open("w", encoding="utf-8") as handle:
-        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
-                                   env=environment, check=False)
-    text = log.read_text(encoding="utf-8")
+    try:
+        with log.open("w", encoding="utf-8") as handle:
+            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                       env=environment, check=False)
+        text = log.read_text(encoding="utf-8")
+    finally:
+        if state_stage is not None:
+            shutil.rmtree(state_stage, ignore_errors=True)
     matches = MARKER.findall(text)
     expected = [int(value) for value in targets.split(',')]
     snapshots = []
+    seen_frames = set()
     for frame_text, path_text, nonzero_text in matches:
+        frame_number = int(frame_text)
+        if frame_number in seen_frames:
+            continue
+        seen_frames.add(frame_number)
         path = pathlib.Path(path_text)
         if not path.is_file():
             raise SystemExit(f"MAME reported missing snapshot: {path}")
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
-        if payload["frame"] != int(frame_text) or payload["nonzero"] != int(nonzero_text):
+        if payload["frame"] != frame_number or payload["nonzero"] != int(nonzero_text):
             raise SystemExit(f"snapshot marker mismatch: {path}")
         snapshots.append(payload)
     canonical = re.sub(r"path=.*? nonzero=", "path=<snapshot> nonzero=", text)
@@ -84,14 +116,18 @@ def main() -> int:
         "count": args.count,
         "width": args.width,
         "input": args.input,
+        "save_state": str(args.save_state) if args.save_state else None,
+        "load_state": str(args.load_state) if args.load_state else None,
         "returncode": completed.returncode,
         "snapshots": [{"frame": item["frame"], "sha256": item["sha256"],
                        "nonzero": item["nonzero"]} for item in snapshots],
         "canonical_log_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
     }
     (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    if completed.returncode or [item["frame"] for item in snapshots] != expected:
+    if completed.returncode or [item["frame"] for item in snapshots] != list(dict.fromkeys(expected)):
         raise SystemExit(f"memory snapshot failed; see {log}")
+    if args.save_state and not args.save_state.is_file():
+        raise SystemExit(f"MAME did not produce save state: {args.save_state}")
     print(json.dumps(result, separators=(",", ":")))
 
 

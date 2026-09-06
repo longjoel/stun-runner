@@ -193,6 +193,14 @@ transition, no track-word change, and no isolated persistent damage field.
 The sweep is useful as a reproducible stress control; it still did not create
 the required enemy-impact interaction.
 
+Static inspection exposed another tempting candidate: the object branch at
+`0x03A31E` tests `0xFFDD80 < 6`, increments it after a successful object
+check, and records the last object pointer. A direct write trace over the
+weapon schedule (frames 600–9000) captured five writes to `0xFFDD80`, all
+zeroing writes from `0x02B9E0`, `0x02719C`, or `0x024BE0`; no increment ever
+occurred. This capped counter is therefore not an observed shield transition
+and remains an unexercised object-class candidate.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

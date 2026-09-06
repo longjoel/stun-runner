@@ -1,0 +1,28 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_save_state_fork_validation",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "capture": {
+    "input": "collision_probe_center",
+    "frame": 1800,
+    "range": "0xFF9530–0xFF954F",
+    "width": 8,
+    "snapshot_sha256": "3fa97c9c4a67d7bbab41492dee89f409faa2482aec1d5608b9e555637663ba38",
+    "canonical_log_sha256": "916c468bbb54ea263ddcc8aba22db983cf1efa856c4a1c91850146d6c910e572"
+  },
+  "fork": {
+    "load_mechanism": "MAME command-line -state 1, staged under state_directory/stunrun/1.sta before Lua startup",
+    "relative_targets": [2, 60, 300],
+    "range": "0xFF9530–0xFF954F",
+    "snapshot_sha256_by_frame": {
+      "2": "f623952cc0269c637edf01c44ba6819af58b274c30afc4778626ea68f627ddc8",
+      "60": "f02a38e704f41e54594f957c97b9f891024777342698a2a62aadc9d860e4c453",
+      "300": "e8f224869ce7234bad3ba4e4aee76f8b26924d99813e8aca0b91116458c194c8"
+    },
+    "canonical_log_sha256": "bdb49185f6621a6b80746ac89a9a0de2aba83ff052831576b14d5324b4aed248",
+    "initial_ram_assertion": "fork frame 2 values equal capture frame 1800 values byte-for-byte"
+  },
+  "semantic_status": "SAVE_STATE_FORK_CONFIRMED; RAM_SNAPSHOT_REPLAYABLE"
+}

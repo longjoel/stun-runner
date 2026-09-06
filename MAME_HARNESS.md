@@ -218,6 +218,30 @@ The test definition must state whether equality is exact or normalized.
 
 Steal Playwright's fixture concept directly.
 
+### Save-state RAM forks
+
+For expensive deterministic setup paths, `tools/mame-memory-snapshot` can
+capture a MAME save state at the final requested frame and later fork from it:
+
+```text
+tools/mame-memory-snapshot ... --frames 1800 --targets 1800 \
+  --save-state /tmp/stunrun-gameplay.sta --nothrottle
+
+tools/mame-memory-snapshot ... --frames 300 --targets 2,60,300 \
+  --load-state /tmp/stunrun-gameplay.sta --input none --nothrottle
+```
+
+The loader stages the state into MAME's command-line slot before Lua starts,
+so the fork does not replay boot, coin/start, or the setup schedule. Fork
+frame numbers are relative to the loaded state. MAME may emit duplicate early
+markers because the capture callback is part of the serialized machine state;
+the tool normalizes identical duplicate frame captures. Frame `2` is the
+first reliable fork sample; use later bounded targets for experiments.
+
+Save states are local regenerable artifacts and must carry the ROM/MAME,
+experiment schedule, capture frame, and checkpoint hashes in metadata before
+being used as canonical evidence.
+
 A fixture establishes a known starting state that many tests can reuse.
 
 Conceptually:
