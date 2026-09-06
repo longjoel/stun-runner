@@ -29,7 +29,8 @@
         "0x02907E tests the value and 0x029110/0x029132 clear it on expiry",
         "0x032F78 checks threshold 0x988"
       ],
-      "semantic_status": "high-confidence countdown mechanism; exact displayed unit and HUD ownership unresolved"
+      "hud_format_path": "0x028CA8 adds the countdown to the track-indexed base at 0xFF4706, formats four digits through 0x022578, and submits the result to the HUD path",
+      "semantic_status": "DYNAMIC-TIME-REMAINING-CONFIRMED; exact displayed unit remains unresolved"
     },
     "0xff9578": {
       "classification": "course-track-index-candidate",
@@ -39,5 +40,5 @@
       "semantic_status": "strong course/track candidate; exact user-visible track numbering unresolved"
     }
   },
-  "interpretation": "The temporal and writer evidence supports promoting the countdown and course-index mechanisms. The live score and persistent high-score table are now independently confirmed by targeted experiments; craft, armor, and weapon fields remain open targeted experiments."
+  "interpretation": "The temporal and writer evidence, together with the 0x028CA8 track-relative HUD formatting path, confirms 0xFF9568 as the displayed time-remaining mechanism without assuming its unit. The live score and persistent high-score table are independently confirmed by targeted experiments. 0xFF9578 remains a strong course/track selector, but its user-visible numbering is unresolved; craft, armor, and weapon fields remain open targeted experiments."
 }

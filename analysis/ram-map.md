@@ -34,7 +34,7 @@ not ordinary 68010 work RAM.
 | `0xFF948C–0xFF948E` | input-dependent counter/accumulator neighborhood used by `0x0418B8`; late-drive adds writes from `0x041956` and `0x04195A` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFFDBA4` | one byte in an indexed table written by `0x030212` from table base `0xFFDB64`; semantic ownership unresolved | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9564–0xFF9567` | elapsed-update counter candidate; `0x024506` increments the longword continuously during the gameplay window | `STATIC + OBSERVED-IN-TRACE` |
-| `0xFF9568–0xFF956B` | countdown candidate initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9568–0xFF956B` | displayed time-remaining mechanism; initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold, and combined with a track-indexed base by HUD routine `0x028CA8` | `DYNAMIC-TIME-REMAINING-CONFIRMED` |
 | `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9532–0xFF9535` | live score accumulator; cleared at several game-state entries, formatted/displayed by nearby UI paths, and observed receiving monotonic 50-point increments at `0xFF9534` from PC `0x03A2EC` | `DYNAMIC-SCORE-CONFIRMED` |
 | `0xFF4410–0xFF44FF` | ten-entry persistent high-score table in the mapped ZRAM view; 24-byte records contain a big-endian score at `+0` and a display name beginning at `+2` | `SNAPSHOT + PERSISTENT-NVRAM + STATIC` |
@@ -85,8 +85,12 @@ Temporal correlation provides the first high-value gameplay-state candidates.
 `0x032F78`; its observed value falls from `8540` to `7966` in the bounded
 late-drive run. `0xFF9578` is repeatedly used as an index into several ROM
 tables and course/state branches, with observed values `0`, `3`, and `6`.
-These are strong countdown and course/track candidates, not yet confirmed HUD
-labels. Full provenance is in
+The timer field is now promoted as the displayed time-remaining mechanism:
+`0x028CA8` combines it with the current course index and formats the result
+through the HUD path, while `0x02907E–0x02910A` performs expiry handling and
+score awards. Its displayed unit is still unresolved. The course/track field
+remains a strong selector, but its user-visible numbering is not yet proven.
+Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
 The adjacent `0xFF9532` longword is the live score accumulator. Static
