@@ -75,6 +75,13 @@ add_test(NAME experiment-parser-c COMMAND stunrun-experiment-parser-test)
 # shell: parse, frame dispatch, anchors, and checkpoint must all hold.
 add_test(NAME native-shell-coin-start
   COMMAND stunrun-native-shell ${CMAKE_CURRENT_SOURCE_DIR}/../experiments/stunrun/coin_start.json)
+# stunrun-checkpoint/v1 emitter contract (golden comparison lives in
+# tests/test_checkpoint_golden.py against the M1 oracle fixture).
+add_executable(stunrun-checkpoint-test
+  checkpoint.c
+  checkpoint_test.c)
+set_target_properties(stunrun-checkpoint-test PROPERTIES C_STANDARD 99)
+add_test(NAME checkpoint-emitter-c COMMAND stunrun-checkpoint-test)
 # Agent 2 maincpu gameplay coverage: live-score accumulator, award
 # selection, and hit counter against the weapon_probe/center golden runs.
 add_executable(stunrun-score-slice-test
