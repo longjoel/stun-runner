@@ -62,7 +62,7 @@ The source-defined init/control/upload slices are now also emitted by a
 dependency-free C99 implementation shared by the reproduction and native
 targets. A deterministic native shell parses the common experiment schema,
 dispatches replay events, and checks the verified title-path contracts; its
-eight CTest targets and 21 ROM-free repository tests pass. This is integration
+ten CTest targets and 23 ROM-free repository tests pass. This is integration
 scaffolding and a source-emission proof. The C-produced `init-state` image has
 also passed the existing MAME replacement loader with zero readback
 mismatches, reset entry `0x0004`, bounded PC advance to `0x0050`, and all four
@@ -73,6 +73,13 @@ and the original ADSP reset PC before the replacement image runs; the main PC
 has a two-byte observed divergence and the loaded ADSP program necessarily
 differs from the original empty frame-3 program. This still does not establish
 full behavioral equivalence to the original initialization checkpoint.
+
+The first evidence-backed main-CPU state slices are also present: the live
+score/object-hit accumulator and the persistent ten-entry high-score table
+decoder. Their C self-checks use the frozen score and NVRAM findings without
+claiming unresolved score promotion, name padding, or counter-wrap semantics.
+With those slices integrated, the native build passes 10 CTest targets and
+the ROM-free repository suite passes 23 tests.
 
 ## Working processor inventory
 

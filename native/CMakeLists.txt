@@ -75,3 +75,21 @@ add_test(NAME experiment-parser-c COMMAND stunrun-experiment-parser-test)
 # shell: parse, frame dispatch, anchors, and checkpoint must all hold.
 add_test(NAME native-shell-coin-start
   COMMAND stunrun-native-shell ${CMAKE_CURRENT_SOURCE_DIR}/../experiments/stunrun/coin_start.json)
+# Agent 2 maincpu gameplay coverage: live-score accumulator, award
+# selection, and hit counter against the weapon_probe/center golden runs.
+add_executable(stunrun-score-slice-test
+  ../reproduction/maincpu/score.c
+  ../reproduction/maincpu/score_test.c)
+target_include_directories(stunrun-score-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-score-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME score-slice-c COMMAND stunrun-score-slice-test)
+# Persistent NVRAM high-score table decoder against the 10-entry golden
+# table (score bytes exact; name prefix only — padding unestablished).
+add_executable(stunrun-nvram-scores-slice-test
+  ../reproduction/maincpu/nvram_scores.c
+  ../reproduction/maincpu/nvram_scores_test.c)
+target_include_directories(stunrun-nvram-scores-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-nvram-scores-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME nvram-scores-slice-c COMMAND stunrun-nvram-scores-slice-test)
