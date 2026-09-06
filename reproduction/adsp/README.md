@@ -1,9 +1,9 @@
 # ADSP replacement image
 
 The first M2 slice is a deliberately minimal ADSP-2100 program image. It uses
-the known `NOP` encoding from the M0 emission proof, places one 32-bit word at
-ADSP program address `0x0000`, and records a fixed entry point at the same
-address.
+the known `NOP` encoding from the M0 emission proof, preserves the four-word
+ADSP reset-vector area at `0x0000`, and records the MAME-confirmed reset entry
+point at program address `0x0004`.
 
 Build the image without ROM contents:
 

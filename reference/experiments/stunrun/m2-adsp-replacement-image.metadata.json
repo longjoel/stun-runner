@@ -9,22 +9,22 @@
     "schema": "stunrun-replacement-image/v1",
     "processor": "adsp2100",
     "origin": "0x0",
-    "entry": "0x0",
-    "length": 4,
-    "bytes_hex": "00000000",
-    "payload_sha256": "df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119"
+    "entry": "0x4",
+    "length": 20,
+    "bytes_hex": "0000000000000000000000000000000000000000",
+    "payload_sha256": "de47c9b27eb8d300dbb5f2c353e632c393262cf06340c4fa7f1b40c4cbd36f90"
   },
   "runtime": {
     "install_frame": 140,
     "settle_frames": 2,
-    "result_sha256": "493e89d3a6569f1bbffc6b099984ab33ee409a15333c7238768d9466b38df6bc",
+    "result_sha256": "fb3867f11dd6f52d8a721084e064c42e85cd9959afc05004727c7594afaf4640",
     "fresh_configuration_runs": 2,
     "repeatable_result": true,
     "observed_frame": 142,
     "installed": true,
     "readback_first_word": "0x00000000",
     "readback_mismatches": 0,
-    "final_pc": "0x0E2C"
+    "final_pc": "0x0E30"
   },
   "hardware_integration": {
     "program_space": "ADSP-2100 program RAM at 0x0000",
@@ -34,7 +34,7 @@
       "68010-visible 0x81801C: release ADSP /HALT"
     ],
     "mame_source": "third_party/mame-master/src/mame/atari/harddriv_m.cpp:685-748",
-    "interpretation": "The image is placed at a fixed origin, read back through the ADSP program space, and executes far enough for the PC to advance from entry 0x0000 to 0x0E2C. This proves image placement and bounded runtime integration, not behavioral equivalence to the original ADSP program."
+    "interpretation": "The image is placed at a fixed origin, read back through the ADSP program space, and executes from the MAME-confirmed ADSP reset entry 0x0004 to PC 0x0E30 after the bounded settle interval. This proves image placement and bounded runtime integration, not behavioral equivalence to the original ADSP program."
   },
   "confidence": "REPEATABLE-MAME-RUNTIME-INTEGRATION",
   "next_question": "Replace the one-word NOP fixture with the smallest evidence-backed ADSP routine whose bytes and entry behavior can be independently validated."

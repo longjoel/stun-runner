@@ -10,7 +10,9 @@ import pathlib
 FIXTURES = {
     "maincpu-68010": ("4e71", 0xFF8000),
     "gsp-tms34010": ("0003", 0xFF800000),
-    "adsp2100": ("00000000", 0x0000),
+    # ADSP reset enters program word 4. Keep the reset-vector words present
+    # and place the known NOP at the first executed word.
+    "adsp2100": ("0000000000000000000000000000000000000000", 0x0000),
     "sound-6502": ("ea", 0x1000),
 }
 
@@ -27,7 +29,7 @@ def main() -> int:
     hex_bytes, default_origin = FIXTURES[args.processor]
     payload = bytes.fromhex(hex_bytes)
     origin = default_origin if args.origin is None else args.origin
-    entry = origin if args.entry is None else args.entry
+    entry = (origin + 4) if args.entry is None and args.processor == "adsp2100" else (origin if args.entry is None else args.entry)
     if origin < 0 or entry < origin or entry >= origin + len(payload):
         parser.error("entry must fall inside the emitted image")
     args.output.mkdir(parents=True, exist_ok=True)

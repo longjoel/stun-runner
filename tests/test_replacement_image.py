@@ -19,9 +19,9 @@ class ReplacementImageTests(unittest.TestCase):
             ], check=True, capture_output=True, text=True)
             image = json.loads((output / "image.json").read_text())
             self.assertEqual(image["origin"], "0x0")
-            self.assertEqual(image["entry"], "0x0")
-            self.assertEqual(image["bytes_hex"], "00000000")
-            self.assertEqual((output / image["binary"]).read_bytes(), b"\0\0\0\0")
+            self.assertEqual(image["entry"], "0x4")
+            self.assertEqual(image["bytes_hex"], "0000000000000000000000000000000000000000")
+            self.assertEqual((output / image["binary"]).read_bytes(), b"\0" * 20)
 
 
 if __name__ == "__main__":

@@ -58,7 +58,7 @@ def main() -> int:
         "processor": "adsp2100",
         "fixture": "captured-original-program-ram",
         "origin": "0x0",
-        "entry": "0x0",
+        "entry": "0x4",
         "length": len(payload),
         "nonzero_words": sum(value != 0 for value in words.values()),
         "capture_frame": int(dumps[-1][0]),

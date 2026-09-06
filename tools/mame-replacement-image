@@ -20,13 +20,16 @@ RESULT = re.compile(
 def lua_script(image: dict, payload: bytes, install_frame: int, settle: int) -> str:
     if image["processor"] != "adsp2100":
         raise ValueError("the first M2 runtime loader supports only adsp2100")
-    if image["origin"] != "0x0" or image["entry"] != "0x0":
-        raise ValueError("ADSP runtime fixture must be placed at origin and entry 0")
+    if image["origin"] != "0x0":
+        raise ValueError("ADSP runtime fixture must be placed at origin 0")
     if len(payload) % 4:
         raise ValueError("ADSP program image must be 32-bit word aligned")
     words = []
     for index in range(0, len(payload), 4):
         words.append(int.from_bytes(payload[index:index + 4], "big"))
+    entry = int(image["entry"], 0)
+    if entry < 0 or entry >= len(words):
+        raise ValueError("ADSP entry must be a word index within the image")
     values = ",".join(f"0x{word:08X}" for word in words)
     return f'''local machine = manager.machine
 local cpu = assert(machine.devices[':mainpcb:adsp'])
@@ -58,13 +61,16 @@ local function install()
     main_space:write_u16(0x81801e, 0)
     main_space:write_u16(0x81801a, 0)
     main_space:write_u16(0x81801c, 0)
-    cpu.state['PC'].value = 0
+    cpu.state['PC'].value = {entry}
     installed = true
 end
 
 emu.register_frame_done(function()
     frame = frame + 1
     if frame == install_frame then install() end
+    if installed and frame <= settle_frame then
+        print(string.format('M2_REPLACEMENT_PROGRESS frame=%d pc=%04X', frame, cpu.state['PC'].value))
+    end
     if frame == settle_frame then
         print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X mismatches=%d final_pc=%04X',
             frame, tostring(installed), first, readback_mismatches, cpu.state['PC'].value))
@@ -115,6 +121,7 @@ def main() -> int:
         "image": args.image.name,
         "image_sha256": image["sha256"],
         "processor": image["processor"],
+        "entry": int(image["entry"], 0),
         "install_frame": args.install_frame,
         "settle_frames": args.settle_frames,
         "observed_frame": int(frame),

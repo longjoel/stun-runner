@@ -36,6 +36,18 @@ to the earliest reproducible initialization boundary:
 
 The first useful output is not decompiled C. It is a repeatable laboratory plus a box of provenance-labeled puzzle pieces.
 
+### M3 progress
+
+The replacement loader now honors the MAME-confirmed ADSP reset entry at
+program word `0x0004` (the prior `0x0000` probe executed the reset-vector
+`RTI` word). A five-word NOP control advances repeatably from `0x0004` to
+`0x0E30`; the ROM-derived frame-600 image is installed with complete read-back
+verification and advances repeatably to `0x004F` after the bounded settle
+interval. These results establish image transport and a stable execution
+loop, but not behavioral equivalence or a source-produced initialization slice.
+The next experiment is to replace the captured image with a minimal
+independently encoded ADSP initialization routine.
+
 ## Working processor inventory
 
 Current Step 0 mining indicates the active programmable processors are:
