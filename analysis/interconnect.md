@@ -92,6 +92,15 @@ not game-level semantics.
   title boundary; the older headless debugger-watchpoint path does not identify
   the writer PC or payload. See
   `reference/experiments/stunrun/adsp-program-snapshot.metadata.json`.
+- OBSERVED-IN-SNAPSHOT-DIFF: a full 16-bit ADSP data-space capture is all-zero
+  through frame 408 in a clean boot, while frame 411 contains 15 nonzero words.
+  The changed ranges include `DM($0955–$0956)`, `DM($0959–$095A)`, and five
+  similarly spaced pairs through `0x0982`; one additional change is at
+  `0x1FFF`. The reusable capture and diff commands are
+  `tools/mame-memory-snapshot` and `tools/diff-memory-snapshot`. This identifies
+  memory deltas and address clusters, but does not by itself establish producer,
+  consumer, or semantic meaning. See
+  `reference/experiments/stunrun/adsp-data-memory-snapshot-diff.metadata.json`.
 
 OBSERVED-IN-TRACE: the normalized 68010 buffer blocks form a concrete
 maincpu→GSP boundary: in each independent 1200-frame run, all 106

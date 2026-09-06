@@ -1,0 +1,51 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/interconnect.md",
+  "runner": "tools/mame-memory-snapshot",
+  "differ": "tools/diff-memory-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "snapshot": {
+    "device": ":mainpcb:adsp",
+    "space": "data",
+    "base": "0x0000",
+    "count": 8192,
+    "width": 16,
+    "frames": [1, 407, 408, 411]
+  },
+  "results": {
+    "frame_1": {
+      "sha256": "3092f82ecf4102ba36112c588d58dc1ecc11e1214fb212dfa83956595c9905d2",
+      "nonzero": 0
+    },
+    "frame_407": {
+      "sha256": "03c84d4277454a85af2248e4412a63b57074645e3da6b2bea384621ed112e0e5",
+      "nonzero": 0
+    },
+    "frame_408": {
+      "sha256": "c754edfd1cd17ee7ba139f6c23a1e206743fd9d07c421a64c6f58bd622c367aa",
+      "nonzero": 0
+    },
+    "frame_411": {
+      "sha256": "5e3c6c7e37e664ff11943220065cad9d15e33616adbd0393c49c4cfd991a1742",
+      "nonzero": 15
+    }
+  },
+  "diffs": {
+    "407_to_408": {"changed_count": 0, "changed_ranges": []},
+    "408_to_411": {
+      "changed_count": 15,
+      "changed_ranges": [
+        {"start": "0x0955", "end": "0x0956", "count": 2},
+        {"start": "0x0959", "end": "0x095A", "count": 2},
+        {"start": "0x0961", "end": "0x0962", "count": 2},
+        {"start": "0x0969", "end": "0x096A", "count": 2},
+        {"start": "0x0971", "end": "0x0972", "count": 2},
+        {"start": "0x0979", "end": "0x097A", "count": 2},
+        {"start": "0x0981", "end": "0x0982", "count": 2},
+        {"start": "0x1FFF", "end": "0x1FFF", "count": 1}
+      ]
+    }
+  },
+  "interpretation": "The ADSP data space remains all-zero through frame 408 in this clean boot, then has 15 changed words by frame 411. The first seven paired ranges include the known initialization landmarks DM(0x0955), DM(0x0956), DM(0x0959), and DM(0x095A); the final 0x1FFF change is retained as an observed boundary value. This is a memory-state observation, not a semantic assignment. The raw snapshots are regenerable and remain outside the repository."
+}

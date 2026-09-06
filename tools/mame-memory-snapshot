@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Capture raw bounded memory-space snapshots from pinned MAME."""
+
+import argparse
+import hashlib
+import json
+import os
+import pathlib
+import re
+import subprocess
+
+
+MARKER = re.compile(r"MAME_MEMORY_SNAPSHOT frame=(\d+) path=(.+) nonzero=(\d+)")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rompath", type=pathlib.Path)
+    parser.add_argument("output", type=pathlib.Path)
+    parser.add_argument("--device", required=True)
+    parser.add_argument("--space", default="program")
+    parser.add_argument("--base", type=lambda value: int(value, 0), default=0)
+    parser.add_argument("--count", type=lambda value: int(value, 0), required=True)
+    parser.add_argument("--width", type=int, choices=(8, 16, 32), default=8)
+    parser.add_argument("--frames", type=int, default=600)
+    parser.add_argument("--targets", default=None)
+    parser.add_argument("--mame", default="mame")
+    args = parser.parse_args()
+    if args.frames <= 0 or args.count <= 0 or args.base < 0:
+        parser.error("frames, count, and base must be positive/nonnegative")
+    targets = args.targets or str(args.frames)
+    if any(int(value) <= 0 or int(value) > args.frames for value in targets.split(',')):
+        parser.error("targets must be positive frames no greater than --frames")
+    args.output.mkdir(parents=True, exist_ok=True)
+    log = args.output / "mame.log"
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
+        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-seconds_to_run",
+        str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
+        str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/memory-snapshot.lua"),
+    ]
+    environment = {
+        **os.environ,
+        "STUNRUN_MEMORY_DEVICE": args.device,
+        "STUNRUN_MEMORY_SPACE": args.space,
+        "STUNRUN_MEMORY_BASE": str(args.base),
+        "STUNRUN_MEMORY_COUNT": str(args.count),
+        "STUNRUN_MEMORY_WIDTH": str(args.width),
+        "STUNRUN_MEMORY_FRAMES": str(args.frames),
+        "STUNRUN_MEMORY_TARGETS": targets,
+        "STUNRUN_MEMORY_OUT": str(args.output),
+        "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
+    }
+    with log.open("w", encoding="utf-8") as handle:
+        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                   env=environment, check=False)
+    text = log.read_text(encoding="utf-8")
+    matches = MARKER.findall(text)
+    expected = [int(value) for value in targets.split(',')]
+    snapshots = []
+    for frame_text, path_text, nonzero_text in matches:
+        path = pathlib.Path(path_text)
+        if not path.is_file():
+            raise SystemExit(f"MAME reported missing snapshot: {path}")
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        if payload["frame"] != int(frame_text) or payload["nonzero"] != int(nonzero_text):
+            raise SystemExit(f"snapshot marker mismatch: {path}")
+        snapshots.append(payload)
+    canonical = re.sub(r"path=.*? nonzero=", "path=<snapshot> nonzero=", text)
+    result = {
+        "schema": "stunrun-memory-snapshot-result/v1",
+        "frames": args.frames,
+        "targets": expected,
+        "device": args.device,
+        "space": args.space,
+        "base": args.base,
+        "count": args.count,
+        "width": args.width,
+        "returncode": completed.returncode,
+        "snapshots": [{"frame": item["frame"], "sha256": item["sha256"],
+                       "nonzero": item["nonzero"]} for item in snapshots],
+        "canonical_log_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    }
+    (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    if completed.returncode or [item["frame"] for item in snapshots] != expected:
+        raise SystemExit(f"memory snapshot failed; see {log}")
+    print(json.dumps(result, separators=(",", ":")))
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

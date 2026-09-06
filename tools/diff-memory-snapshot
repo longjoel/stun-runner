@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+"""Diff two compatible JSON memory snapshots and report changed ranges."""
+
+import argparse
+import json
+import pathlib
+
+
+def load(path: pathlib.Path) -> dict:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    required = ("schema", "device", "space", "base", "count", "width", "values")
+    if any(key not in value for key in required):
+        raise SystemExit(f"{path}: not a memory snapshot")
+    if value["schema"] != "stunrun-memory-snapshot/v1":
+        raise SystemExit(f"{path}: unsupported schema {value['schema']!r}")
+    return value
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("before", type=pathlib.Path)
+    parser.add_argument("after", type=pathlib.Path)
+    parser.add_argument("-o", "--output", type=pathlib.Path)
+    parser.add_argument("--max-changes", type=int, default=10000)
+    args = parser.parse_args()
+    before, after = load(args.before), load(args.after)
+    for key in ("device", "space", "base", "count", "width"):
+        if before[key] != after[key]:
+            raise SystemExit(f"incompatible snapshots: {key} differs")
+    if len(before["values"]) != before["count"] or len(after["values"]) != after["count"]:
+        raise SystemExit("snapshot value count does not match metadata")
+    changes = []
+    for offset, (old, new) in enumerate(zip(before["values"], after["values"])):
+        if old != new:
+            changes.append({"address": before["base"] + offset, "offset": offset,
+                            "before": old, "after": new})
+    if len(changes) > args.max_changes:
+        raise SystemExit(f"change count {len(changes)} exceeds --max-changes {args.max_changes}")
+    ranges = []
+    for change in changes:
+        if ranges and change["address"] == ranges[-1]["end"] + 1:
+            ranges[-1]["end"] = change["address"]
+            ranges[-1]["count"] += 1
+        else:
+            ranges.append({"start": change["address"], "end": change["address"], "count": 1})
+    result = {
+        "schema": "stunrun-memory-snapshot-diff/v1",
+        "before": str(args.before),
+        "after": str(args.after),
+        "device": before["device"],
+        "space": before["space"],
+        "base": before["base"],
+        "count": before["count"],
+        "width": before["width"],
+        "before_frame": before.get("frame"),
+        "after_frame": after.get("frame"),
+        "changed_count": len(changes),
+        "changed_ranges": ranges,
+        "changes": changes,
+    }
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
