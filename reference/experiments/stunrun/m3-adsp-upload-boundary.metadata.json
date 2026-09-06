@@ -1,0 +1,29 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "adsp_program_snapshot_boundary",
+  "runner": "tools/mame-adsp-program-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "frames": 420,
+  "targets": [405, 406, 407, 408, 409, 410, 411],
+  "repeatable_runs": [
+    {
+      "result_sha256": "58da95028b746928b748442244d4f580e7bdd359c6c5c91f7958f3f3540e9e63",
+      "canonical_log_sha256": "b75fa102afce4067d2b5949533e9ffc5693bda10de64ec50e07e54778e14d351"
+    },
+    {
+      "result_sha256": "974d4d0a6240adfbd05401348c96153c03fe6303f873b9808fbc78405a6c902d",
+      "canonical_log_sha256": "6fd6618897eefecfd7af38568874be5a86a845b209ca93eb55dada51750470ac"
+    }
+  ],
+  "boundary": {
+    "last_zero_frame": 407,
+    "first_populated_frame": 408,
+    "first_populated_nonzero_words": 293,
+    "complete_image_frame": 411,
+    "complete_image_nonzero_words": 2718,
+    "pc_at_first_population": "0x011B",
+    "pc_at_complete_image": "0x0014"
+  },
+  "interpretation": "Across two fresh MAME runs, ADSP program RAM is empty through frame 407, begins the 68010 upload at frame 408, and is fully populated by frame 411. This is the canonical bounded upload/reset boundary for the next source-produced initialization experiment."
+}

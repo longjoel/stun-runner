@@ -42,7 +42,6 @@ local frame = 0
 local installed = false
 local first = 0
 local entry_word = 0
-local fetch_reads = 0
 local readback_mismatches = 0
 local install_frame = {install_frame}
 local settle_frame = {install_frame + settle}
@@ -68,15 +67,6 @@ local function install()
     cpu.state['PC'].value = {entry}
     installed = true
 end
-
-space:install_read_tap(0, 0x1fff, 'stunrun_replacement_fetch',
-    function(offset, data, mask)
-        if fetch_reads < 16 then
-            print(string.format('M2_REPLACEMENT_FETCH pc=%04X addr=%04X data=%08X mask=%08X',
-                cpu.state['PC'].value, offset, data, mask))
-        end
-        fetch_reads = fetch_reads + 1
-    end)
 
 if install_frame == 0 then
     -- Install before the first frame so the ADSP opcode cache cannot retain

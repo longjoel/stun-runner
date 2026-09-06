@@ -46,7 +46,10 @@ verification and advances repeatably to `0x004F` after the bounded settle
 interval. These results establish image transport and a stable execution
 loop, but not behavioral equivalence or a source-produced initialization slice.
 The next experiment is to replace the captured image with a minimal
-independently encoded ADSP initialization routine.
+independently encoded ADSP initialization routine. Two fresh snapshot runs now
+bound the original upload precisely: program RAM is empty through frame 407,
+begins populating at frame 408, and is complete by frame 411. See
+`reference/experiments/stunrun/m3-adsp-upload-boundary.metadata.json`.
 
 ## Working processor inventory
 

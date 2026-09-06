@@ -25,5 +25,14 @@
     "final_pc": "0x0004",
     "repeatable": true
   },
+  "post_upload_probe": {
+    "install_frame": 412,
+    "settle_frames": 2,
+    "observed_frame": 414,
+    "result_sha256": "bf28042ae2ea55adcce46bd13185101b6907521e89eeca8dfb4483b207053caf",
+    "readback_mismatches": 0,
+    "final_pc": "0x0004",
+    "interpretation": "The source-defined image can be installed immediately after the bounded original upload (frame 411) and remains in the verified reset loop without using the uploaded image as its payload."
+  },
   "interpretation": "A source-defined unconditional jump at the MAME-confirmed ADSP reset entry remains at PC 0x0004 after bounded execution. This proves the fixed-origin encoder, word-addressed loader, reset/control release, and a stable execution loop; it is not a game-semantic implementation."
 }
