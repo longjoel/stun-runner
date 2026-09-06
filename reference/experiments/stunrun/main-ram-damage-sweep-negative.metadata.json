@@ -1,0 +1,39 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_damage_probe_sweep_negative",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/damage_probe_sweep.json",
+  "launch": "tools/mame-memory-snapshot --nothrottle",
+  "status_snapshot": {
+    "range": "0xFF9500–0xFF95FF",
+    "frames": [3600, 6000, 9000, 12000],
+    "canonical_log_sha256": "41d4701092488f25bbf3250793b6fd9b5b5d08c3d74144e995d9aac2d6c5b397",
+    "result_sha256_by_frame": {
+      "3600": "2c869b4f32a091d306bb3b5c9646e293c95eb7e46b560192b243843c40ba7792",
+      "6000": "ea69cd4fd1e79b105b0801dddfd3aa47bf4907c54413e5fb5ab67799b0b7c3c3",
+      "9000": "f1ceb98cb6bc160fc34bc713a550e986cf6bfcb2952248e24bc597199f39a8ec",
+      "12000": "ac52c1daa9b1610f0aa41dfa3a03d84fd8dc186f551f4442c6bc4848531f5ef7"
+    },
+    "observations": [
+      "0xFF954E and 0xFF9550 are zero at all sampled endpoints.",
+      "0xFF9578 is zero at all sampled endpoints.",
+      "0xFF9534 changes with ordinary scoring/progression, not a damage-specific transition."
+    ]
+  },
+  "craft_snapshot": {
+    "range": "0xFFDD00–0xFFDE00",
+    "width": 16,
+    "frames": [3600, 6000, 9000, 12000],
+    "canonical_log_sha256": "0c715381a2ee50dd88813eb595f769d8b9c25a549fe5dc538e33bbddecda6554",
+    "result_sha256_by_frame": {
+      "3600": "24f2b5ebc5a856291af182071a8c734d2a6efa9a711f6699ec8f7791a2f9ba7b",
+      "6000": "c407736c4a9249bb36d528ecb9353550c446c10b33e7956e6039fd620bb251d5",
+      "9000": "1d2a09ea97ba6a441f0279d1e5ef4c2073ccf6390f2e0c3efaed0184ef532b64",
+      "12000": "4acf0c8d0d564eef310c5ad8c5ac820d2bb848902d4ebc7d3f9461b3d26df7e2"
+    },
+    "observation": "Movement/progression fields vary and the block is transiently zeroed at frame 6000, but no new isolated health-like transition is present."
+  },
+  "semantic_status": "DAMAGE_SWEEP_NEGATIVE; CRAFT_HEALTH_UNRESOLVED"
+}

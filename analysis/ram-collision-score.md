@@ -185,6 +185,14 @@ after frame 7500, but `0xFF954E`, `0xFF9550`, and `0xFF9578` remain zero at all
 sampled endpoints. This is a longer negative control for the score/effect
 cluster, not evidence of armor or weapon inventory.
 
+A new `damage_probe_sweep` then held Button 1 while alternating AD Stick X
+between `0`, `255`, and center through frame 12000. The status and craft
+snapshots show ordinary movement/progression changes, including a transient
+zeroed movement block around frame 6000, but no `0xFF954E/0xFF9550` effect
+transition, no track-word change, and no isolated persistent damage field.
+The sweep is useful as a reproducible stress control; it still did not create
+the required enemy-impact interaction.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

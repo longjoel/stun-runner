@@ -1,0 +1,20 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "damage_probe_sweep",
+  "start": "power_on",
+  "events": [
+    {"frame": 650, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "press"},
+    {"frame": 680, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "release"},
+    {"frame": 750, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "press"},
+    {"frame": 780, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "release"},
+    {"frame": 900, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 0},
+    {"frame": 900, "port": ":mainpcb:a80000", "field": "P1 Button 1", "action": "press"},
+    {"frame": 1500, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 255},
+    {"frame": 2100, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 0},
+    {"frame": 2700, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 255},
+    {"frame": 3300, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 128},
+    {"frame": 3900, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 0},
+    {"frame": 4500, "port": ":mainpcb:8BADC.0", "field": "AD Stick X", "action": "set", "value": 255}
+  ],
+  "expect": {"kind": "frame", "frame": 12000, "timeout_frames": 12120}
+}
