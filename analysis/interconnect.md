@@ -113,13 +113,12 @@ producer-side ADSP meaning of each block remains unresolved. See
   `move.l D0,(A2)+`; the preceding loop at `0x02D304–0x02D364` decodes source
   bytes, computes the destination from `0x800000`, and supplies the observed
   upload. See `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
-- OBSERVED-IN-TRACE: the no-input and coin/start callers at `0x02C204` read the
-  same 32-bit source pointer `0x0001702E` from `$17000` and pass it to
-  `0x02D2E0`. The uploader therefore consumes a repeatable encoded stream; a
-  paired frame-10-to-600 source-window write probe observes no 68010 writes to
-  `0x17000–0x25fff` in either mode. This narrows the post-installation
-  main-CPU producer question, but does not characterize frames 0–9 or identify
-  the device/ROM source of the bytes. See
+- RESOLVED FOR UPLOAD SOURCE: the no-input and coin/start callers at `0x02C204`
+  read the same 32-bit source pointer `0x0001702E` from `$17000` and pass it to
+  `0x02D2E0`. The pinned `driver_68k_map` maps `0x000000–0x0FFFFF` as 68010
+  ROM, so this is a ROM-resident encoded stream, not a mutable source buffer.
+  The paired frame-10-to-600 source-window write probe observes no writes to
+  `0x17000–0x25fff` in either mode. Record semantics remain open. See
   `reference/experiments/stunrun/adsp-source-buffer-write.metadata.json`.
 - OBSERVED-IN-TRACE: normalizing the source-byte tap by its 68010 lane masks
   yields 17 records with control `0`, counts summing to 2,728 24-bit ADSP
@@ -217,6 +216,13 @@ producer-side ADSP meaning of each block remains unresolved. See
 - NARROWED UNKNOWN: the FIFO sink is now runtime-observed, but command framing,
   synchronization, and the first input-dependent/gameplay submission remain
   unresolved.
+
+- BOUNDED NEGATIVE RESULT: low-rate samples of GSP control windows and two
+  sparse VRAM ranges at frames 600 and 1800 are identical between no-input and
+  pre-start-SW1 gameplay runs. This does not rule out unsampled VRAM, palette,
+  or screen-state differences, but it rules out promoting these sparse sums as
+  a gameplay selector. See
+  `reference/experiments/stunrun/gsp-state-snapshot.metadata.json`.
 
 The static/runtime GSP search is recorded in
 `reference/experiments/stunrun/gsp-handler-search.metadata.json`.

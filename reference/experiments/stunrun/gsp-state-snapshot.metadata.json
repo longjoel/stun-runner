@@ -1,0 +1,48 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "mame_gsp_state_snapshot",
+  "runner": "tools/mame-gsp-state-snapshot",
+  "script": "mame/lua/gsp-state-snapshot.lua",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "targets": [600, 1800],
+  "sample_ranges": {
+    "control_lo": "0xF4000000-0xF40000FF, stride 2",
+    "control_hi": "0xF4800000-0xF48000FF, stride 2",
+    "vram_low": "0x02000000-0x0207FFFF, stride 0x400",
+    "vram_high": "0xFF800000-0xFFFFFFFF, stride 0x4000"
+  },
+  "runs": {
+    "none": {
+      "result_sha256": "a93ade6aefe0b150138d24d2294ff338f3d32d56c1f8ff99b24672a0caad062f",
+      "canonical_log_sha256": "d45855d51a81d00d653c57fd12b97358613ab643d0984729c825f4158dc661ac"
+    },
+    "sw_off_prestart": {
+      "result_sha256": "4ef1464f3cb418e4c9f2c2563a7a44c81ffda2b62861d3d7e09cb20312ba6291",
+      "canonical_log_sha256": "083155928dc9a07083ffbcd2aac9ab430b9427235a91955b1b3542ed231db6d0"
+    }
+  },
+  "snapshots": {
+    "frame_600": {
+      "pc": "0xFFF41680",
+      "st": "0x00200010",
+      "control_lo_sum32": 63736,
+      "control_hi_sum32": 809248,
+      "vram_low_sum32": 0,
+      "vram_high_sum32": 15806684
+    },
+    "frame_1800": {
+      "pc": "0xFFF414C0",
+      "st": "0x00200010",
+      "control_lo_sum32": 37008,
+      "control_hi_sum32": 1779648,
+      "vram_low_sum32": 0,
+      "vram_high_sum32": 9729924
+    }
+  },
+  "observation": "All sampled GSP state values are identical between the no-input title run and the pre-start-SW1 gameplay run at both target frames.",
+  "limitation": "Sparse samples do not characterize unsampled GSP VRAM, palette RAM, screen timing, or GSP write provenance; no gameplay selector is promoted.",
+  "confidence": "OBSERVED-IN-REPLAY bounded negative result",
+  "raw_logs_kept_local": true,
+  "next_question": "Use a lower-volume provenance-aware GSP write/control experiment to locate the input-dependent rendering path without relying on sparse state sums."
+}

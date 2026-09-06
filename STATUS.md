@@ -107,7 +107,7 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   RAM-resident 17-record/2,728-word upload stream, the ADSP-buffer→GSP FIFO
   block contract, a frame-363 title-path FIFO submission landmark, source-mapped
   control/reset/bank handlers, and the title-path JSA command-byte pairing.
-  Remaining questions are source-buffer ownership, post-gameplay traffic, the
+  Remaining questions are upload-stream semantics, post-gameplay traffic, the
   first input-dependent GSP submission, and a synchronized semantic gameplay
   selector. The late-applied SW1-off experiment is a repeatable loading / blank
   negative control; applying the same DIP bank before reset now yields a

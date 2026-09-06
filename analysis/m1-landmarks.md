@@ -25,11 +25,12 @@ in `A2`, and performs the observed `MOVE.L` upload. See
 
 The title-path caller at `0x02C204` reads the 32-bit pointer `0x0001702E`
 from `$17000` and passes it to `0x02D2E0` in both no-input and coin/start runs.
+The pinned driver map identifies `0x000000–0x0FFFFF` as 68010 ROM, so the
+source stream is ROM-resident rather than a RAM-resident producer buffer.
 Normalizing the traced byte lanes yields 17 records totaling 2,728 24-bit ADSP
 program words, with one explicit destination gap at word indices 2203–4136,
-then a `0xFF` terminator. The source stream is a
-RAM-resident encoded upload block; its producer and semantic ownership remain
-unresolved. The complete record table is in
+then a `0xFF` terminator. Its semantic record meaning remains unresolved. The
+complete record table is in
 `reference/experiments/stunrun/adsp-program-upload.metadata.json`.
 
 The older breakpoint-probe setup is retained as an instrumentation experiment,

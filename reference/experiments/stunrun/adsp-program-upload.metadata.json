@@ -16,6 +16,15 @@
     "mechanism": "68010 program-space memory tap installed after frame 10, when init_adsp() has dynamically installed the handler",
     "range": "0x800000-0x807fff"
   },
+  "source_mapping": {
+    "pointer": "0x0001702E",
+    "pointer_read_pc": "0x02C204",
+    "mame_source": "third_party/mame-master/src/mame/atari/harddriv.cpp:driver_68k_map",
+    "mapped_range": "0x000000-0x0FFFFF",
+    "mapped_type": "68010 ROM",
+    "ownership": "ROM-resident upload stream consumed by the 68010 uploader; no mutable source-buffer producer is implied",
+    "confidence": "MAME-CONFIRMED map plus OBSERVED-IN-TRACE pointer/read activity"
+  },
   "runs": {
     "none": {
       "input": "none",
@@ -56,8 +65,8 @@
     "destination_gaps": [{"start_word_index": 2203, "end_word_index": 4136, "word_count": 1934}],
     "confidence": "OBSERVED-IN-TRACE normalized from the source-byte tap and corroborated by 5456 program-window halfword writes"
   },
-  "observation": "Direct memory taps in independent 600-frame no-input and coin_start runs observe 5456 program-window halfword writes in each run, all from 68010 PC 0x02D35C, covering 0x800000-0x8048d6. The caller at 0x02C204 reads the same 32-bit source pointer 0x0001702E from $17000 and passes it to 0x02D2E0 in both runs. Normalizing the source-byte tap by the 68010 byte-lane masks yields 17 records totaling 2728 24-bit ADSP program words, including one explicit destination gap, followed by 0xff; this exactly accounts for the paired halfword writes. The source buffer's producer and semantic ownership remain unresolved.",
-  "confidence": "MAME-CONFIRMED window plus OBSERVED-IN-TRACE writer PC and transfer range",
+  "observation": "Direct memory taps in independent 600-frame no-input and coin_start runs observe 5456 program-window halfword writes in each run, all from 68010 PC 0x02D35C, covering 0x800000-0x8048d6. The caller at 0x02C204 reads the same 32-bit source pointer 0x0001702E from $17000 and passes it to 0x02D2E0 in both runs. The pinned driver_68k_map maps that pointer into 68010 ROM, while the source-window probe observes no writes to 0x17000-0x25fff after frame 10. Normalizing the source-byte tap by the 68010 byte-lane masks yields 17 records totaling 2728 24-bit ADSP program words, including one explicit destination gap, followed by 0xff; this exactly accounts for the paired halfword writes. Source ownership is resolved as a ROM-resident upload stream; only the record semantics remain unresolved.",
+  "confidence": "MAME-CONFIRMED ROM mapping plus OBSERVED-IN-TRACE pointer, writer PC, and transfer range",
   "raw_logs_kept_local": true,
   "notes": [
     "The tap reports bus-level write events; paired halfword events arise from the 68010 MOVE.L transfer and are not yet normalized into instruction-level longwords.",

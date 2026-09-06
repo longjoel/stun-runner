@@ -84,8 +84,10 @@ entries, and 30 executions of the 68010 handler that clears `0x818060` and
 returns with `RTE`. MAME's `update_interrupts()` confirms that ADSP IRQ state
 drives main-CPU line 2. The 68010-visible serial buffer is also runtime
 resolved for the title path: 106 count/`0xFFFF` blocks each produce exactly
-the counted writes to the GSP FIFO. Remaining IRQ-0002 work is source-buffer
-ownership, post-gameplay traffic, and the unresolved gameplay boundary. See
+the counted writes to the GSP FIFO. The upload source ownership is now resolved
+by the pinned 68010 map: pointer `0x0001702E` is in ROM, while the runtime
+source-window probe observes no writes. Remaining IRQ-0002 work is upload
+record semantics, post-gameplay traffic, and the input-dependent GSP path. See
 `reference/experiments/stunrun/adsp-special-io-trace.metadata.json`.
 
 The title-path sound transport is also partially resolved: a clean frame-447
