@@ -253,13 +253,14 @@ relative to the loaded state and the tool stages the state in an isolated MAME
 slot before starting the bounded Lua tap.
 
 The same reuse contract is available for processor-level samples with
-`tools/mame-gsp-state-snapshot --load-state STATE`. Its reported GSP frames are
-relative to the loaded checkpoint, so renderer/control-state experiments can
-resume from a live state without replaying setup.
+`tools/mame-gsp-state-snapshot --load-state STATE --nothrottle`. Its reported
+GSP frames are relative to the loaded checkpoint, so renderer/control-state
+experiments can resume from a live state without replaying setup.
 
 Main-CPU landmark samples support the same mode through
-`tools/mame-main-state-snapshot --load-state STATE --input none`, allowing
-score/time/track-adjacent RAM checks to begin at a saved gameplay boundary.
+`tools/mame-main-state-snapshot --load-state STATE --input none --nothrottle`,
+allowing score/time/track-adjacent RAM checks to begin at a saved gameplay
+boundary.
 
 A fixture establishes a known starting state that many tests can reuse.
 

@@ -29,6 +29,8 @@ def main() -> int:
     parser.add_argument("--mame", default="mame")
     parser.add_argument("--load-state", type=pathlib.Path,
                         help="load a MAME state before starting the relative frame counter")
+    parser.add_argument("--nothrottle", action="store_true",
+                        help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--detail", action="store_true",
                         help="also record nonzero GSP control-register words")
     args = parser.parse_args()
@@ -59,6 +61,8 @@ def main() -> int:
     if args.load_state:
         command.insert(command.index("-seconds_to_run"), "-state")
         command.insert(command.index("-seconds_to_run"), "1")
+    if args.nothrottle:
+        command.insert(command.index("-seconds_to_run"), "-nothrottle")
     environment = {
         **os.environ,
         "STUNRUN_GSP_STATE_OUT": str(args.output),
@@ -97,6 +101,7 @@ def main() -> int:
         "schema": "stunrun-gsp-state-snapshot-result/v1",
         "frames": args.frames, "targets": args.targets, "input": args.input,
         "load_state": str(args.load_state) if args.load_state else None,
+        "nothrottle": args.nothrottle,
         "returncode": completed.returncode, "snapshots": snapshots,
         "canonical_log_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
     }

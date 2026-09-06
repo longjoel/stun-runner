@@ -1,0 +1,35 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "saved_state_sampler_nothrottle",
+  "tools": [
+    "tools/mame-gsp-state-snapshot",
+    "tools/mame-main-state-snapshot"
+  ],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "capture_description": "late_drive live checkpoint at setup frame 2400; local regenerable artifact, not committed"
+  },
+  "fork": {
+    "frames": 120,
+    "targets": [30, 120],
+    "input": "none",
+    "nothrottle": true
+  },
+  "results": {
+    "gsp": {
+      "result_sha256": "7f6ed252fa1f32584f225fb3f554268bdb8ea03a9db59183b58d9f69950c11e0",
+      "canonical_log_sha256": "d5fd40389568c888c299b4035ef0c4cb4621f3cbe37613d36d3d655bedbc5c57",
+      "sample_summary": "PC 0xFFF414B0, ST 0x6024A420, VRAM-high sum 19091478 at both targets"
+    },
+    "maincpu": {
+      "result_sha256": "d79ceaaa031502e5df1d8f0ced004cd6acaabe99968d11a916a78b17ad82c701",
+      "canonical_log_sha256": "914639ac125bc8ef31363c3e8fcb7a522dd34526fd3ef3780184abe5af8e8b55",
+      "sample_summary": "PC 0x02120A, record C8C8C800, and update flag 1 at both targets"
+    }
+  },
+  "observation": "Both processor samplers resume from the same saved live checkpoint in unthrottled mode and preserve the requested relative-frame samples.",
+  "confidence": "OBSERVED-IN-SAVED-STATE-FORK"
+}
