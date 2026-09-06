@@ -1,0 +1,44 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/m3-adsp-reset-entry.md",
+  "builder": "tools/build-replacement-image --processor adsp2100 --fixture init-state",
+  "loader": "tools/mame-replacement-image --data-probe 0x30,0x1b,0x1fe3,0x0955,0x0956,0x0957,0x0958,0x0959,0x095a",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "source_listing": {
+    "runner": "tools/mame-adsp-init-listing",
+    "frame": 412,
+    "listing_sha256": "6abc577f8f9a3276174eb7955a656e5468ad52bb53b7b3eef326dcbcd5aa9635",
+    "literal_range": "0x0006-0x003c",
+    "calls": ["0x0780", "0x0834"]
+  },
+  "image": {
+    "origin": "0x0",
+    "entry": "0x4",
+    "length": 8404,
+    "payload_sha256": "9fc021d10f0c4c37c9f442d09b67094acf9b9261eb64afeff53317999b3c9c5c",
+    "bounded_loop": "0x003f"
+  },
+  "runtime": {
+    "install_frame": 412,
+    "settle_frames": 2,
+    "observed_frame": 414,
+    "result_sha256": "0f5af5fe748ef24a6d072ae8bd41877d847b636d297f020c2c6f426a9421dc6d",
+    "fresh_configuration_runs": 2,
+    "repeatable_result": true,
+    "readback_mismatches": 0,
+    "final_pc": "0x0004",
+    "data_words": {
+      "0x0030": "0x0000",
+      "0x001B": "0x0000",
+      "0x1FE3": "0x0000",
+      "0x0955": "0x1242",
+      "0x0956": "0x124E",
+      "0x0957": "0x0000",
+      "0x0958": "0x0000",
+      "0x0959": "0x7FFF",
+      "0x095A": "0xFFFF"
+    }
+  },
+  "interpretation": "The source-defined image preserves the literal decoded setup range and reproduces the observed data-memory landmarks at 0x0955, 0x0956, 0x0959, and 0x095A with zero image readback mismatches. Its called routines remain stubs and its bounded loop is not yet the original initialization checkpoint."
+}

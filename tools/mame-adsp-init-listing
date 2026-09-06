@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Generate a bounded MAME-decoded ADSP listing after program upload."""
+
+import argparse
+import hashlib
+import json
+import os
+import pathlib
+import re
+import subprocess
+
+
+DONE = re.compile(r"M3_ADSP_LISTING frame=(\d+) output=(.+)")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rompath", type=pathlib.Path)
+    parser.add_argument("output", type=pathlib.Path)
+    parser.add_argument("--frame", type=int, default=412)
+    parser.add_argument("--mame", default="mame")
+    args = parser.parse_args()
+    if args.frame <= 0:
+        parser.error("frame must be positive")
+    args.output.mkdir(parents=True, exist_ok=True)
+    listing = args.output / "adsp2100-init.lst"
+    log = args.output / "mame.log"
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
+        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-debug",
+        "-debugger", "none", "-seconds_to_run", str(max(3, (args.frame + 59) // 60 + 1)),
+        "-autoboot_script", str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/adsp-init-listing.lua"),
+    ]
+    environment = {
+        **os.environ,
+        "STUNRUN_ADSP_LISTING_FRAME": str(args.frame),
+        "STUNRUN_ADSP_LISTING_OUT": str(listing),
+        "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
+    }
+    with log.open("w", encoding="utf-8") as handle:
+        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                   env=environment, check=False)
+    text = log.read_text(encoding="utf-8")
+    matches = DONE.findall(text)
+    if completed.returncode or not matches or not listing.is_file() or not listing.stat().st_size:
+        raise SystemExit(f"ADSP listing failed; see {log}")
+    result = {
+        "schema": "stunrun-adsp-init-listing-result/v1",
+        "frame": int(matches[-1][0]),
+        "listing": listing.name,
+        "listing_sha256": hashlib.sha256(listing.read_bytes()).hexdigest(),
+        "returncode": completed.returncode,
+    }
+    (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(result, indent=2))
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

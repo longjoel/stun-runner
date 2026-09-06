@@ -48,12 +48,15 @@ loop, but not behavioral equivalence or a source-produced initialization slice.
 The next experiment is to replace the captured image with a minimal
 independently encoded ADSP initialization routine. The first source-defined
 prefix now preserves the observed calls to `0x0780` and `0x0834`, returns from
-both stubs, and settles at PC `0x0004` after two fresh MAME runs. Two fresh
+both stubs, and settles at PC `0x0004` after two fresh MAME runs. A second
+literal setup slice reproduces the observed PM/DM initialization range and
+the `DM($0955–$095A)` landmarks with zero image readback mismatches. Two fresh
 snapshot runs now
 bound the original upload precisely: program RAM is empty through frame 407,
 begins populating at frame 408, and is complete by frame 411. See
-`reference/experiments/stunrun/m3-adsp-upload-boundary.metadata.json` and
-`reference/experiments/stunrun/m3-adsp-init-prefix.metadata.json`.
+`reference/experiments/stunrun/m3-adsp-upload-boundary.metadata.json`,
+`reference/experiments/stunrun/m3-adsp-init-prefix.metadata.json`, and
+`reference/experiments/stunrun/m3-adsp-init-state.metadata.json`.
 
 ## Working processor inventory
 

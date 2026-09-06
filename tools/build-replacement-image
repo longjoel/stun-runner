@@ -19,6 +19,7 @@ FIXTURES = {
         # opcode class, target in bits 4..17, and condition 0xf.
         "reset-loop": ("00000000000000000000000000000000" "0018004f", 0x0000),
         "init-prefix": (None, 0x0000),
+        "init-state": (None, 0x0000),
     },
     "sound-6502": {"nop": ("ea", 0x1000)},
 }
@@ -35,10 +36,41 @@ def adsp_init_prefix() -> bytes:
     return b"".join(struct.pack(">I", word) for word in words)
 
 
+def adsp_init_state() -> bytes:
+    """Preserve the observed reset-side PM/DM setup through a bounded loop."""
+    words = [0] * (0x834 + 1)
+    words[0x0004] = 0x001C780F
+    words[0x0005] = 0x001C834F
+    observed = [
+        0x00340008, 0x00340009, 0x0034000A, 0x0034000B,
+        0x00380008, 0x00380009, 0x0038000A, 0x0038000B,
+        0x00340015, 0x00380017, 0x0040000A, 0x0090030A,
+        0x0091FE3A, 0x0081FFFA, 0x0023620F, 0x00180130,
+        0x004FFFFA, 0x0091FFFA, 0x0034A000, 0x009401B0,
+        0x003C0007, 0x0035FEF0, 0x00390190, 0x003C0065,
+        0x0014020E, 0x006000A1, 0x005800A3, 0x0035FF50,
+        0x00390000, 0x003C0095, 0x0014026E, 0x006000A1,
+        0x005800A3, 0x0035FE90, 0x00390090, 0x003C0065,
+        0x001402CE, 0x006000A1, 0x005800A3, 0x0081FFEA,
+        0x0092007A, 0x004007CA, 0x0090029A, 0x0040001A,
+        0x009001EA, 0x0040000A, 0x0092003A, 0x0092002A,
+        0x009002BA, 0x009002AA, 0x0090108A, 0x0092002A,
+        0x0090958A, 0x009002DA, 0x009002EA,
+    ]
+    for offset, word in enumerate(observed, start=0x0006):
+        words[offset] = word
+    words[0x003D] = 0x001C780F
+    words[0x003E] = 0x001C834F
+    words[0x003F] = 0x001803FF
+    words[0x0780] = 0x000A000F
+    words[0x0834] = 0x000A000F
+    return b"".join(struct.pack(">I", word) for word in words)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--processor", choices=sorted(FIXTURES), required=True)
-    parser.add_argument("--fixture", choices=("nop", "reset-loop", "init-prefix"), default="nop")
+    parser.add_argument("--fixture", choices=("nop", "reset-loop", "init-prefix", "init-state"), default="nop")
     parser.add_argument("--origin", type=lambda value: int(value, 0))
     parser.add_argument("--entry", type=lambda value: int(value, 0))
     parser.add_argument("--output", type=pathlib.Path, required=True)
@@ -47,7 +79,9 @@ def main() -> int:
     if args.fixture not in FIXTURES[args.processor]:
         parser.error(f"fixture {args.fixture!r} is not available for {args.processor}")
     hex_bytes, default_origin = FIXTURES[args.processor][args.fixture]
-    payload = adsp_init_prefix() if args.fixture == "init-prefix" else bytes.fromhex(hex_bytes)
+    payload = (adsp_init_prefix() if args.fixture == "init-prefix" else
+               adsp_init_state() if args.fixture == "init-state" else
+               bytes.fromhex(hex_bytes))
     origin = default_origin if args.origin is None else args.origin
     entry = (origin + 4) if args.entry is None and args.processor == "adsp2100" else (origin if args.entry is None else args.entry)
     if origin < 0 or entry < origin or entry >= origin + len(payload):

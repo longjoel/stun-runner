@@ -62,3 +62,10 @@ It installs after the repeatable original upload boundary at frame 412, reads
 back every word with zero mismatches, and reaches the stable loop at `PC=0x4`
 in two fresh configurations. The runtime evidence is recorded in
 `reference/experiments/stunrun/m3-adsp-init-prefix.metadata.json`.
+
+The follow-on `init-state` fixture keeps the decoded literal setup from
+`0x0006` through `0x003C`, then uses the same source-defined stubs and bounded
+loop. Its opt-in data-space probe reproduces the observed setup landmarks
+`DM($0955)=0x1242`, `DM($0956)=0x124E`, `DM($0959)=0x7FFF`, and
+`DM($095A)=0xFFFF` in two fresh MAME runs. This is a literal reconstruction
+slice; the called routines and later wait/interrupt behavior remain open.

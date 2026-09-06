@@ -14,11 +14,12 @@ import tempfile
 RESULT = re.compile(
     r"M2_REPLACEMENT_RESULT frame=(\d+) installed=(true|false) "
     r"first=([0-9A-Fa-f]+) entry_word=([0-9A-Fa-f]+) "
-    r"mismatches=(\d+) final_pc=([0-9A-Fa-f]+)"
+    r"mismatches=(\d+) final_pc=([0-9A-Fa-f]+)(?: probes=([0-9A-Fa-f,:]+))?"
 )
 
 
-def lua_script(image: dict, payload: bytes, install_frame: int, settle: int) -> str:
+def lua_script(image: dict, payload: bytes, install_frame: int, settle: int,
+               data_probe: list[int]) -> str:
     if image["processor"] != "adsp2100":
         raise ValueError("the first M2 runtime loader supports only adsp2100")
     if image["origin"] != "0x0":
@@ -32,6 +33,10 @@ def lua_script(image: dict, payload: bytes, install_frame: int, settle: int) -> 
     if entry < 0 or entry >= len(words):
         raise ValueError("ADSP entry must be a word index within the image")
     values = ",".join(f"0x{word:08X}" for word in words)
+    probe_addresses = ",".join(f"0x{address:X}" for address in data_probe)
+    probe_output = ""
+    if data_probe:
+        probe_output = " .. ' probes=' .. table.concat(probe_values, ',')"
     return f'''local machine = manager.machine
 local cpu = assert(machine.devices[':mainpcb:adsp'])
 local maincpu = assert(machine.devices[':mainpcb:maincpu'])
@@ -45,6 +50,9 @@ local entry_word = 0
 local readback_mismatches = 0
 local install_frame = {install_frame}
 local settle_frame = {install_frame + settle}
+local data_space = cpu.spaces['data']
+local probe_addresses = {{{probe_addresses}}}
+local probe_values = {{}}
 
 local function install()
     for index, word in ipairs(words) do
@@ -81,7 +89,10 @@ emu.register_frame_done(function()
         print(string.format('M2_REPLACEMENT_PROGRESS frame=%d pc=%04X', frame, cpu.state['PC'].value))
     end
     if frame == settle_frame then
-        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X entry_word=%08X mismatches=%d final_pc=%04X',
+        for _, address in ipairs(probe_addresses) do
+            probe_values[#probe_values + 1] = string.format('%04X:%04X', address, data_space:read_u16(address))
+        end
+        print(string.format('M2_REPLACEMENT_RESULT frame=%d installed=%s first=%08X entry_word=%08X mismatches=%d final_pc=%04X'{probe_output},
             frame, tostring(installed), first, entry_word, readback_mismatches, cpu.state['PC'].value))
         machine:exit()
     end
@@ -96,6 +107,8 @@ def main() -> int:
     parser.add_argument("--output", required=True, type=pathlib.Path)
     parser.add_argument("--install-frame", type=int, default=140)
     parser.add_argument("--settle-frames", type=int, default=2)
+    parser.add_argument("--data-probe", default="",
+                        help="comma-separated ADSP data-space word addresses")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.install_frame < 0 or args.settle_frames <= 0:
@@ -106,9 +119,13 @@ def main() -> int:
     if hashlib.sha256(payload).hexdigest() != image["sha256"]:
         raise SystemExit("replacement image hash does not match image.json")
     args.output.mkdir(parents=True, exist_ok=True)
+    try:
+        data_probe = [int(value, 0) for value in args.data_probe.split(',') if value]
+    except ValueError as error:
+        raise SystemExit(f"invalid --data-probe address: {error}")
     with tempfile.TemporaryDirectory(prefix="stunrun-replacement-") as temp:
         script = pathlib.Path(temp) / "replacement.lua"
-        script.write_text(lua_script(image, payload, args.install_frame, args.settle_frames), encoding="utf-8")
+        script.write_text(lua_script(image, payload, args.install_frame, args.settle_frames, data_probe), encoding="utf-8")
         log = args.output / "mame.log"
         command = [
             args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
@@ -124,7 +141,7 @@ def main() -> int:
     matches = RESULT.findall(text)
     if completed.returncode or not matches:
         raise SystemExit(f"replacement image validation failed; see {log}")
-    frame, installed, first, entry_word, mismatches, final_pc = matches[-1]
+    frame, installed, first, entry_word, mismatches, final_pc, probe_values = matches[-1]
     result = {
         "schema": "stunrun-replacement-image-result/v1",
         "image": args.image.name,
@@ -141,6 +158,11 @@ def main() -> int:
         "final_pc": int(final_pc, 16),
         "returncode": completed.returncode,
     }
+    if probe_values:
+        result["data_words"] = {
+            f"0x{int(item.split(':', 1)[0], 16):04X}": int(item.split(':', 1)[1], 16)
+            for item in probe_values.split(',')
+        }
     (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2))
     return 0
