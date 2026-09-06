@@ -170,6 +170,11 @@ producer-side ADSP meaning of each block remains unresolved. See
   concrete 68010 path before the later GSP state divergence, without assigning
   gameplay semantics to the byte or routine. See
   `reference/experiments/stunrun/drive-input-rendered-delta.metadata.json`.
+- STATIC-CANDIDATE: routine `0x020430`, called by `0x02FFF0` after
+  `0x023D8C`, reads `0x60C001` and `0xA80001`, then updates the three-byte
+  records at `0xFF9000–0xFF9003` while advancing `0xFFDB4A`. This is the
+  strongest current ROM-side input-to-state candidate for the late transition,
+  but its runtime field meaning is not established.
 - OBSERVED-IN-TRACE: an early Coin 2 variant enters a bounded trace dominated
   by `0x0013EC` → `0x0013FC`/`0x001404`, polling `0x60C001`.
 - OBSERVED-IN-REPLAY: the normal and early Coin 1/start sequences both reach
@@ -221,6 +226,11 @@ producer-side ADSP meaning of each block remains unresolved. See
   `B800, 0105, 0103, 0013, 0004`. These are runtime FIFO-submission
   landmarks, not yet gameplay semantics. See
   `reference/experiments/stunrun/gsp-boundary.metadata.json`.
+- STATIC-CANDIDATE: routine `0x0109EC` uses `0xFF9000` and `0xFF9004` as a
+  command-building area and emits values through `0xC00002`/`0xC0000C`.
+  This suggests a possible bridge from the input-adjacent records to GSP
+  submission, but no runtime pairing is promoted; the direct broad RAM tap is
+  not reliable in installed MAME 0.289's Lua bridge.
 - NARROWED UNKNOWN: the FIFO sink is now runtime-observed, but command framing,
   synchronization, and the first input-dependent/gameplay submission remain
   unresolved.

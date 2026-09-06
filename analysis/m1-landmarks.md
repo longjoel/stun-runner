@@ -110,6 +110,11 @@ has been applied. This is the strongest current synchronized player-control
 boundary candidate, but it remains a candidate rather than a semantic selector.
 See `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 
+Static XREFs narrow the candidate path: `0x02FFF0` calls `0x020430`, whose
+input reads feed the `0xFF9000–0xFF9003` records; `0x0109EC` separately uses
+that region while emitting GSP command/FIFO writes. This is a useful literal
+mechanism to investigate next, not a promoted interpretation of the records.
+
 An early 30-frame Coin 1 pulse followed by Start produces the same result as
 the later two-frame pulse. In the static listing, the only direct references to
 coin bits 7/6 are in the `0x043590` candidate; its six direct callers remain
