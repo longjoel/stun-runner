@@ -262,6 +262,15 @@ producer-side ADSP meaning of each block remains unresolved. See
   1200. This is stronger than the earlier attract/demo delta, but no semantic
   field or ROM-side state meaning is promoted yet. See
   `reference/experiments/stunrun/late-control-boundary.metadata.json`.
+- OBSERVED-IN-DIRECT-READ + MAME-SOURCE-MAPPED: a detail variant of the bounded
+  GSP snapshot reads the 256 control words directly at frames 600, 900, 1200,
+  and 1800. The late and late-drive schedules are identical through frame 900;
+  at frame 1200 the drive schedule changes the repeated `gsp_control_lo[0]`
+  value from `0x1212` to `0xE2E2`, and at frame 1800 the values are `0xEBEB`
+  versus `0x1212`. The pinned MAME source uses offset zero as the GSP VRAM
+  expander color latch. This narrows the observed rendering boundary, but the
+  latch value is a renderer input and does not prove a player-state meaning.
+  See `reference/experiments/stunrun/late-control-boundary.metadata.json`.
 - BOUNDED NEGATIVE RESULT: the same late and late-drive schedules produce no
   68010 writes to the observed ADSP buffer window `0x810000–0x813FFF` through
   frame 1800. The changed path is therefore not established as a main-side

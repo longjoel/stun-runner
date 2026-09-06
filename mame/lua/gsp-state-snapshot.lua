@@ -7,6 +7,7 @@ local output = assert(os.getenv('STUNRUN_GSP_STATE_OUT'), 'STUNRUN_GSP_STATE_OUT
 local limit = tonumber(os.getenv('STUNRUN_GSP_STATE_FRAMES') or '1800')
 local target_text = os.getenv('STUNRUN_GSP_STATE_TARGETS') or '600,1800'
 local input_mode = os.getenv('STUNRUN_GSP_STATE_INPUT') or 'none'
+local detail = os.getenv('STUNRUN_GSP_STATE_DETAIL') == '1'
 local frame = 0
 local targets = {}
 for value in string.gmatch(target_text, '[^,]+') do targets[tonumber(value)] = true end
@@ -83,6 +84,17 @@ local function sample_range(base, span, stride)
     return {base = base, span = span, stride = stride, samples = count, sum32 = sum32, first = first}
 end
 
+local function nonzero_words(base, count)
+    local words = {}
+    for index = 0, count - 1 do
+        local value = space:read_u16(base + index * 2)
+        if value ~= 0 then
+            words[#words + 1] = string.format('%02X=%04X', index, value)
+        end
+    end
+    return table.concat(words, ',')
+end
+
 local function snapshot()
     local state = {
         frame = frame,
@@ -98,6 +110,10 @@ local function snapshot()
         'M1_GSP_STATE frame=%d pc=%08X st=%08X lo_sum=%u hi_sum=%u low_sum=%u high_sum=%u',
         state.frame, state.pc, state.st, state.control_lo.sum32, state.control_hi.sum32,
         state.vram_low.sum32, state.vram_high.sum32))
+    if detail then
+        print(string.format('M1_GSP_CONTROL frame=%d lo=%s hi=%s', frame,
+            nonzero_words(0xf4000000, 128), nonzero_words(0xf4800000, 128)))
+    end
     return state
 end
 

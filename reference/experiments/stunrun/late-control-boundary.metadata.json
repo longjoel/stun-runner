@@ -49,6 +49,21 @@
       "frame_1800": "drive path remains distinct in GSP PC/ST and sparse high-VRAM sum"
     }
   },
+  "gsp_control_detail": {
+    "runner": "tools/mame-gsp-state-snapshot --detail",
+    "targets": [600, 900, 1200, 1800],
+    "late_result_sha256": "b8dfdc47bb8c5fbc0c3d61228b39d2f151d4f0aa280d0c93bc6e0c00e2fcb970",
+    "late_drive_result_sha256": "e7a1cb1fc580ca55ec035280a07108266745d145835b880eea7f1e93f79c0d5c",
+    "mame_source": "third_party/mame-master/src/mame/atari/harddriv_v.cpp",
+    "observed": {
+      "frame_600": "control_lo[0..7]=0x1F1F in both schedules; control_hi is identical",
+      "frame_900": "control_lo[0..7]=0x1212 in both schedules; control_hi is identical",
+      "frame_1200": "late control_lo[0..7]=0x1212; late_drive control_lo[0..7]=0xE2E2; control_hi is identical",
+      "frame_1800": "late control_lo[0..7]=0xEBEB; late_drive control_lo[0..7]=0x1212; control_hi is identical"
+    },
+    "source_mapping": "MAME stores the low control window in gsp_control_lo; its offset-zero value supplies the GSP VRAM expander color latch. The repeated words are address-space aliases observed through direct TMS34010 reads, not eight independent semantic fields.",
+    "interpretation": "The late drive path changes the GSP color latch after the input transition, providing a narrower rendering-state boundary. It is still not a semantic player-state selector."
+  },
   "adsp_buffer_probe": {
     "runner": "tools/mame-adsp-window --window buffer --access write",
     "window": "0x810000-0x813fff",

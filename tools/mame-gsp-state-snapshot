@@ -14,6 +14,7 @@ SNAPSHOT = re.compile(
     r"M1_GSP_STATE frame=(\d+) pc=([0-9A-Fa-f]+) st=([0-9A-Fa-f]+) "
     r"lo_sum=(\d+) hi_sum=(\d+) low_sum=(\d+) high_sum=(\d+)"
 )
+CONTROL = re.compile(r"M1_GSP_CONTROL frame=(\d+) lo=([^\r\n ]*) hi=([^\r\n ]*)")
 
 
 def main() -> int:
@@ -24,6 +25,8 @@ def main() -> int:
     parser.add_argument("--targets", default="600,1800")
     parser.add_argument("--input", choices=("none", "sw_off_prestart", "drive", "late", "late_drive"), default="none")
     parser.add_argument("--mame", default="mame")
+    parser.add_argument("--detail", action="store_true",
+                        help="also record nonzero GSP control-register words")
     args = parser.parse_args()
     if args.frames <= 0:
         parser.error("--frames must be positive")
@@ -42,6 +45,7 @@ def main() -> int:
         "STUNRUN_GSP_STATE_FRAMES": str(args.frames),
         "STUNRUN_GSP_STATE_TARGETS": args.targets,
         "STUNRUN_GSP_STATE_INPUT": args.input,
+        "STUNRUN_GSP_STATE_DETAIL": "1" if args.detail else "0",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     with log.open("w", encoding="utf-8") as handle:
@@ -55,6 +59,15 @@ def main() -> int:
          "vram_high_sum32": int(match.group(7))}
         for match in SNAPSHOT.finditer(text)
     ]
+    controls = {
+        int(match.group(1)): {
+            "lo": match.group(2), "hi": match.group(3)
+        }
+        for match in CONTROL.finditer(text)
+    }
+    for snapshot in snapshots:
+        if snapshot["frame"] in controls:
+            snapshot["control_nonzero"] = controls[snapshot["frame"]]
     canonical = re.sub(r"output=[^\n]+", "output=<output>", text)
     result = {
         "schema": "stunrun-gsp-state-snapshot-result/v1",
