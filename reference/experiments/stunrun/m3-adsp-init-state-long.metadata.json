@@ -1,0 +1,37 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "analysis/m3-adsp-reset-entry.md",
+  "builder": "tools/build-replacement-image --processor adsp2100 --fixture init-state",
+  "loader": "tools/mame-replacement-image --install-frame 1 --settle-frames 60",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "image": {
+    "origin": "0x0",
+    "entry": "0x4",
+    "length": 8476,
+    "payload_sha256": "ddbe84919c7120f970fc5e635979ec5b4fd1fd55da8a991f9a5076e9f9668fe1"
+  },
+  "runtime": {
+    "install_frame": 1,
+    "settle_frames": 60,
+    "observed_frame": 61,
+    "fresh_configuration_runs": 2,
+    "result_sha256": "a7d4d56ca35aca3fe0a593b1bc23e3d909b555e6ad99d11862a9f5c63cae6232",
+    "repeatable_result": true,
+    "installed": true,
+    "readback_mismatches": 0,
+    "final_pc": "0x0050",
+    "data_words": {
+      "0x0030": "0x0000",
+      "0x001B": "0x0A00",
+      "0x1FE3": "0x0000",
+      "0x0955": "0x1242",
+      "0x0956": "0x124E",
+      "0x0957": "0x0000",
+      "0x0958": "0x0000",
+      "0x0959": "0x7FFF",
+      "0x095A": "0xFFFF"
+    }
+  },
+  "interpretation": "The source-defined initialization slice remains in its bounded mailbox loop through a 60-frame post-install interval with repeatable read-back and runtime state. The observed DM 0x001B value is recorded without semantic interpretation; interrupt and mailbox behavior beyond this loop remain open."
+}

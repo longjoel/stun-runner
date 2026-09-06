@@ -40,5 +40,5 @@
       "0x095A": "0xFFFF"
     }
   },
-  "interpretation": "Installed before any original upload, the source-defined image preserves the literal decoded setup range and both bounded startup routine bodies. It reproduces the observed data-memory landmarks at 0x0955, 0x0956, 0x0959, and 0x095A with zero image readback mismatches and settles at the bounded post-setup loop 0x003F. Later wait/interrupt behavior and the canonical title checkpoint remain open."
+  "interpretation": "Installed before any original upload, the source-defined image preserves the literal decoded setup range and both bounded startup routine bodies. It reproduces the observed data-memory landmarks at 0x0955, 0x0956, 0x0959, and 0x095A with zero image readback mismatches and settles at the bounded post-setup loop 0x0050. A separate 60-frame probe confirms that loop remains stable; later wait/interrupt behavior and the canonical title checkpoint remain open."
 }

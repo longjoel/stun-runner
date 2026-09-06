@@ -71,4 +71,8 @@ frame 1, before the original upload, its opt-in data-space probe reproduces the 
 `DM($0955)=0x1242`, `DM($0956)=0x124E`, `DM($0959)=0x7FFF`, and
 `DM($095A)=0xFFFF` in two fresh MAME runs. This is a literal reconstruction
 slice; the source-defined loop begins at the observed mailbox boundary
-`0x0050`, while later wait/interrupt behavior remains open.
+`0x0050`. A separate two-run, 60-frame bounded probe keeps the ADSP at
+`PC=0x0050`, preserves those landmarks, and records `DM($001B)=0x0A00`
+without assigning it semantics. Later wait/interrupt behavior and the
+canonical title checkpoint remain open. Its provenance is recorded in
+`reference/experiments/stunrun/m3-adsp-init-state-long.metadata.json`.
