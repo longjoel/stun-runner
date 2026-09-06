@@ -7,7 +7,9 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
+import tempfile
 
 
 MARKER = re.compile(r"MAME_MEMORY_SNAPSHOT frame=(\d+) path=(.+) nonzero=(\d+)")
@@ -37,13 +39,21 @@ def main() -> int:
         parser.error("targets must be positive frames no greater than --frames")
     args.output.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
+    state_stage = None
+    state_directory = "/tmp/stunrun-state-dir"
     if args.load_state:
         if not args.load_state.is_file():
             raise SystemExit(f"save state does not exist: {args.load_state}")
+        state_stage = pathlib.Path(tempfile.mkdtemp(prefix="stunrun-state-fork-"))
+        slot_directory = state_stage / "stunrun"
+        slot_directory.mkdir()
+        shutil.copy2(args.load_state, slot_directory / "1.sta")
+        state_directory = str(state_stage)
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
         "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
         "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save",
+        "-state_directory", state_directory, "-statename", "%g",
         "-seconds_to_run",
         str(86400 if args.load_state else max(2, (args.frames + 59) // 60 + 1)),
         "-autoboot_script",
@@ -51,6 +61,9 @@ def main() -> int:
     ]
     if args.nothrottle:
         command.insert(command.index("-seconds_to_run"), "-nothrottle")
+    if args.load_state:
+        command.insert(command.index("-seconds_to_run"), "-state")
+        command.insert(command.index("-seconds_to_run"), "1")
     environment = {
         **os.environ,
         "STUNRUN_MEMORY_DEVICE": args.device,
@@ -63,13 +76,19 @@ def main() -> int:
         "STUNRUN_MEMORY_OUT": str(args.output),
         "STUNRUN_MEMORY_INPUT": args.input,
         "STUNRUN_MEMORY_SAVE_STATE": str(args.save_state) if args.save_state else "",
-        "STUNRUN_MEMORY_LOAD_STATE": str(args.load_state) if args.load_state else "",
+        # Loading is performed by MAME's command-line state option.  Avoid
+        # asking the Lua script to load the same state a second time.
+        "STUNRUN_MEMORY_LOAD_STATE": "",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
-    with log.open("w", encoding="utf-8") as handle:
-        completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
-                                   env=environment, check=False)
-    text = log.read_text(encoding="utf-8")
+    try:
+        with log.open("w", encoding="utf-8") as handle:
+            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                       env=environment, check=False)
+        text = log.read_text(encoding="utf-8")
+    finally:
+        if state_stage is not None:
+            shutil.rmtree(state_stage, ignore_errors=True)
     matches = MARKER.findall(text)
     expected = [int(value) for value in targets.split(',')]
     snapshots = []
