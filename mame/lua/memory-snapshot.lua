@@ -59,7 +59,23 @@ local device = assert(machine.devices[device_tag], 'unknown device: ' .. device_
 local space = assert(device.spaces[space_name], 'unknown space: ' .. space_name)
 local reader = width == 8 and space.read_u8 or width == 16 and space.read_u16 or space.read_u32
 
-local events = input_mode == 'late_drive' and {
+local events = input_mode == 'weapon_probe' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 960, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 1100, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'press'},
+    {frame = 1160, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'},
+    {frame = 1250, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', action = 'set', value = 220},
+    {frame = 1350, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', action = 'set', value = 128},
+    {frame = 1400, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 1460, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 1550, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'press'},
+    {frame = 1610, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'late_drive' and {
     {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},

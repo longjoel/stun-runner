@@ -47,6 +47,20 @@
         "0xFFDD80": 2,
         "0xFFDD82–0xFFDD90": "continuous object/renderer traffic"
       }
+    },
+    "synchronized_object_snapshots": {
+      "range": "0xFFDC00–0xFFDD00",
+      "targets": [767, 900, 904, 1100, 1160, 1400, 1460, 1550, 1610, 1800],
+      "weapon_probe_result_sha256": "711d7bac0b15af16f42ad5a6e4111f08e37afce799b6449540d9418184671622",
+      "weapon_probe_canonical_log_sha256": "8698afc78f331d3cebe19677ae151a45784914db07987c0458875fbdc18d0651",
+      "coin_start_only_result_sha256": "60d52ec1963560362b4bff4e686d9c801d753d7bd076aeafc602324c2e1495ad",
+      "coin_start_only_canonical_log_sha256": "2f6fbd9e4c9e7924b58420933173b4d2ba2482f056406a28ba895fbb6a57c5c1",
+      "differential_observations": [
+        "No difference at frames 767, 900, or 904; Button 1 did not create an immediate object-window transition.",
+        "Button 2 produces only the update-flag difference at 0xFFDC1B–0xFFDC1C by frames 1100/1160.",
+        "Later differences at 0xFFDCC5–0xFFDCC9 and 0xFFDCD6–0xFFDCD7 are transient trajectory/animation state; a larger object block appears by frame 1610.",
+        "The evidence is compatible with a weapon-effect/object spawn but does not identify armor, ammunition, or a persistent weapon inventory field."
+      ]
     }
   },
   "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. The extended 0xFFDC00–0xFFDD90 tap likewise shows 0xFFDC1C/0xFFDC1E flag traffic and continuous 0xFFDD82–0xFFDD90 object/renderer writes, but no isolated armor, weapon, or ammunition transition.",
