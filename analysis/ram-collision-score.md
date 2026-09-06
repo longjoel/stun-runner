@@ -98,6 +98,18 @@ object/renderer candidate, not as a health or weapon field. Full hashes and
 the exact relative input schedule are recorded in
 `reference/experiments/stunrun/main-ram-live-fork-differential.metadata.json`.
 
+The checkpoint was then forked into sustained-left and sustained-right
+controls for 3600 relative frames, with Button 1 and Button 2 explicitly
+released at the fork boundary. The entire `0xFF9500–0xFF95FF` status window
+was byte-identical between the extremes at relative frames 600, 1200, 1800,
+2400, 3000, and 3600. Score, timer, track, event flags, and the known
+animation counter therefore show no lateral-extreme-specific transition in
+this segment. The `0xFFDD00–0xFFDE00` craft/object window does distinguish the
+branches, most strongly at `0xFFDD85–0xFFDD90`, while the status window remains
+unchanged. This is stronger evidence for a motion/object/renderer record than
+for armor or weapon state. The schedules and hashes are preserved in
+`reference/experiments/stunrun/main-ram-live-fork-extremes.metadata.json`.
+
 ## Longitudinal status control
 
 The weapon schedule and a matching `late_drive` control were extended to

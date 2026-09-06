@@ -1,0 +1,37 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_live_save_state_extreme_lateral_controls",
+  "tools": ["tools/mame-memory-snapshot", "tools/analyze-memory-candidates"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "base_checkpoint": {
+    "input": "late_drive",
+    "setup_frame": 2400,
+    "state_artifact": "/tmp/stunrun-latedrive2400.sta",
+    "note": "Local regenerable state; not committed"
+  },
+  "relative_frames": [600, 1200, 1800, 2400, 3000, 3600],
+  "controls": {
+    "left": {
+      "input": "fork_hold_left",
+      "status_canonical_log_sha256": "a92aac880822c1edfa5323f41edbd4faf11f1945e08e66a7f7f8cb5a9c20ffbe",
+      "craft_canonical_log_sha256": "8f7ae53b0882d432397198c91e83cedfc02b16b58d6ef64191be4e03d5fd3d09"
+    },
+    "right": {
+      "input": "fork_hold_right",
+      "status_canonical_log_sha256": "f4ee2c2c19cbe2417ce447b631d4419ba33c47813922181cefed81770dd90b7a",
+      "craft_canonical_log_sha256": "f5920acc7ec03ea1b186a078385afc9c919b118de1375e7c1ec1c2ccd3fb9ac4b"
+    }
+  },
+  "comparison": {
+    "status_range": "0xFF9500–0xFF95FF",
+    "status_value_differential": false,
+    "craft_range": "0xFFDD00–0xFFDE00",
+    "strongest_persistent_candidate_range": "0xFFDD85–0xFFDD90",
+    "semantic_status": "INPUT-DEPENDENT-OBJECT-OR-RENDERER-CANDIDATE; ARMOR-WEAPON-AMMO-UNRESOLVED"
+  },
+  "negative_claims": [
+    "Sustained lateral extremes did not produce a status-window transition attributable to damage.",
+    "The differential does not prove that 0xFFDD85–0xFFDD90 belongs to the player craft."
+  ]
+}
