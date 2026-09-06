@@ -25,6 +25,7 @@ def main() -> int:
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--targets", default=None)
     parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center", "collision_probe_hold_left", "collision_probe_hold_right"), default="none")
+    parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0 or args.count <= 0 or args.base < 0:
@@ -41,6 +42,8 @@ def main() -> int:
         str(max(2, (args.frames + 59) // 60 + 1)), "-autoboot_script",
         str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/memory-snapshot.lua"),
     ]
+    if args.nothrottle:
+        command.insert(command.index("-seconds_to_run"), "-nothrottle")
     environment = {
         **os.environ,
         "STUNRUN_MEMORY_DEVICE": args.device,

@@ -178,6 +178,13 @@ through frame 3600. This rules out a simple left/right wall interaction in
 the tube segment; the next damage probe must target an identifiable moving
 object or later non-tube segment.
 
+The existing weapon schedule was then extended with the snapshot harness's
+unthrottled mode through frame 9000. It reaches `0xFF9534 = 0x0438` (1080
+points) by frame 9000, with additional status/display differences appearing
+after frame 7500, but `0xFF954E`, `0xFF9550`, and `0xFF9578` remain zero at all
+sampled endpoints. This is a longer negative control for the score/effect
+cluster, not evidence of armor or weapon inventory.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

@@ -1,0 +1,29 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_weapon_schedule_long_negative",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "input": "weapon_probe",
+  "launch": "tools/mame-memory-snapshot --nothrottle",
+  "status_snapshot": {
+    "range": "0xFF9500–0xFF95FF",
+    "frames": [3600, 4800, 6000, 7500, 9000],
+    "canonical_log_sha256": "988f8cbdd4ce642799929dd5569c5b9737d1771672052561ac135efa56ed7eb5",
+    "result_sha256_by_frame": {
+      "3600": "79001f3cf5be297b3bf2af648e809963e5a34b8819c1ef411f6aaebc1efcd55b",
+      "4800": "0bbdbe519ca4ca579b2633bd00ec6b2a668a878ee883adbfc1cd422b941cdf1f",
+      "6000": "11f9d6d6dbe1091c1d8240c99c1fef295e5fb585e251fc86e01ec769316f4f04",
+      "7500": "0258162ec0b5eea9bf4c1ead7c6e7a94cd36cedbf042d8b9306f8c3cecf763bc",
+      "9000": "738ff1085f54bfc85ce3146bc3a3087924255d21d17dd92247d1e670df4a2271"
+    },
+    "observations": {
+      "score": "0xFF9534 reaches 0x0438 at frame 9000",
+      "0xFF954E": "zero at all sampled endpoints",
+      "0xFF9550": "zero at all sampled endpoints",
+      "0xFF9578": "zero at all sampled endpoints",
+      "late_changes": "additional display/progression differences appear after frame 7500, including 0xFF95B4–0xFF95B5 and 0xFF95BA"
+    }
+  },
+  "semantic_status": "LONG_SCORE_CONTROL; NO_DAMAGE_OR_HEALTH_TRANSITION; ARMOR_AND_WEAPON_FIELDS_UNRESOLVED"
+}
