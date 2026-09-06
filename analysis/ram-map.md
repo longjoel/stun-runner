@@ -41,7 +41,7 @@ not ordinary 68010 work RAM.
 | `0xFFDD16–0xFFDD17` | speed/velocity candidate; reset to zero, increased in `0x02820A` by `0x20`, bounded at `0x3C0`/`0x500`, displayed through the nearby HUD path, and consumed by motion math at `0x039E04` | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFFDD02`, `0xFFDD06`, `0xFFDD08` | three coordinate/position candidates; passed through collision/bounds checks and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570` | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
 | `0xFFDD1A–0xFFDD26` | active movement/physics cluster updated by the drive path; exact axis, steering, acceleration, and renderer roles remain unresolved | `OBSERVED-IN-TRACE` |
-| `0xFFDCC0–0xFFDCE0` | transient trajectory/animation state; static routines `0x0387B4–0x039126` initialize and update velocity/position-like fields, and synchronized Button 2 snapshots produce later differences in this block | `STATIC + SYNCHRONIZED-DIFFERENTIAL` |
+| `0xFFDCC0–0xFFDCE0` | transient trajectory/animation state; writers `0x0388DE–0x038A14` update a coherent 17-pass position/velocity-like record beginning ten frames after the second Button 2 edge | `STATIC + WRITER-TRACE + SYNCHRONIZED-DIFFERENTIAL` |
 | `0x80BFFE` | one observed 68010 write of `0xFFFF` during bounded title-path initialization | `OBSERVED-IN-TRACE` |
 
 ## ROM-to-RAM mechanism annotations

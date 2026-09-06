@@ -61,6 +61,28 @@
         "Later differences at 0xFFDCC5–0xFFDCC9 and 0xFFDCD6–0xFFDCD7 are transient trajectory/animation state; a larger object block appears by frame 1610.",
         "The evidence is compatible with a weapon-effect/object spawn but does not identify armor, ammunition, or a persistent weapon inventory field."
       ]
+    },
+    "trajectory_edge_trace": {
+      "range": "0xFFDCC0–0xFFDCE0",
+      "frames": [1540, 1620],
+      "result_sha256": "1a36458aec21f575437ab5372475f2ee6fdc5358d3ce046bdcb780733fa48da8",
+      "canonical_log_sha256": "68067d33e0a342cd5de219c94d260eb068289d8f4122c6913633de28c6eb05fd",
+      "event_count": 130,
+      "writer_pcs": ["0x035CC2", "0x035CCA", "0x035CD6", "0x0388DE", "0x0388F4", "0x03893C", "0x038942", "0x03899C", "0x038A12", "0x038A14"],
+      "address_counts": {
+        "0xFFDCC0": 2,
+        "0xFFDCC2": 2,
+        "0xFFDCC4": 17,
+        "0xFFDCC6": 17,
+        "0xFFDCC8": 17,
+        "0xFFDCCC": 17,
+        "0xFFDCCE": 17,
+        "0xFFDCD0": 17,
+        "0xFFDCD2": 17,
+        "0xFFDCDC": 7,
+        "0xFFDCDE": 17
+      },
+      "observation": "The first updates occur at frame 1560, ten frames after Button 2 at 1550. The fields advance as a coherent trajectory across 17 writer passes; this is stronger evidence for a spawned/moving effect record than for a persistent armor or inventory field, but its game object identity remains unresolved."
     }
   },
   "observation": "Repeated Button 1/Button 2 and vertical-steering events did not create a new persistent status transition in 0xFF9500–0xFF9580. The score field was only cleared, while the countdown and course mechanisms continued. The extended 0xFFDC00–0xFFDD90 tap likewise shows 0xFFDC1C/0xFFDC1E flag traffic and continuous 0xFFDD82–0xFFDD90 object/renderer writes, but no isolated armor, weapon, or ammunition transition.",
