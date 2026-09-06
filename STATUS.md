@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-**M3 — Reset and initialization**
+**M4 — Native shell**
 
 ## State
 
@@ -14,6 +14,10 @@ input-dependent renderer boundary committed
 M2: **complete** — fixed-origin ADSP replacement image is built, placed, and
 executed in the pinned MAME runtime with repeatable read-back and PC advance
 
+M3: **complete** — source-defined ADSP reset/setup slice installs before the
+original upload, reaches a repeatable bounded loop, and matches the
+synchronized non-ADSP checkpoint boundary
+
 Original in MAME: **ROM-validated and runtime-inventoried; title checkpoint established**
 
 Step 0 driver mining: **worked example retained; runtime tags reconciled against system MAME 0.289**
@@ -24,7 +28,27 @@ Native target: **deterministic replay/checkpoint scaffolding and evidence-backed
 
 Verification harness: **bounded replay/checkpoint/trace path implemented; M1 machine facts are promoted into selectors and evidence fixtures**
 
-## Immediate objective — M3 reset and initialization
+## Immediate objective — M4 native shell
+
+Complete the native deterministic shell contract: replay the common experiment
+schema, preserve machine/checkpoint observability, and establish the smallest
+host-side timing/input/rendering boundary needed before visible-output work.
+Keep all game semantics evidence-backed and leave the current five verified
+transport slices intact.
+
+### M3 completion evidence
+
+Two fresh C-emitter/MAME runs reproduce the fixed `init-state` image
+(`ddbe84919c7120f970fc5e635979ec5b4fd1fd55da8a991f9a5076e9f9668fe1`), install
+at frame 1, settle at frame 61 with ADSP `PC=0x0050`, report zero program
+readback mismatches, and reproduce `DM($0955)=0x1242`, `DM($0956)=0x124E`,
+`DM($0959)=0x7FFF`, and `DM($095A)=0xFFFF`. The two result JSON hashes are
+identical. The synchronized comparison in
+`reference/experiments/stunrun/m3-adsp-c-init-state-frame61.metadata.json`
+matches main CPU, GSP, and sound CPU registers against the canonical boundary;
+the loaded ADSP program/PC difference is intentional and documented.
+
+## Historical M3 objective
 
 Use the M2 image loader and the frozen M1 contract to move the replacement slice
 to the earliest reproducible initialization boundary:
