@@ -45,6 +45,10 @@ instructions and observed writes:
 | `0xFF9490` | `0x020510` increments this byte before calling `0x02053C`; `0x020544` increments it again inside that routine | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9498` | `0x02053C` uses this as a base pointer for a state/cache structure; offsets `+0x16`, `+0x17`, `+0x19`, `+0x1C–0x21`, `+0x28`, and `+0x2A` are accessed | `STATIC-CANDIDATE` |
 | `0xFF94AE–0xFF94BE` | the `0x0205E2–0x02061E` subpath stores source bytes and derived XOR bytes at offsets from the `0xFF9498` structure base; the late-drive trace adds these writers | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9498–0xFF94A4` | late-drive-only initialization writes occur at `0x020680`, `0x0206BE`, `0x0206C8`, and `0x020CA6`; observed values include `0x0404`, `0x0808`, `0x12FF`, and `0xFF2E` | `OBSERVED-IN-TRACE` |
+| `0xFF94AE` | repeated high-byte writes from the `0x020586`/`0x020634`/`0x02063A` path form a descending pattern beginning `0x0F`, `0x0E`, `0x0D`, …, `0x05` in the captured window | `OBSERVED-IN-TRACE` |
+| `0xFF94B0–0xFF94BE` | one captured derived-byte pass writes `0xFE`, `0x01`, then zero-valued low/high-byte components under the masks recorded by the tap | `OBSERVED-IN-TRACE` |
+| `0xFF94C0` | periodic `0x0206CC` writes are `0x0010` in no-input; the late-drive sequence begins `0x0010`, `0xFF1A`, `0x421D`, `0x421F`, `0x4221`, … | `OBSERVED-IN-TRACE` |
 
 The structure and counters are not yet assigned game meanings. In particular,
 the repeated `0x0205E2` stores may be a decoded/cache or renderer-support
