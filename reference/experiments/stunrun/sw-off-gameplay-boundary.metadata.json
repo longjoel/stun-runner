@@ -16,7 +16,7 @@
     "observation": "Rendered track, player vehicle, HUD, speed, level, and credits are visible."
   },
   "checkpoint": {
-    "path": "reference/checkpoints/m1-gameplay/state.json",
+    "path": "reference/checkpoints/m1-rendered-scene/state.json",
     "sha256": "09f484b6b18e73c07bbae5d9e740088d10befcd361b290fccbafeaf9c4836e05",
     "repeatable": true,
     "state_summary": {
@@ -28,6 +28,11 @@
       "adsp_program_sum32": 498822729
     }
   },
+  "comparison_no_input": {
+    "exact_frame": 1800,
+    "screenshot_sha256": "2445f5cb2f853ba1bdba477ecf55f7e82139e51ed8fe3046394988ee5d80f119",
+    "observation": "The no-input run produces the identical rendered scene at the same frame."
+  },
   "gsp_post_loading_probe": {
     "frames": 1800,
     "capture_start_frame": 600,
@@ -37,9 +42,9 @@
       "b4f9998c89374174744e964ced18bcf91c58a389388bcf7ef7da01d5bc1ff8dd",
       "34f388bc456ad0fcb4e2d69a26d80255eeaf587d0f6ad3f9e548cf6106bd0906"
     ],
-    "interpretation": "The first input-dependent visible gameplay boundary does not add writes to the two narrow host GSP registers after frame 600; other GSP VRAM/control paths remain outside this probe."
+    "interpretation": "This rendered-landmark replay does not add writes to the two narrow host GSP registers after frame 600; the no-input comparison is identical, and other GSP VRAM/control paths remain outside this probe."
   },
-  "confidence": "OBSERVED-IN-REPLAY + REPEATABLE-NUMERIC-CHECKPOINT",
+  "confidence": "OBSERVED-IN-REPLAY + REPEATABLE-NUMERIC-CHECKPOINT rendered landmark",
   "raw_artifacts_kept_local": true,
-  "next_question": "Capture a bounded input-dependent GSP VRAM/control landmark or promote a justified gameplay selector without treating visual state alone as proof."
+  "next_question": "Drive a verified player-control input and capture a genuinely input-dependent state transition before promoting a gameplay selector."
 }

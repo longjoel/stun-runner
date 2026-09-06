@@ -111,8 +111,8 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   first input-dependent GSP submission, and a synchronized semantic gameplay
   selector. The late-applied SW1-off experiment is a repeatable loading / blank
   negative control; applying the same DIP bank before reset now yields a
-  repeatable exact-frame gameplay checkpoint, while the normalized M1
-  checkpoint extension remains repeatable for both title and gameplay paths.
+  repeatable exact-frame rendered-scene checkpoint, but the identical no-input
+  render means it is not yet a gameplay selector.
 
 ## Completed baseline slices
 

@@ -183,10 +183,11 @@ producer-side ADSP meaning of each block remains unresolved. See
   the wrong input/DIP configuration as a gameplay selector. See
   `reference/experiments/stunrun/sw-off-loading-boundary.metadata.json`.
 - OBSERVED-IN-REPLAY + REPEATABLE-CHECKPOINT: establishing the same SW1 values
-  before reset, then applying the Coin 1/Start schedule, produces a rendered
-  gameplay frame and an identical frame-1800 numeric checkpoint in two fresh
-  configurations. This proves an input/configuration-dependent gameplay
-  boundary, but does not yet assign semantics to the visible state fields. See
+  before reset, then applying the Coin 1/Start schedule, produces an identical
+  rendered scene and frame-1800 numeric checkpoint in two fresh configurations.
+  The no-input run produces the same rendered scene and sampled GSP state, so
+  this is not evidence of player gameplay or an input-dependent GSP boundary.
+  See
   `reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json`.
 - UNKNOWN: interrupt/flag direction and acknowledgement sequence.
 

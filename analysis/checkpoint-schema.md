@@ -44,7 +44,8 @@ repeatable loading/blank negative control, not a gameplay path or canonical
 numeric checkpoint. The replay harness now supports an exact-frame snapshot
 and exit, so future visual and numeric captures can share a frame boundary.
 
-The frame-1800 gameplay fixture in
-`reference/checkpoints/m1-gameplay/state.json` uses the same compact schema and
-is byte-for-byte repeatable across two fresh configurations. It is a
-provenance-backed gameplay boundary, not yet a semantic `game_state` contract.
+The frame-1800 rendered-scene fixture in
+`reference/checkpoints/m1-rendered-scene/state.json` uses the same compact
+schema and is byte-for-byte repeatable across two fresh configurations. The
+identical no-input render means it is not a gameplay boundary or semantic
+`game_state` contract.

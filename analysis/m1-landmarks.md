@@ -84,11 +84,11 @@ gameplay selector. See
 `reference/experiments/stunrun/sw-off-loading-boundary.metadata.json`.
 
 The corrected pre-start variant applies the SW1 DIP bank before reset rather
-than at frame 1. At exact frame 1800 it produces an identical rendered
-gameplay image and an identical normalized checkpoint in two fresh
-configurations. This is the current strongest gameplay boundary fixture; it
-still promotes only the existing `adsp_program_loaded` selector, not a guessed
-semantic game-state field. See
+than at frame 1. At exact frame 1800 it produces an identical rendered scene
+and an identical normalized checkpoint in two fresh configurations. The
+no-input run produces the same scene, so this remains a repeatable rendered
+landmark rather than a gameplay boundary and promotes no semantic game-state
+field. See
 `reference/experiments/stunrun/sw-off-gameplay-boundary.metadata.json`.
 
 An early 30-frame Coin 1 pulse followed by Start produces the same result as
