@@ -1,0 +1,37 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "main_ram_center_object_hit_score",
+  "tools": ["tools/mame-memory-snapshot", "tools/mame-ram-write-trace", "tools/mame-listings"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "schedule": "experiments/stunrun/collision_probe_center.json",
+  "interaction": {
+    "object_trace": {
+      "range": "0xFFDD00–0xFFDD60",
+      "frames": [2200, 3600],
+      "event_count": 8015,
+      "canonical_log_sha256": "b780e4930a2c7fd0a6c3903108c580d5303734fedc1c1264d27e2350e5f3d567",
+      "hit_counter": {
+        "address": "0xFFDD02",
+        "writer_pc": "0x03A298",
+        "values": "0x01 through 0x22"
+      },
+      "negative_candidates": ["0xFFDD0C", "0xFFDD10", "0xFFDD50"]
+    },
+    "score_trace": {
+      "range": "0xFF9530–0xFF9538",
+      "frames": [2200, 3600],
+      "event_count": 1615,
+      "canonical_log_sha256": "b8c02691475f672e363497229f5334f580f0076270b0628d512e5ca847f8f77a",
+      "writer_pc": "0x03A2EC",
+      "score_values": "50 through 1700"
+    }
+  },
+  "static_mechanism": {
+    "collision_check": "0x03B02C called from the object loop",
+    "hit_counter_increment": "0x03A298 adds one to 0xFFDD02 after a successful check",
+    "score_selection": "0x03A2E2 selects 0x1F4 when 0xFF9578 is nonzero, otherwise 0x32",
+    "score_write": "0x03A2EC adds the selected value to 0xFF9532"
+  },
+  "semantic_status": "OBJECT_HIT_AND_SCORE_CONFIRMED; CRAFT_HEALTH_UNRESOLVED"
+}

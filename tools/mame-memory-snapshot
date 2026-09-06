@@ -24,7 +24,7 @@ def main() -> int:
     parser.add_argument("--width", type=int, choices=(8, 16, 32), default=8)
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--targets", default=None)
-    parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left"), default="none")
+    parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center"), default="none")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0 or args.count <= 0 or args.base < 0:

@@ -40,7 +40,8 @@ not ordinary 68010 work RAM.
 | `0xFF9544` | object/event attribute flag; static paths derive it from bit 7 of active object-record fields at `0x0323A4`/`0x03244A`, rather than from a persistent craft-status record | `STATIC-RESOLVED-OBJECT-FLAG` |
 | `0xFF4410–0xFF44FF` | ten-entry persistent high-score table in the mapped ZRAM view; 24-byte records contain a big-endian score at `+0` and a display name beginning at `+2` | `SNAPSHOT + PERSISTENT-NVRAM + STATIC` |
 | `0xFFDD16–0xFFDD17` | speed/velocity candidate; reset to zero, increased in `0x02820A` by `0x20`, bounded at `0x3C0`/`0x500`, displayed through the nearby HUD path, and consumed by motion math at `0x039E04` | `STATIC + OBSERVED-IN-TRACE` |
-| `0xFFDD02`, `0xFFDD06`, `0xFFDD08` | three coordinate/position candidates; passed through collision/bounds checks and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570` | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
+| `0xFFDD02` | object-hit/progression counter; `0x03A298` increments it after the object collision check, and the following `0x03A2EC` path awards `50` or `500` points based on `0xFF9578` | `DYNAMIC-OBJECT-HIT-COUNTER-CONFIRMED` |
+| `0xFFDD04`, `0xFFDD06`, `0xFFDD08` | coordinate/object-state candidates passed through collision/bounds helpers and copied into historical comparison fields `0xFF9576`, `0xFF9574`, `0xFF9570`; exact ownership remains unresolved | `STATIC-CANDIDATE + OBSERVED-IN-TRACE` |
 | `0xFFDD1A–0xFFDD26` | active movement/physics cluster updated by the drive path; exact axis, steering, acceleration, and renderer roles remain unresolved | `OBSERVED-IN-TRACE` |
 | `0xFFDD0C` | static collision/scoring path accumulates a count-derived contribution here before adding it to the live score; runtime meaning and event ownership remain unresolved | `STATIC-CANDIDATE` |
 | `0xFFDD10` | static collision/scoring path initializes a short event cooldown to `0x14`; the aligned scoring-window trace did not observe a write to this location | `STATIC-CANDIDATE + OBSERVED-NEGATIVE` |
@@ -121,9 +122,10 @@ backed by the two persistent byte lanes `:mainpcb:200e` (M48T02) and
 work RAM. See
 `reference/experiments/stunrun/main-nvram-high-score-table.metadata.json`.
 
-The first drive-state cluster is now narrowed to `0xFFDD02/06/08` and
-`0xFFDD16–0xFFDD26`. The static code treats the first three as bounded
-coordinate-like values and stores their previous values at `0xFF9576/74/70`.
+The drive/object cluster is now split: `0xFFDD02` is an object-hit/progression
+counter, while `0xFFDD04/06/08` remain bounded coordinate/object-state
+candidates whose historical values are stored at `0xFF9576/74/70`.
+The neighboring `0xFFDD16–0xFFDD26` fields form the active motion cluster.
 `0xFFDD16` is stronger: it is reset, stepped by `0x20`, bounded at `0x3C0`
 and `0x500`, passed to a HUD formatting path, and used in motion calculations.
 The synchronized late versus late-drive snapshots diverge first around the

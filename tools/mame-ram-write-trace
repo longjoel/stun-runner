@@ -30,7 +30,7 @@ def main() -> int:
     parser.add_argument("--start-frame", type=int, default=680)
     parser.add_argument("--end-frame", type=int, default=705)
     parser.add_argument("--max-events", type=int, default=50000)
-    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe"), default="none")
+    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center"), default="none")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if not (0 <= args.base <= args.end and args.end_frame >= args.start_frame > 0):

@@ -94,6 +94,35 @@ Static listing inspection resolves two tempting bytes: `0xFF9544` is copied
 from object-record attribute bit 7 by `0x0323A4`/`0x03244A`, and `0xFF9582` is
 the five-bit cyclic counter updated at `0x0268EC`. Neither is armor or health.
 
+## Center-run object-hit confirmation
+
+The no-fire center schedule is a stronger interaction control than the earlier
+steering probes. Its object-window trace covers frames 2200–3600 and has
+canonical log hash:
+
+```text
+b780e4930a2c7fd0a6c3903108c580d5303734fedc1c1264d27e2350e5f3d567
+```
+
+The trace records `0xFFDD02` advancing from `1` through `0x22` at PC
+`0x03A298`. The corresponding score trace has canonical log hash:
+
+```text
+b8c02691475f672e363497229f5334f580f0076270b0628d512e5ca847f8f77a
+```
+
+It records PC `0x03A2EC` writing successive 50-point increments at frames
+2565–2628, 2925–2943, 3043–3201, 3387–3423, and 3585–3594. The static listing
+shows the causal sequence: a successful `0x03B02C` object check reaches
+`0x03A298`, increments `0xFFDD02`, selects the track-dependent point value,
+and adds it to `0xFF9532`. This confirms `0xFFDD02` as an object-hit or
+progression counter and `0xFF9532–0xFF9535` as the score destination in the
+same live interaction.
+
+The center run still leaves `0xFFDD0C`, `0xFFDD10`, and `0xFFDD50` at zero;
+those remain candidates for a different collision/object class. Nothing in
+this successful object-hit path is evidence of craft armor or health.
+
 ## Current conclusion
 
 `0xFFDD0C`, `0xFFDD10`, `0xFFDD4E`, and `0xFFDD50` are retained as literal

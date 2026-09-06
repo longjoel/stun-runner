@@ -1,0 +1,12 @@
+{
+  "schema": "arcade-experiment/v1",
+  "id": "collision_probe_center",
+  "start": "power_on",
+  "events": [
+    {"frame": 650, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "press"},
+    {"frame": 680, "port": ":mainpcb:IN0", "field": "Coin 1", "action": "release"},
+    {"frame": 750, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "press"},
+    {"frame": 780, "port": ":mainpcb:a80000", "field": "1 Player Start", "action": "release"}
+  ],
+  "expect": {"kind": "frame", "frame": 3600, "timeout_frames": 3720}
+}
