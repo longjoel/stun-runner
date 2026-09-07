@@ -86,7 +86,11 @@
       "negatives": ["8 post-start sweep slots", "pre-start stick-L/R + Button1", "Coin 2", "3600-frame late_drive", "3600-frame coin+start-only (score arc 50-1700 reproduced)"],
       "boot_trace": "/tmp/geom-courseboot (frames 1-700): only two zero-writes to 0xFF9578 (frame 36 PC 0x21302, frame 362 PC 0x24322)",
       "mid_trace": "/tmp/geom-coursetrace (frames 2400-2800): zero writes to 0xFF9570-0xFF9580",
-      "untried": ["Service Mode / SW1-DIP course selection", "race completion"],
+      "untried": ["blind service-menu navigation", "race completion"],
+      "service_mode": "/tmp/geom-service: boots near-normal, gameplay suppressed (score 0, geometry zero at 1400); course 0",
+      "sw1": "all-on breaks boot (25KB 0xFF fill, 0xFFFF course is uninitialized RAM); single bits 1-8 boot normal, course 0",
+      "attract_fill": "/tmp/geom-attract (none, 3600): work RAM 0xFF-fills after 600-1200 idle frames (45645 cells, 0x55/0x0F residues), ~39k overlap with DIP-test footprint; ownership unresolved",
+      "human_race_transitions": "/tmp/race-run-3 (16 snapshots + states to frame 9600): course word 0xFF9578 = 0/10/11 with transitions at frames 1445 and 5256 (high byte always 0; low byte 0xFF9579 carries 0/10/11); 53 course-locked cells incl 0xFF9579, 0xFF957D epoch marker (0,1,0), 0xFF9577 (63,0,14); 10+ clean +500 awards all at course 10 (selection model confirmed live); save-state ROM-read differential confounded by execution-regime mismatch (32168/1800/0 events)",
       "ioport_probe_2026_09_06": "1P-only: 1 Player Start, P1 Button 1/2, AD Stick X/Y, Coin 1/2, Service Mode, Diagnostic jumper, SW1:1-8; no 2-player start (2P selection ruled out)"
     },
     "confidence": "OBSERVED-IN-TRACE (this session, determinism cross-checked against prior session hashes)",

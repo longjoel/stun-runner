@@ -63,6 +63,16 @@ def main() -> int:
                         help="use a fresh MAME config dir (default keys: "
                              "coin 5, start 1). Use this if a persisted DIP "
                              "change in your config forces service/test mode.")
+    parser.add_argument("--record", metavar="NAME", default=None,
+                        help="record inputs for later deterministic replay; "
+                             "stored as <output>/<NAME>.inp")
+    parser.add_argument("--playback", metavar="INP", default=None,
+                        help="replay inputs from an INP file (recorded by "
+                             "--record) with full instrumentation; live "
+                             "inputs are ignored during playback. For a "
+                             "faithful replay, record with --fresh-nvram and "
+                             "replay into a NEW output dir with "
+                             "--fresh-nvram.")
     parser.add_argument("--dry-run", action="store_true",
                         help="print the MAME command and exit without launching")
     parser.add_argument("--mame", default="mame",
@@ -70,6 +80,19 @@ def main() -> int:
     args = parser.parse_args()
     if args.frames < 0 or args.every <= 0:
         parser.error("frames must be >= 0 and every must be positive")
+    if args.record is not None and args.playback is not None:
+        parser.error("--record and --playback are mutually exclusive")
+    playback_path = None
+    if args.playback is not None:
+        playback_path = pathlib.Path(args.playback)
+        if not playback_path.is_file():
+            raise SystemExit(f"missing input recording: {args.playback}")
+        playback_path = playback_path.resolve()
+    record_name = None
+    if args.record is not None:
+        record_name = pathlib.Path(args.record).name
+        if not record_name.endswith(".inp"):
+            record_name += ".inp"
     if not (args.rompath / "stunrun").is_dir():
         raise SystemExit(f"missing ROM set directory: {args.rompath}/stunrun")
     args.output.mkdir(parents=True, exist_ok=True)
@@ -78,6 +101,9 @@ def main() -> int:
     if not script.is_file():
         raise SystemExit(f"missing lua sidecar: {script}")
     print(INSTRUCTIONS.format(output=args.output, every=args.every))
+    if args.playback is not None:
+        print(f"REPLAY MODE: inputs come from {args.playback}; "
+              "your live inputs are ignored. Sit back.")
     env = dict(os.environ)
     env["STUNRUN_PLAY_OUT"] = str(args.output)
     env["STUNRUN_PLAY_EVERY"] = str(args.every)
@@ -97,6 +123,13 @@ def main() -> int:
         cfg_dir = args.output / "cfg-fresh"
         cfg_dir.mkdir(exist_ok=True)
         command += ["-cfg_directory", str(cfg_dir)]
+    if record_name is not None:
+        command += ["-input_directory", str(args.output),
+                    "-record", record_name]
+        print(f"inputs will be recorded to {args.output / record_name}")
+    if playback_path is not None:
+        command += ["-input_directory", str(playback_path.parent),
+                    "-playback", playback_path.name]
     print("+ " + " ".join(command), flush=True)
     if args.dry_run:
         return 0

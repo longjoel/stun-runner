@@ -46,10 +46,11 @@ extern "C" {
 #define STUNRUN_SCORE_AWARD_LOW 0x32u
 #define STUNRUN_SCORE_AWARD_HIGH 0x1F4u
 
-/* Claimed course-index values (selection input domain). Provenance gap
- * recorded 2026-09-06: no live MAME run this session reproduced a nonzero
- * course word (see QUESTIONS.md IRQ-0005); the nonzero=>500 selection
- * behavior itself is OBSERVED-IN-TRACE. */
+/* Course-index values for the selection path. Live provenance updated
+ * 2026-09-06: human races observed 0xFF9579 = 5 (frame 880, writer PC
+ * 0x02B63E), 10 and 11, with +500 awards firing at 5 and 10, so the
+ * nonzero=>500 selection is OBSERVED-IN-TRACE. Values 3/6 below remain
+ * static-only regression vectors for the same nonzero path. */
 #define STUNRUN_SCORE_COURSE_ZERO 0u
 #define STUNRUN_SCORE_COURSE_A 3u
 #define STUNRUN_SCORE_COURSE_B 6u

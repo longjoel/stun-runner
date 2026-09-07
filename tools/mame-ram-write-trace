@@ -35,12 +35,24 @@ def main() -> int:
     parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center", "fork_button2_sweep", "fork_hold_left", "fork_hold_right"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
+    parser.add_argument("--playback", type=pathlib.Path,
+                        help="replay a recorded .inp with no scripted inputs; "
+                             "isolation flags are dropped for record fidelity")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if not (0 <= args.base <= args.end and args.end_frame >= args.start_frame > 0):
         parser.error("invalid address or frame range")
     if args.load_state and not args.load_state.is_file():
         raise SystemExit(f"save state does not exist: {args.load_state}")
+    if args.load_state and args.playback:
+        parser.error("--load-state and --playback are mutually exclusive")
+    playback = None
+    if args.playback:
+        playback = args.playback.resolve()
+        if not playback.is_file():
+            raise SystemExit(f"missing input recording: {args.playback}")
+        if args.input != "none":
+            parser.error("--playback requires --input none")
     args.output.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
     state_stage = None
@@ -65,6 +77,13 @@ def main() -> int:
     if args.load_state:
         command.insert(command.index("-seconds_to_run"), "-state")
         command.insert(command.index("-seconds_to_run"), "1")
+    if playback is not None:
+        for flag in ("-noreadconfig", "-nowriteconfig",
+                     "-cfg_directory", "/tmp/stunrun-mame-cfg",
+                     "-nonvram_save"):
+            command.remove(flag)
+        command += ["-input_directory", str(playback.parent),
+                    "-playback", playback.name]
     environment = {
         **os.environ,
         "STUNRUN_RAM_TRACE_OUT": str(args.output),
@@ -97,6 +116,7 @@ def main() -> int:
         "base": args.base, "end": args.end, "load_state": str(args.load_state) if args.load_state else None,
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,
+        "playback": str(playback) if playback else None,
         "returncode": completed.returncode, "events": events,
         "event_count": len(events),
         "writer_pcs": sorted({event["pc"] for event in events}),

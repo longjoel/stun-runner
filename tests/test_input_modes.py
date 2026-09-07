@@ -55,7 +55,11 @@ class InputModeTests(unittest.TestCase):
 
     def test_course_modes_present(self):
         for mode in ("course_sweep", "course_preface_left",
-                     "course_preface_right", "course_coin2"):
+                     "course_preface_right", "course_coin2",
+                     "service_probe", "sw1_all_on",
+                     "sw1_bit1", "sw1_bit2", "sw1_bit3", "sw1_bit4",
+                     "sw1_bit5", "sw1_bit6", "sw1_bit7", "sw1_bit8",
+                     "drive_hold"):
             self.assertIn(mode, wrapper_modes())
             self.assertIn(mode, lua_modes())
 
@@ -74,6 +78,8 @@ class InputModeTests(unittest.TestCase):
     def test_coin_precedes_start(self):
         for mode in ("course_sweep", "course_preface_left",
                      "course_preface_right", "course_coin2",
+                     "service_probe", "sw1_all_on",
+                     "sw1_bit1", "sw1_bit8", "drive_hold",
                      "late_drive", "late"):
             frames = [(frame, field, action)
                       for frame, _, field, action in lua_events(mode)]

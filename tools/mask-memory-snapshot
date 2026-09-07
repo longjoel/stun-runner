@@ -45,7 +45,8 @@ def load_mask(path):
             })
         except (KeyError, ValueError, TypeError):
             raise SystemExit(f"{path}: malformed region {entry!r}")
-        if entry["category"] not in ("explained", "tracked"):
+        if entry["category"] not in ("explained", "tracked",
+                                             "static-candidate"):
             raise SystemExit(f"{path}: bad category {entry['category']!r}")
     return value, regions
 

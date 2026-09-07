@@ -24,8 +24,6 @@ Record:
 - exact launch command;
 - any flags/scripts needed for deterministic tracing.
 
-### Why it matters
-
 All traces, snapshots, annotations, reproduction builds, and verifier comparisons need a single stable reference revision.
 
 ### Resolution
@@ -247,7 +245,7 @@ at 1-frame resolution. Still open: course-dependent table selection
 
 ## IRQ-0005
 
-Status: OPEN
+Status: RESOLVED (original field/width premise corrected)
 From: Agent 2 (Implementer)
 To: Investigator
 Priority: MEDIUM
@@ -333,6 +331,122 @@ Buttons 1/2, AD Stick X/Y, Coin 1/2, Service Mode, Diagnostic jumper,
 SW1:1–8 — no 2-player start exists, so 2P selection is off the table.
 Candidates untried: Service Mode / SW1-DIP course selection,
 race completion.
+
+### Investigation update 5 (2026-09-06, service mode + DIPs, Agent 2 executed)
+
+New modes `service_probe`, `sw1_all_on`, `sw1_bit1`–`sw1_bit8`
+(all rc=0, covered by `tests/test_input_modes.py`):
+- Service Mode held from frame 100 through coin/start: boots
+  near-normally (375,978 nonzero at 600) but gameplay never starts
+  (score 0, geometry buffers zero at 1400). Service suppresses the
+  coin→start→gameplay path — plausibly sitting in a service menu.
+- All-SW1-on: boot breaks, ~25 KB of work RAM 0xFF-filled at frame 600;
+  the 0xFFFF "course" there is uninitialized RAM, not a selection.
+- Single DIP bits 1–8: all boot normally, course 0 throughout.
+- Surprise: a 3600-frame no-input attract run also 0xFF-fills work RAM
+  (45,645 cells, with 0x55/0x0F pattern residues), overlapping the
+  DIP-test footprint by ~39k cells. So the 0xFF-fill state is reachable
+  with default DIPs after ~600–1200 idle frames — possibly a self-test
+  or watchdog-POST loop, ownership unresolved.
+Net: no DIP or service interaction sets course 3/6. This converges with
+the peer's `course-flag-config-matrix` probe (service: 0 course reads;
+all-SW1-on: 104 reads all zero, activity only in the adjacent `0xFF957A`
+input-state word). Remaining: blind service-menu navigation
+(button/stick while in service), race completion.
+
+### Investigation update 6 (2026-09-06, human race captures transitions, Agent 2 executed)
+
+The user's human-play run (`/tmp/race-run-3`, 16 snapshots + states to
+frame 9600) captured the first live nonzero course transitions: word
+`0xFF9578` reads **0 → 10 at frame 1445** and **10 → 11 at frame 5256**
+(big-endian u16; high byte `0xFF9578` stays 0, low byte `0xFF9579`
+carries 0/10/11). The peer reassessment stands refined: `0xFF957A`
+stays 0 here while `0xFF957B` carries the input-state encodings
+(3/7/0/7) in the same run — both fields live side by side.
+Filtering four snapshots (1200/1800/4800/5400) for cells that change at
+both transitions and hold steady between yields 53 course-locked cells,
+headlined by `0xFF9579` (0,10,11), `0xFF957D` (0,1,0 — marks the
+course-10 epoch only), and `0xFF9577` (63,0,14); the rest are
+0xFFFB–0xFFFD block flips plus scattered bytes.
+Award audit CONFIRMS the selection model live: the run's log holds 10+
+clean +500 awards, every one at course 10, while the course-0 sweep run
+scored purely in +50 steps. `tools/mask-memory-snapshot` now accepts the
+`static-candidate` mask category (folded into tracked, never masked)
+with a dedicated test; full suite 69 green.
+A save-state-anchored ROM-read differential (states 1200/1800/5400, PCs
+0x28–0x29300/0x2B–0x2BC00/0x3A–0x3B000, 120 relative frames, no inputs)
+is CONFOUNDED, not conclusive: event counts collapse 32168 → 1800 → 0
+across the three states, so the loaded states sit in different
+execution regimes and absence patterns cannot be read as stride shifts.
+Stride semantics still need the static listing of the reader PCs with
+10/11 as the index domain — over to the Investigator, with states
+`state-1200/1800/5400.sta` available for replay.
+
+### Investigation update 7 (2026-09-06, state-anchored differential blocked, Agent 2 executed)
+
+Harness gotcha: `rom-read-trace.lua` installs its tap at relative frame
+10, so any branch shorter than ~11 relative frames captures nothing —
+the first 10-frame attempt's zeros were a tool boundary, not game fact.
+Re-ran at 30 relative frames: event counts 6086 → 300 → 0 across
+states 1200/1800/5400, with ZERO pairwise PC overlap even between 1200
+and 1800. The three states run fully disjoint code in the traced ranges,
+so no same-PC cross-state stride comparison exists on this path.
+A `drive_hold` mode (stick + Button 1 from relative frame 2, for
+branch-and-drive) was added and verified applied via the `0xFF8000`
+plumbing bytes — yet 600 driven frames from `state-1200.sta` never
+refire the frame-1445 transition (course and score stay 0). Transitions
+require the user's exact play trajectory, not generic driving. The
+unblock is a RECORDED human race (`--record`): with the `.inp`, any
+transition becomes deterministically replayable for writer/ROM-read
+tracing. Covered by `tests/test_input_modes.py`; suite 71 green.
+
+### Investigation update 8 (2026-09-06, recorded race cracks stride, Agent 2 executed)
+
+The user's recorded race (`/tmp/race/r1.inp`, "started on L6") replays
+bit-identically through the play sidecar and settles the open points:
+- Transition writer: frame 880, PC **`0x2B63E`** writes **5** to
+  `0xFF9578` (course-log flips 0→5 at 881). Preceded by `0x2B1FE`
+  stepping `0xFF957A` 3→2 every 3rd frame, followed at 880 by
+  `0x3B25E/0x3B272/0x3B286` zeroing `0xFF9570/74/76`, and at 885 by
+  `0x2BADC/0x2BAE2` zeroing `0xFF957A/7C`. Full frame-850–910 write
+  trace in `/tmp/race-wwrite`.
+- Award path is immediates, not a table: at the first +500s (frames
+  1441/1489, course 5), `0x3A2E2` reads `0x3A2E6` = **`0x1F4`** and
+  `0x3A2EC` reads `0x3A2F0` = `0x9532` — the constants sit in the
+  instruction stream. H1 is dead for awards; the branch is on nonzero.
+- Geometry stride, first dynamic anchor: the same march PCs
+  (`0x29760/0x2976E`, 384 words, +2 step) read base **`0x44630`** at
+  course 0 and base **`0x45230`** at course 5 (Δ `0xC00` = 4 table
+  lengths), each burst feeding the twin-buffer upload. Same routine and
+  shape, course-shifted base — H1 mechanism confirmed, stride constant
+  still needs a third course value. Assumption: the 883–885 burst is the
+  new course's first segment, equivalent to the course-0 1286–1288 one.
+- Per-object pipeline mapped as a bonus: at each +500 event the object
+  PCs (`0x3A0AE/0x3A0DA/0x3A0E6/0x3A268/0x3A502`…) advance to the next
+  record (`0x4C91E→0x4C936` +0x18, `0x4B294→0x4B2C4` +0x30,
+  `0x4B1BA→0x4B226` +0x6C) — successive objects, not course stride.
+  Full table in `/tmp/race-award`.
+- Fidelity notes: record→playback is byte-identical, but the user's
+  original vs my playback differ by 334 cells (clock phase ≈87 frames —
+  a 1-frame record/playback offset) while refiring the transition;
+  trace wrappers now take `--playback` (isolation flags dropped for
+  record fidelity) with arg-gate tests. Full suite green (77 at write
+  time; count moves as peers add tests).
+
+### Investigation update 5 (2026-09-06, full-word reader trace)
+
+The apparent course values were a byte/width interpretation error. The
+four-byte snapshot region begins at `0xFF9578`, but the active 16-bit field is
+at `0xFF957A`. A full-word direct read trace observed `0x0003` at frame 771,
+`0x0006` at frame 927, and `0x0007` at frame 1504. Static code resolves the
+writers: `0x02B1D0` derives the value from `:mainpcb:a80001`, and `0x02BA68`
+derives a masked `0..7` state including the `BTST #2` control bit. The reads
+are input-state comparisons, not course-indexed ROM-table accesses. H1 is
+therefore KILLED for `0xFF957A`; the original H1 premise is also KILLED for
+`0xFF9578` because its only observed nonzero values were misattributed from
+the adjacent input-state word. The distinct `0xFF9578` score/course flag is
+still always zero in current runs, so its producer and any real course
+selection mechanism remain an independent question.
 
 ### Why it matters
 

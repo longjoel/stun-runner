@@ -53,6 +53,40 @@ class PlayCaptureTests(unittest.TestCase):
             self.assertIn(f"os.getenv('{name}'", lua_text,
                           f"sidecar never reads {name}")
 
+    def test_dry_run_record_playback_flags(self):
+        import subprocess
+        import tempfile
+        with tempfile.TemporaryDirectory() as temp:
+            rompath = pathlib.Path(temp) / "roms"
+            (rompath / "stunrun").mkdir(parents=True)
+            out = pathlib.Path(temp) / "out"
+            rec = subprocess.run(
+                [str(WRAPPER), str(rompath), str(out), "--dry-run",
+                 "--record", "race1"],
+                capture_output=True, text=True, cwd=ROOT)
+            self.assertEqual(rec.returncode, 0, rec.stderr)
+            self.assertIn("-record", rec.stdout)
+            self.assertIn("race1.inp", rec.stdout)
+            inp = out / "race1.inp"
+            inp.write_bytes(b"fake")
+            back = subprocess.run(
+                [str(WRAPPER), str(rompath), str(out), "--dry-run",
+                 "--playback", str(inp)],
+                capture_output=True, text=True, cwd=ROOT)
+            self.assertEqual(back.returncode, 0, back.stderr)
+            self.assertIn("-playback", back.stdout)
+            self.assertIn("race1.inp", back.stdout)
+            both = subprocess.run(
+                [str(WRAPPER), str(rompath), str(out), "--dry-run",
+                 "--record", "a", "--playback", str(inp)],
+                capture_output=True, text=True, cwd=ROOT)
+            self.assertNotEqual(both.returncode, 0)
+            missing = subprocess.run(
+                [str(WRAPPER), str(rompath), str(out), "--dry-run",
+                 "--playback", str(out / "nope.inp")],
+                capture_output=True, text=True, cwd=ROOT)
+            self.assertNotEqual(missing.returncode, 0)
+
     def test_dry_run_clean_boot_flags(self):
         import subprocess
         import tempfile
@@ -86,12 +120,48 @@ class PlayCaptureTests(unittest.TestCase):
             self.assertNotEqual(proc.returncode, 0)
             self.assertIn("No such file", proc.stderr)
 
+    def test_trace_playback_arg_gates(self):
+        import subprocess
+        import tempfile
+        for tool, extra in (
+                ("mame-rom-read-trace",
+                 ["--pc-range", "0x28000-0x28100"]),
+                ("mame-ram-write-trace",
+                 ["--device", ":mainpcb:maincpu",
+                  "--base", "0xFF9578", "--end", "0xFF9579"])):
+            with tempfile.TemporaryDirectory() as temp:
+                temp = pathlib.Path(temp)
+                out = temp / "out"
+                base = [str(ROOT / "tools" / tool), "/nonexistent-roms",
+                        str(out), *extra, "--frames", "12",
+                        "--start-frame", "10", "--end-frame", "12"]
+                missing = subprocess.run(
+                    base + ["--playback", str(temp / "nope.inp")],
+                    capture_output=True, text=True, cwd=ROOT)
+                self.assertNotEqual(missing.returncode, 0,
+                                    f"{tool}: missing recording accepted")
+                state = temp / "s.sta"
+                state.write_bytes(b"fake")
+                conflict = subprocess.run(
+                    base + ["--playback", str(temp / "nope.inp"),
+                            "--load-state", str(state)],
+                    capture_output=True, text=True, cwd=ROOT)
+                self.assertNotEqual(conflict.returncode, 0,
+                                    f"{tool}: load-state+playback accepted")
+
     def test_no_scripted_inputs(self):
         lua_text = LUA.read_text(encoding="utf-8")
         self.assertNotIn("set_value", lua_text,
                          "play sidecar must not drive inputs")
         self.assertIn("machine:save", lua_text)
         self.assertIn("stunrun-memory-snapshot/v1", lua_text)
+
+    def test_course_writer_trace_contract(self):
+        lua_text = LUA.read_text(encoding="utf-8")
+        self.assertIn("course-writes.txt", lua_text)
+        self.assertIn("install_write_tap", lua_text)
+        self.assertIn("stunrun_play_course_write", lua_text)
+        self.assertIn("pc_state.value", lua_text)
 
     def test_ignores_bus_fill_samples(self):
         lua_text = LUA.read_text(encoding="utf-8")

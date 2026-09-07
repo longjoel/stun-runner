@@ -132,6 +132,21 @@ class MaskSnapshotTests(unittest.TestCase):
             self.assertEqual(report["residue_ranges"], [])
             self.assertIn("residue=0", run.stdout)
 
+    def test_static_candidate_is_tracked_never_masked(self):
+        with tempfile.TemporaryDirectory() as directory:
+            snap = write_snapshot(directory, "snap.json",
+                                  values=[7] * 16)
+            mask = write_mask(directory, [region("s", 256, 259,
+                                                 "static-candidate")])
+            out = pathlib.Path(directory) / "out"
+            run = self.run_tool("--mask", mask, "--snapshot", snap,
+                                "--output", out)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            report = json.loads((out / "residue.json").read_text())
+            self.assertEqual(report["summary"]["explained_cells"], 0)
+            self.assertEqual(report["summary"]["tracked_cells"], 4)
+            self.assertEqual(report["summary"]["residue_cells"], 12)
+
     def test_device_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             snap = write_snapshot(directory, "snap.json", device="other")

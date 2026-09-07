@@ -190,6 +190,77 @@ local events = input_mode == 'fork_button2_sweep' and {
     {frame = 745, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
     {frame = 800, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
     {frame = 830, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'service_probe' and {
+    {frame = 100, port = ':mainpcb:IN0', field = 'Service Mode', action = 'press'},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:IN0', field = 'Service Mode', action = 'release'}
+} or input_mode == 'sw1_all_on' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:2', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:3', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:4', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:5', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:6', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'drive_hold' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'}
+} or input_mode == 'sw1_bit1' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw1_bit2' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:2', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw1_bit3' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:3', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw1_bit4' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:4', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw1_bit5' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:5', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw1_bit6' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:6', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw1_bit7' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'sw1_bit8' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
 } or input_mode == 'course_coin2' and {
     {frame = 650, port = ':mainpcb:IN0', field = 'Coin 2', action = 'press'},
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 2', action = 'release'},
