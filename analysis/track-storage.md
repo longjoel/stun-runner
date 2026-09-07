@@ -155,6 +155,12 @@ by 1,221 bytes from 4800→5400, and by 182 bytes from 8400→9000. The first is
 a stable roadway interval; the latter two are transition updates affecting
 the base/twin storage, not merely a course-word display change.
 
+At the changed-offset level, the 4800→5400 update changes 603 shared base/twin
+offsets plus 15 twin-only offsets; no base offset changes without its twin.
+The 8400→9000 update changes 91 shared offsets with no asymmetric footprint.
+This supports synchronized copy/update work with occasional twin-side residue,
+not an independent base-only rewrite during these transition windows.
+
 The reusable snapshot workflow is:
 
 1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.

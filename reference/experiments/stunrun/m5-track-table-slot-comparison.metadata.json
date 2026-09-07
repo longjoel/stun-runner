@@ -50,8 +50,8 @@
   "snapshot_comparison_reproducer": "tools/analyze-track-tables /tmp/stunrun-roms-system --snapshot /tmp/race2/snapshot-1200.json --snapshot /tmp/race2/snapshot-4800.json --snapshot /tmp/race2/snapshot-5400.json --snapshot /tmp/race2/snapshot-8400.json --snapshot /tmp/race2/snapshot-9000.json --output /tmp/stunrun-track-table-with-snapshots.json",
   "pairwise_snapshot_diff": [
     {"before": 1200, "after": 1800, "track_changed_bytes": 0},
-    {"before": 4800, "after": 5400, "track_changed_bytes": 1221},
-    {"before": 8400, "after": 9000, "track_changed_bytes": 182}
+    {"before": 4800, "after": 5400, "track_changed_bytes": 1221, "base_changed_bytes": 603, "twin_changed_bytes": 618, "shared_changed_offsets": 603, "base_only_offsets": 0, "twin_only_offsets": 15},
+    {"before": 8400, "after": 9000, "track_changed_bytes": 182, "base_changed_bytes": 91, "twin_changed_bytes": 91, "shared_changed_offsets": 91, "base_only_offsets": 0, "twin_only_offsets": 0}
   ],
   "ram_snapshot_slot_matches": [
     {
