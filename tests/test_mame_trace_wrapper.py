@@ -26,6 +26,12 @@ class MameTraceWrapperTests(unittest.TestCase):
         self.assertIn('"fork_hold_left"', text)
         self.assertIn('"fork_center"', text)
 
+    def test_supports_recorded_input_playback(self):
+        text = TOOL.read_text(encoding="utf-8")
+        self.assertIn("--playback INP", text)
+        self.assertIn("playback_args=", text)
+        self.assertIn('STUNRUN_TRACE_PLAYBACK="$playback"', text)
+
 
 if __name__ == "__main__":
     unittest.main()

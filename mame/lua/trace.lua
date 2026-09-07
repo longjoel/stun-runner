@@ -7,6 +7,7 @@ local cpu = assert(os.getenv('STUNRUN_TRACE_CPU'), 'STUNRUN_TRACE_CPU is require
 local limit = tonumber(os.getenv('STUNRUN_TRACE_FRAMES') or '60')
 local input_mode = os.getenv('STUNRUN_TRACE_INPUT') or 'none'
 local trace_start_frame = tonumber(os.getenv('STUNRUN_TRACE_START_FRAME') or '1')
+local playback = os.getenv('STUNRUN_TRACE_PLAYBACK')
 local frame = 0
 local sw_off_prefix = {
     {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', action = 'press'},
@@ -39,7 +40,7 @@ local late_prefix = {
     {port = ':mainpcb:SW1', field = 'SW1:8', action = 'set', value = 1}
 }
 print('MAME_TRACE_CONFIG start=' .. trace_start_frame .. ' cpu=' .. cpu .. ' output=' .. output)
-local events = (input_mode == 'late_drive' and {
+local events = (playback ~= nil and {}) or (input_mode == 'late_drive' and {
     {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', press = true},
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1'},
     {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', press = true},

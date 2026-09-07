@@ -257,3 +257,12 @@ This mechanism is now represented by the dependency-free C slice in
 `A4/A8/A6`, later `A8`, and `A7/A9/A10` loads. The dedicated
 `gsp-record-parser-slice-c` test passes. This is a native-facing transport and
 record-layout contract, not yet a complete GSP producer or semantic renderer.
+
+The recorded race also isolates a GSP-side FIFO-fed consumer at `0xFFF48C20`.
+Its runtime entry occurs 15 times in the road-transfer window versus 5 times
+in the matched no-input trace. The loop at `0xFFF48D50–0xFFF48E80` combines
+byte lanes and writes two work-buffer families based at `0xFFF6F650` and
+`0xFFF70650`. This is the next literal renderer boundary: it proves an
+input-dependent FIFO-to-work-buffer path, but not that either destination or
+any payload word is specifically roadway data. Details are in
+`analysis/gsp-road-fifo-consumer.md` and its provenance metadata.

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY CPU_TAG [FRAMES] [MAME_EXE] [INPUT] [TRACE_START_FRAME] [--load-state STATE]" >&2
+    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY CPU_TAG [FRAMES] [MAME_EXE] [INPUT] [TRACE_START_FRAME] [--load-state STATE | --playback INP]" >&2
     exit 2
 }
 
@@ -15,10 +15,17 @@ mame_exe=${5:-mame}
 input_mode=${6:-none}
 trace_start_frame=${7:-1}
 load_state=
+playback=
 if [[ $# -gt 7 ]]; then
-    [[ $# -eq 9 && $8 == "--load-state" ]] || usage
-    load_state=$9
-    [[ -f "$load_state" ]] || { echo "save state does not exist: $load_state" >&2; exit 2; }
+    [[ $# -eq 9 && ( $8 == "--load-state" || $8 == "--playback" ) ]] || usage
+    if [[ $8 == "--load-state" ]]; then
+        load_state=$9
+        [[ -f "$load_state" ]] || { echo "save state does not exist: $load_state" >&2; exit 2; }
+    else
+        playback=$9
+        [[ -f "$playback" ]] || { echo "input recording does not exist: $playback" >&2; exit 2; }
+        [[ "$input_mode" == "none" ]] || { echo "--playback requires INPUT=none" >&2; exit 2; }
+    fi
 fi
 [[ "$frames" =~ ^[1-9][0-9]*$ ]] || { echo "frames must be a positive integer" >&2; exit 2; }
 [[ "$trace_start_frame" =~ ^[1-9][0-9]*$ && "$trace_start_frame" -le "$frames" ]] || { echo "trace start frame must be in 1..frames" >&2; exit 2; }
@@ -51,16 +58,23 @@ if [[ -n "$load_state" ]]; then
     state_args=(-state_directory "$state_directory" -statename %g -state 1)
     seconds_to_run=86400
 fi
+playback_args=()
+config_args=(-noreadconfig -nowriteconfig -cfg_directory /tmp/stunrun-mame-cfg -nonvram_save)
+if [[ -n "$playback" ]]; then
+    playback_dir=$(CDPATH= cd -- "$(dirname -- "$playback")" && pwd)
+    playback_args=(-input_directory "$playback_dir" -playback "$(basename -- "$playback")")
+    config_args=()
+fi
 STUNRUN_TRACE_OUT="$trace" \
 STUNRUN_TRACE_CPU="$cpu" \
 STUNRUN_TRACE_FRAMES="$frames" \
 STUNRUN_TRACE_INPUT="$input_mode" \
 STUNRUN_TRACE_START_FRAME="$trace_start_frame" \
+STUNRUN_TRACE_PLAYBACK="$playback" \
 SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" \
 "$mame_exe" -rompath "$rompath" stunrun \
-    -video none -sound none -skip_gameinfo -noreadconfig -nowriteconfig \
-    -cfg_directory /tmp/stunrun-mame-cfg -nonvram_save \
-    "${state_args[@]}" -debug -debugger none -seconds_to_run "$seconds_to_run" \
+    -video none -sound none -skip_gameinfo "${config_args[@]}" \
+    "${state_args[@]}" "${playback_args[@]}" -debug -debugger none -seconds_to_run "$seconds_to_run" \
     -autoboot_script "$repo_dir/mame/lua/trace.lua" \
     >"$output/mame.log" 2>&1
 
