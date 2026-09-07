@@ -1,0 +1,59 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_save_state_object_writer_forks",
+  "tools": ["tools/mame-memory-snapshot", "tools/diff-memory-snapshot", "tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive1200.sta",
+    "sha256": "5d81b72231dc9dc6bd77357d2308c3facc817ee9b35bbe17e1fb16d9c5f7eef7",
+    "capture_description": "late-drive live checkpoint at setup frame 1200; local regenerable artifact, not committed"
+  },
+  "ram_window": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "base": "0xFFDD00",
+    "last": "0xFFDDFF",
+    "width": 8
+  },
+  "forks": {
+    "center": {
+      "input": "none",
+      "relative_frames": [2, 120, 300, 600],
+      "result_sha256": "d2194912244f52ee094a12ee31b124785d5356009333ec1f0ca186db590a45df"
+    },
+    "left": {
+      "input": "fork_hold_left",
+      "relative_frames": [2, 120, 300, 600],
+      "result_sha256": "98faca482c8be39ef7b8f5870dc30a2ed20960a523325dd2f818b98bdb8f85df"
+    },
+    "right": {
+      "input": "fork_hold_right",
+      "relative_frames": [2, 120, 300, 600],
+      "result_sha256": "f65142205895d3ee289d644a0af75cd8830f86802ceb7a322439d8f44a19c707"
+    }
+  },
+  "differential": {
+    "first_persistent_frame": 300,
+    "left_vs_center": {
+      "frame_300_changed_addresses": ["0xFFDD86", "0xFFDD87", "0xFFDD88", "0xFFDD90", "0xFFDD91"],
+      "frame_600_changed_addresses": ["0xFFDD86", "0xFFDD87", "0xFFDD88", "0xFFDD90", "0xFFDD91", "0xFFDDBB"]
+    },
+    "right_vs_center": {
+      "frame_300_changed_addresses": ["0xFFDD86", "0xFFDD87", "0xFFDD88", "0xFFDD8A", "0xFFDD8B"],
+      "frame_600_changed_addresses": ["0xFFDD86", "0xFFDD87", "0xFFDD88", "0xFFDD8A", "0xFFDD8B", "0xFFDDBB"]
+    }
+  },
+  "writer_trace": {
+    "window": "0xFFDD80–0xFFDDA0",
+    "relative_frames": [2, 600],
+    "center": {"events": 4094, "truncated": false, "result_sha256": "88ef1a5b4cae73342acda0058cbd2a4e82f0ee97a37c948f3462d3421386355b"},
+    "left": {"events": 4226, "truncated": false, "result_sha256": "fabaada25be9e80a1dd0ea3baa85a3b79c15a05cb3362b990426f15c382a8aa7"},
+    "right": {"events": 4232, "truncated": false, "result_sha256": "e27db3538f111a2cfd436b3351dc87639599d50cda2afb5415090dc03de1ac14"},
+    "dominant_static_writer_family": ["0x03D18C", "0x03D1B2", "0x03D208", "0x03D248"],
+    "record_layout": "0x03D012 indexes 16-byte records from base 0xFFDD86"
+  },
+  "observation": "Sustained steering from a saved live-drive state changes only the established object/animation interpolation record and one adjacent byte in this window; no new status, score, timer, or track field changes.",
+  "semantic_status": "OBJECT_ANIMATION_RENDERER_RECORD_CONFIRMED; NOT_ARMOR_WEAPON_AMMO",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + STATIC-LISTING + WRITER-TRACE"
+}
