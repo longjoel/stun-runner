@@ -121,6 +121,33 @@ no equally safe record boundary has been promoted there. The same structural
 analysis should be repeated for the observed course-5/10/11 table bases before
 assuming that all table slots use identical layouts.
 
+### Cross-slot ROM comparison
+
+The local, MAME-validated main-CPU ROM set makes it possible to compare the
+slots directly without committing their contents. The four observed windows
+are not four unrelated formats:
+
+```text
+words   0–23       identical in all four slots
+words  24,27       differ only in the course-0 slot
+words  25–26,28–47 identical in all four slots
+words  48–143      slot-specific payload (three 16-record blocks)
+words 144–383      identical in all four slots (five 16-record blocks)
+```
+
+In other words, 286 of 384 words are identical across course 0, 5, 10, and
+11/12. The course-5, course-10, and course-11/12 slots share all 288 words
+outside the 96-word variable payload; course 0 has two additional differences
+in the otherwise shared prefix. This supports a cautious storage model of
+**common header + slot-specific payload + common command/geometry suffix**.
+It does not prove that the 96-word region is the whole track identity, nor
+does it assign X, Y, width, curvature, flags, or terminators to any field.
+
+The strongest safe conclusion is therefore that table selection changes a
+bounded payload inside a largely shared 768-byte command/data template. The
+record-shaped 16×3 grouping remains an observed byte layout, not a decoded
+semantic record type.
+
 ### Follow-up comparison attempt
 
 The existing long-play recording was replayed while filtering directly for all
@@ -165,6 +192,7 @@ the observed copy, lane, and transport mechanisms.
 - `reference/experiments/stunrun/m5-road-fifo-lane-differential.metadata.json` —
   384-read/192-write lane match.
 - `reference/experiments/stunrun/m5-track-table-slot-comparison.metadata.json` —
-  targeted cross-slot replay and its negative later-window result.
+  targeted cross-slot replay, ROM-content comparison, and its negative
+  later-window result.
 - `reproduction/maincpu/geom_upload.h` and `road_fifo.h` — native literal
   mechanisms and their provenance comments.

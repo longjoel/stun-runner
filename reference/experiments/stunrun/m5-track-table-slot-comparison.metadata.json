@@ -29,6 +29,23 @@
       "canonical_log_sha256": "8933cac8477dc2d22fe9a8d3e40126204cc80795566c58786cb331214e3de1f0"
     }
   ],
+  "rom_content_comparison": {
+    "source": "/tmp/stunrun-roms-system/stunrun",
+    "manifest": "roms/stunrun.manifest.json",
+    "reconstruction": "mainpcb:maincpu ROM_LOAD16_BYTE files placed at their manifest offsets; each source byte occupies the corresponding even/odd byte lane",
+    "slot_sha256": {
+      "0x044630": "dda9cba51823fb32da9bc1551288589f0f15a3fce1f938c9ea290b84b4f7a648",
+      "0x044930": "b1a46c38e65c2937ceac14f30c8d5bb3cb19ba854d91578ebc780e98b725c905",
+      "0x045230": "08b5599149893a997cab13d0d91539a1901ba27e62ae1e2c879b7351e976c79f",
+      "0x045530": "b26e677dbe5f3b3b92ef4f6fa1ba590c6c9231c659800938ffe3c9754fa8ba30"
+    },
+    "common_word_count_all_four": 286,
+    "common_word_ranges_all_four": ["0-23", "25-26", "28-47", "144-383"],
+    "variable_word_range": "48-143",
+    "course_5_10_11_12_common_word_count": 288,
+    "course_0_extra_prefix_differences": [24, 27],
+    "interpretation": "common header/prefix plus a 96-word slot-specific payload plus a common 240-word suffix; semantic field assignments remain unknown"
+  },
   "filter": "--pc-range 0x0-0x50000 with --address-range covering each known 0x300-byte slot",
   "observation": "The first course-10 table load is reproducible, but the later transition windows do not show reads from any known table slot under a broad PC filter. This does not invalidate the RAM-derived course-to-slot map; it leaves the later loader path or replay timing unresolved.",
   "confidence": "POSITIVE-CONTROL-OBSERVED; LATER-WINDOW-NEGATIVE-OBSERVED"
