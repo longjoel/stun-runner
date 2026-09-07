@@ -64,14 +64,21 @@ int main(void)
                     &state, vram_bytes, sizeof(vram_bytes)) ||
                 state.vram_word_count != 4u || state.vram_words[0] != 0x1234u ||
                 state.vram_words[1] != 0xABCDu ||
-                stunrun_gsp_video_set_vram_bytes(&state, vram_bytes, 6u) ||
-                state.vram_words[0] != 0x1234u) {
+            stunrun_gsp_video_set_vram_bytes(&state, vram_bytes, 6u) ||
+            state.vram_words[0] != 0x1234u) {
                 puts("gsp video byte VRAM state failed");
                 return 1;
             }
         }
         if (!stunrun_gsp_video_set_vram_words(&state, vram, 4u)) {
             puts("gsp video word VRAM restore failed");
+            return 1;
+        }
+        if (stunrun_gsp_video_set_vram_words(
+                &state, vram, SIZE_MAX) ||
+            stunrun_gsp_video_set_vram_bytes(
+                &state, (const uint8_t *)vram, SIZE_MAX)) {
+            puts("gsp video oversized VRAM accepted");
             return 1;
         }
         state.palette_rgb[1u * 3u] = 0x11u;

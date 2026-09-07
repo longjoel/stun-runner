@@ -42,7 +42,8 @@ int stunrun_gsp_video_set_vram_words(stunrun_gsp_video_state_t *state,
     uint16_t *copy;
 
     if (state == NULL || vram_words == NULL ||
-        !power_of_two(vram_word_count))
+        !power_of_two(vram_word_count) ||
+        vram_word_count > SIZE_MAX / sizeof(*copy))
         return 0;
     copy = (uint16_t *)malloc(vram_word_count * sizeof(*copy));
     if (copy == NULL)
@@ -66,7 +67,8 @@ int stunrun_gsp_video_set_vram_bytes(stunrun_gsp_video_state_t *state,
         (vram_byte_count & 1u) != 0u)
         return 0;
     word_count = vram_byte_count / 2u;
-    if (!power_of_two(word_count))
+    if (!power_of_two(word_count) ||
+        word_count > SIZE_MAX / sizeof(*copy))
         return 0;
     copy = (uint16_t *)malloc(word_count * sizeof(*copy));
     if (copy == NULL)
@@ -109,12 +111,13 @@ int stunrun_gsp_video_load(stunrun_gsp_video_state_t *state,
     FILE *vram_file = NULL;
     FILE *palette_file = NULL;
     long vram_bytes;
-    uint16_t *words = NULL;
+    uint8_t *vram_data = NULL;
     uint8_t palette_rgb[256u * 3u];
-    size_t word_count;
-    size_t i;
+    stunrun_gsp_video_state_t loaded;
+
     if (state == NULL || vram_path == NULL || palette_path == NULL)
         return 0;
+    stunrun_gsp_video_init(&loaded);
     vram_file = fopen(vram_path, "rb");
     palette_file = fopen(palette_path, "rb");
     if (vram_file == NULL || palette_file == NULL)
@@ -125,31 +128,34 @@ int stunrun_gsp_video_load(stunrun_gsp_video_state_t *state,
     if (vram_bytes <= 0 || (vram_bytes % 2) != 0 ||
         fseek(vram_file, 0, SEEK_SET) != 0)
         goto fail;
-    word_count = (size_t)vram_bytes / 2u;
-    if (!power_of_two(word_count))
-        goto fail;
-    words = (uint16_t *)malloc(word_count * sizeof(*words));
-    if (words == NULL || fread(palette_rgb, 1, sizeof(palette_rgb),
-                               palette_file) != sizeof(palette_rgb) ||
+    vram_data = (uint8_t *)malloc((size_t)vram_bytes);
+    if (vram_data == NULL ||
+        fread(palette_rgb, 1, sizeof(palette_rgb), palette_file) !=
+            sizeof(palette_rgb) ||
         fgetc(palette_file) != EOF ||
-        fread(words, sizeof(*words), word_count, vram_file) != word_count)
-        goto fail_words;
-    /* Exported words are little-endian, independent of host byte order. */
-    for (i = 0; i < word_count; i++) {
-        uint8_t *bytes = (uint8_t *)&words[i];
-        words[i] = (uint16_t)bytes[0] | ((uint16_t)bytes[1] << 8);
-    }
+        fread(vram_data, 1, (size_t)vram_bytes, vram_file) !=
+            (size_t)vram_bytes)
+        goto fail;
     fclose(vram_file);
     fclose(palette_file);
+    vram_file = NULL;
+    palette_file = NULL;
+    if (!stunrun_gsp_video_set_vram_bytes(&loaded, vram_data,
+                                          (size_t)vram_bytes))
+        goto fail;
+    memcpy(loaded.palette_rgb, palette_rgb, sizeof(loaded.palette_rgb));
+    free(vram_data);
     free(state->vram_words);
-    state->vram_words = words;
-    state->vram_word_count = word_count;
-    memcpy(state->palette_rgb, palette_rgb, sizeof(state->palette_rgb));
+    state->vram_words = loaded.vram_words;
+    state->vram_word_count = loaded.vram_word_count;
+    memcpy(state->palette_rgb, loaded.palette_rgb, sizeof(state->palette_rgb));
+    loaded.vram_words = NULL;
+    stunrun_gsp_video_free(&loaded);
     return 1;
 
-fail_words:
-    free(words);
 fail:
+    free(vram_data);
+    stunrun_gsp_video_free(&loaded);
     if (vram_file != NULL)
         fclose(vram_file);
     if (palette_file != NULL)
