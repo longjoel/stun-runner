@@ -114,3 +114,21 @@ target_include_directories(stunrun-fifo-block-slice-test PRIVATE
   ../reproduction/maincpu)
 set_target_properties(stunrun-fifo-block-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME fifo-block-slice-c COMMAND stunrun-fifo-block-slice-test)
+# Course-table march and twin-buffer fan-out against the traced upload
+# mechanism (384-word +2 march, count-gated dual copy, 0x300 stride).
+add_executable(stunrun-geom-upload-slice-test
+  ../reproduction/maincpu/geom_upload.c
+  ../reproduction/maincpu/geom_upload_test.c)
+target_include_directories(stunrun-geom-upload-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-geom-upload-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME geom-upload-slice-c COMMAND stunrun-geom-upload-slice-test)
+# Object-hit -> award-select -> score-add chain with instruction-stream
+# immediates (0x1F4 at 0x3A2E6, dest words 0xFFDD02/0xFF9532).
+add_executable(stunrun-award-path-slice-test
+  ../reproduction/maincpu/award_path.c
+  ../reproduction/maincpu/award_path_test.c)
+target_include_directories(stunrun-award-path-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-award-path-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME award-path-slice-c COMMAND stunrun-award-path-slice-test)

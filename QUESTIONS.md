@@ -433,6 +433,43 @@ bit-identically through the play sidecar and settles the open points:
   record fidelity) with arg-gate tests. Full suite green (77 at write
   time; count moves as peers add tests).
 
+### Investigation update 9 (2026-09-06, stride CLOSED AS FRAMED, Agent 2 executed)
+
+`/tmp/race2/r2.inp` (courses 10→11→12 at frames 950/4548/8085; writers
+`0x2B63E`=0x0A then **`0x320BC`**=0x0B/0x0C — start-set vs
+progression-advance split) replays with the 0→10 transition refiring at
+the exact frame. Epoch march survey (925k events, no truncation,
+PCs `0x29600–0x29A00`) kills H1 as framed — there is no single
+course-proportional stride:
+- Full-table marches (360–384 words, +2 step) land on bases
+  `0x44630` (course 0 AND 11), `0x44930` (11 AND 12), `0x45230`
+  (course 5), `0x45530` (course 10) — all ≡ `0x230` (mod `0x300`),
+  i.e. mutually `0x300`-spaced slots in a ROM table array (record size
+  768 B = stride, mirroring the RAM twin-buffer stride). (An earlier
+  draft said `0x30`; the slice's own congruence test caught the bad
+  phase — absolute phase is `0x230`.)
+- Courses share tables (11 reuses 0's `0x44630`); each epoch uploads
+  several tables. So the mechanism is course→segment-sequence→table
+  index, not base+course×stride. Short sub-record reads (24–72 words
+  at `0x45E60`/`0x46640`/`0x466A0`, other congruences) are a separate
+  record type, semantics unknown.
+Status recommendation: PARTIALLY RESOLVED — table array located with
+slot stride; open remainder is the segment→index map and field
+semantics (static listing + the preserved `r2.inp`/states). The award
+path stays immediates (update 8); geometry and awards obey different
+course mechanisms.
+
+### Investigation update 10 (2026-09-06, award-path C slice, Agent 2 executed)
+
+`reproduction/maincpu/award_path.{h,c}` freezes the three-PC chain with
+instruction-stream immediates (`0x1F4` at `0x3A2E6`, dest words
+`0xFFDD02`/`0xFF9532` via `0x3A29C`/`0x3A2F0`), each read observed twice
+identically at course 5; the 50-path immediate address stays UNKNOWN.
+Oracle behavior: 10+ clean +500 awards at course 5/10, +50-only at
+course 0. Ctest `award-path-slice-c` green (21 asserts, strict
+`-Wall -Wextra -Werror`); full ctest 15/15. Gameplay-state reproduction
+now covers segment upload + award chain.
+
 ### Investigation update 5 (2026-09-06, full-word reader trace)
 
 The apparent course values were a byte/width interpretation error. The
