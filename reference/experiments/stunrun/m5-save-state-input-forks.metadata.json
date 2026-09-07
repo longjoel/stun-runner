@@ -56,7 +56,7 @@
     }
   },
   "observation": "A single saved MAME state can seed independent center, lateral, and Button 2 experiments. Relative RAM snapshots are repeatable and expose input-dependent residue without replaying boot or setup.",
-  "candidate_cluster": "0xFFFC6F–0xFFFE86, with largest residue ranges near 0xFFFCF3, 0xFFFD17, 0xFFFDCF, and 0xFFFE54",
+  "candidate_cluster": "0xFFFC6F–0xFFFE86, subsequently resolved as 68010 stack/temporary formatting and renderer scratch rather than persistent gameplay state",
   "confidence": "OBSERVED-IN-INSTALLED-MAME + MASKED-DIFFERENTIAL",
-  "limitation": "The residue is not yet assigned to armor, weapon, ammunition, track, or player ownership semantics; writer traces and independent perturbation are required before promotion."
+  "limitation": "This fork does not by itself identify armor, weapon, ammunition, track, or player ownership semantics; the high-address residue is excluded from those candidates by the follow-up stack/writer probe."
 }

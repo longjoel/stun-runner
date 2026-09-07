@@ -59,8 +59,13 @@
     "event_count_each": 0,
     "observation": "No writes were observed through the corresponding GSP program-space window during the three 180-frame forks."
   },
-  "observation": "The main CPU owns writes reaching the sampled residue windows. Button 2 adds writes to the first two clusters, while the latter clusters are high-frequency shared/renderer activity in both branches.",
+  "observation": "The main CPU owns writes reaching the sampled residue windows. The static writers are stack-relative formatting/renderer helpers (including the 0x030220 parser/formatter and HUD callers); Button 2 adds writes to the first two clusters, while the latter clusters are high-frequency temporary-buffer activity in both branches.",
+  "stack_evidence": {
+    "checkpoint_maincpu_sp": "0xFFFE36",
+    "checkpoint_provenance": "reference/checkpoints/m1-machine-map/state.json",
+    "interpretation": "The sampled high-address range overlaps the active 68010 supervisor stack and local formatting buffers; it is not promoted as persistent game state."
+  },
   "representative_writer_pcs": ["0x026A74", "0x02E4E6", "0x02F2CC", "0x02F946", "0x030220", "0x038E5E"],
   "confidence": "OBSERVED-IN-INSTALLED-MAME + WRITER-TRACE",
-  "limitation": "The dense traces are not yet sufficient to assign armor, weapon, ammunition, track, or player ownership semantics. PC-to-function interpretation remains literal listing evidence only."
+  "limitation": "The dense traces classify this range as stack/temporary display work, but do not identify armor, weapon, ammunition, track, or player ownership fields elsewhere in RAM. PC-to-function interpretation remains literal listing evidence only."
 }

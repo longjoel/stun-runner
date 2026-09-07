@@ -10,6 +10,7 @@ field.
 | Address/range | Owner/view | Evidence | Status |
 |---|---|---|---|
 | `0xFF8000–0xFFFFFF` | 68010 work RAM | pinned `driver_68k_map` | `MAME-CONFIRMED` |
+| `0xFFFC6C–0xFFFE88` | 68010 supervisor-stack/local formatting scratch in the frame-600 checkpoint; HUD/formatter paths write this range, including the `0x030220` parser/formatter | checkpoint SP `0xFFFE36`, static listing, saved-state writer trace | `STATIC + WRITER-TRACE; NOT-PERSISTENT-GAME-STATE` |
 | `0xFF4000–0xFF4FFF` | 68010 ZRAM view combining the M48T02 high byte and 2816 EEPROM low byte | pinned `driver_68k_map` / `hd68k_zram_r/w` | `MAME-CONFIRMED` |
 | `0x0000–0x1FFF` (ADSP data space) | ADSP-2100 internal data RAM | runtime ADSP address space and direct snapshots | `MAME-CONFIRMED` |
 | `0x0000–0x1FFF` (ADSP program space) | ADSP-2100 program RAM | runtime map, upload taps, program snapshots | `MAME-CONFIRMED` |
