@@ -2,6 +2,34 @@
 
 #include "geom_upload.h"
 
+int stunrun_geom_observed_table_base(unsigned course, uint32_t *base)
+{
+    uint32_t value;
+
+    if (base == NULL) {
+        return 0;
+    }
+    switch (course) {
+    case 0u:
+        value = STUNRUN_GEOM_TABLE_C0;
+        break;
+    case 5u:
+        value = STUNRUN_GEOM_TABLE_C5;
+        break;
+    case 10u:
+        value = STUNRUN_GEOM_TABLE_C10;
+        break;
+    case 11u:
+    case 12u:
+        value = STUNRUN_GEOM_TABLE_C11_C12;
+        break;
+    default:
+        return 0;
+    }
+    *base = value;
+    return 1;
+}
+
 void stunrun_geom_march(const uint16_t *table, uint16_t *image)
 {
     size_t i;

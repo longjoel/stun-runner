@@ -100,6 +100,8 @@ semantics to the table words; those remain Investigator-owned questions.
 Use `tools/export-geometry-native-state` on a settled main-CPU snapshot
 covering `0xFF9584–0xFF9B83` to produce this fixture; the exporter rejects a
 nonmatching `+0x300` twin before writing it.
+The shared C slice exposes only the observed finite course-to-ROM-base map;
+unknown course values are rejected because no general stride is established.
 
 Convert an MAME PNG to PPM and compare it with the native output using
 `tools/compare-ppm`; the tool reports dimensions, changed pixels/channels, and

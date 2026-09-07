@@ -2,7 +2,8 @@
  *
  * Agent 2 (Implementer) encoding of Agent 1's frozen upload contract.
  * Literal mechanism only — table semantics, field meanings, and the
- * (course, segment) -> table-base map remain unresolved.
+ * (course, segment) -> table-base map remains unresolved beyond the finite
+ * observed course map exposed below.
  *
  * Provenance (all OBSERVED-IN-TRACE unless noted):
  * - March readers 0x29760/0x2976E each read the same 384 words at +2
@@ -82,6 +83,10 @@ extern "C" {
  * bases is UNKNOWN. */
 #define STUNRUN_GEOM_DEST_BASE 0xFF9584u
 #define STUNRUN_GEOM_DEST_TWIN 0xFF9884u
+
+/* Return an observed ROM-table base for a known course value. The finite map
+ * is intentional: no general course stride has been established. */
+int stunrun_geom_observed_table_base(unsigned course, uint32_t *base);
 
 /* One march pass: copy STUNRUN_GEOM_MARCH_WORDS words from table to
  * image in ascending address order. NULL pointers are safe no-ops. */

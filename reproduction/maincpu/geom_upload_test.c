@@ -27,6 +27,7 @@ int main(void)
     static uint16_t dst_a[STUNRUN_GEOM_MARCH_WORDS];
     static uint16_t dst_b[STUNRUN_GEOM_MARCH_WORDS];
     unsigned i;
+    uint32_t base = 0;
 
     for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++) {
         table[i] = (uint16_t)(0xA500u + i);
@@ -48,6 +49,18 @@ int main(void)
     check(STUNRUN_GEOM_TABLE_C10 % STUNRUN_GEOM_TWIN_STRIDE == 0x230u);
     check(STUNRUN_GEOM_TABLE_C11_C12 % STUNRUN_GEOM_TWIN_STRIDE == 0x230u);
     check(STUNRUN_GEOM_TABLE_C5 - STUNRUN_GEOM_TABLE_C0 == 0xC00u);
+    check(stunrun_geom_observed_table_base(0u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C0);
+    check(stunrun_geom_observed_table_base(5u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C5);
+    check(stunrun_geom_observed_table_base(10u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C10);
+    check(stunrun_geom_observed_table_base(11u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C11_C12);
+    check(stunrun_geom_observed_table_base(12u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C11_C12);
+    check(!stunrun_geom_observed_table_base(1u, &base));
+    check(!stunrun_geom_observed_table_base(0u, NULL));
 
     /* March preserves ascending order over all 384 words. */
     stunrun_geom_march(table, image);
