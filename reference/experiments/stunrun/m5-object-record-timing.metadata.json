@@ -1,0 +1,17 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_object_record_timing",
+  "date": "2026-09-07",
+  "target": "stunrun",
+  "purpose": "Classify repeatability and coarse timing of the 0xFFDD00 object-record window from a saved live-drive state.",
+  "mame": "0.289 (mame0289-dirty)",
+  "window": {"base": "0xFFDD00", "bytes": 256, "width": 8},
+  "saved_state": "/tmp/stunrun-latedrive1200.sta",
+  "runs": [
+    {"path": "/tmp/stunrun-m5-spawn-repeat-a", "frames": [2, 600], "input": "none", "canonical_log_sha256": "784f8eebd8d19c670ee289ccee5aae24798bd23e1c9788ba9eb5b73a29959dad"},
+    {"path": "/tmp/stunrun-m5-spawn-repeat-b", "frames": [2, 600], "input": "none", "canonical_log_sha256": "2dd2fd2fe2b2c4680f548c894faa367fd415773b0b087acfe1b988b793e0d24d"}
+  ],
+  "repeatability": {"common_frames": 599, "snapshot_file_mismatches": 0, "frame_600_snapshot_sha256": "18b77ce64cbac179cd05d12b4302478380f19e6504bac9b3b9ae13eabfc382e1"},
+  "lifecycle": {"nonzero_interval_frames": [2, 38], "clear_interval_frames": [39, 121], "first_repopulation_frame": 122, "repopulation_sample_frame": 123, "repopulated_sample_frame": 200},
+  "interpretation": "DETERMINISTIC OBJECT-RECORD TIMING; SPAWN TRIGGER UNKNOWN. The fork does not distinguish frame-locked from position-locked behavior."
+}
