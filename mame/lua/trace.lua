@@ -88,6 +88,20 @@ local events = (input_mode == 'late_drive' and {
     {frame = 300, port = ':mainpcb:a80000', field = '1 Player Start', press = true},
     {frame = 302, port = ':mainpcb:a80000', field = '1 Player Start'}
 } or input_mode == 'sw_off_none' and sw_off_prefix or {})
+if input_mode == 'fork_hold_left' then
+    events = {
+        {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
+        {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1'},
+        {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2'}
+    }
+elseif input_mode == 'fork_center' then
+    events = {
+        {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+        {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1'},
+        {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2'},
+        {frame = 1800, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128}
+    }
+end
 local next_event = 1
 
 local function apply_event(event)

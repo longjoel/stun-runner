@@ -21,6 +21,11 @@ class MameTraceWrapperTests(unittest.TestCase):
         self.assertIn("state_args=(-state_directory", text)
         self.assertIn("seconds_to_run=86400", text)
 
+    def test_supports_saved_state_visible_forks(self):
+        text = TOOL.read_text(encoding="utf-8")
+        self.assertIn('"fork_hold_left"', text)
+        self.assertIn('"fork_center"', text)
+
 
 if __name__ == "__main__":
     unittest.main()

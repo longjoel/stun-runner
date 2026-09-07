@@ -211,3 +211,18 @@ carried by GSP VRAM production rather than palette or scanout-register state;
 the writer PCs are still shared renderer machinery, not a promoted road
 decoder. Full hashes are in
 `reference/experiments/stunrun/m5-save-state-gsp-visible-differential.metadata.json`.
+
+The corresponding runtime GSP instruction traces decode the previously raw
+writer addresses. `0xFFF45DD0` is a literal `LINE 0` primitive preceded by
+endpoint arithmetic (`SRL`, `CMPXY`, `MOVX`, subtraction, and increment),
+making it the strongest current candidate for a geometry-producing native
+slice. `0xFFF46590` is a `PIXBLT B,XY` loop that reads a source descriptor,
+masks it with `0x7F`, computes a source offset, and reads the low VRAM window
+at `0x02000000`. `0xFFF454E0`, `0xFFF45A00`, and `0xFFF47AB0` are `FILL XY`
+paths with computed coordinates; `0xFFF43030` is a `FILL L` setup with
+`B3=0x400` and `B7=0x40200`. The left/center traces contain 16,082/10,077
+executions of the line primitive and 195/194 pixel-blit instructions over the
+same ten-frame endpoint window. These decoded contexts narrow the next native
+work to GSP geometry/pixel primitives while preserving the semantic caveat:
+the line is not yet proven to be roadway, object, or HUD output. Provenance is
+in `reference/experiments/stunrun/m5-gsp-instruction-fork-trace.metadata.json`.
