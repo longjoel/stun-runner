@@ -1,0 +1,27 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "save_state_playback_combination",
+  "tool": "installed MAME command line with mame/lua/play-capture.lua",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/race/state-600.sta",
+    "sha256": "c6b812558a4859a91937805da2224910a820be06d9d2d742332dfeb4153c73eb",
+    "input_recording": "/tmp/race/r1.inp"
+  },
+  "launch": {
+    "state": "-state 1",
+    "playback": "-playback r1.inp",
+    "relative_frames": 60,
+    "log_sha256": "bf8373652d217db5780ebd6b3e9d3efdcf483e201145ee758697a133f2a65d1d"
+  },
+  "result": {
+    "returncode": 0,
+    "reported_playback_frames": 1,
+    "applied_recorded_events": 0,
+    "snapshot_frame": 60
+  },
+  "observation": "MAME accepts the combined launch and loads the state, but the input recording is not seekable as a suffix: playback reports one frame and no recorded events are applied. Save-state forks must use relative scripted inputs or a dedicated suffix recording.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME",
+  "caveat": "The state and input recording are local artifacts and depend on the pinned MAME build and ROM set."
+}

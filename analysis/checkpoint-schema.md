@@ -78,6 +78,13 @@ build and validated ROM set. Raw RAM snapshots remain the comparison evidence;
 the state supplies the CPU, DSP, video, timer, and peripheral context needed
 to resume deterministically.
 
+Recorded `.inp` playback is a separate stream, not a seekable suffix. An
+observed launch combining `-state 1` with `-playback r1.inp` loaded the state
+successfully but reported one playback frame and applied no recorded events.
+Do not treat that combination as continuation from the checkpoint; use a
+relative scripted input schedule, or create a dedicated suffix recording from
+the loaded state.
+
 The frame-1800 rendered-scene fixture in
 `reference/checkpoints/m1-rendered-scene/state.json` uses the same compact
 schema and is byte-for-byte repeatable across two fresh configurations. The
