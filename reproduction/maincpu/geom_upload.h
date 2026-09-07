@@ -23,6 +23,10 @@
  *   per copy (base group never touches the twin copy and vice versa):
  *   same metadata (followup_session.findings). Destination base
  *   addresses are NOT frozen here; the caller supplies them.
+ * - Saved-state producer fixture:
+ *   reference/experiments/stunrun/m5-save-state-road-buffer-fixture.metadata.json
+ *   captures both 768-byte destinations at 0xFF9584/0xFF9884 from a recorded
+ *   race checkpoint; repeated forks are byte-identical and the copies match.
  *
  * Deliberately NOT claimed: what 0x22DA means; which (course, segment)
  * selects which table base (caller input); per-copy writer scheduling.
