@@ -52,7 +52,8 @@ def decode(args):
     dpy_step = (args.dpy_step if args.dpy_step is not None
                 else -(display["dpyctl"] & 0x03fc))
     dpy_tap = args.dpy_tap if args.dpy_tap is not None else 0
-    fine = args.fine_scroll if args.fine_scroll is not None else 0
+    fine = (args.fine_scroll if args.fine_scroll is not None
+            else display.get("fine_scroll", 0))
     pixel_data = bytearray(width * height * 3)
     mask = len(vram) - 1
     if len(vram) == 0 or len(vram) & mask:

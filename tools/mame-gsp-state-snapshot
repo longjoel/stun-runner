@@ -19,7 +19,8 @@ SNAPSHOT = re.compile(
 CONTROL = re.compile(r"M1_GSP_CONTROL frame=(\d+) lo=([^\r\n ]*) hi=([^\r\n ]*)")
 DISPLAY = re.compile(
     r"M1_GSP_DISPLAY frame=(\d+) dpyadr=(\S+) dpytap=(\S+) "
-    r"dpystart=(\S+) heblnk=(\S+) hsblnk=(\S+) dpyctl=(\S+)"
+    r"dpystart=(\S+) heblnk=(\S+) hsblnk=(\S+) dpyctl=(\S+) "
+    r"fine_scroll=(\S+)"
 )
 SCREEN = re.compile(r"M1_GSP_SCREEN frame=(\d+) path=(.+)")
 
@@ -109,6 +110,7 @@ def main() -> int:
             "heblnk": None if match.group(5) == "nil" else int(match.group(5)),
             "hsblnk": None if match.group(6) == "nil" else int(match.group(6)),
             "dpyctl": None if match.group(7) == "nil" else int(match.group(7)),
+            "fine_scroll": None if match.group(8) == "nil" else int(match.group(8)),
         }
         for match in DISPLAY.finditer(text)
     }

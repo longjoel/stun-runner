@@ -112,6 +112,7 @@ local function snapshot()
             heblnk = ioreg(1),
             hsblnk = ioreg(2),
             dpyctl = ioreg(8),
+            fine_scroll = ioreg(0x01) & 0x07,
         },
         control_lo = sample_range(0xf4000000, 0x100, 2),
         control_hi = sample_range(0xf4800000, 0x100, 2),
@@ -123,10 +124,11 @@ local function snapshot()
         state.frame, state.pc, state.st, state.control_lo.sum32, state.control_hi.sum32,
         state.vram_low.sum32, state.vram_high.sum32))
     print(string.format(
-        'M1_GSP_DISPLAY frame=%d dpyadr=%s dpytap=%s dpystart=%s heblnk=%s hsblnk=%s dpyctl=%s',
+        'M1_GSP_DISPLAY frame=%d dpyadr=%s dpytap=%s dpystart=%s heblnk=%s hsblnk=%s dpyctl=%s fine_scroll=%s',
         frame, tostring(state.display.dpyadr), tostring(state.display.dpytap),
         tostring(state.display.dpystart), tostring(state.display.heblnk),
-        tostring(state.display.hsblnk), tostring(state.display.dpyctl)))
+        tostring(state.display.hsblnk), tostring(state.display.dpyctl),
+        tostring(state.display.fine_scroll)))
     if screen_output ~= '' then
         local screen = assert(machine.screens[':mainpcb:screen'], 'screen not found')
         assert(screen:snapshot(screen_output) == nil, 'screen snapshot failed')

@@ -109,6 +109,7 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn("--screen", tool)
         self.assertIn("STUNRUN_GSP_STATE_SCREEN", lua)
         self.assertIn("screen:snapshot", lua)
+        self.assertIn("fine_scroll", lua)
 
     def test_analyze_memory_candidates_ranks_persistent_diffs(self):
         with tempfile.TemporaryDirectory() as temp:

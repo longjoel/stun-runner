@@ -79,7 +79,9 @@ The GSP display registers are mapped at `0xc0000000` and are likewise
 captured at stride `16`. The register indices relevant to the multisync
 scanline callback are `DPYCTL=8`, `DPYSTART=9`, `DPYTAP=27`, `DPYADR=30`,
 `HEBLNK=1`, and `HSBLNK=2`. The bounded GSP-state recipe now reports these
-values alongside the PC/status and memory checksums. This establishes the
+values and effective `fine_scroll` alongside the PC/status and memory checksums. The
+fine-scroll control is read from GSP control register 1 and masked to the
+multisync 3-bit range, matching MAME's `hdgsp_control_hi_w` behavior. This establishes the
 runtime inputs needed to apply MAME's literal scanline formula to a VRAM
 snapshot; it does not yet claim a decoded native renderer.
 
