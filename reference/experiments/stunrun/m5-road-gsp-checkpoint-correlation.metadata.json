@@ -47,5 +47,19 @@
     "direct_vram_value_matches": {"1290": 1, "1293": 0, "1297": 1},
     "interpretation": "The road FIFO lane is an exact every-other-word selection from the base buffer. The payload is not a raw copy into the sampled GSP VRAM, implying GSP-side interpretation or buffering."
   },
+  "gsp_vram_write_trace": {
+    "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-vram-write-road-low --device :mainpcb:gsp --space program --base 0x02000000 --end 0x0207FFFF --frames 1297 --start-frame 1288 --end-frame 1297 --tap-frame 10 --max-events 100000 --input late_drive --nothrottle",
+    "result": "/tmp/stunrun-m5-gsp-vram-write-road-low/result.json",
+    "result_sha256": "c50083f64cd49b7b1da1c35aead958641630166141bde5c58f30d98c3b8a6545",
+    "event_count": 73515,
+    "truncated": false,
+    "writers": {
+      "0xFFF454E0": {"events": 70387, "frames": [1288, 1290, 1291, 1292, 1293, 1294, 1295, 1296]},
+      "0xFFF43030": {"events": 512, "frames": [1289, 1293], "trace_mnemonic": "FILL L"},
+      "0xFFF46590": {"events": 1536, "frames": [1288, 1292, 1296], "trace_mnemonic": "PIXBLT B,XY"},
+      "0xFFF47AB0": {"events": 1080, "frames": [1288, 1292, 1296]}
+    },
+    "interpretation": "The visible-memory writers are shared GSP display machinery with a periodic pixel-blit pair. Their cadence is offset from the main road FIFO bursts; no road-specific GSP consumer is promoted."
+  },
   "interpretation": "The road buffer changes continuously while the GSP-visible VRAM update is bursty and delayed across these landmarks. This supports a buffered/display-scheduled consumer boundary but does not attribute every VRAM change to the road FIFO or decode table fields."
 }

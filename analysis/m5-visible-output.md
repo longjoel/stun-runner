@@ -177,3 +177,10 @@ matches the even words of its 384-word source buffer, while the values do not
 appear verbatim across the downstream GSP VRAM snapshot. This strengthens the
 producer boundary and indicates GSP-side interpretation, but still does not
 identify curvature, width, or scanline fields.
+
+A GSP VRAM write tap in the same interval attributes the display-side writes to
+four PCs: broad writer `0xFFF454E0`, `FILL L` at `0xFFF43030`, and the periodic
+`PIXBLT B,XY`/paired writers at `0xFFF46590` and `0xFFF47AB0`. Their cadence is
+offset from the main road bursts, so these are shared renderer landmarks, not a
+promoted road-table decoder. The writer trace is recorded in
+`reference/experiments/stunrun/m5-road-gsp-checkpoint-correlation.metadata.json`.

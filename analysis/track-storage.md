@@ -333,6 +333,21 @@ road stream is not simply copied into visible VRAM. The safe mechanism model is
 now **base buffer → every-other-word FIFO lane → GSP-side interpretation →
 display memory**; the GSP-side command/geometry format remains unknown.
 
+A bounded GSP program-space write trace further qualifies the display side. Four
+writer PCs touch the low VRAM aperture during frames 1288–1296:
+
+| GSP PC | Literal/runtime role | Observed cadence |
+| --- | --- | --- |
+| `0xFFF454E0` | broad VRAM writer; operation not decoded | frames 1288, 1290–1296 |
+| `0xFFF43030` | `FILL L` | frames 1289 and 1293 |
+| `0xFFF46590` | `PIXBLT B,XY` | frames 1288, 1292, 1296 |
+| `0xFFF47AB0` | paired VRAM writer; operation not decoded | frames 1288, 1292, 1296 |
+
+The periodic pixel-blit pair is phase-shifted from the main-CPU road FIFO bursts
+at 1290, 1293, and 1297. This is consistent with a shared GSP display scheduler
+or command queue. It is not evidence that any one writer consumes the road
+table; a road-specific producer/consumer pairing remains open.
+
 ## A visible pattern inside one ROM table
 
 The traced course-0 table at `0x044630` is 384 words long. Looking only at
