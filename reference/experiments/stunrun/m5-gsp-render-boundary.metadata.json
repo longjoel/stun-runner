@@ -34,6 +34,15 @@
     "known_f400_writer_set": ["FFF42EB0", "FFF45330", "FFF46370", "FFF479E0"],
     "color_latch": "GSP control offset zero at F4000000 is the MAME-mapped VRAM expander color latch; its semantic palette meaning remains unresolved."
   },
+  "bus_tap_control": {
+    "runner": "tools/mame-ram-write-trace",
+    "window": "GSP program space 0xF4000000-0xF4000003",
+    "frames": [850, 930],
+    "input": "late_drive",
+    "result_sha256": "7e64e4bb3e7b4b93a459905539ba421f7e7a8deab3910ec839b2905b97138ca9",
+    "event_count": 0,
+    "interpretation": "The ordinary Lua write tap observes no bus writes for this internal GSP renderer activity; the instruction trace remains the authoritative observation for the F4000000 operations."
+  },
   "interpretation": "This narrows the first input-dependent visual boundary to a GSP pixel-blit/coordinate path. It does not yet identify the source texture, palette encoding, screen composition, or player-state semantics.",
   "raw_artifacts": "Trace files remain local under /tmp/stunrun-m5-gsp-window and /tmp/stunrun-m5-gsp-late; metadata records provenance and hashes only.",
   "confidence": "OBSERVED-IN-INSTALLED-MAME + STATIC-TRACE-CONTEXT"

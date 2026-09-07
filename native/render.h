@@ -26,6 +26,9 @@ void stunrun_render_begin(stunrun_renderer_t *renderer, unsigned frame,
 int stunrun_render_set_pixel(stunrun_renderer_t *renderer, unsigned x,
                              unsigned y, uint8_t red, uint8_t green,
                              uint8_t blue);
+int stunrun_render_blit(stunrun_renderer_t *renderer, const uint8_t *source,
+                        unsigned source_width, unsigned source_height,
+                        int destination_x, int destination_y);
 uint32_t stunrun_render_hash(const stunrun_renderer_t *renderer);
 int stunrun_render_write_ppm(const stunrun_renderer_t *renderer,
                              const char *path);

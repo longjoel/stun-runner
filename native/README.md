@@ -78,6 +78,8 @@ determinism) alongside the per-slice C tests.
 
 `render.c` / `render.h` provide a dependency-free 512x240 RGB software
 framebuffer with deterministic clear, pixel, hash, and PPM-write operations.
+It also exposes a clipped opaque RGB blit primitive as the literal host-side
+counterpart for the unresolved GSP pixel-blit boundary.
 The native shell emits a blank-frame hash tagged `mode=blank-scaffold`; this
 proves the host rendering/logging boundary without presenting synthetic pixels
 as reconstructed game output. Set `STUNRUN_RENDER_PPM=/path/frame.ppm` to
