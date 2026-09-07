@@ -1,0 +1,38 @@
+# M5 first visible output — oracle boundary
+
+M5 is not complete yet. The original rendered checkpoint is now pinned as a
+repeatable local oracle, and the native shell can emit an image artifact with
+matching geometry, but the native pixels are still the deliberate blank M4
+scaffold.
+
+## Original oracle
+
+Two fresh installed-MAME runs used the pinned title checkpoint recipe:
+
+```sh
+SDL_VIDEODRIVER=dummy mame -rompath /tmp/stunrun-roms-system \
+  -noreadconfig -nowriteconfig -cfg_directory <fresh-cfg> \
+  -nvram_directory <fresh-nvram> -nonvram_save stunrun -video soft \
+  -sound none -skip_gameinfo -seconds_to_run 10 \
+  -snapname m5-oracle -snapshot_directory <output> \
+  -autoboot_script mame/lua/checkpoint.lua
+```
+
+Both produced a byte-identical `512×240` 8-bit RGB PNG:
+
+```text
+sha256: 9aa7b12be07ef28b5796c64e67e722b595664cd09b8c5daead3d7a3707b9e85e
+```
+
+The frame contains the S.T.U.N. Runner title/attract presentation, vehicle,
+roadway, and HUD. This is a rendered observation, not a claim that the native
+target has reconstructed those subsystems.
+
+## Native boundary
+
+Set `STUNRUN_RENDER_PPM=/tmp/native-frame.ppm` when running the native shell.
+It writes a `512×240` P6 RGB frame and reports its deterministic pixel hash.
+The current native frame is tagged `mode=blank-scaffold`; comparing it against
+the oracle is expected to fail until evidence-backed title rendering is
+implemented. The next investigation is to identify the smallest original
+renderer/palette/command slice needed to reproduce one stable visible region.

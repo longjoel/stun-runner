@@ -11,6 +11,7 @@ Compiles native/shell.c with the system C compiler and checks:
 No ROMs, no MAME, no network required.
 """
 import json
+import os
 import pathlib
 import shutil
 import subprocess
@@ -70,7 +71,7 @@ class NativeShellTests(unittest.TestCase):
             self.assertIn("checkpoint frames=600", first.stdout)
             self.assertIn("time-us=10000000", first.stdout)
             self.assertIn("input-hash=0x", first.stdout)
-            self.assertIn("render frame=600 width=320 height=240 "
+            self.assertIn("render frame=600 width=512 height=240 "
                           "hash=0x", first.stdout)
             self.assertIn('checkpoint-json={', first.stdout)
             self.assertIn('"description": "native-shell-transport-model"',
@@ -137,6 +138,23 @@ class NativeShellTests(unittest.TestCase):
             self.assertIn("full-contract=skipped terminal!=600", run.stdout)
             self.assertIn("upload=empty install_ready=0", run.stdout)
             self.assertIn("RESULT PASS", run.stdout)
+
+    def test_shell_writes_optional_ppm_frame(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binary = self.compile_shell(directory)
+            ppm = pathlib.Path(directory) / "frame.ppm"
+            env = dict(os.environ)
+            env["STUNRUN_RENDER_PPM"] = str(ppm)
+            run = subprocess.run([str(binary)], env=env,
+                                 capture_output=True, text=True,
+                                 check=False)
+            self.assertEqual(run.returncode, 0,
+                             f"shell failed:\n{run.stdout}")
+            self.assertIn("render-output", run.stdout)
+            payload = ppm.read_bytes()
+            header = b"P6\n512 240\n255\n"
+            self.assertTrue(payload.startswith(header))
+            self.assertEqual(len(payload), len(header) + 512 * 240 * 3)
 
     def test_shell_refuses_unrunnable_inputs_loudly(self):
         with tempfile.TemporaryDirectory() as directory:

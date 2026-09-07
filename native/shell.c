@@ -37,6 +37,7 @@
  */
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "adsp_control_seq.h"
@@ -246,6 +247,7 @@ static int run_walk(void)
     static uint32_t image[STUNRUN_ADSP_INIT_STATE_WORDS];
     static uint16_t dm[STUNRUN_ADSP_DM_SIZE];
     static stunrun_renderer_t renderer;
+    const char *render_path;
     stunrun_jsa_latches_t latches;
     stunrun_adsp_control_tally_t tally;
     stunrun_jsa_title_counts_t counts;
@@ -355,6 +357,15 @@ static int run_walk(void)
     /* Rendering is a deliberately blank native frame boundary until the
      * first visible-output milestone supplies evidence-backed drawing. */
     stunrun_render_begin(&renderer, g_terminal, 0u, 0u, 0u);
+    render_path = getenv("STUNRUN_RENDER_PPM");
+    if (render_path != NULL && render_path[0] != '\0') {
+        if (!stunrun_render_write_ppm(&renderer, render_path)) {
+            printf("shell: render-output path=%s status=error\n", render_path);
+            g_failures++;
+        } else {
+            printf("shell: render-output path=%s status=written\n", render_path);
+        }
+    }
     printf("render frame=%u width=%u height=%u hash=0x%08X mode=blank-scaffold\n",
            renderer.frame, STUNRUN_RENDER_WIDTH, STUNRUN_RENDER_HEIGHT,
            (unsigned)stunrun_render_hash(&renderer));

@@ -76,8 +76,9 @@ determinism) alongside the per-slice C tests.
 
 ## Rendering boundary (M4 scaffolding)
 
-`render.c` / `render.h` provide a dependency-free 320x240 RGB software
+`render.c` / `render.h` provide a dependency-free 512x240 RGB software
 framebuffer with deterministic clear, pixel, hash, and PPM-write operations.
 The native shell emits a blank-frame hash tagged `mode=blank-scaffold`; this
 proves the host rendering/logging boundary without presenting synthetic pixels
-as reconstructed game output. Evidence-backed drawing begins at M5.
+as reconstructed game output. Set `STUNRUN_RENDER_PPM=/path/frame.ppm` to
+write the terminal frame for inspection. Evidence-backed drawing begins at M5.

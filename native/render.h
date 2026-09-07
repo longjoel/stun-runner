@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define STUNRUN_RENDER_WIDTH 320u
+#define STUNRUN_RENDER_WIDTH 512u
 #define STUNRUN_RENDER_HEIGHT 240u
 #define STUNRUN_RENDER_CHANNELS 3u
 #define STUNRUN_RENDER_BYTES \
