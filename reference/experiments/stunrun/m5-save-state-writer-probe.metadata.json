@@ -1,0 +1,66 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_save_state_writer_probe",
+  "tools": ["tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-human-live/state-600.sta",
+    "sha256": "65870b98010918dbb94cf19f1922f4a193acdd7996616d48925ad48d9d524760",
+    "relative_frames": [2, 60],
+    "capture_description": "frame-600 live gameplay checkpoint; local regenerable artifact, not committed"
+  },
+  "main_cpu_trace": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "tap_window": "0xFFFCF2–0xFFFE60",
+    "tap_alignment_note": "The first exact residue tap began on an odd byte and missed aligned bus writes; these probes widen each target to even boundaries.",
+    "targets": {
+      "0xFFFCF3": {
+        "window": "0xFFFCF2–0xFFFCFE",
+        "center_events": 0,
+        "button2_events": 142,
+        "center_result_sha256": "c3d2123fce2d3fe995d33aeb5eaab3a918e51c4ab18371485057c4dfcf82558d",
+        "button2_result_sha256": "02207340f0d164762286ea41477b5224bedcc46ff6072dd5feee08c6a60f5769"
+      },
+      "0xFFFD17": {
+        "window": "0xFFFD16–0xFFFD22",
+        "center_events": 0,
+        "button2_events": 65,
+        "center_result_sha256": "b359c14e75443314ae9fbbc8660a9318d7cb3472f9e5a5e8c5a83db67143d748",
+        "button2_result_sha256": "39a95bc278cf68690f776baf81a7a3213949310f06b394ae0010177f5ca583b9"
+      },
+      "0xFFFDCF": {
+        "window": "0xFFFDCE–0xFFFDDA",
+        "center_events": 10000,
+        "center_truncated": true,
+        "button2_events": 4234,
+        "button2_truncated": false,
+        "center_result_sha256": "e630d430d3052d95d68d92c85861669e8bc7b77f975e4a45b887b8ff8e7b7fd1",
+        "button2_result_sha256": "33385c03135417ea806936864b7a7b3f831b4d2497b08d0a1b3428548a633e2c"
+      },
+      "0xFFFE54": {
+        "window": "0xFFFE52–0xFFFE60",
+        "center_events": 2269,
+        "center_truncated": false,
+        "button2_events": 10000,
+        "button2_truncated": true,
+        "center_result_sha256": "a35ccb3ac8f6a3442dcd4d561f5a4782359465b881b9f7da216481edd8574629",
+        "button2_result_sha256": "c7f405c93ee0352e8f0d437bcff2f300749c53c42185ec964b6812c27a24ff72"
+      }
+    }
+  },
+  "gsp_trace": {
+    "device": ":mainpcb:gsp",
+    "space": "program",
+    "tap_window": "0xFFFC6C00–0xFFFE8800",
+    "inputs": ["none", "fork_hold_left", "fork_button2_sweep"],
+    "relative_frames": [2, 180],
+    "event_count_each": 0,
+    "observation": "No writes were observed through the corresponding GSP program-space window during the three 180-frame forks."
+  },
+  "observation": "The main CPU owns writes reaching the sampled residue windows. Button 2 adds writes to the first two clusters, while the latter clusters are high-frequency shared/renderer activity in both branches.",
+  "representative_writer_pcs": ["0x026A74", "0x02E4E6", "0x02F2CC", "0x02F946", "0x030220", "0x038E5E"],
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + WRITER-TRACE",
+  "limitation": "The dense traces are not yet sufficient to assign armor, weapon, ammunition, track, or player ownership semantics. PC-to-function interpretation remains literal listing evidence only."
+}
