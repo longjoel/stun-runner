@@ -30,6 +30,18 @@
       "0xFFDD9B": "eb8c24d60a411f28e73e232d8de28e2cce78a94632683b89101590f291769e47",
       "0xFFDDBB": "fec877cdf7c472cd136092115fd401e5216c7e863a057aa647525a5843835f6f"
     },
+    "status_range": {
+      "range": "0xFF954E–0xFF95FF",
+      "button2_result_sha256": "5eeae76987022af29a4ffdbf6784a50aa9c24fe2947017361e33a5f06a519dec",
+      "center_result_sha256": "30f3fbddd9c0146cca06e908a0a9ad31415241eb417dcf7b4fadf8114db11d35",
+      "button2_event_count": 404,
+      "center_event_count": 400,
+      "button2_only_or_additional_addresses": [
+        "0xFF9550", "0xFF9578", "0xFF957C", "0xFF9582",
+        "0xFF9584–0xFF95FE"
+      ],
+      "interpretation": "The additional writes are initialization/geometry and adjacent state activity; no persistent weapon or ammunition field is isolated."
+    },
     "dcc6_writes": {
       "frame": 7,
       "pcs": ["0x038942", "0x038952", "0x038DF0"],

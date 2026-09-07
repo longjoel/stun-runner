@@ -293,7 +293,9 @@ The other three final differences had no main-CPU writers in the captured
 window. This promotes `0xFFDCC6–0xFFDCC7` to a Button 2/effect-path candidate,
 not to weapon or ammunition semantics. It also demonstrates why a tap frame
 must be recorded whenever a save-state fork applies input immediately after
-load.
+load. The corresponding status-window trace had 404 events versus 400 in the
+center control, with the extra activity concentrated in geometry/initialization
+and adjacent state fields; it did not isolate a persistent ammo counter.
 
 Provenance is in
 `reference/experiments/stunrun/state-600-button2-early-tap.metadata.json`.
