@@ -1,0 +1,70 @@
+{
+  "schema": "stunrun-human-play-course-progression/v1",
+  "experiment": "human-course-progression",
+  "target": "stunrun",
+  "mame": {
+    "executable": "/usr/bin/mame",
+    "version": "0.289 (mame0289-dirty)",
+    "rompath": "/tmp/stunrun-roms-system",
+    "rom_validation": "tools/check-roms passed before capture"
+  },
+  "start": {
+    "condition": "power_on",
+    "input": "human-play",
+    "configuration": "fresh NVRAM and fresh MAME config",
+    "lua": "mame/lua/play-capture.lua",
+    "wrapper": "tools/mame-play-capture",
+    "command": "tools/mame-play-capture /tmp/stunrun-roms-system /tmp/stunrun-human-live --frames 21600 --every 600 --fresh-nvram --clean-cfg"
+  },
+  "capture": {
+    "frames": 21600,
+    "snapshot_cadence": 600,
+    "snapshot_base": "0xFF8000",
+    "snapshot_count": "0x80000",
+    "state_cadence": 600,
+    "output_directory": "/tmp/stunrun-human-live",
+    "course_address": "0xFF9578",
+    "score_address": "0xFF9532",
+    "course_log": {
+      "path": "/tmp/stunrun-human-live/course-log.txt",
+      "sha256": "daee1984928d9f2416c701118b619775fadbbb8cf15e08b0428634a02e64bb0e"
+    },
+    "snapshots_written": 36,
+    "states_written": 36
+  },
+  "course_transitions": [
+    {"frame": 3142, "from": 0, "to": 1, "score_low16": 5050},
+    {"frame": 7019, "from": 1, "to": 2, "score_low16": 12290},
+    {"frame": 10377, "from": 2, "to": 3, "score_low16": 31265},
+    {"frame": 15310, "from": 3, "to": 4, "score_low16": 62005},
+    {"frame": 19862, "from": 4, "to": 5, "score_low16": 45569},
+    {"frame": 20105, "from": 5, "to": 4, "score_low16": 49569},
+    {"frame": 20108, "from": 4, "to": 5, "score_low16": 49569}
+  ],
+  "checkpoint_hashes": [
+    {"frame": 3000, "snapshot_sha256": "6398ed5bc101053c8a1608920fa30ec13af1ce99b6857ead9c7b0872a97c3d1c", "state_sha256": "132e59ff521426b655b3deb919aa432d1312a16fb09f1703c9c535b584b59b60"},
+    {"frame": 3600, "snapshot_sha256": "5258104b86103ca2d58ac4590b5698cf16bc1885a6ce27abd8d24f995b3a8c9f", "state_sha256": "231c397e28dd7b20e94c4738ca999837a7031d51bee7fe7cfbb8f2854d802e04"},
+    {"frame": 6600, "snapshot_sha256": "46bc62d98bab483e63df6ec6e1d65dc133b1c029a36f33222e6ba1376fc147e7", "state_sha256": "d5441e09ea8998a77f0c963625aef7a77c3a5aa8e4603a8824e1856fbb5ad339"},
+    {"frame": 7200, "snapshot_sha256": "9b4d439603a3c952b2111383d7ee9d4d37db4f1f4cf5438ea54fca0e7405b4e0", "state_sha256": "7c6b12b179a883fba78ca02f7911ffdd60d171ce4a67a45c008a19ef3f8f6fcb"},
+    {"frame": 10200, "snapshot_sha256": "a7586be170bbdd6532838a9986ec7e1c90005abafd75acdfe7bcbfd60e28ee2a", "state_sha256": "8ab57907cadc4657bcb87f8adfed9982f8c53b7210441bf713af903da67d9914"},
+    {"frame": 10800, "snapshot_sha256": "5c40cec34a4489a684dc0619f39f17fe1f2ddca75442b329c83d70c3d6ac7153", "state_sha256": "cf9598a99f07357deb711390cb0cd8c6107de24d51f50c3a215a7711cf1c062c"},
+    {"frame": 15000, "snapshot_sha256": "ae2e054aa8df11c8e78529970748c12fa19133b5b8a0cc3ba3269d0076dc7d24", "state_sha256": "8fca85d8a97b076a4c80c176443943586ce176b093cdf7c417ddd1e3a07d779e"},
+    {"frame": 15600, "snapshot_sha256": "d2ce154003e81dd6fa6e0a25c3f892cbf69de078070d259656db473fc3a8ff21", "state_sha256": "cde73f7cd1ae79f4be9d874aa18e758c75981f3b2c7b1179a0a61bfa48317d14"},
+    {"frame": 19800, "snapshot_sha256": "a95451fef6722fb8b6433b3ab675d442a7ed166494a5ec78f6ae395270dd8901", "state_sha256": "223fcbbffb4618fe07d24c88f0c63704c1bf1e38835cee1120725dffb6d4e4d0"},
+    {"frame": 20400, "snapshot_sha256": "7278d7bf688f958c62c2aba89df29718f2ada2f43bd6ad8761d7933f9d7c8f96", "state_sha256": "8bbf22853b42c04ebeb11075e79a8539d50c7a9c5740022993c58170f111eb37"},
+    {"frame": 21600, "snapshot_sha256": "6cf9024c080ecbb88b046e6ea4d2b2be7c49736e3e6195ce755c8f8f4ff0829e", "state_sha256": "78f8affef4b64534bfef4b60778656c1bc77f8a0486a312ae2085a1982fcf0a5c"
+    }
+  ],
+  "interpretation": {
+    "confirmed": [
+      "0xFF9578 changed through the observed sequence 0, 1, 2, 3, 4, and 5 during one bounded human-play run",
+      "each six-hundred-frame checkpoint has a matching local MAME save state",
+      "the score accumulator changed throughout the run and remained observable alongside course transitions"
+    ],
+    "not_proven": [
+      "the numeric value is the displayed track label rather than an internal progression state",
+      "the transient 5-to-4-to-5 sequence is a distinct course transition rather than end-of-course cleanup"
+    ]
+  },
+  "raw_artifacts": "Large snapshots and save states remain local under /tmp/stunrun-human-live; this metadata records provenance and hashes without committing ROM-derived contents."
+}

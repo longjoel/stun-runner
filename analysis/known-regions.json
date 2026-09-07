@@ -98,10 +98,10 @@
       "label": "course-score-selection-candidate",
       "base": "0xFF9578",
       "last": "0xFF9579",
-      "category": "static-candidate",
-      "provenance": "analysis/ram-map.md",
-      "confidence": "STATIC-STRONG-CANDIDATE",
-      "note": "Distinct state/index word tested by the object-award path; writers at 0x0252EC, 0x02572C/0x02577A/0x0257C8/0x025814, 0x02B63E, and 0x0320BC/0x0320FA/0x032104 select progression values, but nonzero transition remains unobserved."
+      "category": "tracked",
+      "provenance": "reference/experiments/stunrun/human-course-progression.metadata.json",
+      "confidence": "DYNAMIC-PROGRESSION-CONFIRMED",
+      "note": "Distinct state/index word tested by the object-award path; writers at 0x0252EC, 0x02572C/0x02577A/0x0257C8/0x025814, 0x02B63E, and 0x0320BC/0x0320FA/0x032104 select progression values. Human-play capture observed 0→1→2→3→4→5; displayed track-label semantics remain unproven."
     },
     {
       "label": "input-state-word",

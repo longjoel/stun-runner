@@ -24,8 +24,8 @@ The transition-bearing direct read trace observed:
 The snapshots show these in the low byte of `FF9578..FF957B`, explaining why
 the earlier two-byte probe at `FF9578` returned zero. The values are input-state
 encodings, not course numbering, geometry record strides, or ROM-table
-indices. The separate `0xFF9578` score/course flag has not produced a nonzero
-transition in the current runs and remains unresolved.
+indices. The separate `0xFF9578` score/course flag had not produced a nonzero
+transition in the earlier scripted runs and was unresolved at that point.
 
 The configuration matrix is also negative: `service_probe` produced no reads
 of the field during frames 600–900, and `sw1_all_on` read `0xFF9578` as zero
@@ -53,6 +53,20 @@ its value is the displayed track number. The current late-drive writer trace
 still observed only zero-valued writes at `0x021302`, `0x024322`, `0x02B63E`,
 and `0x02B95E`; reaching the nonzero branches requires a new gameplay
 transition or a save state taken there.
+
+## Human-play progression capture
+
+The bounded real-time capture `human-course-progression` then observed the
+word changing through `0→1→2→3→4→5`. The transitions occurred at frames
+`3142`, `7019`, `10377`, `15310`, and `19862`; a short terminal cleanup path
+also produced `5→4→5` at frames `20105` and `20108`. Each 600-frame sample
+has a matching local save state, and representative snapshot/state hashes are
+recorded in `reference/experiments/stunrun/human-course-progression.metadata.json`.
+
+This promotes `0xFF9578` from a static candidate to a dynamically confirmed
+progression/state field. It still does not prove that the stored number is
+the on-screen track label, nor that the terminal `5→4→5` sequence represents
+three distinct courses.
 
 Evidence: `reference/experiments/stunrun/course-word-reader-trace.metadata.json`,
 `/tmp/stunrun-course-read-long/result.json`, and the main-CPU listing around
