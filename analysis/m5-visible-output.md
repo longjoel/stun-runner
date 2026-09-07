@@ -138,7 +138,10 @@ captured words/palette through `tools/export-gsp-native-state`; when those
 binary inputs are supplied to the native shell, its `gsp-visible-state` frame
 is byte-identical to the paired MAME screen. The shell still has no native
 game-state producer, so this proves renderer integration rather than full M5
-completion.
+completion. A fresh local invocation of the built shell reproduced the paired
+frame with zero changed pixels and zero changed channels; the exact command,
+fixture hashes, and comparison are recorded in
+`reference/experiments/stunrun/m5-native-visible-bridge.metadata.json`.
 
 ## Road-buffer consumer boundary
 

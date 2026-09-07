@@ -1,0 +1,31 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_native_visible_bridge",
+  "date": "2026-09-07",
+  "target": "stunrun",
+  "purpose": "Verify that the native renderer consumes the captured GSP visible state without pixel drift.",
+  "status": "FIXTURE-BRIDGE-EXACT; NATIVE-GAME-STATE-PRODUCER-ABSENT",
+  "source_fixture": {
+    "vram": "/tmp/stunrun-native-gsp/vram.bin",
+    "vram_sha256": "797526ad7f118db11426c8c76cd689990342a64ff425bcee1c5d2310b2bc4bc9",
+    "palette": "/tmp/stunrun-native-gsp/palette.rgb",
+    "palette_sha256": "ede7722ffbb47d0dff7fe612e4d3649b4420fb0419f72b9cb9463390a908a758"
+  },
+  "native_binary": {
+    "path": "build/native/stunrun-native-shell",
+    "sha256": "bac0e52a9a03d8656643b5cdcf4272d3d8e06001739516731dab2371f56031b2"
+  },
+  "command": "STUNRUN_GSP_VRAM_BIN=/tmp/stunrun-native-gsp/vram.bin STUNRUN_GSP_PALETTE_BIN=/tmp/stunrun-native-gsp/palette.rgb STUNRUN_RENDER_PPM=/tmp/stunrun-m5-native-current.ppm build/native/stunrun-native-shell",
+  "comparison": {
+    "tool": "tools/compare-ppm",
+    "expected": "/tmp/m5-visible-exact.ppm",
+    "expected_sha256": "c9b94f3f2a76ed95ffbfe6ab2a3601ffec8235fea62a691ba2fa100875a320d9",
+    "actual": "/tmp/stunrun-m5-native-current.ppm",
+    "actual_sha256": "c9b94f3f2a76ed95ffbfe6ab2a3601ffec8235fea62a691ba2fa100875a320d9",
+    "changed_pixels": 0,
+    "changed_channels": 0,
+    "max_abs_error": 0,
+    "mean_abs_error": 0.0
+  },
+  "interpretation": "The recovered VRAM layout, palette conversion, and native visible-frame renderer are pixel-exact for this captured state. The captured state is supplied externally; this does not establish a native producer for game state or M5 completion."
+}
