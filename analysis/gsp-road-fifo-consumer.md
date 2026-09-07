@@ -73,9 +73,12 @@ still UNKNOWN.
 
 An ordinary GSP memory-read probe over the first downstream destination
 (`0xF5000000–0xF5000FFF`) observed zero readback events in the same replay
-window. The result is retained as a MAME instrumentation boundary: the region
-may be device-consumed or write-only from this space, and the negative result
-does not invalidate the direct write trace.
+window. The pinned `multisync_gsp_map` identifies this range as the
+`hdgsp_paletteram_lo_r/w` palette plane; the twin range is
+`hdgsp_paletteram_hi_r/w`. The negative read result is therefore an
+instrumentation/readback limitation, not evidence that the destination is an
+unowned or inactive window. The exact event-level copy trace remains the
+authoritative transport evidence.
 
 Exact-race snapshots of both downstream families show 232/256 base words and
 190/256 twin words changing from 1280→1290, with neither changing from

@@ -264,6 +264,46 @@ regions:
     notes:
       - address comes from MAME input-port comment and must be confirmed against canonical runtime map
 
+  - name: gsp_vram_aperture
+    processor: gsp
+    start: 0x02000000
+    end: 0x020fffff
+    access: rw
+    evidence: MAME-CONFIRMED
+    candidate_selector: gsp.vram_aperture
+    mame_handlers:
+      - hdgsp_vram_2bpp_r
+      - hdgsp_vram_2bpp_w
+    notes:
+      - multisync_gsp_map routes this aperture to the GSP VRAM handlers
+      - the installed runtime's visible VRAM captures use this address family with the configured address stride
+
+  - name: gsp_palette_low
+    processor: gsp
+    start: 0xf5000000
+    end: 0xf5000fff
+    access: rw
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
+    candidate_selector: gsp.palette_low
+    mame_handlers:
+      - hdgsp_paletteram_lo_r
+      - hdgsp_paletteram_lo_w
+    notes:
+      - the downstream base copy is an exact raw 256-word transfer into this palette-plane window
+
+  - name: gsp_palette_high
+    processor: gsp
+    start: 0xf5800000
+    end: 0xf5800fff
+    access: rw
+    evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
+    candidate_selector: gsp.palette_high
+    mame_handlers:
+      - hdgsp_paletteram_hi_r
+      - hdgsp_paletteram_hi_w
+    notes:
+      - the downstream twin copy is an exact raw 256-word transfer into this palette-plane window
+
 relationships:
   - from: adsp
     to: maincpu
