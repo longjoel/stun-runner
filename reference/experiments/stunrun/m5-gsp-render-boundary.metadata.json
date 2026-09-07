@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5-gsp-render-boundary-window",
+  "runner": "tools/mame-trace",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "trace_cpu": ":mainpcb:gsp",
+  "trace_window": {"start_frame": 850, "end_frame": 930},
+  "inputs": {
+    "stationary": "late",
+    "driven": "late_drive",
+    "drive_event_frame": 900
+  },
+  "runs": {
+    "stationary": {
+      "trace_sha256": "6e908287905342f6f0680535c2420161ec0a6bc142a0a99231e99d1c2e418b19",
+      "trace_lines": 366347,
+      "known_renderer_writer_occurrences": 405
+    },
+    "driven": {
+      "trace_sha256": "0306947403c886370fb2f6e415c7b6e5108cf9ea7ba75f992bb2b54e1c2b60fc",
+      "trace_lines": 419285,
+      "known_renderer_writer_occurrences": 558
+    }
+  },
+  "first_aligned_trace_difference": {
+    "line": 242516,
+    "stationary": "FFF46590: PIXBLT B,XY",
+    "driven": "FFF465A0: ADDXY  A8,A1",
+    "context": "The two traces share the preceding PIXBLT and address-generation instructions; the driven path takes an additional coordinate update before the loop returns."
+  },
+  "literal_renderer_context": {
+    "pixel_loop": "The GSP executes repeated PIXBLT B,XY operations against @2000000h and the driven path diverges in this loop.",
+    "known_f400_writer_set": ["FFF42EB0", "FFF45330", "FFF46370", "FFF479E0"],
+    "color_latch": "GSP control offset zero at F4000000 is the MAME-mapped VRAM expander color latch; its semantic palette meaning remains unresolved."
+  },
+  "interpretation": "This narrows the first input-dependent visual boundary to a GSP pixel-blit/coordinate path. It does not yet identify the source texture, palette encoding, screen composition, or player-state semantics.",
+  "raw_artifacts": "Trace files remain local under /tmp/stunrun-m5-gsp-window and /tmp/stunrun-m5-gsp-late; metadata records provenance and hashes only.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + STATIC-TRACE-CONTEXT"
+}

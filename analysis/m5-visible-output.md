@@ -51,3 +51,17 @@ mean channel error: 79.6585205078125
 
 This is the expected negative control and is retained so the first real native
 visual slice can be measured against the same oracle.
+
+## First renderer boundary
+
+A paired GSP trace over frames `850–930` narrows the first input-dependent
+visual divergence to a pixel-blit loop. The stationary and driven traces share
+the preceding `PIXBLT B,XY` and address-generation instructions; the first
+aligned difference is the driven path taking `ADDXY A8,A1` at `0xFFF465A0`
+where the stationary path executes another `PIXBLT B,XY` at `0xFFF46590`.
+The driven trace also contains 558 occurrences of the known `F4000000` writer
+set versus 405 in the stationary trace. This is the current smallest literal
+renderer boundary, not yet a decoded tile, palette, or full-screen renderer.
+
+Provenance and complete trace hashes are in
+`reference/experiments/stunrun/m5-gsp-render-boundary.metadata.json`.
