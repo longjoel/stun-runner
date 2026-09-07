@@ -266,3 +266,9 @@ byte lanes and writes two work-buffer families based at `0xFFF6F650` and
 input-dependent FIFO-to-work-buffer path, but not that either destination or
 any payload word is specifically roadway data. Details are in
 `analysis/gsp-road-fifo-consumer.md` and its provenance metadata.
+
+Destination snapshots add a timing check: from frames 1290 to 1300, the
+driven path changes 235/256 sampled words at `0xFFF6F650` and 195/256 at
+`0xFFF70650`, while the no-input baseline changes 1 and 0. This validates the
+two-buffer update boundary as a native-facing synchronization point without
+inventing payload semantics.

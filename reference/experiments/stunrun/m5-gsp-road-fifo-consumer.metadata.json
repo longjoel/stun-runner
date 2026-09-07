@@ -42,6 +42,44 @@
       "0xFFF48E70: ADDK 8h,A5"
     ]
   },
+  "destination_snapshot_check": {
+    "sample_count": 256,
+    "width": 16,
+    "address_stride": 16,
+    "frames": [1280, 1290, 1300],
+    "driven_input": "late_drive",
+    "no_input_baseline": "none",
+    "buffers": {
+      "0xFFF6F650": {
+        "driven_result_sha256": "f046e26ca00483220cc9402c236259524c95cba04f16493105ec25ca4695c9e9",
+        "driven_snapshot_sha256": {
+          "1280": "65ba3250066475c6d9dbfa62f118d38142a9e9e3b5baf3ce4835a712d0a8d156",
+          "1290": "53ed32aa80e666d6d81d3d57fbd15d2be29df77928a630d95f364bab5afc4507",
+          "1300": "111e1c5542503efed3297d0d9ce3216cab88b641a58c11796ec7c77deff19f65"
+        },
+        "baseline_result_sha256": "a41c7edf446bf0706dee6157e6a741613ae225c8ff1313e5ed77611a69b39554",
+        "baseline_snapshot_sha256": {
+          "1280": "d97bb096016c5c939f5f89f360d35ee8ad4c52f58fb42fef49aa413584020561",
+          "1290": "db1bc715ceffe233ead2294f0a679301d04d60ae4246d1784dd16e7329ce827a",
+          "1300": "fbe3bec91da5effb1ae7a0594b6724ad5b6de6cba99aa3e3ffeb1e343702da28"
+        },
+        "driven_changed_1290_to_1300": 235,
+        "baseline_changed_1290_to_1300": 1
+      },
+      "0xFFF70650": {
+        "driven_result_sha256": "13cd22849dd9af7061737a3146c8bc6dc284daa84780fc9b97424cca8dcf3a44",
+        "driven_snapshot_sha256": {
+          "1280": "9ef08e4c87488f7d5241a6991e92b313426d3de2ae8086b6920c5ac568fcf44f",
+          "1290": "705f8c8789ed616391b1bf6020977957693fa9df2eb96200cabb55e83ef872b4",
+          "1300": "05f0386891aafddb87d18f700b20fd035be4c6c0dd409ea660a30b69ec2ffccd"
+        },
+        "baseline_result_sha256": "fab5925f848ff5deb1667fd38be1c7f1315a1ab7af07ac26c883019e23d055d0",
+        "driven_changed_1290_to_1300": 195,
+        "baseline_changed_1290_to_1300": 0
+      }
+    },
+    "interpretation": "The two destination families update in the same driven interval and remain effectively stable in the matched no-input interval; contents and semantics remain UNKNOWN."
+  },
   "negative_probe": {
     "gsp_fifo_memory_read_events": 0,
     "window": "0xC0000C–0xC0000D",

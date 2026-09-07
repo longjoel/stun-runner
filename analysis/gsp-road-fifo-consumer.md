@@ -32,6 +32,15 @@ This establishes an input-dependent GSP FIFO-to-work-buffer consumer and two
 destination-buffer families. It does not establish that either buffer is
 road geometry, nor does it identify the meaning of any payload word.
 
+## Destination timing check
+
+Three snapshots of each destination were taken at frames 1280, 1290, and
+1300 in matched `late_drive` and no-input runs. Between frames 1290 and 1300,
+the driven run changed 235 of 256 sampled words at `0xFFF6F650` and 195 of
+256 at `0xFFF70650`. The no-input run changed 1 and 0 words respectively.
+This timing correlation strengthens the consumer attribution while leaving
+the buffer contents and field semantics UNKNOWN.
+
 ## Replay support
 
 `tools/mame-trace` now accepts `--playback INP` in the same positional slot as
