@@ -1,0 +1,24 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "trajectory_shift_constants",
+  "tool": "tools/mame-memory-snapshot",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "snapshot": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "base": "0x04D771",
+    "count": 4,
+    "width": 8,
+    "frame": 1,
+    "result_sha256": "9e09f96582dbd0151550a4a83f7083baf12f825e0cda9266e5c40a35d8af0377",
+    "values": [1, 0, 1, 0]
+  },
+  "mapping": {
+    "0x04D771": "arithmetic shift count used by the D3 delta filter",
+    "0x04D773": "arithmetic shift count used by the trajectory output filter",
+    "both_values": 1
+  },
+  "observation": "The ROM-sourced shift bytes used by the 0x0388FE-0x038A0E trajectory logic are both one. This freezes the shift constants without assigning a physical axis or effect identity.",
+  "confidence": "MAME-CONFIRMED-ROM-READ"
+}

@@ -17,6 +17,18 @@ int main(void)
            (int16_t)0xFCA0);
     assert(stunrun_trajectory_step((int16_t)0xFA60, 1) ==
            (int16_t)0xFA61);
+    assert(STUNRUN_TRAJECTORY_SPEED_SHIFT == 1u);
+    assert(STUNRUN_TRAJECTORY_POSITION_SHIFT == 1u);
+    {
+        int16_t stored = -7;
+        assert(stunrun_trajectory_filter_delta(4, 0, &stored) == -2);
+        assert(stored == -2);
+        stored = -7;
+        assert(stunrun_trajectory_filter_delta(3, 3, &stored) == 7);
+        assert(stored == 7);
+        assert(stunrun_trajectory_filter_delta(2, 3, &stored) == 1);
+        assert(stunrun_trajectory_filter_delta(3, 2, &stored) == -1);
+    }
     puts("trajectory-state tests passed");
     return 0;
 }

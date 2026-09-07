@@ -25,9 +25,9 @@ semantics Agent 1 left open.
   (`0xC0000C`). Payload semantics remain unresolved. Sources:
   `adsp-buffer-window.metadata.json` and `adsp-interface-map.metadata.json`.
 - `trajectory_state.h` / `trajectory_state.c` — literal initialization,
-  signed step, and clamp mechanism for the trajectory coordinate at
-  `0xFFDCC6`. The physical axis and effect/object identity remain unknown;
-  this is not an ammo or weapon-inventory model.
+  signed step, one-bit ROM-sourced delta filter, and clamp mechanism for the
+  trajectory coordinate at `0xFFDCC6`. The physical axis and effect/object
+  identity remain unknown; this is not an ammo or weapon-inventory model.
 
 The native target compiles these same sources (`native/CMakeLists.txt`:
 `score-slice-c`, `nvram-scores-slice-c`, `fifo-block-slice-c`). Public

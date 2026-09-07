@@ -20,6 +20,8 @@ extern "C" {
 #define STUNRUN_TRAJECTORY_INITIAL  ((int16_t)-0x360)
 #define STUNRUN_TRAJECTORY_RESET    ((int16_t)-0x360)
 #define STUNRUN_TRAJECTORY_LOWER    ((int16_t)-0x5A0)
+#define STUNRUN_TRAJECTORY_SPEED_SHIFT 1u
+#define STUNRUN_TRAJECTORY_POSITION_SHIFT 1u
 
 /* The observed 68010 literal is 0xFCA0, which is -0x360. */
 int16_t stunrun_trajectory_initial(void);
@@ -29,6 +31,12 @@ int16_t stunrun_trajectory_clamp(int32_t value);
 
 /* Add a signed integrator delta and apply that clamp. */
 int16_t stunrun_trajectory_step(int16_t coordinate, int16_t delta);
+
+/* Literal D2/D0/D3 filter at 0x0388D2-0x03893C. The first two arguments
+ * are the two successive deltas before the subtraction into D3. The stored
+ * value models 0xFFDCD2, which is written with the filtered result. */
+int16_t stunrun_trajectory_filter_delta(int16_t d2_delta, int16_t d0_delta,
+                                        int16_t *stored_dcd2);
 
 #ifdef __cplusplus
 }
