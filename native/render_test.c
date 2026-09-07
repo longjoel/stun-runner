@@ -28,6 +28,26 @@ int main(void)
             !stunrun_render_blit(&renderer, source, 2u, 2u, -1, -1))
             return 1;
     }
+    if (!stunrun_render_fill_xy(&renderer, 4, 6, 2, 3, 0xA1u, 0xB2u,
+                                0xC3u) ||
+        renderer.pixels[((size_t)3u * STUNRUN_RENDER_WIDTH + 2u) * 3u] !=
+            0xA1u ||
+        renderer.pixels[((size_t)6u * STUNRUN_RENDER_WIDTH + 4u) * 3u + 1u] !=
+            0xB2u ||
+        renderer.pixels[((size_t)7u * STUNRUN_RENDER_WIDTH + 2u) * 3u] ==
+            0xA1u ||
+        !stunrun_render_fill_xy(&renderer, -4, -3, -1, -1, 1u, 2u, 3u))
+        return 1;
+    if (!stunrun_render_line(&renderer, 1, 1, 4, 4, 0xD1u, 0xE2u,
+                             0xF3u) ||
+        renderer.pixels[((size_t)1u * STUNRUN_RENDER_WIDTH + 1u) * 3u] !=
+            0xD1u ||
+        renderer.pixels[((size_t)3u * STUNRUN_RENDER_WIDTH + 3u) * 3u + 1u] !=
+            0xE2u ||
+        !stunrun_render_line(&renderer, -2, 0, 2, 0, 9u, 8u, 7u) ||
+        renderer.pixels[2u * 3u] != 9u ||
+        !stunrun_render_line(&renderer, 0, 0, 0, 0, 1u, 2u, 3u))
+        return 1;
     {
         uint16_t vram[4] = {0x0201u, 0u, 0u, 0u};
         uint8_t palette[256u * 3u] = {0};

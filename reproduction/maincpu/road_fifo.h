@@ -24,6 +24,15 @@ extern "C" {
 size_t stunrun_road_fifo_drain(const uint16_t *base, size_t words,
                                uint16_t *fifo_out, size_t fifo_cap);
 
+/* Drain a bounded source sub-range using the same observed even-word lane.
+ * This represents a burst observed across multiple frames: source_offset
+ * must be even, and the returned words are base[source_offset],
+ * base[source_offset + 2], ... . */
+size_t stunrun_road_fifo_drain_range(const uint16_t *base, size_t words,
+                                     size_t source_offset,
+                                     size_t source_count,
+                                     uint16_t *fifo_out, size_t fifo_cap);
+
 #ifdef __cplusplus
 }
 #endif

@@ -28,6 +28,10 @@ semantics Agent 1 left open.
   signed step, one-bit ROM-sourced delta filter, and clamp mechanism for the
   trajectory coordinate at `0xFFDCC6`. The physical axis and effect/object
   identity remain unknown; this is not an ammo or weapon-inventory model.
+- `road_fifo.h` / `road_fifo.c` — complete and bounded partial forms of the
+  observed base-buffer to GSP FIFO lane: every other source word is emitted.
+  The range form models bursts split across adjacent frames without assigning
+  payload semantics or frame scheduling.
 
 The native target compiles these same sources (`native/CMakeLists.txt`:
 `score-slice-c`, `nvram-scores-slice-c`, `fifo-block-slice-c`). Public

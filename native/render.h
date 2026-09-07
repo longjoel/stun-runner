@@ -29,6 +29,16 @@ int stunrun_render_set_pixel(stunrun_renderer_t *renderer, unsigned x,
 int stunrun_render_blit(stunrun_renderer_t *renderer, const uint8_t *source,
                         unsigned source_width, unsigned source_height,
                         int destination_x, int destination_y);
+/* Clipped inclusive-coordinate fill counterpart for the traced GSP FILL XY
+ * operation. Bounds may be supplied in either order; this is a raster
+ * primitive only and assigns no meaning to the coordinates. */
+int stunrun_render_fill_xy(stunrun_renderer_t *renderer, int x0, int y0,
+                           int x1, int y1, uint8_t red, uint8_t green,
+                           uint8_t blue);
+/* Clipped line counterpart for the traced GSP LINE 0 primitive. */
+int stunrun_render_line(stunrun_renderer_t *renderer, int x0, int y0,
+                        int x1, int y1, uint8_t red, uint8_t green,
+                        uint8_t blue);
 /* Render the evidence-backed visible multisync layout: four 512-byte lines
  * per 2048-byte VRAM row, with little-endian 16-bit words and RGB palette. */
 int stunrun_render_gsp_visible(stunrun_renderer_t *renderer,

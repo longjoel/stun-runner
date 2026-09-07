@@ -70,6 +70,89 @@ int stunrun_render_blit(stunrun_renderer_t *renderer, const uint8_t *source,
     return 1;
 }
 
+int stunrun_render_fill_xy(stunrun_renderer_t *renderer, int x0, int y0,
+                           int x1, int y1, uint8_t red, uint8_t green,
+                           uint8_t blue)
+{
+    int left;
+    int right;
+    int top;
+    int bottom;
+    int y;
+
+    if (renderer == NULL)
+        return 0;
+    left = x0 < x1 ? x0 : x1;
+    right = x0 < x1 ? x1 : x0;
+    top = y0 < y1 ? y0 : y1;
+    bottom = y0 < y1 ? y1 : y0;
+    if (right < 0 || left >= (int)STUNRUN_RENDER_WIDTH ||
+        bottom < 0 || top >= (int)STUNRUN_RENDER_HEIGHT)
+        return 1;
+    if (left < 0)
+        left = 0;
+    if (top < 0)
+        top = 0;
+    if (right >= (int)STUNRUN_RENDER_WIDTH)
+        right = (int)STUNRUN_RENDER_WIDTH - 1;
+    if (bottom >= (int)STUNRUN_RENDER_HEIGHT)
+        bottom = (int)STUNRUN_RENDER_HEIGHT - 1;
+    for (y = top; y <= bottom; y++) {
+        int x;
+        for (x = left; x <= right; x++) {
+            size_t offset = ((size_t)y * STUNRUN_RENDER_WIDTH +
+                             (unsigned)x) * 3u;
+            renderer->pixels[offset] = red;
+            renderer->pixels[offset + 1u] = green;
+            renderer->pixels[offset + 2u] = blue;
+        }
+    }
+    return 1;
+}
+
+int stunrun_render_line(stunrun_renderer_t *renderer, int x0, int y0,
+                        int x1, int y1, uint8_t red, uint8_t green,
+                        uint8_t blue)
+{
+    int dx;
+    int sx;
+    int dy;
+    int sy;
+    int error;
+
+    if (renderer == NULL)
+        return 0;
+    dx = x0 < x1 ? x1 - x0 : x0 - x1;
+    sx = x0 < x1 ? 1 : -1;
+    dy = y0 < y1 ? y1 - y0 : y0 - y1;
+    sy = y0 < y1 ? 1 : -1;
+    error = dx - dy;
+    for (;;) {
+        if (x0 >= 0 && x0 < (int)STUNRUN_RENDER_WIDTH && y0 >= 0 &&
+            y0 < (int)STUNRUN_RENDER_HEIGHT) {
+            size_t offset = ((size_t)y0 * STUNRUN_RENDER_WIDTH +
+                             (unsigned)x0) * 3u;
+            renderer->pixels[offset] = red;
+            renderer->pixels[offset + 1u] = green;
+            renderer->pixels[offset + 2u] = blue;
+        }
+        if (x0 == x1 && y0 == y1)
+            break;
+        {
+            int twice_error = error * 2;
+            if (twice_error > -dy) {
+                error -= dy;
+                x0 += sx;
+            }
+            if (twice_error < dx) {
+                error += dx;
+                y0 += sy;
+            }
+        }
+    }
+    return 1;
+}
+
 int stunrun_render_gsp_visible(stunrun_renderer_t *renderer,
                                const uint16_t *vram_words,
                                size_t vram_word_count,

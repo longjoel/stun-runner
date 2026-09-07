@@ -80,10 +80,27 @@ determinism) alongside the per-slice C tests.
 framebuffer with deterministic clear, pixel, hash, and PPM-write operations.
 It also exposes a clipped opaque RGB blit primitive as the literal host-side
 counterpart for the unresolved GSP pixel-blit boundary.
+`stunrun_render_fill_xy` provides the corresponding clipped inclusive-bounds
+primitive for the traced GSP `FILL XY` path; its coordinates remain raw.
+`stunrun_render_line` provides the endpoint-preserving clipped counterpart for
+the traced `LINE 0` path; neither primitive assigns game meaning to inputs.
 The `stunrun_render_gsp_visible` primitive applies the evidence-backed
 four-lines-per-VRAM-row layout and 16-bit word byte lanes to a supplied GSP
 VRAM/palette state; it does not provide that state or claim a complete game
 renderer.
+`stunrun_gsp_palette_decode` owns the corresponding two-plane palette
+conversion observed in the snapshot exporter (low-plane high/low bytes become
+R/G, high-plane low byte becomes B).
+`stunrun_gsp_video_set_palette_planes` installs that conversion directly into
+the native video state for future raw-snapshot producers.
+`stunrun_gsp_video_render` is the state-level entry point that submits loaded
+VRAM and palette data to the visible-layout renderer.
+`stunrun_gsp_video_set_vram_words` provides the corresponding owned, validated
+VRAM-state boundary; failed input leaves the existing state unchanged.
+`stunrun_gsp_video_set_vram_bytes` accepts the little-endian byte form emitted
+by the captured-state exporter and performs the conversion in C.
+File loading follows the same transactional rule: malformed or incomplete
+VRAM/palette files do not discard a previously loaded video state.
 With no video-state inputs the native shell emits a blank-frame hash tagged
 `mode=blank-scaffold`; this proves the host rendering/logging boundary without
 presenting synthetic pixels as reconstructed game output. For paired MAME
