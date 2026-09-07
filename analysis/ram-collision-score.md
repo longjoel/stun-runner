@@ -297,5 +297,12 @@ load. The corresponding status-window trace had 404 events versus 400 in the
 center control, with the extra activity concentrated in geometry/initialization
 and adjacent state fields; it did not isolate a persistent ammo counter.
 
+The static listing closes the field mechanism further: `0x0387C6`, `0x038D94`,
+and `0x038DF0` initialize `0xFFDCC6`; the integrator at `0x0388DE–0x038942`
+updates and clamps it using the motion delta at `0xFFDD16`, and downstream
+trajectory/object builders consume the resulting value. The field is therefore
+promoted as a trajectory coordinate/state word. Its physical axis and the
+specific effect/object variant remain UNKNOWN.
+
 Provenance is in
 `reference/experiments/stunrun/state-600-button2-early-tap.metadata.json`.
