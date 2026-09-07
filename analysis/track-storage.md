@@ -121,8 +121,10 @@ The byte arithmetic is now represented literally in
 `reproduction/maincpu/road_buffer_math.c`. It is a standalone slice rather than
 part of the fixture shell: the shell's captured geometry input represents a
 pre-transform buffer, while this C slice models the later subtract/add phase
-with 8-bit wraparound and a configurable byte count. Its focused native test
-is `road-buffer-math-slice-c`.
+with 8-bit wraparound and a configurable byte count. The same slice now models
+the preceding raw-base/scaled-twin copy loop, including divisor values other
+than the observed `1` case. Its focused native test is
+`road-buffer-math-slice-c`.
 
 The reusable snapshot workflow is:
 

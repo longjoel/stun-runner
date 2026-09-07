@@ -23,6 +23,12 @@ void stunrun_road_buffer_subtract(uint8_t *base, const uint8_t *twin,
 void stunrun_road_buffer_add(uint8_t *base, const uint8_t *twin,
                              size_t bytes);
 
+/* Model the 0x029760/0x02977E copy loops. Returns 1 on success; a zero
+ * divisor is rejected instead of attempting to model the 68010 exception. */
+int stunrun_road_buffer_copy_scaled(const uint8_t *source, uint8_t *base,
+                                    uint8_t *twin, uint8_t divisor,
+                                    size_t bytes);
+
 #ifdef __cplusplus
 }
 #endif
