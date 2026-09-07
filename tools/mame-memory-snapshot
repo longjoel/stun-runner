@@ -28,7 +28,7 @@ def main() -> int:
                         help="address increment between sampled values")
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--targets", default=None)
-    parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center", "collision_probe_hold_left", "collision_probe_hold_right", "damage_probe_sweep", "fork_lateral_sweep", "fork_button2_sweep", "fork_hold_left", "fork_hold_right", "fork_center", "course_sweep", "course_preface_left", "course_preface_right", "course_coin2", "service_probe", "sw1_all_on", "sw1_bit1", "sw1_bit2", "sw1_bit3", "sw1_bit4", "sw1_bit5", "sw1_bit6", "sw1_bit7", "sw1_bit8", "drive_hold"), default="none")
+    parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center", "collision_probe_hold_left", "collision_probe_hold_right", "damage_probe_sweep", "fork_lateral_sweep", "fork_button2_sweep", "fork_hold_left", "fork_hold_right", "fork_center", "fork_delayed_left", "fork_delayed_right", "course_sweep", "course_preface_left", "course_preface_right", "course_coin2", "service_probe", "sw1_all_on", "sw1_bit1", "sw1_bit2", "sw1_bit3", "sw1_bit4", "sw1_bit5", "sw1_bit6", "sw1_bit7", "sw1_bit8", "drive_hold"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--save-state", type=pathlib.Path, help="save a MAME state at the final requested frame")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")

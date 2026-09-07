@@ -13,5 +13,16 @@
   ],
   "repeatability": {"common_frames": 599, "snapshot_file_mismatches": 0, "frame_600_snapshot_sha256": "18b77ce64cbac179cd05d12b4302478380f19e6504bac9b3b9ae13eabfc382e1"},
   "lifecycle": {"nonzero_interval_frames": [2, 38], "clear_interval_frames": [39, 121], "first_repopulation_frame": 122, "repopulation_sample_frame": 123, "repopulated_sample_frame": 200},
-  "interpretation": "DETERMINISTIC OBJECT-RECORD TIMING; SPAWN TRIGGER UNKNOWN. The fork does not distinguish frame-locked from position-locked behavior."
+  "revalidation": {
+    "path": "/tmp/stunrun-m5-object-control-current",
+    "input": "none",
+    "frames": [2, 180],
+    "targets": [2, 30, 39, 60, 79, 80, 81, 90, 120, 121, 122, 123, 150, 180],
+    "nothrottle": true,
+    "canonical_log_sha256": "b6861f4eab5650058cd5e53cbd1eefec159d65fe6307aee805a1f6394262dfa7",
+    "frame_180_snapshot_sha256": "9e8ca1963f28ee2a93fc61647913ace8a8e78261f2075a33c33a7e4c2acd0c8f",
+    "nonzero_counts": {"2": 49, "30": 49, "39": 49, "60": 49, "79": 49, "80": 49, "81": 49, "90": 49, "120": 49, "121": 49, "122": 49, "123": 49, "150": 49, "180": 49},
+    "historical_clear_interval_reproduced": false
+  },
+  "interpretation": "OBJECT-RECORD WINDOW OBSERVED; LIFECYCLE CONDITION UNKNOWN. The historical clear/repopulation schedule was byte-repeatable in two older runs but was not reproduced by fresh throttled or --nothrottle controls from the same saved state. Do not promote a spawn trigger or gameplay field meaning."
 }

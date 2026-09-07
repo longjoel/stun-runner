@@ -63,6 +63,12 @@ class InputModeTests(unittest.TestCase):
             self.assertIn(mode, wrapper_modes())
             self.assertIn(mode, lua_modes())
 
+    def test_delayed_fork_modes_present(self):
+        for mode in ("fork_delayed_left", "fork_delayed_right"):
+            self.assertIn(mode, wrapper_modes())
+            self.assertIn(mode, lua_modes())
+            self.assertEqual(lua_events(mode)[0][0], 80)
+
     def test_press_precedes_release(self):
         for mode in lua_modes():
             held = {}

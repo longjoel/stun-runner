@@ -14,31 +14,29 @@ modes:
 
 ## Result
 
-The three input forks are byte-identical at every sampled frame
-`2, 30, 39, 60, 90, 120, 121, 122, 123, 150, 180`. At relative frame 180,
-all three contain 49 nonzero bytes and their snapshot bytes match exactly.
+The three immediate input forks are byte-identical at every sampled frame
+`2, 30, 39, 60, 90, 120, 121, 122, 123, 150, 180`. The delayed-left and
+delayed-right forks (event at frame 80) are also byte-identical to a fresh
+no-input control at every sampled frame through 180. At relative frame 180,
+all current runs contain 49 nonzero bytes.
 This means the experiment did **not** distinguish left, center, and right
 steering in this saved-state window.
 
-All three forks do differ from the earlier no-input replay of the same saved
-state. The difference is only one byte at frame 2 (`0xFFDD1B`, value `1`
-instead of `2`), then the object-record bytes remain populated where the
-no-input replay had a clear interval at relative frames 39–121. At frame 180,
-the fork-versus-no-input differences are concentrated at offsets
-`0x60`, `0x82–0x8A`, `0x9B`, `0xA0`, `0xAA`, `0xB0`, `0xBB`, and `0xD1`.
+A prior comparison appeared to show a difference against an older no-input
+replay. A fresh no-input control from the same state, under both throttled and
+`--nothrottle` execution, is byte-identical to both delayed forks. The older
+clear/repopulation replay is now classified as a historical execution
+condition discrepancy, not an input effect.
 
 The defensible conclusion is therefore:
 
-> An input event applied immediately after loading the saved state changes the
-> subsequent object-record lifecycle relative to the untouched replay, but
-> these three modes do not provide evidence that the record responds to
-> steering direction. The field semantics and spawn trigger remain unknown.
+> This saved-state experiment shows no reproducible left/center/right
+> differential. The field semantics, lifecycle trigger, and the cause of the
+> historical clear interval remain unknown.
 
-The likely next discriminating experiment is to add explicit telemetry for
-the input port and writer PCs, then fork with a delayed input event at several
-relative frames. That will separate “input event changes initialization” from
-“object record follows player position” without assigning gameplay meanings to
-the bytes prematurely.
+The harness now logs each applied input event as `MAME_MEMORY_INPUT`. The next
+discriminating experiment is a freshly created state plus writer-PC telemetry,
+after the historical/current execution discrepancy is explained.
 
 ## Provenance
 

@@ -13,11 +13,16 @@
     {"input": "fork_hold_left", "path": "/tmp/stunrun-m5-object-fork-left", "canonical_log_sha256": "e82ca6637264185b54a16a99200c883f472c7a10fb8982fa48c5fd9bb315f6d3", "frame_180_snapshot_sha256": "0a987b250bdeaf1083c5ea5ca59cb58316cbf8d47c6b14fd1ed030c0c6ba7690", "frame_180_nonzero": 49},
     {"input": "fork_hold_right", "path": "/tmp/stunrun-m5-object-fork-right", "canonical_log_sha256": "1e7a70f84725b8293623e630e0144540bef006a3742f1de2d05f6a93f7b65279", "frame_180_snapshot_sha256": "27714f28031ff498423b327d37fbfd1d299fb55f3f33fe8baca5c5ba0901a7ca", "frame_180_nonzero": 49}
   ],
+  "delayed_forks": [
+    {"input": "fork_delayed_left", "event_frame": 80, "path": "/tmp/stunrun-m5-object-delayed-left", "canonical_log_sha256": "2106c0cc560160c57c21a128194abdff5867462311d25c9c8c9d4d4dfa041828", "frame_180_snapshot_sha256": "7c2f8acff8d3a342aa7f0a046cd5966ed42124f70946baa589af334805841b8b", "frame_180_nonzero": 49},
+    {"input": "fork_delayed_right", "event_frame": 80, "path": "/tmp/stunrun-m5-object-delayed-right", "canonical_log_sha256": "445a513281848223a7efda581c80780fbeb8d45c4b5bb40d5f78db7995e34f0d", "frame_180_snapshot_sha256": "3fd35cb1236a40da5664a08fe9d22bac7286a825402bcafea3ca983e1d863db8", "frame_180_nonzero": 49}
+  ],
   "comparison": {
     "fork_snapshots_pairwise_identical": true,
     "common_sampled_frames": [2, 30, 39, 60, 90, 120, 121, 122, 123, 150, 180],
-    "fork_vs_no_input_frame_2_differing_offsets": [187],
-    "fork_vs_no_input_frame_180_differing_offsets": [96, 130, 132, 134, 136, 138, 144, 155, 160, 170, 176, 187, 192, 209]
+    "fresh_no_input_control_path": "/tmp/stunrun-m5-object-control-current",
+    "fresh_no_input_control_byte_identical_to_delayed_forks": true,
+    "historical_no_input_comparison_is_stale": true
   },
-  "interpretation": "EARLY INPUT-EVENT FORK CHANGES LIFECYCLE; DIRECTIONAL STEERING EFFECT NOT SHOWN. The three fork modes are identical to one another, so this experiment does not establish left/center/right semantics or a position-locked spawn trigger."
+  "interpretation": "NO REPRODUCIBLE DIRECTIONAL DIFFERENTIAL. The delayed left/right forks and fresh no-input control are byte-identical at every sampled frame. The earlier apparent differential came from comparing against a historical no-input capture whose clear interval is not currently reproducible."
 }

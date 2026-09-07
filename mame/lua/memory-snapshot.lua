@@ -86,6 +86,14 @@ local events = input_mode == 'fork_button2_sweep' and {
     {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
     {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
     {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'fork_delayed_left' and {
+    {frame = 80, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
+    {frame = 80, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 80, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'fork_delayed_right' and {
+    {frame = 80, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 255},
+    {frame = 80, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 80, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
 } or input_mode == 'fork_lateral_sweep' and {
     {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
     {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
@@ -286,6 +294,8 @@ local function apply_event(event)
     if event.action == 'press' then field:set_value(1)
     elseif event.action == 'release' then field:set_value(0)
     else field:set_value(event.value) end
+    print(string.format('MAME_MEMORY_INPUT frame=%d port=%s field=%s action=%s value=%s',
+        frame, event.port, event.field, event.action, tostring(event.value or (event.action == 'press' and 1 or 0))))
 end
 
 local function capture()
