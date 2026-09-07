@@ -52,8 +52,25 @@ move.w  <word>, $c0000c.l
 move.w  <word>, $c0000c.l
 ```
 
-Thus the record is upstream of a geometry/FIFO submission path. It is not a
-persistent craft-status structure.
+Thus the record is statically upstream of a geometry/FIFO submission path. It
+is not a persistent craft-status structure.
+
+## Runtime qualification
+
+A focused FIFO write tap over `0xC0000C`, filtered to the `0x02F470` entry
+point, captured no events in the current saved-state interval. This is
+expected to miss the routine's internal write PCs and also shows that this
+particular branch was not directly exercised by the loaded state. An
+unfiltered FIFO tap is heavily multiplexed by other emitters, including the
+road/command paths, and reached its event budget before it could be used as a
+record-specific attribution.
+
+The evidence status is therefore precise: the **record update mechanism is
+runtime-confirmed**, and its **candidate geometry/FIFO consumer is
+static-listing-confirmed**, but a direct runtime record-to-FIFO payload
+correlation remains open. The next proof should trace the executing
+`0x03E51C`/`0x03E3FC` caller path or use a fresh state in which that display
+branch is active, then pair its FIFO writes with the record bytes.
 
 ## Runtime correlation
 
