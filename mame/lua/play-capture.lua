@@ -71,7 +71,11 @@ local snapshots = 0
 local last_course = nil
 local last_score = nil
 local log_handle = assert(io.open(output .. '/course-log.txt', 'w'))
+local write_handle = assert(io.open(output .. '/course-writes.txt', 'w'))
+local pc_state = device.state['CURPC'] or device.state['PC']
+local course_write_tap
 log_handle:write('frame course score_lo\n')
+write_handle:write('frame pc address data mask\n')
 
 local function read_u16(addr)
     return space:read_u8(addr) * 256 + space:read_u8(addr + 1)
@@ -127,8 +131,23 @@ local function capture()
     end
 end
 
+local function install_course_write_tap()
+    -- The inclusive end address is widened for the 68010 bus tap, then
+    -- filtered back to the exact two-byte word in the callback.
+    course_write_tap = space:install_write_tap(
+        course_addr, course_addr + 1, 'stunrun_play_course_write',
+        function(offset, data, mask)
+            if offset >= course_addr and offset <= course_addr + 1 then
+                write_handle:write(string.format('%d %08X %08X %08X %08X\n',
+                    frame, pc_state.value, offset, data, mask))
+                write_handle:flush()
+            end
+        end)
+end
+
 emu.register_frame_done(function()
     frame = frame + 1
+    if frame == 10 then install_course_write_tap() end
     local course = read_u16(course_addr)
     local score = read_u32(score_addr)
     if not valid_gameplay_sample(course, score) then
@@ -149,6 +168,7 @@ emu.register_frame_done(function()
     if frame % every == 0 then capture() end
     if limit > 0 and frame >= limit then
         log_handle:close()
+        write_handle:close()
         print(string.format('MAME_PLAY_DONE frames=%d snapshots=%d', frame, snapshots))
         machine:exit()
     end
