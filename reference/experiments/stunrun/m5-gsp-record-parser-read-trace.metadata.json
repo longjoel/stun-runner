@@ -1,0 +1,33 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-gsp-record-parser-read-trace",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Recover the literal indexed-record addressing and field-read sequence preceding the GSP FILL XY geometry path.",
+  "checkpoint": {
+    "state": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "relative_trace_frames": [1790, 1800],
+    "window": "0xFF800000–0xFFFFFFFF",
+    "max_events": 5000
+  },
+  "captures": {
+    "left_index": {"input": "fork_hold_left", "pc": "0xFFF45000", "result_sha256": "fd0011c390fb29da753a33eee187b382a4256bb7564568dd9484a885651f8f2f", "events": 1710, "data_reads": 855, "data_address_range": "0xFF(FB)A4C0–0xFF(FE)B8B0"},
+    "left_record": {"input": "fork_hold_left", "pc": "0xFFF45090", "result_sha256": "b3e912e4a2780181921f394c5aeeabfd252d6892fde316e405b4205c0e56fa09", "events": 1704, "data_reads": 852, "data_address_range": "0xFFFA0260–0xFFFE9FD0"},
+    "center_index": {"input": "fork_center", "pc": "0xFFF45000", "result_sha256": "fe4b79377dd129f059cc34c5121c6db6dd5b4debb0f4ea878941afe0f620cdb1", "events": 2024, "data_reads": 1012, "data_address_range": "0xFFFB90C0–0xFFFEA3D0"},
+    "center_record": {"input": "fork_center", "pc": "0xFFF45090", "result_sha256": "eb026c78e6ca92d8c2bc2d537e3faa3ab92889789b144784847becc4eadd991", "events": 2020, "data_reads": 1010, "data_address_range": "0xFFFA0260–0xFFFE8B60"}
+  },
+  "literal_sequence": {
+    "index_reader": ["MOVE *A3+,A5,0", "ZEXT A5,0", "CMPXY A12,A5", "SLL 4h,A5", "ADD A1,A5"],
+    "record_stride_bytes": 16,
+    "record_reader": ["MOVE *A5+,A4,0", "MOVE *A5+,A8,0", "MOVE *A5+,A6,0"],
+    "coordinate_path": ["MOVE *A5+,A8,0", "MOVY A8,A6", "MOVE *A5+,A7,1", "MOVE *A5+,A9,1", "MOVE *A5+,A10,0"]
+  },
+  "observations": {
+    "center_index_example": "At frame 1791 the index stream includes 0x0001, 0x0011, 0x0021, ... at 16-byte address steps.",
+    "center_record_example": "At frame 1791 the record reader observes repeated 0x0130 words at addresses 0xFFFD0260, 0xFFFD0360, ...; this is a literal value observation, not a semantic label.",
+    "input_dependence": "Left and center forks select different index/data address streams and read counts from the same saved-state origin.",
+    "instruction_fetch_caveat": "Each result includes the instruction-fetch event at the filtered PC; data_reads excludes events whose address equals that PC."
+  },
+  "interpretation": "The GSP has an indexed 16-byte record walk feeding its geometry renderer. The record layout and addressing mechanism are now strong native-slice candidates; field ownership and whether the records represent road, object, or HUD primitives remain UNKNOWN."
+}

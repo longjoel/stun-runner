@@ -76,6 +76,15 @@ add_test(NAME native-render-boundary-c COMMAND stunrun-render-test)
 add_executable(stunrun-gsp-video-test gsp_video.c gsp_video_test.c)
 set_target_properties(stunrun-gsp-video-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-gsp-video-boundary-c COMMAND stunrun-gsp-video-test)
+# Literal GSP indexed-record addressing and raw field positions from the M5
+# runtime parser trace. No field semantics are assigned here.
+add_executable(stunrun-gsp-record-parser-slice-test
+  ../reproduction/gsp/record_parser.c
+  ../reproduction/gsp/record_parser_test.c)
+target_include_directories(stunrun-gsp-record-parser-slice-test PRIVATE
+  ../reproduction/gsp)
+set_target_properties(stunrun-gsp-record-parser-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME gsp-record-parser-slice-c COMMAND stunrun-gsp-record-parser-slice-test)
 # arcade-experiment/v1 parser self-check (valid, corrupt, and schema-
 # violating fixtures; no ROMs or MAME involved).
 add_executable(stunrun-experiment-parser-test

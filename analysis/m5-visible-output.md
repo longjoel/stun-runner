@@ -238,3 +238,22 @@ work-record inputs before rasterization. This narrows the producer question to
 the high-memory record writer/source format; it does not yet assign those
 records to roadway, object, or HUD semantics. Provenance is in
 `reference/experiments/stunrun/m5-gsp-geometry-source-read-trace.metadata.json`.
+
+The preceding GSP parser is now bounded directly. At `0xFFF45000`, the
+runtime sequence is `MOVE *A3+,A5`, zero extension, `CMPXY`, `SLL 4h,A5`, and
+`ADD A1,A5`: the selected record address is therefore a base plus a 16-byte
+index stride. At `0xFFF45090`, the first record words are loaded into `A4`,
+`A8`, and `A6`; the later coordinate path loads another `A8`, then `A7`, `A9`,
+and `A10` before the `FILL XY` loop. The center fork visibly reads index words
+`0x0001, 0x0011, 0x0021, …` at 16-byte address steps, while the record reader
+observes repeated literal `0x0130` values in one dynamic region. These are
+mechanism-level facts only: no record field is promoted to road, object, or
+HUD semantics. Provenance is in
+`reference/experiments/stunrun/m5-gsp-record-parser-read-trace.metadata.json`.
+
+This mechanism is now represented by the dependency-free C slice in
+`reproduction/gsp/record_parser.c`: it computes the observed `base + index *
+0x10` address and exposes the raw word positions consumed by the traced
+`A4/A8/A6`, later `A8`, and `A7/A9/A10` loads. The dedicated
+`gsp-record-parser-slice-c` test passes. This is a native-facing transport and
+record-layout contract, not yet a complete GSP producer or semantic renderer.
