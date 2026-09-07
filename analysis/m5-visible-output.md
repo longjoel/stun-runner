@@ -272,3 +272,10 @@ driven path changes 235/256 sampled words at `0xFFF6F650` and 195/256 at
 `0xFFF70650`, while the no-input baseline changes 1 and 0. This validates the
 two-buffer update boundary as a native-facing synchronization point without
 inventing payload semantics.
+
+PC-filtered writes further bound the transfer shape: each destination receives
+896 full-word writes in seven 128-write bursts across the 1280–1298 window.
+The base-side addresses advance by `0x20` from `0xFFF6F650`; the twin-side
+family begins at `0xFFF70660` and follows the same count. The offset difference
+is recorded literally and is not yet a semantic front/back or road/object
+classification.

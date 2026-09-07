@@ -80,6 +80,24 @@
     },
     "interpretation": "The two destination families update in the same driven interval and remain effectively stable in the matched no-input interval; contents and semantics remain UNKNOWN."
   },
+  "pc_filtered_write_trace": {
+    "command_template": "tools/mame-ram-write-trace /tmp/stunrun-roms-system OUTPUT --device :mainpcb:gsp --space program --base 0xFFF6F650 --end 0xFFF7164F --frames 1300 --start-frame 1280 --end-frame 1300 --max-events 50000 --tap-frame 10 --pc PC --playback /tmp/race/r1.inp",
+    "base_writer_pc": "0xFFF48D60",
+    "base_result_sha256": "ea5928ec37dda3ffdc9a737a71ae2b0b4b75eb8f480375a008a7d2e7467461b8",
+    "base_event_count": 896,
+    "base_address_count": 128,
+    "base_address_range": "0xFFF6F650–0xFFF70630",
+    "base_address_step": "0x20",
+    "twin_writer_pc": "0xFFF48E60",
+    "twin_result_sha256": "d5f47ce619ae62e9707aa8dfa96c355c79d0d216706cd487d8fd8535de616184",
+    "twin_event_count": 896,
+    "twin_address_count": 128,
+    "twin_address_range": "0xFFF70660–0xFFF71640",
+    "burst_frames": [1280, 1283, 1286, 1289, 1292, 1295, 1298],
+    "writes_per_burst": 128,
+    "mask": "0xFFFF",
+    "interpretation": "The runtime loop writes both destination families with the same seven-burst cadence and count. Buffer roles and payload semantics remain UNKNOWN."
+  },
   "negative_probe": {
     "gsp_fifo_memory_read_events": 0,
     "window": "0xC0000C–0xC0000D",

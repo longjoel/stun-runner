@@ -47,6 +47,14 @@ the two `+0x10` destination strides, plus the observed byte-lane composition.
 The `gsp-work-buffer-consumer-slice-c` test passes. This is a transport/layout
 contract for the native boundary, not a decoded road renderer.
 
+A PC-filtered write trace strengthens the loop shape. Each destination writer
+produced 896 full-word writes in seven 128-write bursts at frames 1280, 1283,
+1286, 1289, 1292, 1295, and 1298. The base-side writer covered 128 addresses
+from `0xFFF6F650` through `0xFFF70630` at `0x20` address steps; the twin-side
+writer covered 128 corresponding addresses from `0xFFF70660` through
+`0xFFF71640`. The differing initial offsets are retained as observed selector
+state, not assigned a semantic buffer role.
+
 ## Replay support
 
 `tools/mame-trace` now accepts `--playback INP` in the same positional slot as
