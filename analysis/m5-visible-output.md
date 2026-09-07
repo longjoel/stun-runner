@@ -303,3 +303,7 @@ changed channels, and SHA-256
 `c9b94f3f2a76ed95ffbfe6ab2a3601ffec8235fea62a691ba2fa100875a320d9`. This
 confirms the shell-level `stunrun_gsp_video_render` path; the fixture remains
 externally supplied and is not a native game-state producer.
+
+The canonical recorded-race snapshot series now covers both GSP work-buffer
+families in one 512-word, stride-16 capture. It provides an exact replay-backed
+input for the next producer/consumer correlation step.

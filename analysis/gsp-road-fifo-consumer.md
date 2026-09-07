@@ -89,5 +89,11 @@ real MAME smoke run replayed `/tmp/race/r1.inp` and captured the requested GSP
 range at frame 30, so exact recorded input can now drive both instruction
 traces and memory snapshots.
 
+The exact `/tmp/race/r1.inp` replay also has a combined 512-word snapshot
+fixture covering both families. From frames 1280→1290, 232 base words and 190
+twin words change; from 1290→1300, both are stable. This replay-backed series
+is the preferred input for future producer correlation because it avoids a
+synthetic schedule.
+
 The provenance record is
 `reference/experiments/stunrun/m5-gsp-road-fifo-consumer.metadata.json`.
