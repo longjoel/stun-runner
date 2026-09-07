@@ -67,6 +67,8 @@ class NativeShellTests(unittest.TestCase):
                              "shell output is not deterministic")
             self.assertIn("RESULT PASS", first.stdout)
             self.assertIn("checkpoint frames=600", first.stdout)
+            self.assertIn("time-us=10000000", first.stdout)
+            self.assertIn("input-hash=0x", first.stdout)
             self.assertIn('checkpoint-json={', first.stdout)
             self.assertIn('"description": "native-shell-transport-model"',
                           first.stdout)
@@ -128,6 +130,7 @@ class NativeShellTests(unittest.TestCase):
             self.assertEqual(run.returncode, 0,
                              f"shell failed:\n{run.stdout}\n{run.stderr}")
             self.assertIn("action=set value=220", run.stdout)
+            self.assertIn("input-state frame=9 active=1 hash=0x", run.stdout)
             self.assertIn("full-contract=skipped terminal!=600", run.stdout)
             self.assertIn("upload=empty install_ready=0", run.stdout)
             self.assertIn("RESULT PASS", run.stdout)

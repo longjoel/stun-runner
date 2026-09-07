@@ -35,6 +35,7 @@
  * usage/parse/unsupported-terminal failures. Output is fully
  * deterministic: same bytes on every run (no addresses, no timing).
  */
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -53,6 +54,70 @@ static const stunrun_exp_event_t *g_events = NULL;
 static unsigned g_event_count = 0;
 static unsigned g_dispatched = 0;
 static unsigned g_pending = 0;
+
+/* Generic replay boundary only: this is not game state. */
+typedef struct shell_input_latch {
+    char port[STUNRUN_EXP_STR_LEN];
+    char field[STUNRUN_EXP_STR_LEN];
+    int value;
+} shell_input_latch_t;
+
+static shell_input_latch_t g_input[STUNRUN_EXP_MAX_EVENTS];
+static unsigned g_input_count = 0;
+static uint32_t g_input_hash = 2166136261u;
+
+static void input_hash_bytes(const void *data, size_t length)
+{
+    const unsigned char *bytes = (const unsigned char *)data;
+    size_t i;
+    for (i = 0; i < length; i++) {
+        g_input_hash ^= bytes[i];
+        g_input_hash *= 16777619u;
+    }
+}
+
+static unsigned input_latch_index(const stunrun_exp_event_t *event)
+{
+    unsigned i;
+    for (i = 0; i < g_input_count; i++)
+        if (strcmp(g_input[i].port, event->port) == 0 &&
+            strcmp(g_input[i].field, event->field) == 0)
+            return i;
+    if (g_input_count >= STUNRUN_EXP_MAX_EVENTS)
+        return STUNRUN_EXP_MAX_EVENTS;
+    snprintf(g_input[g_input_count].port, STUNRUN_EXP_STR_LEN, "%s",
+             event->port);
+    snprintf(g_input[g_input_count].field, STUNRUN_EXP_STR_LEN, "%s",
+             event->field);
+    g_input[g_input_count].value = 0;
+    return g_input_count++;
+}
+
+static void input_latch_apply(const stunrun_exp_event_t *event)
+{
+    unsigned index = input_latch_index(event);
+    unsigned i;
+    if (index >= STUNRUN_EXP_MAX_EVENTS)
+        return;
+    g_input[index].value = event->action == STUNRUN_EXP_PRESS ? 1 :
+                           event->action == STUNRUN_EXP_RELEASE ? 0 :
+                           event->value;
+    g_input_hash = 2166136261u;
+    for (i = 0; i < g_input_count; i++) {
+        input_hash_bytes(g_input[i].port, strlen(g_input[i].port) + 1u);
+        input_hash_bytes(g_input[i].field, strlen(g_input[i].field) + 1u);
+        input_hash_bytes(&g_input[i].value, sizeof(g_input[i].value));
+    }
+}
+
+static unsigned input_active_count(void)
+{
+    unsigned i, active = 0;
+    for (i = 0; i < g_input_count; i++)
+        if (g_input[i].value != 0)
+            active++;
+    return active;
+}
 
 #define expect(cond) \
     do { \
@@ -107,6 +172,9 @@ static void dispatch_inputs(void)
         if (ev->label[0] != '\0')
             printf(" label=%s", ev->label);
         printf("\n");
+        input_latch_apply(ev);
+        printf("shell: input-state frame=%u active=%u hash=0x%08X\n",
+               frame, input_active_count(), (unsigned)g_input_hash);
     }
 }
 
@@ -281,9 +349,12 @@ static int run_walk(void)
             g_pending++;
     }
 
-    printf("checkpoint frames=%u events=%u pending=%u upload=%s "
+    printf("checkpoint frames=%u time-us=%u events=%u pending=%u "
+           "input-active=%u input-hash=0x%08X upload=%s "
            "install_ready=%d control=%s counts=%s nmi=%d irq4=%d\n",
-           g_terminal, g_dispatched, g_pending,
+           g_terminal, (unsigned)(((uint64_t)g_terminal * 1000000u) / 60u),
+           g_dispatched, g_pending, input_active_count(),
+           (unsigned)g_input_hash,
            upload_name(stunrun_adsp_upload_state_at(g_terminal)),
            stunrun_adsp_install_frame_ready(g_terminal),
            control_state, counts_state,

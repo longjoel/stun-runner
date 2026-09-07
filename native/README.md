@@ -28,9 +28,10 @@ twice and requires byte-identical stdout.
 
 With one argv pointing at an `arcade-experiment/v1` JSON file
 (`schemas/experiment.schema.json`), the walk length comes from
-`expect.frame` and the file's input events dispatch at their frames as
-telemetry (inputs have no consumer model yet — the shell owns no game
-state by design). `native/experiment.c` is a dependency-free C99 parser
+`expect.frame` and the file's input events dispatch at their frames. The shell
+retains a generic latest-value latch for each port/field pair and emits a
+deterministic active-count/hash boundary; this is input plumbing only, not
+game semantics. `native/experiment.c` is a dependency-free C99 parser
 that enforces the schema strictly (exact tag, id pattern, required keys,
 press/release/set enum, set-requires-value, no unknown keys on events or
 expect) with bounded resources. Whole-run contracts (control tally,
