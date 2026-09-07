@@ -79,6 +79,13 @@ entries. It observes zero executions of `0x03E51C`, `0x03E3FC`, or
 `0x02F470`. The current run therefore proves the live updater, but not that
 the geometry-consumer branch is selected in this state.
 
+A second instruction trace loaded the later `/tmp/stunrun-latedrive2400.sta`
+checkpoint and covered relative frames 1–120. It again observed the updater
+(`0x03D120` and `0x03D1A0`, ten entries each) and zero executions of the
+candidate consumer entries. This rules out “the frame-1200 state was simply
+too early” as the explanation; the consumer attribution needs a different
+caller/branch or a display-focused trace.
+
 ## Runtime correlation
 
 The matched 600-frame saved-state traces show the same path dynamically:
@@ -102,3 +109,6 @@ MAME/ROM environment. Runtime hashes and paths are recorded in
 The bounded instruction trace is `/tmp/stunrun-m5-object-instr/maincpu.trace`
 with SHA-256
 `cfb7affa7e2f7fef694f5fcdb54339ad4c4d30815b5aaafaca952699fcd697b9`.
+The later-checkpoint trace is
+`/tmp/stunrun-m5-object-instr-2400/maincpu.trace` with SHA-256
+`43ec6634bb044a315bb6786f9208738230bf8fc51211d1bfe127371c2384bb94`.

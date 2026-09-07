@@ -37,6 +37,15 @@
     "consumer_entry_counts": {"0x03E51C": 0, "0x03E3FC": 0, "0x02F470": 0},
     "interpretation": "The updater executes repeatedly in this window, but the candidate geometry-consumer branch is not selected."
   },
+  "later_checkpoint_instruction_trace": {
+    "path": "/tmp/stunrun-m5-object-instr-2400/maincpu.trace",
+    "sha256": "43ec6634bb044a315bb6786f9208738230bf8fc51211d1bfe127371c2384bb94",
+    "saved_state": "/tmp/stunrun-latedrive2400.sta",
+    "relative_frames": [1, 120],
+    "updater_entry_counts": {"0x03D120": 10, "0x03D1A0": 10},
+    "consumer_entry_counts": {"0x03E51C": 0, "0x03E3FC": 0, "0x02F470": 0},
+    "interpretation": "A later live-drive checkpoint reproduces the updater without selecting the candidate consumer branch."
+  },
   "interpretation": "The short current fork has initialization writes only; it does not exercise the later transition.",
   "extended_transition": {
     "window": {"base": "0xFFDD80", "end": "0xFFDDA0"},
