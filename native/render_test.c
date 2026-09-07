@@ -28,6 +28,18 @@ int main(void)
             !stunrun_render_blit(&renderer, source, 2u, 2u, -1, -1))
             return 1;
     }
+    {
+        uint16_t vram[4] = {0x0201u, 0u, 0u, 0u};
+        uint8_t palette[256u * 3u] = {0};
+        palette[1u * 3u] = 0x12u;
+        palette[1u * 3u + 1u] = 0x34u;
+        palette[2u * 3u] = 0x56u;
+        palette[2u * 3u + 1u] = 0x78u;
+        if (!stunrun_render_gsp_visible(&renderer, vram, 4u, palette) ||
+            renderer.pixels[0] != 0x12u || renderer.pixels[1] != 0x34u ||
+            renderer.pixels[3] != 0x56u || renderer.pixels[4] != 0x78u)
+            return 1;
+    }
     puts("native render boundary: all checks passed");
     return 0;
 }

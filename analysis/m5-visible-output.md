@@ -131,3 +131,8 @@ The GSP-state tool now accepts `--screen PATH` and calls MAME's
 `9aa7b12be07ef28b5796c64e67e722b595664cd09b8c5daead3d7a3707b9e85`, proving
 that the memory/register capture and rendered oracle can be collected from one
 deterministic run.
+
+The native renderer now has a matching pure C primitive for this recovered
+layout, covered by `native-render-boundary-c`. It consumes caller-supplied GSP
+words and 256-entry RGB palette data; the native shell does not yet populate
+those inputs, so its terminal frame remains the deliberate blank scaffold.

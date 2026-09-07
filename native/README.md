@@ -80,6 +80,10 @@ determinism) alongside the per-slice C tests.
 framebuffer with deterministic clear, pixel, hash, and PPM-write operations.
 It also exposes a clipped opaque RGB blit primitive as the literal host-side
 counterpart for the unresolved GSP pixel-blit boundary.
+The `stunrun_render_gsp_visible` primitive applies the evidence-backed
+four-lines-per-VRAM-row layout and 16-bit word byte lanes to a supplied GSP
+VRAM/palette state; it does not provide that state or claim a complete game
+renderer.
 The native shell emits a blank-frame hash tagged `mode=blank-scaffold`; this
 proves the host rendering/logging boundary without presenting synthetic pixels
 as reconstructed game output. Set `STUNRUN_RENDER_PPM=/path/frame.ppm` to

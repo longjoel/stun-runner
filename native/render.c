@@ -70,6 +70,35 @@ int stunrun_render_blit(stunrun_renderer_t *renderer, const uint8_t *source,
     return 1;
 }
 
+int stunrun_render_gsp_visible(stunrun_renderer_t *renderer,
+                               const uint16_t *vram_words,
+                               size_t vram_word_count,
+                               const uint8_t *palette_rgb)
+{
+    unsigned y;
+    size_t mask;
+    if (renderer == NULL || vram_words == NULL || palette_rgb == NULL ||
+        vram_word_count == 0u || (vram_word_count & (vram_word_count - 1u)) != 0u)
+        return 0;
+    mask = vram_word_count - 1u;
+    for (y = 0; y < STUNRUN_RENDER_HEIGHT; y++) {
+        size_t row_base = ((size_t)(y / 4u) << 10) & mask;
+        size_t color_base = (size_t)(y & 3u) << 9;
+        unsigned x;
+        for (x = 0; x < STUNRUN_RENDER_WIDTH; x++) {
+            size_t color_index = color_base + x;
+            uint16_t word = vram_words[(row_base + (color_index >> 1)) & mask];
+            unsigned color = (color_index & 1u) ? (word >> 8) : (word & 0xffu);
+            size_t source = (size_t)color * 3u;
+            size_t target = ((size_t)y * STUNRUN_RENDER_WIDTH + x) * 3u;
+            renderer->pixels[target] = palette_rgb[source];
+            renderer->pixels[target + 1u] = palette_rgb[source + 1u];
+            renderer->pixels[target + 2u] = palette_rgb[source + 2u];
+        }
+    }
+    return 1;
+}
+
 uint32_t stunrun_render_hash(const stunrun_renderer_t *renderer)
 {
     uint32_t hash = 2166136261u;
