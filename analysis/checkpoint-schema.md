@@ -44,6 +44,40 @@ repeatable loading/blank negative control, not a gameplay path or canonical
 numeric checkpoint. The replay harness now supports an exact-frame snapshot
 and exit, so future visual and numeric captures can share a frame boundary.
 
+## Reusable state forks
+
+A MAME save state is a full-machine checkpoint, not merely a RAM dump. It can
+therefore be loaded once and used as the origin for multiple bounded
+experiments; the frame counter and input schedule supplied to the tools are
+relative to the loaded state. This avoids replaying boot and setup for every
+RAM or visual probe.
+
+Create a checkpoint at a requested absolute run frame:
+
+```sh
+tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/checkpoint \
+  --device :mainpcb:maincpu --base 0xff9500 --count 0x86 \
+  --frames 900 --targets 900 --input collision_probe_center \
+  --save-state /tmp/stunrun-center900.sta --nothrottle
+```
+
+Fork it with relative frames and independent inputs:
+
+```sh
+tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/fork \
+  --device :mainpcb:maincpu --base 0xff9500 --count 0x86 \
+  --frames 240 --targets 60,120,240 \
+  --load-state /tmp/stunrun-center900.sta \
+  --input fork_center --nothrottle
+```
+
+The installed MAME 0.289 workflow was rechecked from the frame-900 state with
+relative targets 10, 20, and 30; all three snapshots completed with return
+code zero. Save states remain local artifacts and depend on the pinned MAME
+build and validated ROM set. Raw RAM snapshots remain the comparison evidence;
+the state supplies the CPU, DSP, video, timer, and peripheral context needed
+to resume deterministically.
+
 The frame-1800 rendered-scene fixture in
 `reference/checkpoints/m1-rendered-scene/state.json` uses the same compact
 schema and is byte-for-byte repeatable across two fresh configurations. The
