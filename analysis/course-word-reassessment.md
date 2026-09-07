@@ -74,6 +74,32 @@ The writer attribution further promotes the normal `1..5` path to
 same recorded input run. The terminal cleanup writes remain separately
 classified because they came from `0x0291A2` and `0x0252EC`.
 
+## Terminal `5→4→5` context
+
+The two terminal writes are not equivalent to the five normal progression
+writes. The first, at `0x0291A2`, is reached from the timer/progression routine
+after the `0xFF9568` time-remaining field has expired or been cleared. The
+routine dispatches on the current `0xFF9578` value, decrements it for this
+branch, and sets `0xFF9550` to `0x2C` before continuing the transition work.
+
+The second, at `0x0252EC`, occurs in a state/presentation path that uses the
+current word as an index into the ROM table at `0x047406`, clears the nearby
+presentation state at `0xFF9520`, calls `0x2BAD6`, and then increments
+`0xFF9578` before returning to the transition dispatcher. The observed pair
+therefore fits terminal cleanup followed by re-entry into the same state more
+closely than it fits two additional course changes.
+
+Classification:
+
+* `0→1→2→3→4→5`: normal progression, dynamically writer-confirmed at
+  `0x0320BC`.
+* `5→4→5`: terminal cleanup/re-entry behavior, dynamically observed but not a
+  new-course claim.
+
+This interpretation is deliberately bounded: it does not establish whether
+the value shown on screen is a track label, nor whether the cleanup path is
+entered only on timeout or also on another end-of-segment condition.
+
 Evidence: `reference/experiments/stunrun/course-word-reader-trace.metadata.json`,
 `/tmp/stunrun-course-read-long/result.json`, and the main-CPU listing around
-`0x02B1D0` and `0x02BA68`.
+`0x02B1D0`, `0x02BA68`, `0x0252EC`, and `0x0291A2`.

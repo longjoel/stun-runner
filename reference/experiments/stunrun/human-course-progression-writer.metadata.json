@@ -59,7 +59,7 @@
   ],
   "interpretation": {
     "confirmed": "The normal course progression writes values 1 through 5 at PC 0x0320BC; the write precedes the frame-done observation by one frame.",
-    "bounded_caveat": "The later 5-to-4-to-5 writes use different PCs and are retained as terminal cleanup/transition behavior, not folded into the normal progression writer claim.",
+    "bounded_caveat": "The later 5-to-4-to-5 writes use different PCs and are retained as terminal cleanup/transition behavior, not folded into the normal progression writer claim. Static context places 0x0291A2 after time-expiry dispatch and 0x0252EC in the state/presentation re-entry path, supporting cleanup/re-entry rather than two new course changes.",
     "not_proven": "The stored progression value is exactly the on-screen track label."
   },
   "raw_artifacts": "Snapshots, save states, and the input recording remain local under /tmp/stunrun-course-recorded; this metadata commits provenance and hashes only."
