@@ -1,0 +1,41 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_save_state_frame_series_repeat",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-latedrive1200.sta",
+    "sha256": "5d81b72231dc9dc6bd77357d2308c3facc817ee9b35bbe17e1fb16d9c5f7eef7",
+    "input": "none",
+    "relative_frames": [2, 600]
+  },
+  "ram_window": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "base": "0xFFDD00",
+    "last": "0xFFDDFF",
+    "width": 8,
+    "targets": "every frame 2..600"
+  },
+  "repeats": {
+    "run_a_result_sha256": "45d5f167b29a7c657d32bf66df77a5c823716d693b1ad8623543e07ceba5da79",
+    "run_b_result_sha256": "8f0715f540fd42802d6e0cc5dcf496b50bf6093f299ff7748a4cec80d95cd37c",
+    "snapshots_compared": 599,
+    "snapshot_hash_mismatches": 0
+  },
+  "repeatable_transitions": [
+    {
+      "relative_frame": 39,
+      "observation": "The five initially nonzero 16-byte object records at 0xFFDD86+slot*0x10 become zero; 0xFFDD02 remains zero."
+    },
+    {
+      "relative_frame": 137,
+      "observation": "The same record area is reinitialized with five nonzero records; 0xFFDD02 remains zero."
+    }
+  ],
+  "observation": "A full per-frame object-window series resumed from a saved state is byte-repeatable across independent runs and exposes deterministic transition boundaries without replaying setup.",
+  "semantic_status": "DETERMINISTIC-TRANSITIONS-OBSERVED; SPAWN-SEMANTICS-UNRESOLVED",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME",
+  "limitation": "The record clear/reinitialization is not sufficient to distinguish object spawn, game-state transition, or renderer reset; an independent gameplay selector and writer trace are required."
+}
