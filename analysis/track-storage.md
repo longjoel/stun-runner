@@ -68,6 +68,15 @@ separate animation reader. The bulk upload occurs in staged plateaus rather
 than as one permanently stable write; intermediate snapshots can therefore be
 mid-update and should not be treated as complete tables.
 
+One saved race checkpoint makes the distinction concrete. After loading
+`/tmp/race/state-1200.sta`, the 768-byte base/twin content was unchanged at
+relative frames 2, 10, and 30. Its first 720 bytes (words 0–359) exactly match
+the ROM slot at `0x045230` (the observed course-5 slot), while only the final
+48 bytes (words 360–383) differ. This is strong evidence for a ROM table copy
+followed by a bounded runtime tail update; it is not evidence that the whole
+RAM buffer is a permanently direct ROM image. The tail's field meaning and
+writer remain unresolved.
+
 The reusable snapshot workflow is:
 
 1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.

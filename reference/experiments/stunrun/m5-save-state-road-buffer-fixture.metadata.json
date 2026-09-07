@@ -29,6 +29,14 @@
     "frame_30_different_bytes": 0,
     "interpretation": "Both observed 768-byte copies are settled and byte-identical in this checkpoint window."
   },
+  "rom_slot_comparison": {
+    "source_fixture": "/tmp/stunrun-m5-road-producer-a/geometry.bin",
+    "source_fixture_sha256": "1920a742f63d7ee46ef6c98db2e2d8b89092443330c8a4b4da3980ee32b14420",
+    "matching_rom_slot": "0x045230",
+    "exact_word_range": "0-359",
+    "runtime_different_word_range": "360-383",
+    "interpretation": "The captured RAM buffer preserves the selected ROM table through word 359 and has a 24-word tail update; the update's semantics and writer are unresolved."
+  },
   "observation": "A saved human-race state can provide a deterministic road-buffer producer fixture without replaying the race. The fixture is sufficient to exercise the literal twin-buffer consumer/renderer boundary, but not to infer field semantics.",
   "semantic_status": "TWIN_ROAD_BUFFER_FIXTURE_CONFIRMED; FIELDS_UNRESOLVED",
   "confidence": "OBSERVED-IN-INSTALLED-MAME + REPEATABLE-SAVE-STATE-CAPTURE"
