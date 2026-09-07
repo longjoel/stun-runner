@@ -95,6 +95,32 @@ The GSP receives the values through the MAME-confirmed GSP I/O window
 `0xC00000–0xC03FFF`; `0xC0000C` is the narrow runtime FIFO sink. The GSP's
 interpretation of these road words remains open.
 
+## A visible pattern inside one ROM table
+
+The traced course-0 table at `0x044630` is 384 words long. Looking only at
+word boundaries, its tail has a particularly clear shape:
+
+```text
+words 0–143       prefix / mixed data; structure not yet identified
+words 144–191     16 records × 3 words
+words 192–239     16 records × 3 words
+words 240–287     16 records × 3 words
+words 288–335     16 records × 3 words
+words 336–383     16 records × 3 words
+```
+
+Thus the final 240 words are five adjacent arrays of sixteen 6-byte records.
+Several fields show smooth or interleaved ramps, and the last block contains
+repeated `0x00BA`/`0xBA00`-like values. Those patterns make a coordinate,
+lookup, or rasterization structure plausible, but they do not identify which
+word is X, Y, width, curvature, a flag, or a terminator. The current confidence
+label is **ROM-DATA-SHAPE OBSERVED; FIELD SEMANTICS UNKNOWN**.
+
+The first 144 words also contain repeated ramps and packed-looking values, but
+no equally safe record boundary has been promoted there. The same structural
+analysis should be repeated for the observed course-5/10/11 table bases before
+assuming that all table slots use identical layouts.
+
 ## What is still unknown
 
 - Which word or bit fields describe lateral position, height, width, or
