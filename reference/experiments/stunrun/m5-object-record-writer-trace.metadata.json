@@ -18,6 +18,16 @@
   "address_range_observed": ["0xFFDD86", "0xFFDDC2"],
   "canonical_log_sha256": "8e5969214d335c5f418058dd01061a5bf12c99f9706dd11043f5125cd566fb01",
   "truncated": false,
+  "static_listing": {
+    "path": "/tmp/stunrun-listing-ff9578/maincpu-68010.lst",
+    "record_base": "0xFFDD86",
+    "record_stride": 16,
+    "record_copy_pc": "0x03D012",
+    "record_update_pcs": ["0x03D120", "0x03D1A0"],
+    "fifo_submission_pc": "0x02F470",
+    "fifo_address": "0xC0000C",
+    "geometry_caller_pcs": ["0x03E51C", "0x03E3FC"]
+  },
   "interpretation": "The short current fork has initialization writes only; it does not exercise the later transition.",
   "extended_transition": {
     "window": {"base": "0xFFDD80", "end": "0xFFDDA0"},
