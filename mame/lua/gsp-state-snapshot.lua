@@ -96,11 +96,22 @@ local function nonzero_words(base, count)
 end
 
 local function snapshot()
+    local function ioreg(index)
+        return space:read_u16(0xc0000000 + index * 16)
+    end
     local state = {
         frame = frame,
         time_seconds = machine.time:as_double(),
         pc = gsp.state['PC'].value,
         st = gsp.state['ST'].value,
+        display = {
+            dpyadr = ioreg(30),
+            dpytap = ioreg(27),
+            dpystart = ioreg(9),
+            heblnk = ioreg(1),
+            hsblnk = ioreg(2),
+            dpyctl = ioreg(8),
+        },
         control_lo = sample_range(0xf4000000, 0x100, 2),
         control_hi = sample_range(0xf4800000, 0x100, 2),
         vram_low = sample_range(0x02000000, 0x80000, 0x400),
@@ -110,6 +121,11 @@ local function snapshot()
         'M1_GSP_STATE frame=%d pc=%08X st=%08X lo_sum=%u hi_sum=%u low_sum=%u high_sum=%u',
         state.frame, state.pc, state.st, state.control_lo.sum32, state.control_hi.sum32,
         state.vram_low.sum32, state.vram_high.sum32))
+    print(string.format(
+        'M1_GSP_DISPLAY frame=%d dpyadr=%s dpytap=%s dpystart=%s heblnk=%s hsblnk=%s dpyctl=%s',
+        frame, tostring(state.display.dpyadr), tostring(state.display.dpytap),
+        tostring(state.display.dpystart), tostring(state.display.heblnk),
+        tostring(state.display.hsblnk), tostring(state.display.dpyctl)))
     if detail then
         print(string.format('M1_GSP_CONTROL frame=%d lo=%s hi=%s', frame,
             nonzero_words(0xf4000000, 128), nonzero_words(0xf4800000, 128)))

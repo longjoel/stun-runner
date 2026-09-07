@@ -96,6 +96,13 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(diff["changed_ranges"], [{"start": 0x12, "end": 0x13, "count": 2}])
             self.assertEqual(diff["changes"][0]["before"], 2)
 
+    def test_memory_snapshot_exposes_address_stride(self):
+        tool = (ROOT / "tools" / "mame-memory-snapshot").read_text()
+        lua = (ROOT / "mame" / "lua" / "memory-snapshot.lua").read_text()
+        self.assertIn("--address-stride", tool)
+        self.assertIn("STUNRUN_MEMORY_STRIDE", tool)
+        self.assertIn("offset * address_stride", lua)
+
     def test_analyze_memory_candidates_ranks_persistent_diffs(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

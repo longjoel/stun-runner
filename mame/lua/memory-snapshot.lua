@@ -43,6 +43,7 @@ local space_name = os.getenv('STUNRUN_MEMORY_SPACE') or 'program'
 local base = tonumber(os.getenv('STUNRUN_MEMORY_BASE') or '0')
 local count = tonumber(os.getenv('STUNRUN_MEMORY_COUNT') or '1')
 local width = tonumber(os.getenv('STUNRUN_MEMORY_WIDTH') or '8')
+local address_stride = tonumber(os.getenv('STUNRUN_MEMORY_STRIDE') or '1')
 local limit = tonumber(os.getenv('STUNRUN_MEMORY_FRAMES') or '600')
 local target_text = os.getenv('STUNRUN_MEMORY_TARGETS') or tostring(limit)
 local output = assert(os.getenv('STUNRUN_MEMORY_OUT'), 'STUNRUN_MEMORY_OUT is required')
@@ -55,6 +56,7 @@ local state_saved = false
 local load_requested = load_state_path == ''
 
 assert(width == 8 or width == 16 or width == 32, 'width must be 8, 16, or 32')
+assert(address_stride > 0 and address_stride % 1 == 0, 'address stride must be a positive integer')
 assert(count > 0 and count % 1 == 0, 'count must be a positive integer')
 assert(base >= 0 and base % 1 == 0, 'base must be a nonnegative integer')
 for value in string.gmatch(target_text, '[^,]+') do targets[tonumber(value)] = true end
@@ -290,7 +292,7 @@ local function capture()
     local values = {}
     local nonzero = 0
     for offset = 0, count - 1 do
-        local value = reader(space, base + offset)
+        local value = reader(space, base + offset * address_stride)
         values[#values + 1] = value
         if value ~= 0 then nonzero = nonzero + 1 end
     end

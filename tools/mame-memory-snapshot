@@ -24,6 +24,8 @@ def main() -> int:
     parser.add_argument("--base", type=lambda value: int(value, 0), default=0)
     parser.add_argument("--count", type=lambda value: int(value, 0), required=True)
     parser.add_argument("--width", type=int, choices=(8, 16, 32), default=8)
+    parser.add_argument("--address-stride", type=int, default=1,
+                        help="address increment between sampled values")
     parser.add_argument("--frames", type=int, default=600)
     parser.add_argument("--targets", default=None)
     parser.add_argument("--input", choices=("none", "late", "late_drive", "weapon_probe", "collision_probe_left", "collision_probe_center", "collision_probe_hold_left", "collision_probe_hold_right", "damage_probe_sweep", "fork_lateral_sweep", "fork_button2_sweep", "fork_hold_left", "fork_hold_right", "fork_center", "course_sweep", "course_preface_left", "course_preface_right", "course_coin2", "service_probe", "sw1_all_on", "sw1_bit1", "sw1_bit2", "sw1_bit3", "sw1_bit4", "sw1_bit5", "sw1_bit6", "sw1_bit7", "sw1_bit8", "drive_hold"), default="none")
@@ -32,8 +34,8 @@ def main() -> int:
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
-    if args.frames <= 0 or args.count <= 0 or args.base < 0:
-        parser.error("frames, count, and base must be positive/nonnegative")
+    if args.frames <= 0 or args.count <= 0 or args.base < 0 or args.address_stride <= 0:
+        parser.error("frames, count, base, and address-stride must be positive/nonnegative")
     targets = args.targets or str(args.frames)
     if any(int(value) <= 0 or int(value) > args.frames for value in targets.split(',')):
         parser.error("targets must be positive frames no greater than --frames")
@@ -71,6 +73,7 @@ def main() -> int:
         "STUNRUN_MEMORY_BASE": str(args.base),
         "STUNRUN_MEMORY_COUNT": str(args.count),
         "STUNRUN_MEMORY_WIDTH": str(args.width),
+        "STUNRUN_MEMORY_STRIDE": str(args.address_stride),
         "STUNRUN_MEMORY_FRAMES": str(args.frames),
         "STUNRUN_MEMORY_TARGETS": targets,
         "STUNRUN_MEMORY_OUT": str(args.output),
@@ -120,6 +123,7 @@ def main() -> int:
         "base": args.base,
         "count": args.count,
         "width": args.width,
+        "address_stride": args.address_stride,
         "input": args.input,
         "save_state": str(args.save_state) if args.save_state else None,
         "load_state": str(args.load_state) if args.load_state else None,

@@ -17,6 +17,10 @@ SNAPSHOT = re.compile(
     r"lo_sum=(\d+) hi_sum=(\d+) low_sum=(\d+) high_sum=(\d+)"
 )
 CONTROL = re.compile(r"M1_GSP_CONTROL frame=(\d+) lo=([^\r\n ]*) hi=([^\r\n ]*)")
+DISPLAY = re.compile(
+    r"M1_GSP_DISPLAY frame=(\d+) dpyadr=(\S+) dpytap=(\S+) "
+    r"dpystart=(\S+) heblnk=(\S+) hsblnk=(\S+) dpyctl=(\S+)"
+)
 
 
 def main() -> int:
@@ -93,9 +97,22 @@ def main() -> int:
         }
         for match in CONTROL.finditer(text)
     }
+    displays = {
+        int(match.group(1)): {
+            "dpyadr": None if match.group(2) == "nil" else int(match.group(2)),
+            "dpytap": None if match.group(3) == "nil" else int(match.group(3)),
+            "dpystart": None if match.group(4) == "nil" else int(match.group(4)),
+            "heblnk": None if match.group(5) == "nil" else int(match.group(5)),
+            "hsblnk": None if match.group(6) == "nil" else int(match.group(6)),
+            "dpyctl": None if match.group(7) == "nil" else int(match.group(7)),
+        }
+        for match in DISPLAY.finditer(text)
+    }
     for snapshot in snapshots:
         if snapshot["frame"] in controls:
             snapshot["control_nonzero"] = controls[snapshot["frame"]]
+        if snapshot["frame"] in displays:
+            snapshot["display"] = displays[snapshot["frame"]]
     canonical = re.sub(r"output=[^\n]+", "output=<output>", text)
     result = {
         "schema": "stunrun-gsp-state-snapshot-result/v1",

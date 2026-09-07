@@ -65,3 +65,20 @@ renderer boundary, not yet a decoded tile, palette, or full-screen renderer.
 
 Provenance and complete trace hashes are in
 `reference/experiments/stunrun/m5-gsp-render-boundary.metadata.json`.
+
+## GSP snapshot address units
+
+The GSP program space reports an address shift of `3`, so a byte-oriented
+snapshot must not assume that consecutive sampled addresses are consecutive
+GSP values. `tools/mame-memory-snapshot` now accepts `--address-stride` and
+records it in the result metadata. For the installed MAME configuration, a
+16-bit GSP VRAM word capture uses stride `16`; the corresponding 8-bit view
+uses stride `8`.
+
+The GSP display registers are mapped at `0xc0000000` and are likewise
+captured at stride `16`. The register indices relevant to the multisync
+scanline callback are `DPYCTL=8`, `DPYSTART=9`, `DPYTAP=27`, `DPYADR=30`,
+`HEBLNK=1`, and `HSBLNK=2`. The bounded GSP-state recipe now reports these
+values alongside the PC/status and memory checksums. This establishes the
+runtime inputs needed to apply MAME's literal scanline formula to a VRAM
+snapshot; it does not yet claim a decoded native renderer.
