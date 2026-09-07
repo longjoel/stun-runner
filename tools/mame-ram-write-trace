@@ -32,6 +32,8 @@ def main() -> int:
     parser.add_argument("--start-frame", type=int, default=680)
     parser.add_argument("--end-frame", type=int, default=705)
     parser.add_argument("--max-events", type=int, default=50000)
+    parser.add_argument("--pc", type=lambda value: int(value, 0),
+                        help="capture writes only while the CPU PC equals this value")
     parser.add_argument("--tap-frame", type=int, default=10,
                         help="install the write tap at this relative frame "
                              "(default: 10; use 1 to catch early input paths)")
@@ -102,6 +104,7 @@ def main() -> int:
         "STUNRUN_RAM_TRACE_END_ADDRESS": str(args.end),
         "STUNRUN_RAM_TRACE_MAX_EVENTS": str(args.max_events),
         "STUNRUN_RAM_TRACE_TAP_FRAME": str(args.tap_frame),
+        "STUNRUN_RAM_TRACE_PC": str(args.pc) if args.pc is not None else "",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -123,6 +126,7 @@ def main() -> int:
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,
         "tap_frame": args.tap_frame,
+        "pc": args.pc,
         "playback": str(playback) if playback else None,
         "returncode": completed.returncode, "events": events,
         "event_count": len(events),

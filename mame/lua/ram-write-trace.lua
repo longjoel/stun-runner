@@ -16,6 +16,8 @@ local end_address = assert(tonumber(os.getenv('STUNRUN_RAM_TRACE_END_ADDRESS')),
 -- but widen an even end by one byte for tap installation.
 local tap_end_address = end_address + (end_address % 2 == 0 and 1 or 0)
 local max_events = tonumber(os.getenv('STUNRUN_RAM_TRACE_MAX_EVENTS') or '50000')
+local pc_filter_text = os.getenv('STUNRUN_RAM_TRACE_PC') or ''
+local pc_filter = pc_filter_text ~= '' and tonumber(pc_filter_text) or nil
 local frame = 0
 local events = {}
 local next_event = 1
@@ -104,7 +106,8 @@ local function install_tap()
     tap = space:install_write_tap(start_address, tap_end_address, 'stunrun_ram_write_trace',
         function(offset, data, mask)
             if frame < start_frame or frame > end_frame or offset < start_address or
-                offset > end_address or #events >= max_events then return end
+                offset > end_address or #events >= max_events or
+                (pc_filter ~= nil and pc.value ~= pc_filter) then return end
             events[#events + 1] = {frame = frame, pc = pc.value, address = offset,
                                    data = data, mask = mask}
         end)

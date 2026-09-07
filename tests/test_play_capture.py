@@ -128,7 +128,8 @@ class PlayCaptureTests(unittest.TestCase):
                  ["--pc-range", "0x28000-0x28100"]),
                 ("mame-ram-write-trace",
                  ["--device", ":mainpcb:maincpu",
-                  "--base", "0xFF9578", "--end", "0xFF9579"]),
+                  "--base", "0xFF9578", "--end", "0xFF9579",
+                  "--pc", "0x2248E"]),
                 ("mame-ram-read-trace",
                  ["--base", "0xFF9578", "--end", "0xFF9579"])):
             with tempfile.TemporaryDirectory() as temp:
