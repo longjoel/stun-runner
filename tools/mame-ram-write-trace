@@ -37,7 +37,7 @@ def main() -> int:
     parser.add_argument("--tap-frame", type=int, default=10,
                         help="install the write tap at this relative frame "
                              "(default: 10; use 1 to catch early input paths)")
-    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center", "fork_button2_sweep", "fork_hold_left", "fork_hold_right"), default="none")
+    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center", "fork_button2_sweep", "fork_hold_left", "fork_hold_right", "fork_center"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
     parser.add_argument("--playback", type=pathlib.Path,

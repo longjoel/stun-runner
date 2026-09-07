@@ -46,6 +46,19 @@ local events = input_mode == 'late_drive' and {
     {frame = 600, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 220},
     {frame = 1200, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'set', value = 1},
     {frame = 1200, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128}
+} or input_mode == 'fork_hold_left' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'fork_hold_right' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 255},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'fork_center' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'},
+    {frame = 1800, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128}
 } or input_mode == 'sw_off_prestart' and {
     {frame = 120, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
     {frame = 122, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},

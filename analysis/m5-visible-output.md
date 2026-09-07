@@ -195,3 +195,19 @@ useful input/state-dependent boundary for a future save-state-matched trace,
 but the independent reset runs are not sufficient to call any writer
 road-specific. Provenance is in
 `reference/experiments/stunrun/m5-gsp-vram-steering-differential.metadata.json`.
+
+The stronger save-state-matched fork uses the canonical live checkpoint at
+setup frame 2400 and the exact `saved_state_left`/`saved_state_center`
+relative schedules. At relative frame 1800 it reproduces the established
+screen hashes (`7ebd0c…` left and `f2af2b…` center) while reporting identical
+display registers (`DPYADR=0xFBDC`, `DPYSTART=0xFFFC`, `DPYTAP=0`,
+`HEBLNK=0x37`, `HSBLNK=0x137`, `DPYCTL=0xF004`, fine scroll `7`) and zero
+changed words in both 512-entry palette planes. The GSP VRAM snapshot changes
+in 27,174 of 32,768 sampled words across 959 ranges. The paired write traces
+also show state-dependent scheduling: broad writer `0xFFF454E0` changes from
+25,407 to 31,853 events, while `0xFFF46590` changes from 2,064 to 1,376.
+This is the first save-state-matched proof that the visible differential is
+carried by GSP VRAM production rather than palette or scanout-register state;
+the writer PCs are still shared renderer machinery, not a promoted road
+decoder. Full hashes are in
+`reference/experiments/stunrun/m5-save-state-gsp-visible-differential.metadata.json`.

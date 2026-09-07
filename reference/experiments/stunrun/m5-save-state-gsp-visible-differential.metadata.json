@@ -1,0 +1,65 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-save-state-gsp-visible-differential",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Locate the input-dependent visible-output boundary from one identical live gameplay save state.",
+  "checkpoint": {
+    "state": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "relative_terminal_frame": 1800
+  },
+  "forks": {
+    "left": {
+      "input": "fork_hold_left",
+      "gsp_state_result_sha256": "3c54b72a8b6d011dd28b61c3672130f1d8399957b33effbc641332b792241b54",
+      "screen_sha256": "7ebd0c597ab53ee4a0a956f2ca3dce9905039180f51c73bc576da05e02198f2e",
+      "vram_snapshot_sha256": "29771740e27c4cda56f9bcbe39d8257c779d3eb9b7881276953d9574b518d505",
+      "vram_write_trace_result_sha256": "94014d441d9362be0f8cfd6fc47234d1d3e25d73371af6a673d639ac8afc58c1",
+      "gsp_pc": "0xFFF44420",
+      "gsp_st": "0x82200030",
+      "control_lo_sum32": 493440,
+      "control_hi_sum32": 1595648
+    },
+    "center": {
+      "input": "fork_center",
+      "gsp_state_result_sha256": "20db51a7a568e28e3f50bd37eae0dc30b63b0be98bebb24fe94d56df90354c68",
+      "screen_sha256": "f2af2bb773850ebfcf1f1609870ed626fadb0090a5d55277f7553e7d8489a3fb",
+      "vram_snapshot_sha256": "73a557fb507ed6fb48c80cbdb39adc0c53544d45162556efd248b3be30a75cee",
+      "vram_write_trace_result_sha256": "03a28cc3e238765bea7681fb4a2895408832e65d0a479e3f8519bb0aeed4a816",
+      "gsp_pc": "0xFFF45460",
+      "gsp_st": "0x50200810",
+      "control_lo_sum32": 69904,
+      "control_hi_sum32": 809344
+    }
+  },
+  "common_display_state": {
+    "dpyadr": "0xFBDC",
+    "dpytap": "0x0000",
+    "dpystart": "0xFFFC",
+    "heblnk": "0x0037",
+    "hsblnk": "0x0137",
+    "dpyctl": "0xF004",
+    "fine_scroll": 7
+  },
+  "memory_differential": {
+    "vram": {
+      "window": "0xFF800000–0xFFFFFFFF",
+      "changed_words": 27174,
+      "changed_ranges": 959,
+      "diff_sha256": "67847ababdf53acaf9029c2397a211e6512d810276bcf4767a5bf9f180d73c5b"
+    },
+    "palette_low_changed_words": 0,
+    "palette_high_changed_words": 0
+  },
+  "writer_differential": {
+    "0xFFF43030": {"left": 768, "center": 768},
+    "0xFFF454E0": {"left": 25407, "center": 31853},
+    "0xFFF45A00": {"left": 314, "center": 387},
+    "0xFFF45C40": {"left": 309, "center": 366},
+    "0xFFF45DD0": {"left": 14263, "center": 15008},
+    "0xFFF46590": {"left": 2064, "center": 1376},
+    "0xFFF47AB0": {"left": 17976, "center": 17616}
+  },
+  "interpretation": "The canonical left/center screenshot differential is reproduced from one identical save state. Display registers and both palette planes are identical at the endpoint; the visible difference is carried by GSP VRAM contents and state-dependent writer scheduling. The writer PCs remain shared display machinery, so this does not yet identify a road-specific decoder or player-state field."
+}
