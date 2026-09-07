@@ -130,6 +130,8 @@ def main() -> int:
                 "path": str(snapshot_path),
                 "frame": snapshot.get("frame"),
                 "buffer_sha256": hashlib.sha256(buffer_bytes).hexdigest(),
+                "settled_tail_sha256": hashlib.sha256(
+                    buffer_bytes[0x2D0:0x300]).hexdigest(),
                 "twin_different_byte_count": sum(
                     left != right for left, right in zip(buffer_bytes, twin_bytes)),
                 "best": matches[0],

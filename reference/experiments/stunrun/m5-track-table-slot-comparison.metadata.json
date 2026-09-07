@@ -79,6 +79,11 @@
       "representative_buffer_sha256": "2b26947b005f5b5c8d211bf024386b343b2934f8791ec70542f9a2812511026e"
     }
   ],
+  "settled_tail_hashes": [
+    {"frames": [1200, 4200], "tail_bytes": 48, "sha256": "1fde9342944cfe67609f581158016ef67d2559a19c0f3e011c21bb2013b940e0"},
+    {"frames": [5400, 7800], "tail_bytes": 48, "sha256": "95c306ba452f428c822959ffc44d04a25aff1228adec48446dc6297875107aa2"},
+    {"frames": [9000, 12600], "tail_bytes": 48, "sha256": "fa5dcc83cfdfa5e2ec12b4795c2e04a193bb481618fc199bf1abedb19d915cd0"}
+  ],
   "in_flight_transition_frames": [4800, 8400, 13200],
   "tail_writer_trace": {
     "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-tail-write-c10 --device :mainpcb:maincpu --base 0xFF9854 --end 0xFF9B83 --frames 1000 --start-frame 900 --end-frame 1000 --tap-frame 1 --max-events 10000 --playback /tmp/race2/r2.inp --nothrottle",

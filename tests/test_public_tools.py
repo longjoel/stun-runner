@@ -85,6 +85,8 @@ class PublicToolTests(unittest.TestCase):
             comparison = json.loads(output.read_text())["snapshot_comparisons"][0]
             self.assertEqual(comparison["best"]["slot"], "0x00620")
             self.assertEqual(comparison["best"]["different_word_ranges"], ["360-383"])
+            self.assertEqual(comparison["settled_tail_sha256"],
+                             "00c560922d5d536424b96f2d92e6cdda6055330024c3bd693e41cb1734a801a8")
 
     def test_machine_map_reconciliation_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
