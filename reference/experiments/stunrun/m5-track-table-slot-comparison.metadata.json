@@ -1,0 +1,35 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_track_table_slot_comparison",
+  "date": "2026-09-07",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "recording": "/tmp/race2/r2.inp",
+  "purpose": "Compare the known ROM table slots during the recorded course transitions without collecting the full ROM fetch stream.",
+  "table_slots": ["0x044630", "0x044930", "0x045230", "0x045530"],
+  "positive_control": {
+    "command": "tools/mame-rom-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-track-table-trace --pc-range 0x29760-0x29782 --rom-end 0x50001 --frames 9000 --start-frame 850 --end-frame 8200 --max-events 500000 --playback /tmp/race2/r2.inp --nothrottle",
+    "result": "/tmp/stunrun-m5-track-table-trace/result.json",
+    "events": 15381,
+    "slot": "0x045530",
+    "slot_reads": 1536,
+    "slot_read_frames": [952, 953, 954],
+    "reader_pcs": ["0x029760", "0x02976E"],
+    "canonical_log_sha256": "f58199d2d153a825520aa7aa74b70501304c291143671a9515f6fba0157815d3"
+  },
+  "negative_windows": [
+    {
+      "frames": [4300, 4700],
+      "events": 0,
+      "canonical_log_sha256": "1d1cec25c2a4ef14363046ee89c2ca4fea1b3aa38d0906c9e4a9c5c9029b8270"
+    },
+    {
+      "frames": [7800, 8200],
+      "events": 0,
+      "canonical_log_sha256": "8933cac8477dc2d22fe9a8d3e40126204cc80795566c58786cb331214e3de1f0"
+    }
+  ],
+  "filter": "--pc-range 0x0-0x50000 with --address-range covering each known 0x300-byte slot",
+  "observation": "The first course-10 table load is reproducible, but the later transition windows do not show reads from any known table slot under a broad PC filter. This does not invalidate the RAM-derived course-to-slot map; it leaves the later loader path or replay timing unresolved.",
+  "confidence": "POSITIVE-CONTROL-OBSERVED; LATER-WINDOW-NEGATIVE-OBSERVED"
+}

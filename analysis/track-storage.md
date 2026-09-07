@@ -121,6 +121,22 @@ no equally safe record boundary has been promoted there. The same structural
 analysis should be repeated for the observed course-5/10/11 table bases before
 assuming that all table slots use identical layouts.
 
+### Follow-up comparison attempt
+
+The existing long-play recording was replayed while filtering directly for all
+four observed 384-word ROM slots. The first table load was reproduced at
+`0x045530` (course 10): both reader PCs fetched the complete 384-word range at
+frame 953. Targeted windows around the later recorded transitions (frames
+4300–4700 and 7800–8200) produced no reads from `0x044630`, `0x044930`,
+`0x045230`, or `0x045530`.
+
+This is a limitation of the current replay/loader observation, not evidence
+that those slots are unused. The RAM-derived course/slot observations remain
+valid, but the later loader may run outside the known reader-PC path, may have
+loaded before the capture window, or may be represented by a different replay
+regime. The ROM tracer now accepts `--address-range` filters so this question
+can be repeated without collecting the entire program-ROM fetch stream.
+
 ## What is still unknown
 
 - Which word or bit fields describe lateral position, height, width, or
@@ -148,5 +164,7 @@ the observed copy, lane, and transport mechanisms.
   recorded-race replay bursts.
 - `reference/experiments/stunrun/m5-road-fifo-lane-differential.metadata.json` —
   384-read/192-write lane match.
+- `reference/experiments/stunrun/m5-track-table-slot-comparison.metadata.json` —
+  targeted cross-slot replay and its negative later-window result.
 - `reproduction/maincpu/geom_upload.h` and `road_fifo.h` — native literal
   mechanisms and their provenance comments.

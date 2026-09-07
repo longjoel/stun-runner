@@ -36,6 +36,8 @@ def main() -> int:
     parser.add_argument("output", type=pathlib.Path)
     parser.add_argument("--pc-range", action="append", type=parse_range, required=True,
                         help="capture reads only while PC is in START-END; repeatable")
+    parser.add_argument("--address-range", action="append", type=parse_range,
+                        help="capture only ROM addresses in START-END; repeatable")
     parser.add_argument("--rom-end", type=lambda value: int(value, 0), default=0xFFFFF)
     parser.add_argument("--frames", type=int, default=1800)
     parser.add_argument("--start-frame", type=int, default=600)
@@ -102,6 +104,8 @@ def main() -> int:
         "STUNRUN_ROM_TRACE_MAX_EVENTS": str(args.max_events),
         "STUNRUN_ROM_TRACE_INPUT": args.input,
         "STUNRUN_ROM_TRACE_PC_RANGES": ",".join(f"{start}-{end}" for start, end in args.pc_range),
+        "STUNRUN_ROM_TRACE_ADDRESS_RANGES": ",".join(
+            f"{start}-{end}" for start, end in (args.address_range or [])),
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -119,6 +123,7 @@ def main() -> int:
     result = {
         "schema": "stunrun-rom-read-trace-result/v1",
         "rom_end": args.rom_end, "pc_ranges": [list(item) for item in args.pc_range],
+        "address_ranges": [list(item) for item in (args.address_range or [])],
         "load_state": str(args.load_state) if args.load_state else None,
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,

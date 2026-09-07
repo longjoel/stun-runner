@@ -13,6 +13,13 @@ for item in string.gmatch(range_text, '[^,]+') do
     assert(first and last, 'invalid PC range: ' .. item)
     ranges[#ranges + 1] = {first = tonumber(first), last = tonumber(last)}
 end
+local address_ranges = {}
+local address_range_text = os.getenv('STUNRUN_ROM_TRACE_ADDRESS_RANGES') or ''
+for item in string.gmatch(address_range_text, '[^,]+') do
+    local first, last = string.match(item, '^(%d+)%-(%d+)$')
+    assert(first and last, 'invalid address range: ' .. item)
+    address_ranges[#address_ranges + 1] = {first = tonumber(first), last = tonumber(last)}
+end
 local frame = 0
 local events = {}
 local input_mode = os.getenv('STUNRUN_ROM_TRACE_INPUT') or 'none'
@@ -38,6 +45,14 @@ local function in_pc_range(value)
     return false
 end
 
+local function in_address_range(value)
+    if #address_ranges == 0 then return true end
+    for _, range in ipairs(address_ranges) do
+        if value >= range.first and value <= range.last then return true end
+    end
+    return false
+end
+
 local function apply_event(event)
     local port = assert(manager.machine.ioport.ports[event.port])
     local field = assert(port.fields[event.field])
@@ -49,6 +64,7 @@ local function install_tap()
         function(offset, data, mask)
             local current_pc = pc.value
             if frame >= start_frame and frame <= end_frame and offset <= rom_end and
+                in_address_range(offset) and
                 #events < max_events and in_pc_range(current_pc) then
                 events[#events + 1] = {frame = frame, pc = current_pc, address = offset,
                                        data = data, mask = mask}
