@@ -1,0 +1,12 @@
+{
+  "schema": "stunrun-ram-read-trace/v1",
+  "experiment": "course-flag-config-matrix",
+  "target": "stunrun",
+  "mame": {"executable": "/usr/bin/mame", "version": "0.289 (mame0289-dirty)", "rompath": "/tmp/stunrun-roms-system"},
+  "address": {"device": ":mainpcb:maincpu", "space": "program", "range": ["0xFF9578", "0xFF957B"], "course_flag_word": "0xFF9578", "input_state_word": "0xFF957A"},
+  "runs": [
+    {"id": "service-probe", "input": "service_probe", "frames": [600, 900], "reads": 0, "course_flag_values": [], "canonical_log_sha256": "010a8791face5aa74336579a90186094c96f7618ccbad64953ba4affc4393a80"},
+    {"id": "sw1-all-on", "input": "sw1_all_on", "frames": [600, 900], "reads": 104, "course_flag_values": [0], "input_state_values": [0, 3], "canonical_log_sha256": "50cdbfad89f1cfe042f57dfeb3e1ef7c5ffafc65b2b7e5a68be629f99556de40"}
+  ],
+  "interpretation": "Service mode and all-SW1-on did not produce a nonzero 0xFF9578 course/score flag. SW1-all-on changed only the adjacent 0xFF957A input-state word, confirming the field separation. Race completion remains untested."
+}

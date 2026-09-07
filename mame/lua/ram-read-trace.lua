@@ -67,6 +67,26 @@ local input_events = input_mode == 'late_drive' and {
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 2', value = 0},
     {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', value = 1},
     {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', value = 0}
+} or input_mode == 'service_probe' and {
+    {frame = 100, port = ':mainpcb:IN0', field = 'Service Mode', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', value = 1},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', value = 0},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', value = 1},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', value = 0},
+    {frame = 900, port = ':mainpcb:IN0', field = 'Service Mode', value = 0}
+} or input_mode == 'sw1_all_on' and {
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:1', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:2', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:3', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:4', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:5', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:6', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:7', value = 1},
+    {frame = 1, port = ':mainpcb:SW1', field = 'SW1:8', value = 1},
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', value = 1},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', value = 0},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', value = 1},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', value = 0}
 } or {}
 local next_event = 1
 local tap

@@ -27,6 +27,11 @@ encodings, not course numbering, geometry record strides, or ROM-table
 indices. The separate `0xFF9578` score/course flag has not produced a nonzero
 transition in the current runs and remains unresolved.
 
+The configuration matrix is also negative: `service_probe` produced no reads
+of the field during frames 600–900, and `sw1_all_on` read `0xFF9578` as zero
+while changing only the adjacent `0xFF957A` input-state word. See
+`reference/experiments/stunrun/course-flag-config-matrix.metadata.json`.
+
 Evidence: `reference/experiments/stunrun/course-word-reader-trace.metadata.json`,
 `/tmp/stunrun-course-read-long/result.json`, and the main-CPU listing around
 `0x02B1D0` and `0x02BA68`.
