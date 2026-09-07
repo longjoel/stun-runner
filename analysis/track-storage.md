@@ -113,7 +113,9 @@ while the twin loop divides each source byte by a stack parameter before
 storing it. In the settled race snapshots that parameter is `1` at
 `0xFF954E`, which explains the observed byte-for-byte twin. The storage
 mechanism therefore supports a scaled twin even though the current fixtures
-exercise the identity case.
+exercise the identity case. The static caller at `0x02446C` visibly pushes
+`1` as that loader's divisor argument before calling `0x0296AA`; other callers
+must not be assumed to use the same value without a corresponding trace.
 
 The byte arithmetic is now represented literally in
 `reproduction/maincpu/road_buffer_math.c`. It is a standalone slice rather than

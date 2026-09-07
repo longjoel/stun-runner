@@ -90,7 +90,7 @@
     "copy_loop": "0x029760 copies raw source bytes to the base; 0x02977E divides each source byte by the parameter at frame-local A6+0x17 before storing to the twin",
     "subtract_loop": "0x0298C0 iterates 0x300 bytes and subtracts twin bytes from base bytes",
     "add_loop": "0x0298FA iterates 0x300 bytes and adds twin bytes to base bytes",
-    "settled_divisor_observation": "0xFF954E is 1 in race2 snapshots at frames 1200, 5400, and 9000",
+    "settled_divisor_observation": "0xFF954E is 1 in race2 snapshots at frames 1200, 5400, and 9000; static caller 0x02446C also pushes divisor argument 1 before calling 0x0296AA",
     "interpretation": "The observed identity twin is a parameter value, not a universal copy rule; the animation writer trace is a selected tail slice of a full-buffer byte arithmetic loop."
   },
   "filter": "--pc-range 0x0-0x50000 with --address-range covering each known 0x300-byte slot",
