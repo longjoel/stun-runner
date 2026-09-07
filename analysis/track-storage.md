@@ -80,11 +80,12 @@ writer remain unresolved.
 The long race adds an important qualification: the tail is stable within a
 settled interval. Across frames 1200–4200, 5400–7800, and 9000–12600, every
 captured tail snapshot has the same 48-byte tail hash for its interval, while
-the three interval hashes are different. This makes the tail look like a
-course/transition-specific settled payload (or a deterministic derived value),
-not a continuously changing animation residue. The evidence still does not
-identify its fields, so “tail payload” is the safe name rather than a decoded
-track-record claim.
+the three interval hashes are different. More importantly, the four observed
+ROM slots have an identical 48-byte suffix, but each settled RAM tail differs
+from that common ROM suffix. The tail is therefore runtime-derived state
+overlaid on a common ROM template, not a per-course ROM payload and not merely
+continuously changing animation residue. Its fields remain unidentified, so
+“runtime tail” is the safe name rather than a decoded track-record claim.
 
 The longer recorded race shows the same mechanism across transitions. Stable
 snapshots match these source slots through word 359:
@@ -155,7 +156,8 @@ than the observed `1` case. Its focused native test is
 For future RAM work, `tools/analyze-track-tables` also accepts repeated
 `--snapshot PATH` arguments. It reports the best matching ROM slot, exact and
 different word ranges, whole-buffer and settled-tail hashes, and base/twin
-differences without printing buffer contents. This makes
+differences; when applicable it also reports the common ROM-tail hash. This
+makes
 settled-versus-in-flight classification repeatable from ordinary
 `stunrun-memory-snapshot/v1` artifacts.
 

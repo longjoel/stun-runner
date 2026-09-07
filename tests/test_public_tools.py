@@ -82,7 +82,10 @@ class PublicToolTests(unittest.TestCase):
                 *base_args, "--snapshot", snapshot, "--output", output,
             )
             self.assertEqual(result.returncode, 0)
-            comparison = json.loads(output.read_text())["snapshot_comparisons"][0]
+            report = json.loads(output.read_text())
+            comparison = report["snapshot_comparisons"][0]
+            self.assertEqual(report["common_tail_sha256"],
+                             "d54e3b376eb4d0fc96fd4af38c020e99c1e4b54d38d65edc4e97e2e72eeec18d")
             self.assertEqual(comparison["best"]["slot"], "0x00620")
             self.assertEqual(comparison["best"]["different_word_ranges"], ["360-383"])
             self.assertEqual(comparison["settled_tail_sha256"],

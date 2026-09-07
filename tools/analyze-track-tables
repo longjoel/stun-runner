@@ -95,6 +95,11 @@ def main() -> int:
         "common_word_count": len(common),
         "variable_word_ranges": contiguous_ranges(
             [index for index in range(len(first)) if index not in set(common)]),
+        "common_tail_sha256": (
+            hashlib.sha256(table_payloads[bases[0]][0x2D0:0x300]).hexdigest()
+            if all(table_payloads[base][0x2D0:0x300] ==
+                   table_payloads[bases[0]][0x2D0:0x300] for base in bases[1:])
+            else None),
     }
     if args.snapshot:
         comparisons = []
