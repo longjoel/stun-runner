@@ -1,0 +1,22 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_object_record_writer_trace",
+  "date": "2026-09-07",
+  "target": "stunrun",
+  "purpose": "Bound the active main-CPU writers for the object-record RAM window in a fresh saved-state fork.",
+  "mame": "0.289 (mame0289-dirty)",
+  "saved_state": "/tmp/stunrun-latedrive1200.sta",
+  "path": "/tmp/stunrun-m5-object-writers-current",
+  "device": ":mainpcb:maincpu",
+  "space": "program",
+  "window": {"base": "0xFFDD00", "end": "0xFFDDFF", "width": 8},
+  "run": {"frames": 180, "capture_start_frame": 1, "capture_end_frame": 180, "tap_frame": 1, "input": "none", "nothrottle": true},
+  "event_count": 42,
+  "event_frames": [1, 2],
+  "events_after_frame_2": 0,
+  "writer_pcs": ["0x03D18C", "0x03D18E", "0x03D192", "0x03D1B2", "0x03D1EC", "0x03D1F4", "0x03D1FA", "0x03D248", "0x03D24C"],
+  "address_range_observed": ["0xFFDD86", "0xFFDDC2"],
+  "canonical_log_sha256": "8e5969214d335c5f418058dd01061a5bf12c99f9706dd11043f5125cd566fb01",
+  "truncated": false,
+  "interpretation": "CURRENT FORK HAS INITIALIZATION WRITES ONLY. The loaded object-record bytes remain stable through frame 180; this trace does not exercise a live spawn/update transition and does not establish field semantics."
+}
