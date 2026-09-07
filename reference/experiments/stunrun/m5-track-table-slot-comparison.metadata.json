@@ -93,6 +93,13 @@
     "settled_divisor_observation": "0xFF954E is 1 in race2 snapshots at frames 1200, 5400, and 9000; static caller 0x02446C also pushes divisor argument 1 before calling 0x0296AA",
     "interpretation": "The observed identity twin is a parameter value, not a universal copy rule; the animation writer trace is a selected tail slice of a full-buffer byte arithmetic loop."
   },
+  "transform_state_snapshots": [
+    {"recording": "race2", "frame": 1200, "course_word": 10, "ff954e": "0x0001", "ff9550": "0x0001", "buffer_state": "settled-slot-prefix-plus-tail"},
+    {"recording": "race2", "frame": 4800, "course_word": 11, "ff954e": "0x0005", "ff9550": "0x001A", "buffer_state": "in-flight-transition"},
+    {"recording": "race2", "frame": 5400, "course_word": 11, "ff954e": "0x0001", "ff9550": "0x0001", "buffer_state": "settled-slot-prefix-plus-tail"},
+    {"recording": "race2", "frame": 8400, "course_word": 12, "ff954e": "0x008A", "ff9550": "0x0017", "buffer_state": "in-flight-transition"},
+    {"recording": "race2", "frame": 9000, "course_word": 12, "ff954e": "0x0001", "ff9550": "0x0001", "buffer_state": "settled-slot-prefix-plus-tail"}
+  ],
   "filter": "--pc-range 0x0-0x50000 with --address-range covering each known 0x300-byte slot",
   "observation": "The first course-10 table load is reproducible, but the later transition windows do not show reads from any known table slot under a broad PC filter. This does not invalidate the RAM-derived course-to-slot map; it leaves the later loader path or replay timing unresolved.",
   "confidence": "POSITIVE-CONTROL-OBSERVED; LATER-WINDOW-NEGATIVE-OBSERVED"

@@ -124,6 +124,14 @@ while `0x029ADE` decrements it and calls the add loop. The startup path loads
 candidate, not the separately established HUD time-remaining field at
 `0xFF9568–0xFF956B`.
 
+Snapshot correlation supports that role without assigning a complete semantic
+name: in the long race, settled course buffers have `0xFF954E = 1` and
+`0xFF9550 = 1`, while transition snapshots show nontrivial timer/mode pairs
+(`0x0005/0x001A` at frame 4800 and `0x008A/0x0017` at frame 8400). Those
+transition buffers are also the snapshots that fail to match a complete ROM
+slot. The values are useful selectors for future experiments, not proof that
+`0xFF9550` is a particular gameplay mode.
+
 The byte arithmetic is now represented literally in
 `reproduction/maincpu/road_buffer_math.c`. It is a standalone slice rather than
 part of the fixture shell: the shell's captured geometry input represents a
