@@ -260,12 +260,14 @@ frame 953. Targeted windows around the later recorded transitions (frames
 4300–4700 and 7800–8200) produced no reads from `0x044630`, `0x044930`,
 `0x045230`, or `0x045530`.
 
-This is a limitation of the current replay/loader observation, not evidence
-that those slots are unused. The RAM-derived course/slot observations remain
-valid, but the later loader may run outside the known reader-PC path, may have
-loaded before the capture window, or may be represented by a different replay
-regime. The ROM tracer now accepts `--address-range` filters so this question
-can be repeated without collecting the entire program-ROM fetch stream.
+That negative result is window-specific, not evidence that those slots are
+unused. The broader 925,004-event `race2` march survey later observed the same
+reader PCs touching slot `0x044630` at frames 5975 and 6049. This reinforces
+the settled RAM mapping while showing why a narrow transition window is a
+poor proxy for the complete loader lifecycle. The remaining uncertainty is
+the segment-to-slot selection sequence, not whether later slot loads can
+occur. The ROM tracer accepts `--address-range` filters so this question can
+be repeated without collecting the entire program-ROM fetch stream.
 
 ## What is still unknown
 
