@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <radialGradient id="sbg" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#231244"/>
+      <stop offset="100%" stop-color="#0b0720"/>
+    </radialGradient>
+    <linearGradient id="sring" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffb347"/>
+      <stop offset="60%" stop-color="#ff5a1f"/>
+      <stop offset="100%" stop-color="#ff2d55"/>
+    </linearGradient>
+  </defs>
+  <circle cx="300" cy="300" r="292" fill="#ffffff"/>
+  <circle cx="300" cy="300" r="272" fill="url(#sbg)"/>
+  <g fill="none">
+    <ellipse cx="300" cy="250" rx="205" ry="150" stroke="url(#sring)" stroke-width="16" opacity="0.45"/>
+    <ellipse cx="300" cy="250" rx="140" ry="102" stroke="url(#sring)" stroke-width="18" opacity="0.7"/>
+    <ellipse cx="300" cy="250" rx="82"  ry="60"  stroke="#ffd34d" stroke-width="18"/>
+    <ellipse cx="300" cy="250" rx="32"  ry="23"  stroke="#fff6d8" stroke-width="12"/>
+  </g>
+  <g transform="translate(215,385) rotate(-8) scale(1.5)">
+    <polygon points="0,-14 96,0 0,14 22,0" fill="#e8ecf4"/>
+    <polygon points="0,-14 96,0 22,0" fill="#ff2d55" opacity="0.85"/>
+    <rect x="96" y="-3" width="26" height="6" rx="3" fill="#ffd34d"/>
+  </g>
+  <text x="300" y="500" text-anchor="middle" font-family="Liberation Sans, Arial, sans-serif"
+        font-size="52" font-weight="bold" letter-spacing="3" fill="#ffd34d">STUN-RUNNER</text>
+  <text x="300" y="540" text-anchor="middle" font-family="Liberation Sans, Arial, sans-serif"
+        font-size="30" font-weight="bold" letter-spacing="10" fill="#8fd0ff">RE PROJECT</text>
+</svg>
