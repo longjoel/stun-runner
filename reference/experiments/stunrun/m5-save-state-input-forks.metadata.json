@@ -1,0 +1,62 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_save_state_input_forks",
+  "tools": [
+    "tools/mame-memory-snapshot",
+    "tools/diff-memory-snapshot",
+    "tools/mask-memory-snapshot"
+  ],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-human-live/state-600.sta",
+    "sha256": "65870b98010918dbb94cf19f1922f4a193acdd7996616d48925ad48d9d524760",
+    "capture_description": "frame-600 live gameplay checkpoint; local regenerable artifact, not committed"
+  },
+  "forks": {
+    "center": {
+      "input": "fork_center",
+      "relative_frames": [60, 120, 180],
+      "result_sha256": "dc76b9b10fdc77133ff59283f401090db3b38d42298c0f0a4d29ac311fd462f5"
+    },
+    "lateral": {
+      "input": "fork_lateral_sweep",
+      "relative_frames": [60, 120, 180],
+      "result_sha256": "ae29d9f0f58dd111b2f6d57234782788862a2c94b3128ef5f5461198d3190cfc"
+    },
+    "button2": {
+      "input": "fork_button2_sweep",
+      "relative_frames": [60, 120, 180],
+      "result_sha256": "2f07d16a376550d48aab047470509f1099ef5c10c01756ffd433f1c293d89b02"
+    }
+  },
+  "ram_window": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "base": "0xFF8000",
+    "last": "0xFFFFFF",
+    "width": 8
+  },
+  "center_differentials": {
+    "lateral": {
+      "frame_60_changed_cells": 543,
+      "frame_120_changed_cells": 549,
+      "frame_180_changed_cells": 541,
+      "frame_180_masked_residue_cells": 532,
+      "frame_180_masked_residue_ranges": 207,
+      "frame_180_masked_result_sha256": "ddd3a99a77889cf8452835f988d466e641285b36077fe50e8c0619475171fa3c"
+    },
+    "button2": {
+      "frame_60_changed_cells": 532,
+      "frame_120_changed_cells": 542,
+      "frame_180_changed_cells": 533,
+      "frame_180_masked_residue_cells": 524,
+      "frame_180_masked_residue_ranges": 202,
+      "frame_180_masked_result_sha256": "5551f47ad0c16e3c5c0b224b2f4ddc92803e3d0cbab631d5d52f4ce77ac08020"
+    }
+  },
+  "observation": "A single saved MAME state can seed independent center, lateral, and Button 2 experiments. Relative RAM snapshots are repeatable and expose input-dependent residue without replaying boot or setup.",
+  "candidate_cluster": "0xFFFC6F–0xFFFE86, with largest residue ranges near 0xFFFCF3, 0xFFFD17, 0xFFFDCF, and 0xFFFE54",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + MASKED-DIFFERENTIAL",
+  "limitation": "The residue is not yet assigned to armor, weapon, ammunition, track, or player ownership semantics; writer traces and independent perturbation are required before promotion."
+}
