@@ -46,6 +46,15 @@
     "consumer_entry_counts": {"0x03E51C": 0, "0x03E3FC": 0, "0x02F470": 0},
     "interpretation": "A later live-drive checkpoint reproduces the updater without selecting the candidate consumer branch."
   },
+  "late_drive_instruction_trace": {
+    "path": "/tmp/stunrun-m5-late-instr/maincpu-68010.trace",
+    "sha256": "992037d9b7b5a71160b9740bdca8ddf43b5954d91d0f54bb4c9d7fd32188c827",
+    "start_condition": "reset",
+    "input": "late_drive",
+    "relative_frames": [850, 1800],
+    "entry_counts": {"0x02B7E8": 204, "0x02F470": 204, "0x03CF40": 3848, "0x03D120": 3852, "0x03D1A0": 3853, "0x03E5C4": 0, "0x03E51C": 0, "0x03E3FC": 0},
+    "interpretation": "The common FIFO primitive executes through caller 0x02B7E8, while the candidate 0x03E5C4/0x03E51C/0x03E3FC record-consumer path remains unobserved."
+  },
   "interpretation": "The short current fork has initialization writes only; it does not exercise the later transition.",
   "extended_transition": {
     "window": {"base": "0xFFDD80", "end": "0xFFDDA0"},

@@ -86,6 +86,15 @@ candidate consumer entries. This rules out “the frame-1200 state was simply
 too early” as the explanation; the consumer attribution needs a different
 caller/branch or a display-focused trace.
 
+A fresh reset-to-`late_drive` instruction trace over frames 850–1800 adds an
+important distinction: `0x02F470` executes 204 times, but the observed caller
+is `0x02B7E8`, which constructs its own coordinate arguments before calling
+the common emitter. The same trace contains 3,848 calls to `0x03CF40`, 3,852
+entries to `0x03D120`, and 3,853 to `0x03D1A0`, but zero entries to
+`0x03E5C4`, `0x03E51C`, or `0x03E3FC`. Therefore `0x02F470` is a shared
+geometry/FIFO primitive in this runtime path; its execution alone does not
+prove that the `0xFFDD86` record supplied its arguments.
+
 ## Runtime correlation
 
 The matched 600-frame saved-state traces show the same path dynamically:
@@ -112,3 +121,6 @@ with SHA-256
 The later-checkpoint trace is
 `/tmp/stunrun-m5-object-instr-2400/maincpu.trace` with SHA-256
 `43ec6634bb044a315bb6786f9208738230bf8fc51211d1bfe127371c2384bb94`.
+The reset-to-`late_drive` trace is
+`/tmp/stunrun-m5-late-instr/maincpu-68010.trace` with SHA-256
+`992037d9b7b5a71160b9740bdca8ddf43b5954d91d0f54bb4c9d7fd32188c827`.
