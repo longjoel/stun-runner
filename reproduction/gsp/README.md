@@ -27,3 +27,8 @@ observed values such as `0xBD08` versus `0x6565`.
 The write-event helper combines caller-supplied values with the observed
 address sequence while refusing partial output when either stream lacks
 capacity; it does not synthesize or relate the two value streams.
+
+`stunrun_gsp_display_copy` models the later 256-word sequential copy for one
+independent stream. The observed destination families are
+`0xF5000000`/`0xF5800000`; address-space and pixel-format interpretation remain
+outside this transport slice.

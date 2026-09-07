@@ -71,6 +71,12 @@ writes to each destination over eight bursts at frames 1280, 1281, 1284,
 memory boundary, but the destination device layout and payload semantics are
 still UNKNOWN.
 
+The 256-word sequential copy is now represented by
+`stunrun_gsp_display_copy()` in the dependency-free C slice. Base and twin
+callers provide separate source arrays; the function copies exactly the
+observed bounded transfer count and rejects shorter buffers. Its test is
+covered by `gsp-work-buffer-consumer-slice-c`.
+
 ## Replay support
 
 `tools/mame-trace` now accepts `--playback INP` in the same positional slot as

@@ -20,6 +20,9 @@ extern "C" {
 #define STUNRUN_GSP_WORK_BUFFER_WRITE_TWIN 0xFFF70660u
 #define STUNRUN_GSP_WORK_BUFFER_WRITE_STRIDE 0x20u
 #define STUNRUN_GSP_WORK_BUFFER_WRITE_COUNT 128u
+#define STUNRUN_GSP_DISPLAY_COPY_WORDS 256u
+#define STUNRUN_GSP_DISPLAY_DEST_BASE 0xF5000000u
+#define STUNRUN_GSP_DISPLAY_DEST_TWIN 0xF5800000u
 
 typedef struct stunrun_gsp_work_buffer_write {
     uint32_t address;
@@ -56,6 +59,13 @@ uint16_t stunrun_gsp_combine_byte_lanes(uint8_t high_lane,
 size_t stunrun_gsp_expand_byte_lane_streams(
     const uint8_t *base_lanes, const uint8_t *twin_lanes, size_t lane_count,
     uint16_t *base_words, uint16_t *twin_words, size_t word_capacity);
+
+/* Copy one independent 256-word stream through the observed sequential
+ * display-memory transfer. Payload and destination device semantics remain
+ * UNKNOWN. */
+size_t stunrun_gsp_display_copy(const uint16_t *source, size_t source_words,
+                                uint16_t *destination,
+                                size_t destination_capacity);
 
 #ifdef __cplusplus
 }

@@ -77,6 +77,26 @@ int main(void)
                   twin_words, 2u) == 0u);
     }
 
+    {
+        uint16_t source[STUNRUN_GSP_DISPLAY_COPY_WORDS];
+        uint16_t destination[STUNRUN_GSP_DISPLAY_COPY_WORDS];
+        size_t i;
+        for (i = 0; i < STUNRUN_GSP_DISPLAY_COPY_WORDS; i++) {
+            source[i] = (uint16_t)(i ^ 0x5A5Au);
+            destination[i] = 0u;
+        }
+        CHECK(stunrun_gsp_display_copy(
+                  source, STUNRUN_GSP_DISPLAY_COPY_WORDS, destination,
+                  STUNRUN_GSP_DISPLAY_COPY_WORDS) ==
+              STUNRUN_GSP_DISPLAY_COPY_WORDS);
+        CHECK(destination[0] == source[0] && destination[255] == source[255]);
+        CHECK(stunrun_gsp_display_copy(source, 255u, destination,
+                                       STUNRUN_GSP_DISPLAY_COPY_WORDS) == 0u);
+        CHECK(stunrun_gsp_display_copy(source,
+                                       STUNRUN_GSP_DISPLAY_COPY_WORDS,
+                                       destination, 255u) == 0u);
+    }
+
     if (failures == 0)
         puts("gsp-work-buffer-consumer-slice: PASS");
     return failures != 0;

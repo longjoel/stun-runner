@@ -88,3 +88,18 @@ size_t stunrun_gsp_expand_byte_lane_streams(
     }
     return pairs;
 }
+
+size_t stunrun_gsp_display_copy(const uint16_t *source, size_t source_words,
+                                uint16_t *destination,
+                                size_t destination_capacity)
+{
+    size_t i;
+
+    if (source == NULL || destination == NULL ||
+        source_words < STUNRUN_GSP_DISPLAY_COPY_WORDS ||
+        destination_capacity < STUNRUN_GSP_DISPLAY_COPY_WORDS)
+        return 0u;
+    for (i = 0; i < STUNRUN_GSP_DISPLAY_COPY_WORDS; i++)
+        destination[i] = source[i];
+    return STUNRUN_GSP_DISPLAY_COPY_WORDS;
+}
