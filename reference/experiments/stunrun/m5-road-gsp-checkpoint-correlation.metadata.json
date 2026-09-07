@@ -1,0 +1,39 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-road-gsp-checkpoint-correlation",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Compare main road-buffer changes with GSP VRAM changes around observed road FIFO bursts.",
+  "schedule": "late_drive",
+  "landmarks": [1288, 1290, 1293, 1297],
+  "captures": {
+    "main_road_buffer": {
+      "command": "tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-main-road-checkpoints --device :mainpcb:maincpu --space program --base 0xFF9584 --count 768 --width 8 --frames 1297 --targets 1288,1290,1293,1297 --input late_drive --nothrottle",
+      "result": "/tmp/stunrun-m5-main-road-checkpoints/result.json",
+      "result_sha256": "cc4ffea5e8ef432a37e49690d4643a4c890ed831b30f80e8f1e709bbc3f8754d",
+      "snapshot_sha256": {
+        "1288": "458d8ebf5fcff04be7e8deead15b84330cedea30b4388540a2269827f8b1ee3f",
+        "1290": "d58f7b7dfd634f743e17fcc9d6f59426ec085399f59c8659a8203b90e6d903e4",
+        "1293": "9d721a22b8500283e2e8b1e106dd3ff8826bce770799a5e6b18dd1b3ddb32d20",
+        "1297": "25d08518046c36c87fd193310982e9ccd0b89a3a1cd94402385597f5f7f8b731"
+      }
+    },
+    "gsp_vram": {
+      "command": "tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-vram-road --device :mainpcb:gsp --space program --base 0xFF800000 --count 32768 --width 16 --address-stride 16 --frames 1297 --targets 1288,1290,1293,1297 --input late_drive --nothrottle",
+      "result": "/tmp/stunrun-m5-gsp-vram-road/result.json",
+      "result_sha256": "7e32513b8d96322fdc879e3c52893db63c816e5c13406c8cdc2c0d9419918f4f",
+      "snapshot_sha256": {
+        "1288": "3777e79c5508dd3be1bfd8916ef84f991dc232c789f0b4122fb946ceae259725",
+        "1290": "f2cecfade4f0ce6f18e58706a571c05865cd0ee1fcda1e7a5eb126580b997116",
+        "1293": "01d336cab467a0c9e3569ee09fc494da5e3e289ceed1517f4f53449c46ddafbb",
+        "1297": "fae8e170e79df136a6e09fcda4dcd4ce1dee2b2f0aba31deba44423fcaff09343d"
+      }
+    }
+  },
+  "differential": {
+    "1288_to_1290": {"main_road_bytes_changed": 621, "gsp_vram_words_changed": 16696},
+    "1290_to_1293": {"main_road_bytes_changed": 606, "gsp_vram_words_changed": 0},
+    "1293_to_1297": {"main_road_bytes_changed": 606, "gsp_vram_words_changed": 3306}
+  },
+  "interpretation": "The road buffer changes continuously while the GSP-visible VRAM update is bursty and delayed across these landmarks. This supports a buffered/display-scheduled consumer boundary but does not attribute every VRAM change to the road FIFO or decode table fields."
+}

@@ -164,3 +164,10 @@ Separate deterministic read/write taps further match the `0x02248E` FIFO
 payload to every other source read: 384 source reads correspond to 192 FIFO
 writes in the three-frame control window. This lane-level contract is recorded
 in `reference/experiments/stunrun/m5-road-fifo-lane-differential.metadata.json`.
+
+A same-schedule checkpoint pair now samples the main road buffer and GSP VRAM
+around those bursts. The base buffer continues changing between frames 1290
+and 1293 while GSP VRAM remains byte-identical, then 3,306 GSP words change by
+frame 1297. This is the first bounded timing evidence for a buffered/display-
+scheduled road consumer; it is not yet a decoded geometry format. Provenance is
+in `reference/experiments/stunrun/m5-road-gsp-checkpoint-correlation.metadata.json`.

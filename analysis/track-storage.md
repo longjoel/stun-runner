@@ -302,6 +302,27 @@ The GSP receives the values through the MAME-confirmed GSP I/O window
 `0xC00000–0xC03FFF`; `0xC0000C` is the narrow runtime FIFO sink. The GSP's
 interpretation of these road words remains open.
 
+### Road-buffer to display timing boundary
+
+A paired deterministic `late_drive` capture sampled the main road buffer and
+GSP VRAM at the same frame landmarks around the three observed FIFO bursts.
+The counts are useful as a timing observation, not as a pixel-field decode:
+
+| Interval | Main base-buffer bytes changed | GSP VRAM words changed |
+| --- | ---: | ---: |
+| 1288 → 1290 | 621 / 768 | 16,696 / 32,768 |
+| 1290 → 1293 | 606 / 768 | 0 / 32,768 |
+| 1293 → 1297 | 606 / 768 | 3,306 / 32,768 |
+
+The frame-1290 road burst therefore lands near a large GSP-visible update, but
+the continuously changing main buffer does not imply a same-frame VRAM change:
+the GSP state is identical from 1290 through 1293, then changes again by 1297.
+This supports a buffered or display-scheduled consumer boundary. It does not
+identify which words control curvature, width, or scanline placement, and the
+capture does not prove that every changed VRAM word came from the road FIFO.
+The current label remains **ROAD FIFO → GSP DISPLAY TIMING OBSERVED; FIELD
+SEMANTICS UNKNOWN**.
+
 ## A visible pattern inside one ROM table
 
 The traced course-0 table at `0x044630` is 384 words long. Looking only at
