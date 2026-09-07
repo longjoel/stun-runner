@@ -85,6 +85,18 @@ target_include_directories(stunrun-gsp-record-parser-slice-test PRIVATE
   ../reproduction/gsp)
 set_target_properties(stunrun-gsp-record-parser-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME gsp-record-parser-slice-c COMMAND stunrun-gsp-record-parser-slice-test)
+# Literal GSP FIFO-fed work-buffer setup from the M5 consumer trace.  This
+# preserves the masked selector, 16-byte stride, and byte-lane operation
+# without assigning semantics to either destination buffer.
+add_executable(stunrun-gsp-work-buffer-consumer-slice-test
+  ../reproduction/gsp/work_buffer_consumer.c
+  ../reproduction/gsp/work_buffer_consumer_test.c)
+target_include_directories(stunrun-gsp-work-buffer-consumer-slice-test PRIVATE
+  ../reproduction/gsp)
+set_target_properties(stunrun-gsp-work-buffer-consumer-slice-test PROPERTIES
+  C_STANDARD 99)
+add_test(NAME gsp-work-buffer-consumer-slice-c
+  COMMAND stunrun-gsp-work-buffer-consumer-slice-test)
 # arcade-experiment/v1 parser self-check (valid, corrupt, and schema-
 # violating fixtures; no ROMs or MAME involved).
 add_executable(stunrun-experiment-parser-test

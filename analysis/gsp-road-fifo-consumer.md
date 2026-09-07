@@ -41,6 +41,12 @@ the driven run changed 235 of 256 sampled words at `0xFFF6F650` and 195 of
 This timing correlation strengthens the consumer attribution while leaving
 the buffer contents and field semantics UNKNOWN.
 
+The literal setup is now represented by the dependency-free C slice in
+`reproduction/gsp/work_buffer_consumer.c`. It exposes the masked selector and
+the two `+0x10` destination strides, plus the observed byte-lane composition.
+The `gsp-work-buffer-consumer-slice-c` test passes. This is a transport/layout
+contract for the native boundary, not a decoded road renderer.
+
 ## Replay support
 
 `tools/mame-trace` now accepts `--playback INP` in the same positional slot as
