@@ -307,3 +307,7 @@ externally supplied and is not a native game-state producer.
 The canonical recorded-race snapshot series now covers both GSP work-buffer
 families in one 512-word, stride-16 capture. It provides an exact replay-backed
 input for the next producer/consumer correlation step.
+
+The ordinary GSP read tap observes no readback from the first downstream copy
+destination, so that address family remains a device-boundary observation
+rather than a directly sampled visible framebuffer.

@@ -71,6 +71,12 @@ writes to each destination over eight bursts at frames 1280, 1281, 1284,
 memory boundary, but the destination device layout and payload semantics are
 still UNKNOWN.
 
+An ordinary GSP memory-read probe over the first downstream destination
+(`0xF5000000–0xF5000FFF`) observed zero readback events in the same replay
+window. The result is retained as a MAME instrumentation boundary: the region
+may be device-consumed or write-only from this space, and the negative result
+does not invalidate the direct write trace.
+
 The 256-word sequential copy is now represented by
 `stunrun_gsp_display_copy()` in the dependency-free C slice. Base and twin
 callers provide separate source arrays; the function copies exactly the

@@ -149,6 +149,12 @@
     },
     "interpretation": "The exact recorded race supplies a bounded pair of independently changing GSP work-buffer streams; the later interval is stable at the sampled granularity."
   },
+  "display_copy_readback_probe": {
+    "command": "tools/mame-ram-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-display-read1 --device :mainpcb:gsp --space program --base 0xF5000000 --end 0xF5000FFF --frames 1300 --start-frame 1280 --end-frame 1300 --max-events 20000 --playback /tmp/race/r1.inp",
+    "event_count": 0,
+    "reader_pcs": [],
+    "interpretation": "The ordinary GSP memory-read tap observes no readback from the first downstream destination. This is an instrumentation/model boundary, consistent with a device-consumed or write-only destination; it does not negate the direct write trace."
+  },
   "negative_probe": {
     "gsp_fifo_memory_read_events": 0,
     "window": "0xC0000C–0xC0000D",
