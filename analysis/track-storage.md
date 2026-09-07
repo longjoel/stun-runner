@@ -53,6 +53,34 @@ It controls progression/award behavior, but its displayed track-label meaning
 has not been proven. The adjacent input-state fields must not be confused with
 it.
 
+## The course-transition dispatcher (static evidence)
+
+The code around `0x024CE4` is the clearest static bridge between progression
+state and table loading found so far. In the relevant branch it:
+
+1. calls `0x03DF36` with `0xFF9532`, `D2`, and a count of `10`;
+2. stores the returned pointer in `0xFF951A`;
+3. if the return is nonzero, selects ROM table `0x044630` through
+   `0xFF9558`, clears the table-copy counters, and calls `0x0297A6`;
+4. later calls `0x03E5C4` with `0xFF951A` and `0xFF9532`, then conditionally
+   calls the next table/transition routine at `0x0296AA`.
+
+This is useful control-flow evidence, but it is not yet a decoded
+`course = table[index]` formula. `0x03DF36` walks a list of 24-byte records
+backward from a caller-supplied base, comparing each record's first longword
+against its first argument, and returns a record pointer or zero. The meaning
+of the caller's `D2` base and the records' remaining fields is still unknown.
+The nearby `0x03E5C4` routine is primarily a display/HUD state routine; its
+call to the object-record renderer does not make it a track-table consumer.
+
+The runtime traces collected so far do not reach `0x024CE4`, `0x03DF36`, or
+`0x03E5C4` during the saved late-drive/object checkpoints. That is consistent
+with those checkpoints being inside an already-running roadway state, not
+evidence that this dispatcher is dead. The next clean experiment is to save
+just before a recorded course transition and trace the dispatcher while
+retaining the input recording; loading a state without the corresponding
+replay input does not reproduce the transition.
+
 ## RAM representation
 
 The settled copies are byte-for-byte equal in the saved road-buffer fixture:
