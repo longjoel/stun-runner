@@ -1,0 +1,126 @@
+# How S.T.U.N. Runner stores track data
+
+This is the current human-readable picture of the track/road data path. It is
+deliberately split into **observed** facts and unresolved interpretation. The
+words in the buffers have not yet been decoded into curvature, elevation, or
+segment semantics.
+
+## The short version
+
+The 68010 selects a 384-word table in program ROM, copies it into two 768-byte
+work-RAM buffers, applies a slow animation/update pass, and submits the base
+buffer toward the TMS34010 GSP through the FIFO at `0xC0000C`.
+
+```text
+68010 ROM table (384 × 16-bit words)
+              │  +2-byte sequential march
+              ▼
+base RAM      0xFF9584–0xFF9883  (768 bytes)
+twin RAM      0xFF9884–0xFF9B83  (768 bytes, base + 0x300)
+              │
+              ├─ animation readers/writers touch both copies
+              │
+              └─ PC 0x02248E reads the base buffer
+                   384 source halfword reads
+                   192 observed FIFO writes to 0xC0000C
+```
+
+The 384→192 relationship is a bus/lane observation. In three independent
+late-drive bursts, each FIFO value matched every other source read:
+`fifo[i] == source[2*i]`. That is not yet a claim about the logical geometry
+record format.
+
+## ROM table selection
+
+The table reader pair at PCs `0x029760` and `0x02976E` performs the same
+ascending 384-word march. The observed ROM bases are:
+
+| Observed course/state | ROM base | Evidence status |
+| ---: | ---: | --- |
+| 0 | `0x044630` | observed in trace |
+| 5 | `0x045230` | observed in recorded race |
+| 10 | `0x045530` | observed in recorded race |
+| 11, 12 | `0x044930` | observed in recorded race |
+
+These bases share a `0x230 mod 0x300` alignment, but they do **not** form one
+general course-proportional stride. Several course values reuse table slots.
+The native code therefore exposes a finite observed lookup and rejects
+unknown values instead of inventing a formula.
+
+The state/index word at `0xFF9578` is written by the normal progression path
+at `0x0320BC` and was observed to advance `0→1→2→3→4→5` in a human race.
+It controls progression/award behavior, but its displayed track-label meaning
+has not been proven. The adjacent input-state fields must not be confused with
+it.
+
+## RAM representation
+
+The settled copies are byte-for-byte equal in the saved road-buffer fixture:
+
+- base: `0xFF9584–0xFF9883`
+- twin: `0xFF9884–0xFF9B83`
+- twin offset: `+0x300` bytes
+- table size: `0x300` bytes / 384 16-bit words
+
+The bulk uploader has disjoint writer-PC groups for the two copies. The base
+copy also receives a slower animation/update pass, while the twin is used by a
+separate animation reader. The bulk upload occurs in staged plateaus rather
+than as one permanently stable write; intermediate snapshots can therefore be
+mid-update and should not be treated as complete tables.
+
+The reusable snapshot workflow is:
+
+1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.
+2. Capture `0xFF9584` for `0x600` bytes at a settled frame.
+3. Run `tools/export-geometry-native-state`.
+4. The exporter verifies the `+0x300` twin and emits a 768-byte big-endian
+   fixture for the native geometry boundary.
+
+No commercial ROM bytes or raw RAM dumps belong in the repository; the
+experiment metadata records provenance and local paths only.
+
+## What the GSP submission tells us
+
+The road consumer at PC `0x02248E` reads the base buffer sequentially. A fresh
+late-drive trace saw complete bursts at frames 1290, 1293, and 1297. The
+recorded-race replay saw repeated bursts from frames 1085 through 1293,
+including a split burst across frames 1088–1089.
+
+Separate read/write taps, using the same deterministic schedule, matched the
+FIFO payload at frames 1290, 1293, and 1297. Other writers also use
+`0xC0000C`, so the matching road subsequence must be identified by PC and
+position within the broader FIFO stream.
+
+The GSP receives the values through the MAME-confirmed GSP I/O window
+`0xC00000–0xC03FFF`; `0xC0000C` is the narrow runtime FIFO sink. The GSP's
+interpretation of these road words remains open.
+
+## What is still unknown
+
+- Which word or bit fields describe lateral position, height, width, or
+  curvature.
+- Whether one 384-word table is one segment, a ring of segments, or a command
+  block with mixed metadata and coordinates.
+- Why the producer selects each shared ROM slot for every progression state.
+- The exact timing/ownership of the base-only animation pass.
+- Whether other gameplay regimes use a different consumer schedule.
+- How the GSP FIFO words become road pixels and how they combine with the
+  already decoded VRAM/palette path.
+
+Those questions remain explicitly open; the current native slices model only
+the observed copy, lane, and transport mechanisms.
+
+## Evidence index
+
+- `reference/experiments/stunrun/geometry-residue-capture.metadata.json` — ROM
+  march, copy writers, staged updates, and table validation.
+- `reference/experiments/stunrun/m5-save-state-road-buffer-fixture.metadata.json` —
+  repeatable saved-state RAM fixture.
+- `reference/experiments/stunrun/m5-road-buffer-consumer-trace.metadata.json` —
+  base-buffer consumer reads.
+- `reference/experiments/stunrun/m5-road-buffer-recorded-replay.metadata.json` —
+  recorded-race replay bursts.
+- `reference/experiments/stunrun/m5-road-fifo-lane-differential.metadata.json` —
+  384-read/192-write lane match.
+- `reproduction/maincpu/geom_upload.h` and `road_fifo.h` — native literal
+  mechanisms and their provenance comments.
