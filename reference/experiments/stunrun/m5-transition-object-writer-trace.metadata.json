@@ -1,0 +1,41 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_transition_object_writer_trace",
+  "date": "2026-09-07",
+  "target": "stunrun",
+  "purpose": "Compare object-record writer timing across two race-course transition checkpoints without replaying the full run.",
+  "mame": "0.289 (mame0289-dirty)",
+  "device": ":mainpcb:maincpu",
+  "space": "program",
+  "window": {"base": "0xFFDD00", "end": "0xFFDDFF", "width": 8},
+  "run": {"frames": 600, "capture_start_frame": 1, "capture_end_frame": 600, "tap_frame": 1, "input": "none", "nothrottle": true},
+  "checkpoints": {
+    "state_4800": {
+      "saved_state": "/tmp/race2/state-4800.sta",
+      "saved_state_sha256": "e50d2913478796c10ae12a8bc1112e0cd4bca40f4b3ebc8278ff7243adf03f45",
+      "path": "/tmp/stunrun-m5-transition-object-4800",
+      "result_sha256": "786f4d9c21e71b4c1a2c53fc7916e8cae71ff09584a5d5fe0a5156b8f55bc55e",
+      "event_count": 11607,
+      "record_window_event_count": 11503,
+      "first_record_window_write_relative_frame": 218,
+      "clear_writer_pc": "0x021302",
+      "record_event_sequence_sha256": "18500811cb4c7b9ce72ffd7caa45e348f49a93c9d69d72121889113e97e60d30"
+    },
+    "state_5400": {
+      "saved_state": "/tmp/race2/state-5400.sta",
+      "saved_state_sha256": "6829f56aa6746feef3a889203c813894c1339fa8693e7278432b91fc1f3ece89",
+      "path": "/tmp/stunrun-m5-transition-object-5400",
+      "result_sha256": "1d4f20acbc537ab8779848da88553f18bb1bf7ec1f76122ab41f18a0d6a031ee",
+      "event_count": 11607,
+      "record_window_event_count": 11503,
+      "first_record_window_write_relative_frame": 1,
+      "clear_writer_pc": "0x021302",
+      "record_event_sequence_sha256": "5e0cc478b48f9a148d8d6e76a5da4ab1ed5215f568efbdc1b66c4e8a75b54054"
+    }
+  },
+  "high_volume_writer_pcs": [
+    "0x03D18C", "0x03D18E", "0x03D192", "0x03D1B2",
+    "0x03D1EC", "0x03D1F4", "0x03D1FA", "0x03D248", "0x03D24C"
+  ],
+  "interpretation": "The earlier transition checkpoint exposes a delayed clear/reinitialization phase; the later checkpoint begins inside the same recurring object updater. No distinct spawn-table writer family was observed, so object identity and field semantics remain unknown."
+}
