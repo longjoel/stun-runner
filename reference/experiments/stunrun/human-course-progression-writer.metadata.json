@@ -38,6 +38,16 @@
     {"frame": 19678, "pc": "0x0291A2", "value": 4, "observed_course_change_frame": 19679},
     {"frame": 19681, "pc": "0x0252EC", "value": 5, "observed_course_change_frame": 19682}
   ],
+  "replay_verification": {
+    "command": "mame -nothrottle -video none -sound none -input_directory /tmp/stunrun-course-recorded -playback course-progression.inp with mame/lua/play-capture.lua",
+    "output_directory": "/tmp/stunrun-course-replay",
+    "course_log_sha256": "0247dfc58efc60897db5f34f6b1d63926703e122f6672d33b998d1d12b319e4e",
+    "course_write_log_sha256": "282933b87fb4bb35d197c8a88c92b23a84e83c2eefd5f52f9cc304aecd3c675a",
+    "identical_snapshot_frames": 33,
+    "identical_snapshot_range": [600, 19800],
+    "terminal_replay_frame": 21600,
+    "result": "PASS: recorded course and writer logs are byte-identical; all recorded snapshots through frame 19800 are byte-identical"
+  },
   "interpretation": {
     "confirmed": "The normal course progression writes values 1 through 5 at PC 0x0320BC; the write precedes the frame-done observation by one frame.",
     "bounded_caveat": "The later 5-to-4-to-5 writes use different PCs and are retained as terminal cleanup/transition behavior, not folded into the normal progression writer claim.",
