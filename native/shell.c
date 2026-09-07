@@ -45,6 +45,7 @@
 #include "adsp_upload_stream.h"
 #include "fifo_block.h"
 #include "geom_upload.h"
+#include "road_fifo.h"
 #include "experiment.h"
 #include "jsa_latch.h"
 #include "checkpoint.h"
@@ -301,6 +302,7 @@ static int run_walk(void)
     uint16_t geometry_table[STUNRUN_GEOM_MARCH_WORDS];
     uint16_t geometry_base[STUNRUN_GEOM_MARCH_WORDS];
     uint16_t geometry_twin[STUNRUN_GEOM_MARCH_WORDS];
+    uint16_t geometry_fifo[STUNRUN_ROAD_FIFO_WORDS];
 
     stunrun_jsa_latches_init(&latches);
     stunrun_adsp_control_tally_init(&tally);
@@ -321,16 +323,24 @@ static int run_walk(void)
             passes = stunrun_geom_upload(STUNRUN_GEOM_COPY_COUNT,
                                          geometry_table, geometry_base,
                                          geometry_twin);
+            size_t fifo_words = stunrun_road_fifo_drain(
+                geometry_base, STUNRUN_GEOM_MARCH_WORDS, geometry_fifo,
+                STUNRUN_ROAD_FIFO_WORDS);
+            int fifo_match = fifo_words == STUNRUN_ROAD_FIFO_WORDS;
             for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++)
                 if (geometry_base[i] != geometry_twin[i] ||
-                    geometry_base[i] != geometry_table[i])
+                    geometry_base[i] != geometry_table[i] ||
+                    geometry_fifo[i] != geometry_base[i])
                     copies_match = 0;
             expect(passes == STUNRUN_GEOM_COPY_COUNT);
             expect(copies_match);
+            expect(fifo_match);
             printf("shell: geometry-upload fixture=loaded passes=%u "
-                   "bytes=%u sum=0x%08X copies=match\n", passes,
+                   "bytes=%u sum=0x%08X copies=match fifo-drain=%u "
+                   "dest=0x%08X\n", passes,
                    STUNRUN_GEOM_MARCH_WORDS * 2u,
-                   (unsigned)geometry_sum(geometry_base));
+                   (unsigned)geometry_sum(geometry_base),
+                   (unsigned)fifo_words, STUNRUN_ROAD_FIFO_DEST);
         }
     }
 

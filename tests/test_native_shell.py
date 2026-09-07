@@ -36,6 +36,7 @@ SOURCES = [
     str(ADSP / "adsp_upload_stream.c"),
     str(ROOT / "reproduction" / "maincpu" / "fifo_block.c"),
     str(MAINCPU / "geom_upload.c"),
+    str(MAINCPU / "road_fifo.c"),
     str(SOUND / "jsa_latch.c"),
 ]
 
@@ -197,6 +198,7 @@ class NativeShellTests(unittest.TestCase):
             self.assertIn("geometry-upload fixture=loaded passes=2 bytes=768",
                           run.stdout)
             self.assertIn("copies=match", run.stdout)
+            self.assertIn("fifo-drain=384 dest=0x00C0000C", run.stdout)
 
     def test_shell_refuses_unrunnable_inputs_loudly(self):
         with tempfile.TemporaryDirectory() as directory:
