@@ -129,6 +129,23 @@ only three samples. Writer attribution resolves the most tempting periodic
 fields as elapsed/animation state rather than a track cursor; see
 `reference/experiments/stunrun/geometry-writer-attribution.metadata.json`.
 
+### Focused ROM-read pairing
+
+The reusable `tools/mame-rom-read-trace` captures reads from the 68010 program
+ROM while filtering on the current PC. A fresh `late_drive` run over frames
+600–1800 paired the geometry-adjacent code with its ROM accesses; provenance
+is in `reference/experiments/stunrun/geometry-rom-read-trace.metadata.json`.
+
+The timer/HUD neighborhood (`0x028000–0x029300`) produced one non-instruction
+ROM lookup in this window: `PC 0x0280F8` reads `0x04EECC`. The course/geometry
+writer neighborhood (`0x02B000–0x02BC00`) produced repeated indexed accesses
+to renderer/table data, chiefly `0x0475FC`, `0x047604`, and `0x0473CA`.
+These are renderer-table accesses, not evidence that `0xFF9578` is itself a
+ROM table pointer. The trace captured 57,018 events without truncation; opcode
+fetches remain present because MAME read taps observe instruction fetches as
+well as data reads, so data-read summaries explicitly exclude the local code
+window.
+
 ## Recording
 
 Write the run up as `reference/experiments/stunrun/` metadata

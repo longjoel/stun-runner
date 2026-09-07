@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+"""Trace selected 68010 reads from the main program ROM."""
+
+import argparse
+import collections
+import hashlib
+import json
+import os
+import pathlib
+import re
+import shutil
+import subprocess
+import tempfile
+
+
+EVENT = re.compile(
+    r"M1_ROM_READ frame=(\d+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
+    r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
+)
+DONE = re.compile(r"M1_ROM_READ_DONE frames=(\d+) events=(\d+) truncated=(true|false)")
+
+
+def parse_range(value: str) -> tuple[int, int]:
+    parts = value.split("-", 1)
+    if len(parts) != 2:
+        raise argparse.ArgumentTypeError("range must be START-END")
+    start, end = (int(part, 0) for part in parts)
+    if not 0 <= start <= end:
+        raise argparse.ArgumentTypeError("invalid range")
+    return start, end
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rompath", type=pathlib.Path)
+    parser.add_argument("output", type=pathlib.Path)
+    parser.add_argument("--pc-range", action="append", type=parse_range, required=True,
+                        help="capture reads only while PC is in START-END; repeatable")
+    parser.add_argument("--rom-end", type=lambda value: int(value, 0), default=0xFFFFF)
+    parser.add_argument("--frames", type=int, default=1800)
+    parser.add_argument("--start-frame", type=int, default=600)
+    parser.add_argument("--end-frame", type=int, default=1800)
+    parser.add_argument("--max-events", type=int, default=200000)
+    parser.add_argument("--input", choices=("none", "late_drive"), default="none")
+    parser.add_argument("--nothrottle", action="store_true")
+    parser.add_argument("--load-state", type=pathlib.Path)
+    parser.add_argument("--mame", default="mame")
+    args = parser.parse_args()
+    if not (0 <= args.start_frame <= args.end_frame <= args.frames):
+        parser.error("invalid frame range")
+    if args.load_state and not args.load_state.is_file():
+        raise SystemExit(f"save state does not exist: {args.load_state}")
+    args.output.mkdir(parents=True, exist_ok=True)
+    log = args.output / "mame.log"
+    state_stage = None
+    state_directory = "/tmp/stunrun-state-dir"
+    if args.load_state:
+        state_stage = pathlib.Path(tempfile.mkdtemp(prefix="stunrun-rom-read-"))
+        slot_directory = state_stage / "stunrun"
+        slot_directory.mkdir()
+        shutil.copy2(args.load_state, slot_directory / "1.sta")
+        state_directory = str(state_stage)
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
+        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
+        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save", "-seconds_to_run",
+        str(86400 if args.load_state else max(2, (args.frames + 59) // 60 + 1)),
+        "-state_directory", state_directory, "-statename", "%g", "-autoboot_script",
+        str(pathlib.Path(__file__).resolve().parents[1] / "mame/lua/rom-read-trace.lua"),
+    ]
+    if args.load_state:
+        seconds_index = command.index("-seconds_to_run")
+        command[seconds_index:seconds_index] = ["-state", "1"]
+    if args.nothrottle:
+        command.insert(command.index("-seconds_to_run"), "-nothrottle")
+    environment = {
+        **os.environ,
+        "STUNRUN_ROM_TRACE_OUT": str(args.output),
+        "STUNRUN_ROM_TRACE_FRAMES": str(args.frames),
+        "STUNRUN_ROM_TRACE_START": str(args.start_frame),
+        "STUNRUN_ROM_TRACE_END": str(args.end_frame),
+        "STUNRUN_ROM_TRACE_ROM_END": str(args.rom_end),
+        "STUNRUN_ROM_TRACE_MAX_EVENTS": str(args.max_events),
+        "STUNRUN_ROM_TRACE_INPUT": args.input,
+        "STUNRUN_ROM_TRACE_PC_RANGES": ",".join(f"{start}-{end}" for start, end in args.pc_range),
+        "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
+    }
+    try:
+        with log.open("w", encoding="utf-8") as handle:
+            completed = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
+                                       env=environment, check=False)
+        text = log.read_text(encoding="utf-8")
+    finally:
+        if state_stage is not None:
+            shutil.rmtree(state_stage, ignore_errors=True)
+    events = [{"frame": int(m.group(1)), "pc": int(m.group(2), 16),
+               "address": int(m.group(3), 16), "data": int(m.group(4), 16),
+               "mask": int(m.group(5), 16)} for m in EVENT.finditer(text)]
+    done = DONE.findall(text)
+    result = {
+        "schema": "stunrun-rom-read-trace-result/v1",
+        "rom_end": args.rom_end, "pc_ranges": [list(item) for item in args.pc_range],
+        "load_state": str(args.load_state) if args.load_state else None,
+        "frames": args.frames, "capture_start_frame": args.start_frame,
+        "capture_end_frame": args.end_frame, "input": args.input,
+        "returncode": completed.returncode, "events": events,
+        "event_count": len(events),
+        "reader_pcs": sorted({event["pc"] for event in events}),
+        "address_counts": {f"0x{address:X}": count for address, count in
+                            collections.Counter(event["address"] for event in events).items()},
+        "canonical_log_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+    }
+    if done:
+        result["truncated"] = done[-1][2] == "true"
+    (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    if completed.returncode or not done:
+        raise SystemExit(f"ROM read trace failed; see {log}")
+    print(json.dumps({key: value for key, value in result.items() if key != "events"}, separators=(",", ":")))
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

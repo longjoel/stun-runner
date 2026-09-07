@@ -1,0 +1,20 @@
+{
+  "schema": "stunrun-rom-read-trace/v1",
+  "experiment": "geometry-rom-read-trace",
+  "target": "stunrun",
+  "mame": {"executable": "/usr/bin/mame", "version": "0.289 (mame0289-dirty)", "rompath": "/tmp/stunrun-roms-system"},
+  "start_condition": "reset",
+  "input": "late_drive",
+  "frames": {"total": 1800, "capture_start": 600, "capture_end": 1800},
+  "pc_ranges": [["0x028000", "0x029300"], ["0x02B000", "0x02BC00"]],
+  "result": {
+    "event_count": 57018,
+    "truncated": false,
+    "canonical_log_sha256": "891d5c723bb1a0b8d0fe421104e016ced796b4589a1240eb8d5a24821a0753e9",
+    "non_code_read_count": 2069,
+    "non_code_top_addresses": [["0x0475FC", 484], ["0x0475FE", 220], ["0x047600", 220], ["0x0473CA", 177], ["0x047604", 176], ["0x047602", 132]],
+    "timer_hud_non_code_reads": [{"pc": "0x0280F8", "address": "0x04EECC", "count": 42}]
+  },
+  "artifacts": {"local_result": "/tmp/stunrun-rom-read-course/result.json", "local_log": "/tmp/stunrun-rom-read-course/mame.log"},
+  "interpretation": "The 0x02B000-0x02BC00 reads are renderer/table accesses. They do not establish that 0xFF9578 is a ROM table pointer or identify its user-visible numbering. MAME read taps include opcode fetches, so non-code summaries are explicitly qualified."
+}

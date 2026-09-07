@@ -197,6 +197,35 @@ to course word `0xFF9578` (PCs `0x02B95E` and `0x02B63E`). These observations
 strengthen the negative result for a cursor in this window but do not test
 68010 ROM-read sequencing; H2 remains OPEN.
 
+### Investigation update 2 (2026-09-06, ROMs available, Agent 2 executed)
+
+The kill criterion FIRED for every monotonic candidate the coarse
+(300-frame) and fine (60-frame) temporal classifiers surfaced:
+`0xFF8016` (+4861 over frames 600–1800), `0xFF9492` (+1214, exactly
+1/frame — a frame ticker), and `0xFFDB38` (+4861/+4867) advance
+identically under `late_drive` (steer + Button 1) and under `late`
+(coin + start, no steer, no button). All three are clock-driven, not
+distance cursors; `0xFF8016` and `0xFFDB38` move in lockstep (identical
+deltas). No other monotonic word exists at 60-frame granularity, so H2
+has no cursor candidate left in work RAM at this sampling — a per-frame
+series over a short window is the only remaining cursor test, and ROM
+read sequencing is still untested.
+
+Superseding lead for geometry: 15 residue ranges form identical pairs
+at +0x300 stride (e.g. `0xFF9609`↔`0xFF9909` len 258,
+`0xFF97A0`↔`0xFF9AA0` len 177) updated as staged plateaus (stable
+600–1260, transition ~1300, new plateau) in lockstep. A 16,219-event
+write trace over `0xFF9500–0xFF9C00` (frames 1280–1420, no truncation)
+attributes the two copies to DISJOINT writer-PC groups — base copy
+`{0x296EA,0x29786,0x29820,0x29878,0x298B4,0x29980,0x299BA}`, twin copy
+`{0x29708,0x29794,0x2986E,0x29914,0x29930}`. The ~1300 upload happens
+under `late_drive` but twin cells never change under `late`, so the
+uploader is gameplay-progress-coupled, not clock-driven. Full
+provenance in
+`reference/experiments/stunrun/geometry-residue-capture.metadata.json`
+(`followup_session`); snapshots and classifier outputs are local-only
+under `/tmp/geom-*`.
+
 ---
 
 ## IRQ-0005
@@ -232,6 +261,19 @@ useful; a bare table dump without stride semantics is not.
 
 If no read address shifts by a course-proportional stride between the
 two runs, H1 is dead — report the actual indexing pattern found.
+
+### Investigation update 3 (2026-09-06, focused ROM-read trace)
+
+The new `tools/mame-rom-read-trace` capability was exercised on a fresh
+reset/`late_drive` run over frames 600–1800. It captured 57,018 reads without
+truncation while filtering PCs `0x028000–0x029300` and `0x02B000–0x02BC00`.
+The HUD neighborhood produced one non-instruction ROM lookup,
+`0x0280F8 → 0x04EECC`; the `0x02B000–0x02BC00` neighborhood repeatedly read
+renderer/table addresses led by `0x0475FC`, `0x047604`, and `0x0473CA`.
+This does not yet identify a course-indexed table or establish a stride. MAME
+read taps include opcode fetches, so the summary explicitly excludes the
+local code window; the result and provenance are in
+`reference/experiments/stunrun/geometry-rom-read-trace.metadata.json`.
 
 ### Why it matters
 
