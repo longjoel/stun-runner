@@ -125,6 +125,13 @@ replay, `0x0298C0` produced 5,376 lane events over the complete base window
 repeated full-buffer base transform, with the apparent tail ramp caused by the
 selected bytes' values rather than by a tail-specific writer.
 
+Read taps close the arithmetic contract: PC `0x0298BE` read the complete twin
+window 5,376 times on the same eight subtract-pass frames, and PC `0x0298F8`
+did the same on the eight add-pass frames. The observed pairs are therefore
+literal `base[i] = base[i] - twin[i]` and `base[i] = base[i] + twin[i]`
+passes, with 8-bit bus-lane writes, rather than an inferred relationship from
+the final snapshots alone.
+
 The table-copy listing also shows that the base loop copies raw source bytes,
 while the twin loop divides each source byte by a stack parameter before
 storing it. In the settled race snapshots that parameter is `1` at
