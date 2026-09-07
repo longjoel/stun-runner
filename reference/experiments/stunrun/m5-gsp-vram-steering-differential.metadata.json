@@ -1,0 +1,43 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-gsp-vram-steering-differential",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Compare bounded GSP visible-memory writer footprints under the established late-drive path and a left-hold fork.",
+  "window": {
+    "device": ":mainpcb:gsp",
+    "space": "program",
+    "base": "0x02000000",
+    "end": "0x0207FFFF",
+    "frames": [1288, 1293],
+    "tap_frame": 10,
+    "max_events": 100000
+  },
+  "captures": {
+    "late_drive": {
+      "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-vram-write-latedrive --device :mainpcb:gsp --space program --base 0x02000000 --end 0x0207FFFF --frames 1293 --start-frame 1288 --end-frame 1293 --tap-frame 10 --max-events 100000 --input late_drive --nothrottle",
+      "result": "/tmp/stunrun-m5-gsp-vram-write-latedrive/result.json",
+      "result_sha256": "9cf39f63fa25657884e2fc0dfac3dfb428125b4d3c7eb22671bf028f73f0fd14",
+      "summary": "/tmp/stunrun-m5-gsp-vram-write-latedrive/summary.json",
+      "summary_sha256": "1fb1da8b8f40443c97b9fd5a468d69977e07e46d65279e779909af6c78b6d7",
+      "event_count": 45508,
+      "truncated": false
+    },
+    "fork_hold_left": {
+      "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-vram-write-left --device :mainpcb:gsp --space program --base 0x02000000 --end 0x0207FFFF --frames 1293 --start-frame 1288 --end-frame 1293 --tap-frame 10 --max-events 100000 --input fork_hold_left --nothrottle",
+      "result": "/tmp/stunrun-m5-gsp-vram-write-left/result.json",
+      "result_sha256": "c2dd3e535f8b720ee8a7cf3674b65d001fc634770d2e4e53dbd4884e1e93e418",
+      "summary": "/tmp/stunrun-m5-gsp-vram-write-left/summary.json",
+      "summary_sha256": "69a33f8a1e3fcb181149dc00bf58bd2f9db888c27d8893c4f2af0e3ab51ff406",
+      "event_count": 18224,
+      "truncated": false
+    }
+  },
+  "writer_differential": {
+    "0xFFF43030": {"late_drive": 256, "fork_hold_left": 512, "address_intersection": 256},
+    "0xFFF454E0": {"late_drive": 22683, "fork_hold_left": 5914, "address_intersection": 5597},
+    "0xFFF46590": {"late_drive": 800, "fork_hold_left": 992, "address_intersection": 800},
+    "0xFFF47AB0": {"late_drive": 720, "fork_hold_left": 6352, "address_intersection": 720}
+  },
+  "interpretation": "The same four writer PCs occur in both bounded paths, while frame cadence and address footprints vary with the input schedule. This establishes state/input dependence of shared GSP display work and identifies useful candidates for future save-state-matched differential tracing. Because these captures start from independent reset runs rather than an identical save state, no writer is promoted as a road-specific decoder."
+}

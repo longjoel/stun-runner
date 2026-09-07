@@ -184,3 +184,14 @@ four PCs: broad writer `0xFFF454E0`, `FILL L` at `0xFFF43030`, and the periodic
 offset from the main road bursts, so these are shared renderer landmarks, not a
 promoted road-table decoder. The writer trace is recorded in
 `reference/experiments/stunrun/m5-road-gsp-checkpoint-correlation.metadata.json`.
+
+A six-frame writer differential then compared the same GSP VRAM window under
+the established `late_drive` path and the available `fork_hold_left` path.
+Both paths used the same four writer PCs, but their event counts and footprints
+changed: `0xFFF43030` doubled from 256 to 512 events, `0xFFF46590` grew from
+800 to 992, and `0xFFF47AB0` grew from 720 to 6,352. The broad writer also
+changed from 22,683 to 5,914 unique addresses. This makes the writer set a
+useful input/state-dependent boundary for a future save-state-matched trace,
+but the independent reset runs are not sufficient to call any writer
+road-specific. Provenance is in
+`reference/experiments/stunrun/m5-gsp-vram-steering-differential.metadata.json`.
