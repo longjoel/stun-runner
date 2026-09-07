@@ -47,6 +47,22 @@
     "course_0_extra_prefix_differences": [24, 27],
     "interpretation": "common header/prefix plus a 96-word slot-specific payload plus a common 240-word suffix; semantic field assignments remain unknown"
   },
+  "static_selector_six_slot_comparison": {
+    "command": "tools/analyze-track-tables /tmp/stunrun-roms-system --base 0x44630 --base 0x44930 --base 0x44C30 --base 0x44F30 --base 0x45230 --base 0x45530 --output /tmp/stunrun-track-table-six.json",
+    "selector": "ROM 0x047406, 23 longword entries",
+    "slot_sha256": {
+      "0x044630": "dda9cba51823fb32da9bc1551288589f0f15a3fce1f938c9ea290b84b4f7a648",
+      "0x044930": "b1a46c38e65c2937ceac14f30c8d5bb3cb19ba854d91578ebc780e98b725c905",
+      "0x044C30": "d2c32bae97d10dbe5e4a5717968c79ae07489f2690eb145ed09d047abe5db329",
+      "0x044F30": "ad77588ddf6c587a3ae596c8529c78fc10d519bf4e56e5899d28d13e82c3e7e2",
+      "0x045230": "08b5599149893a997cab13d0d91539a1901ba27e62ae1e2c879b7351e976c79f",
+      "0x045530": "b26e677dbe5f3b3b92ef4f6fa1ba590c6c9231c659800938ffe3c9754fa8ba30"
+    },
+    "common_word_count": 286,
+    "common_word_ranges": ["0-23", "25-26", "28-47", "144-383"],
+    "variable_word_ranges": ["24-24", "27-27", "48-143"],
+    "interpretation": "The two statically referenced but previously unobserved slots use the same 384-word layout: common prefix, 96-word slot-specific payload, and common 240-word suffix. Runtime use of those two slots remains unconfirmed."
+  },
   "snapshot_comparison_reproducer": "tools/analyze-track-tables /tmp/stunrun-roms-system --snapshot /tmp/race2/snapshot-1200.json --snapshot /tmp/race2/snapshot-4800.json --snapshot /tmp/race2/snapshot-5400.json --snapshot /tmp/race2/snapshot-8400.json --snapshot /tmp/race2/snapshot-9000.json --output /tmp/stunrun-track-table-with-snapshots.json",
   "pairwise_snapshot_diff": [
     {"before": 1200, "after": 1800, "track_changed_bytes": 0},

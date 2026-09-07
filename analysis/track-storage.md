@@ -330,6 +330,14 @@ bounded payload inside a largely shared 768-byte command/data template. The
 record-shaped 16×3 grouping remains an observed byte layout, not a decoded
 semantic record type.
 
+The static selector names two additional slots, `0x044C30` and `0x044F30`,
+that were not present in the first four-slot runtime comparison. A six-slot
+ROM comparison shows they use the same layout: 286 of 384 words are common,
+with only words 24, 27, and 48–143 varying. This expands the storage model
+without expanding the runtime claim: the two slots are structurally proven
+track-table candidates, but their live use still needs a trace or settled RAM
+match.
+
 ### Follow-up comparison attempt
 
 The existing long-play recording was replayed while filtering directly for all
