@@ -35,6 +35,7 @@ SOURCES = [
     str(ADSP / "adsp_control_seq.c"),
     str(ADSP / "adsp_upload_stream.c"),
     str(ROOT / "reproduction" / "maincpu" / "fifo_block.c"),
+    str(MAINCPU / "geom_upload.c"),
     str(SOUND / "jsa_latch.c"),
 ]
 
@@ -178,6 +179,24 @@ class NativeShellTests(unittest.TestCase):
                              f"shell failed:\n{run.stdout}")
             self.assertIn("mode=gsp-visible-state", run.stdout)
             self.assertTrue(frame.is_file())
+
+    def test_shell_consumes_optional_geometry_fixture(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = pathlib.Path(directory)
+            binary = self.compile_shell(directory)
+            table = directory / "geometry.bin"
+            table.write_bytes(b"".join(
+                struct.pack(">H", 0xA000 + value) for value in range(384)))
+            env = dict(os.environ)
+            env["STUNRUN_GEOM_TABLE_BIN"] = str(table)
+            run = subprocess.run([str(binary)], env=env,
+                                 capture_output=True, text=True,
+                                 check=False)
+            self.assertEqual(run.returncode, 0,
+                             f"shell failed:\n{run.stdout}\n{run.stderr}")
+            self.assertIn("geometry-upload fixture=loaded passes=2 bytes=768",
+                          run.stdout)
+            self.assertIn("copies=match", run.stdout)
 
     def test_shell_refuses_unrunnable_inputs_loudly(self):
         with tempfile.TemporaryDirectory() as directory:

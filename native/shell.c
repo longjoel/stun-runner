@@ -44,6 +44,7 @@
 #include "adsp_init_image.h"
 #include "adsp_upload_stream.h"
 #include "fifo_block.h"
+#include "geom_upload.h"
 #include "experiment.h"
 #include "jsa_latch.h"
 #include "checkpoint.h"
@@ -120,6 +121,41 @@ static unsigned input_active_count(void)
         if (g_input[i].value != 0)
             active++;
     return active;
+}
+
+/* Optional evidence fixture only: the captured 68010 table bytes are
+ * big-endian words.  No ROM table selection or course semantics are modeled
+ * here; the literal upload slice owns only the 384-word march and twin copy. */
+static int load_geometry_table(const char *path, uint16_t *table)
+{
+    unsigned char bytes[STUNRUN_GEOM_MARCH_WORDS * 2u];
+    FILE *file;
+    size_t i;
+
+    if (path == NULL || table == NULL)
+        return 0;
+    file = fopen(path, "rb");
+    if (file == NULL)
+        return 0;
+    if (fread(bytes, 1u, sizeof(bytes), file) != sizeof(bytes) ||
+        fgetc(file) != EOF) {
+        fclose(file);
+        return 0;
+    }
+    fclose(file);
+    for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++)
+        table[i] = (uint16_t)(((uint16_t)bytes[i * 2u] << 8) |
+                              bytes[i * 2u + 1u]);
+    return 1;
+}
+
+static uint32_t geometry_sum(const uint16_t *words)
+{
+    uint32_t sum = 0;
+    unsigned i;
+    for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++)
+        sum += words[i];
+    return sum;
 }
 
 #define expect(cond) \
@@ -260,12 +296,43 @@ static int run_walk(void)
     unsigned i;
     const char *gsp_vram_path = getenv("STUNRUN_GSP_VRAM_BIN");
     const char *gsp_palette_path = getenv("STUNRUN_GSP_PALETTE_BIN");
+    const char *geometry_table_path = getenv("STUNRUN_GEOM_TABLE_BIN");
     const char *render_mode = "blank-scaffold";
+    uint16_t geometry_table[STUNRUN_GEOM_MARCH_WORDS];
+    uint16_t geometry_base[STUNRUN_GEOM_MARCH_WORDS];
+    uint16_t geometry_twin[STUNRUN_GEOM_MARCH_WORDS];
 
     stunrun_jsa_latches_init(&latches);
     stunrun_adsp_control_tally_init(&tally);
     stunrun_render_init(&renderer);
     stunrun_gsp_video_init(&video);
+
+    if (geometry_table_path != NULL) {
+        unsigned passes;
+        unsigned i;
+        int copies_match = 1;
+
+        if (!load_geometry_table(geometry_table_path, geometry_table)) {
+            printf("shell: geometry-upload fixture=read-failed\n");
+            g_failures++;
+        } else {
+            memset(geometry_base, 0, sizeof(geometry_base));
+            memset(geometry_twin, 0, sizeof(geometry_twin));
+            passes = stunrun_geom_upload(STUNRUN_GEOM_COPY_COUNT,
+                                         geometry_table, geometry_base,
+                                         geometry_twin);
+            for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++)
+                if (geometry_base[i] != geometry_twin[i] ||
+                    geometry_base[i] != geometry_table[i])
+                    copies_match = 0;
+            expect(passes == STUNRUN_GEOM_COPY_COUNT);
+            expect(copies_match);
+            printf("shell: geometry-upload fixture=loaded passes=%u "
+                   "bytes=%u sum=0x%08X copies=match\n", passes,
+                   STUNRUN_GEOM_MARCH_WORDS * 2u,
+                   (unsigned)geometry_sum(geometry_base));
+        }
+    }
 
     for (frame = 0; frame <= g_terminal; frame++) {
         dispatch_inputs();

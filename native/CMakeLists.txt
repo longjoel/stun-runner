@@ -63,6 +63,7 @@ add_executable(stunrun-native-shell
   ../reproduction/adsp/adsp_control_seq.c
   ../reproduction/adsp/adsp_upload_stream.c
   ../reproduction/maincpu/fifo_block.c
+  ../reproduction/maincpu/geom_upload.c
   ../reproduction/sound/jsa_latch.c)
 target_include_directories(stunrun-native-shell PRIVATE
   ../reproduction/adsp ../reproduction/maincpu ../reproduction/sound)
