@@ -82,3 +82,26 @@ scanline callback are `DPYCTL=8`, `DPYSTART=9`, `DPYTAP=27`, `DPYADR=30`,
 values alongside the PC/status and memory checksums. This establishes the
 runtime inputs needed to apply MAME's literal scanline formula to a VRAM
 snapshot; it does not yet claim a decoded native renderer.
+
+## Literal frame decoder
+
+`tools/decode-gsp-frame` applies the multisync callback to a captured 16-bit
+GSP VRAM snapshot and the currently selected 256-entry palette reads. It is
+deliberately parameterized for `DPYTAP` and fine scroll because the current
+low-rate state sample is a frame-boundary observation, not a per-scanline
+register trace. A synthetic fixture covers the word-byte selection and row/
+column formula.
+
+The first real decode reproduces the title scene's broad structure, but is not
+pixel-equivalent yet. With the frame-600 captures and explicit
+`--dpy-tap 0x4c0 --fine-scroll 7`, the current comparison is:
+
+```text
+dimensions: 512x240 on both sides
+changed pixels: 60343 / 122880
+mean channel error: 28.99599880642361
+```
+
+This is a useful positive boundary, not an M5 completion claim. The remaining
+work is to capture the display parameters at the actual scanline/update point
+or reconcile MAME's screenshot crop with the frame-boundary register sample.
