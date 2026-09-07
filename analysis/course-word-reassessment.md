@@ -49,10 +49,11 @@ executable writers:
 The state is also used as an index into ROM tables at `0x047406`, `0x048180`,
 and `0x048068` in the `0x0249EC–0x024B36` path. This makes `0xFF9578` a
 strong course/mode/progression candidate, but does not by itself prove that
-its value is the displayed track number. The current late-drive writer trace
-still observed only zero-valued writes at `0x021302`, `0x024322`, `0x02B63E`,
-and `0x02B95E`; reaching the nonzero branches requires a new gameplay
-transition or a save state taken there.
+its value is the displayed track number. The recorded human-play writer trace
+now directly attributes the normal nonzero progression writes to `0x0320BC`:
+that instruction increments `0xFF9578` and the frame-done observer reports the
+new value on the following frame. See
+`reference/experiments/stunrun/human-course-progression-writer.metadata.json`.
 
 ## Human-play progression capture
 
@@ -67,6 +68,11 @@ This promotes `0xFF9578` from a static candidate to a dynamically confirmed
 progression/state field. It still does not prove that the stored number is
 the on-screen track label, nor that the terminal `5→4→5` sequence represents
 three distinct courses.
+
+The writer attribution further promotes the normal `1..5` path to
+`DYNAMIC-WRITER-CONFIRMED`: all five values were written by `0x0320BC` in the
+same recorded input run. The terminal cleanup writes remain separately
+classified because they came from `0x0291A2` and `0x0252EC`.
 
 Evidence: `reference/experiments/stunrun/course-word-reader-trace.metadata.json`,
 `/tmp/stunrun-course-read-long/result.json`, and the main-CPU listing around

@@ -1,0 +1,47 @@
+{
+  "schema": "stunrun-human-play-course-writer/v1",
+  "experiment": "human-course-progression-recorded",
+  "target": "stunrun",
+  "mame": {
+    "executable": "/usr/bin/mame",
+    "version": "0.289 (mame0289-dirty)",
+    "rompath": "/tmp/stunrun-roms-system",
+    "rom_validation": "tools/check-roms passed before capture"
+  },
+  "start": {
+    "condition": "power_on",
+    "configuration": "fresh NVRAM and fresh MAME config",
+    "wrapper": "tools/mame-play-capture",
+    "lua": "mame/lua/play-capture.lua",
+    "command": "tools/mame-play-capture /tmp/stunrun-roms-system /tmp/stunrun-course-recorded --frames 21600 --every 600 --record course-progression --fresh-nvram --clean-cfg"
+  },
+  "capture": {
+    "terminal": "operator closed the window after the course-5 segment; MAME exit code 0",
+    "last_snapshot_frame": 19800,
+    "snapshot_cadence": 600,
+    "snapshot_base": "0xFF8000",
+    "snapshot_count": "0x80000",
+    "course_address": "0xFF9578",
+    "score_address": "0xFF9532",
+    "input_recording": {"path": "/tmp/stunrun-course-recorded/course-progression.inp", "sha256": "41aa6ef0c9b85231d70a74d54a68cfee19b9d52569db88bee6ab03640007164d"},
+    "course_log": {"path": "/tmp/stunrun-course-recorded/course-log.txt", "sha256": "0247dfc58efc60897db5f34f6b1d63926703e122f6672d33b998d1d12b319e4e"},
+    "course_write_log": {"path": "/tmp/stunrun-course-recorded/course-writes.txt", "sha256": "282933b87fb4bb35d197c8a88c92b23a84e83c2eefd5f52f9cc304aecd3c675a"}
+  },
+  "course_writes": [
+    {"frame": 3399, "pc": "0x0320BC", "value": 1, "observed_course_change_frame": 3400},
+    {"frame": 6994, "pc": "0x0320BC", "value": 2, "observed_course_change_frame": 6995},
+    {"frame": 10827, "pc": "0x0320BC", "value": 3, "observed_course_change_frame": 10828},
+    {"frame": 15292, "pc": "0x0320BC", "value": 4, "observed_course_change_frame": 15293},
+    {"frame": 19438, "pc": "0x0320BC", "value": 5, "observed_course_change_frame": 19439}
+  ],
+  "terminal_cleanup_writes": [
+    {"frame": 19678, "pc": "0x0291A2", "value": 4, "observed_course_change_frame": 19679},
+    {"frame": 19681, "pc": "0x0252EC", "value": 5, "observed_course_change_frame": 19682}
+  ],
+  "interpretation": {
+    "confirmed": "The normal course progression writes values 1 through 5 at PC 0x0320BC; the write precedes the frame-done observation by one frame.",
+    "bounded_caveat": "The later 5-to-4-to-5 writes use different PCs and are retained as terminal cleanup/transition behavior, not folded into the normal progression writer claim.",
+    "not_proven": "The stored progression value is exactly the on-screen track label."
+  },
+  "raw_artifacts": "Snapshots, save states, and the input recording remain local under /tmp/stunrun-course-recorded; this metadata commits provenance and hashes only."
+}

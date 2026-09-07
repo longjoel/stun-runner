@@ -100,8 +100,8 @@
       "last": "0xFF9579",
       "category": "tracked",
       "provenance": "reference/experiments/stunrun/human-course-progression.metadata.json",
-      "confidence": "DYNAMIC-PROGRESSION-CONFIRMED",
-      "note": "Distinct state/index word tested by the object-award path; writers at 0x0252EC, 0x02572C/0x02577A/0x0257C8/0x025814, 0x02B63E, and 0x0320BC/0x0320FA/0x032104 select progression values. Human-play capture observed 0→1→2→3→4→5; displayed track-label semantics remain unproven."
+      "confidence": "DYNAMIC-WRITER-CONFIRMED",
+      "note": "Distinct state/index word tested by the object-award path; the recorded human-play writer trace attributes normal values 1..5 to PC 0x0320BC, while terminal cleanup writes use 0x0291A2 and 0x0252EC. Displayed track-label semantics remain unproven."
     },
     {
       "label": "input-state-word",
