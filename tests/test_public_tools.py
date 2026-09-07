@@ -134,6 +134,26 @@ class PublicToolTests(unittest.TestCase):
                 struct.pack("<H", value) for value in (1, 0x2345, 3, 4)))
             self.assertEqual(palette_out.read_bytes(), bytes([0x10, 0, 0x20]) * 256)
 
+    def test_export_geometry_native_state_validates_twin_and_writes_words(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            values = list(range(256)) * 6
+            snapshot = temp / "road.json"
+            snapshot.write_text(json.dumps({
+                "schema": "stunrun-memory-snapshot/v1",
+                "device": ":mainpcb:maincpu", "space": "program",
+                "base": 0xFF9584, "count": 0x600, "width": 8,
+                "frame": 30, "values": values,
+            }), encoding="utf-8")
+            output = temp / "geometry.bin"
+            result = self.run_tool("export-geometry-native-state", snapshot,
+                                   "--output", output)
+            metadata = json.loads(result.stdout)
+            self.assertEqual(metadata["copies"], "match")
+            self.assertEqual(metadata["bytes"], 0x300)
+            self.assertEqual(output.stat().st_size, 0x300)
+            self.assertEqual(output.read_bytes()[:4], b"\x00\x01\x02\x03")
+
     def test_analyze_memory_candidates_ranks_persistent_diffs(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

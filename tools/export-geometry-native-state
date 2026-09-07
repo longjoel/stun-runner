@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""Export a settled main-CPU road-buffer snapshot for the native boundary."""
+
+import argparse
+import json
+import pathlib
+import struct
+
+
+BASE = 0xFF9584
+BUFFER_BYTES = 0x300
+TWIN = BASE + BUFFER_BYTES
+
+
+def load_snapshot(path):
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-memory-snapshot/v1":
+        raise SystemExit(f"{path}: expected stunrun-memory-snapshot/v1")
+    if value.get("device") != ":mainpcb:maincpu" or value.get("space") != "program":
+        raise SystemExit(f"{path}: expected main CPU program snapshot")
+    if value.get("base") != BASE or value.get("width") != 8:
+        raise SystemExit(f"{path}: expected base 0x{BASE:X} and width 8")
+    if value.get("count", 0) < BUFFER_BYTES * 2:
+        raise SystemExit(f"{path}: snapshot must include both 0x300-byte buffers")
+    values = value.get("values")
+    if not isinstance(values, list) or len(values) < BUFFER_BYTES * 2:
+        raise SystemExit(f"{path}: snapshot values are too short")
+    if any(not isinstance(item, int) or not 0 <= item <= 0xFF
+           for item in values[:BUFFER_BYTES * 2]):
+        raise SystemExit(f"{path}: snapshot values must be 8-bit integers")
+    base = values[:BUFFER_BYTES]
+    twin = values[BUFFER_BYTES:BUFFER_BYTES * 2]
+    if base != twin:
+        raise SystemExit(
+            f"{path}: road-buffer twin mismatch at 0x{TWIN:X}")
+    return value, base
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("snapshot", type=pathlib.Path)
+    parser.add_argument("--output", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    metadata, values = load_snapshot(args.snapshot)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_bytes(b"".join(
+        struct.pack(">H", (values[index] << 8) | values[index + 1])
+        for index in range(0, BUFFER_BYTES, 2)))
+    print(json.dumps({
+        "schema": "stunrun-native-geometry-state/v1",
+        "source": str(args.snapshot),
+        "source_frame": metadata["frame"],
+        "source_base": f"0x{BASE:X}",
+        "twin_base": f"0x{TWIN:X}",
+        "bytes": BUFFER_BYTES,
+        "output": str(args.output),
+        "encoding": "big-endian-16-bit",
+        "copies": "match",
+    }, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

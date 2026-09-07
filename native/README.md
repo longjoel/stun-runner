@@ -97,6 +97,9 @@ The optional `STUNRUN_GEOM_TABLE_BIN` input accepts a 768-byte big-endian
 table fixture and exercises the evidence-backed 384-word road-buffer upload
 and twin-copy boundary. It intentionally does not select a course or assign
 semantics to the table words; those remain Investigator-owned questions.
+Use `tools/export-geometry-native-state` on a settled main-CPU snapshot
+covering `0xFF9584–0xFF9B83` to produce this fixture; the exporter rejects a
+nonmatching `+0x300` twin before writing it.
 
 Convert an MAME PNG to PPM and compare it with the native output using
 `tools/compare-ppm`; the tool reports dimensions, changed pixels/channels, and
