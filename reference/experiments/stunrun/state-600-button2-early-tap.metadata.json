@@ -1,0 +1,42 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "state_600_button2_early_tap",
+  "tools": ["tools/mame-memory-snapshot", "tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/race/state-600.sta",
+    "sha256": "c6b812558a4859a91937805da2224910a820be06d9d2d742332dfeb4153c73eb",
+    "description": "recorded-race gameplay checkpoint at source frame 600; local artifact, not committed"
+  },
+  "fork": {
+    "relative_frames": 300,
+    "target": 300,
+    "control_input": "fork_center",
+    "probe_input": "fork_button2_sweep",
+    "status_range": "0xFF9500–0xFF95FF",
+    "effect_range": "0xFFDCC0–0xFFDDBF",
+    "control_status_result_sha256": "96887601c90518d524ff3b2657755f2210c47c70cd15156fe1b0d2b5790f8981",
+    "button2_status_result_sha256": "c99295c9e89c9dc02233431f95e811ab510275b2ebfc6180335d67c469c557f9",
+    "control_effect_result_sha256": "06b5c6343adcb15894c8a8299b465911be169d9b75d699b0c6b9b4df74b7b054",
+    "button2_effect_result_sha256": "698623cffd1cd7b0bbae90797fd8de7c8f9118a5bc7825b5e508de00214040d"
+  },
+  "early_trace": {
+    "tap_frame": 1,
+    "capture_frames": [1, 300],
+    "button2_dcc6_result_sha256": "68224a3bc1578a2d935c09824de4f353047a0ea9d6270ccc6946e5352604bb6b",
+    "center_dcc6_result_sha256": "980ece01b7c8649d3947747b0bc6fb2c23f965af055ab85f03252cfe4589663f",
+    "button2_other_bytes_result_sha256": {
+      "0xFFDD9B": "eb8c24d60a411f28e73e232d8de28e2cce78a94632683b89101590f291769e47",
+      "0xFFDDBB": "fec877cdf7c472cd136092115fd401e5216c7e863a057aa647525a5843835f6f"
+    },
+    "dcc6_writes": {
+      "frame": 7,
+      "pcs": ["0x038942", "0x038952", "0x038DF0"],
+      "event_count": 3
+    }
+  },
+  "observation": "Button 2 changes a broad status snapshot and four effect-window bytes, but the early writer trace isolates only 0xFFDCC6–0xFFDCC7 as a Button 2-specific main-CPU write. This is an effect-path candidate; armor, weapon, and ammunition semantics remain UNKNOWN.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + EARLY-TAP CONTROL",
+  "caveat": "The save state and raw snapshots/traces are local artifacts and depend on the pinned MAME build and validated ROM set."
+}

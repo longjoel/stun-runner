@@ -32,6 +32,9 @@ def main() -> int:
     parser.add_argument("--start-frame", type=int, default=680)
     parser.add_argument("--end-frame", type=int, default=705)
     parser.add_argument("--max-events", type=int, default=50000)
+    parser.add_argument("--tap-frame", type=int, default=10,
+                        help="install the write tap at this relative frame "
+                             "(default: 10; use 1 to catch early input paths)")
     parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center", "fork_button2_sweep", "fork_hold_left", "fork_hold_right"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
@@ -42,6 +45,8 @@ def main() -> int:
     args = parser.parse_args()
     if not (0 <= args.base <= args.end and args.end_frame >= args.start_frame > 0):
         parser.error("invalid address or frame range")
+    if not (1 <= args.tap_frame <= args.frames):
+        parser.error("tap-frame must be between 1 and frames")
     if args.load_state and not args.load_state.is_file():
         raise SystemExit(f"save state does not exist: {args.load_state}")
     if args.load_state and args.playback:
@@ -96,6 +101,7 @@ def main() -> int:
         "STUNRUN_RAM_TRACE_BASE": str(args.base),
         "STUNRUN_RAM_TRACE_END_ADDRESS": str(args.end),
         "STUNRUN_RAM_TRACE_MAX_EVENTS": str(args.max_events),
+        "STUNRUN_RAM_TRACE_TAP_FRAME": str(args.tap_frame),
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -116,6 +122,7 @@ def main() -> int:
         "base": args.base, "end": args.end, "load_state": str(args.load_state) if args.load_state else None,
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,
+        "tap_frame": args.tap_frame,
         "playback": str(playback) if playback else None,
         "returncode": completed.returncode, "events": events,
         "event_count": len(events),

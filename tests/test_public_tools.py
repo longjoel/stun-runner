@@ -204,6 +204,16 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(diff["first_event_mismatch"]["index"], 0)
             self.assertEqual(diff["after_only_writer_pcs"], [0x200])
 
+    def test_ram_write_trace_exposes_early_tap_frame(self):
+        wrapper = (ROOT / "tools" / "mame-ram-write-trace").read_text(
+            encoding="utf-8")
+        lua = (ROOT / "mame" / "lua" / "ram-write-trace.lua").read_text(
+            encoding="utf-8")
+        self.assertIn('"--tap-frame"', wrapper)
+        self.assertIn("STUNRUN_RAM_TRACE_TAP_FRAME", wrapper)
+        self.assertIn("STUNRUN_RAM_TRACE_TAP_FRAME", lua)
+        self.assertIn("frame == tap_frame", lua)
+
 
 if __name__ == "__main__":
     unittest.main()

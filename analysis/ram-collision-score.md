@@ -275,3 +275,25 @@ static candidates. `0xFFDD52–0xFFDD5A` is an observed adjacent event/object
 cluster. No field in this experiment is promoted to armor, weapon, or ammo.
 The next useful experiment is a controlled collision or damage interaction,
 not more passive firing in the current course segment.
+
+## Early-tap Button 2 fork control
+
+To avoid losing writes caused by an input event near the fork boundary, the
+RAM-write tracer now accepts `--tap-frame`; the default remains frame 10, while
+`--tap-frame 1` installs the tap before the scripted frame-2 Button 2 event.
+
+From the recorded-race checkpoint `/tmp/race/state-600.sta`, a 300-frame
+center branch and a `fork_button2_sweep` branch were compared. The status
+window differed in 124 bytes, but the effect window
+`0xFFDCC0–0xFFDDBF` differed in only four bytes:
+`0xFFDCC6–0xFFDCC7`, `0xFFDD9B`, and `0xFFDDBB`. With the early tap, only
+`0xFFDCC6` received a Button 2-specific write, at relative frame 7, from PCs
+`0x038942`, `0x038952`, and `0x038DF0`; the center branch had no writes there.
+The other three final differences had no main-CPU writers in the captured
+window. This promotes `0xFFDCC6–0xFFDCC7` to a Button 2/effect-path candidate,
+not to weapon or ammunition semantics. It also demonstrates why a tap frame
+must be recorded whenever a save-state fork applies input immediately after
+load.
+
+Provenance is in
+`reference/experiments/stunrun/state-600-button2-early-tap.metadata.json`.

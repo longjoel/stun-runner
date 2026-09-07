@@ -5,6 +5,7 @@ local output = assert(os.getenv('STUNRUN_RAM_TRACE_OUT'), 'STUNRUN_RAM_TRACE_OUT
 local limit = tonumber(os.getenv('STUNRUN_RAM_TRACE_FRAMES') or '705')
 local start_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_START') or '680')
 local end_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_END') or tostring(limit))
+local tap_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_TAP_FRAME') or '10')
 local input_mode = os.getenv('STUNRUN_RAM_TRACE_INPUT') or 'none'
 local device_tag = assert(os.getenv('STUNRUN_RAM_TRACE_DEVICE'), 'STUNRUN_RAM_TRACE_DEVICE is required')
 local space_name = os.getenv('STUNRUN_RAM_TRACE_SPACE') or 'program'
@@ -111,7 +112,7 @@ end
 
 emu.register_frame_done(function()
     frame = frame + 1
-    if frame == 10 then install_tap() end
+    if frame == tap_frame then install_tap() end
     while next_event <= #input_events and input_events[next_event].frame == frame do
         apply_event(input_events[next_event])
         next_event = next_event + 1
