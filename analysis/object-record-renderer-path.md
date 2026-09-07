@@ -72,6 +72,13 @@ correlation remains open. The next proof should trace the executing
 `0x03E51C`/`0x03E3FC` caller path or use a fresh state in which that display
 branch is active, then pair its FIFO writes with the record bytes.
 
+An instruction trace from the same saved state makes the boundary sharper.
+Across relative frames 300–310 it observes repeated calls
+`0x03CF40 → 0x03D120/0x03D1A0` and 24 executions each of the two updater
+entries. It observes zero executions of `0x03E51C`, `0x03E3FC`, or
+`0x02F470`. The current run therefore proves the live updater, but not that
+the geometry-consumer branch is selected in this state.
+
 ## Runtime correlation
 
 The matched 600-frame saved-state traces show the same path dynamically:
@@ -92,3 +99,6 @@ Static evidence comes from the installed-MAME main-CPU listing
 `/tmp/stunrun-listing-ff9578/maincpu-68010.lst`, generated for the pinned
 MAME/ROM environment. Runtime hashes and paths are recorded in
 `reference/experiments/stunrun/m5-object-record-writer-trace.metadata.json`.
+The bounded instruction trace is `/tmp/stunrun-m5-object-instr/maincpu.trace`
+with SHA-256
+`cfb7affa7e2f7fef694f5fcdb54339ad4c4d30815b5aaafaca952699fcd697b9`.

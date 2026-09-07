@@ -28,6 +28,15 @@
     "fifo_address": "0xC0000C",
     "geometry_caller_pcs": ["0x03E51C", "0x03E3FC"]
   },
+  "instruction_trace": {
+    "path": "/tmp/stunrun-m5-object-instr/maincpu.trace",
+    "sha256": "cfb7affa7e2f7fef694f5fcdb54339ad4c4d30815b5aaafaca952699fcd697b9",
+    "relative_frames": [300, 310],
+    "updater_entry_counts": {"0x03D120": 24, "0x03D1A0": 24},
+    "caller_observed": ["0x03CF40"],
+    "consumer_entry_counts": {"0x03E51C": 0, "0x03E3FC": 0, "0x02F470": 0},
+    "interpretation": "The updater executes repeatedly in this window, but the candidate geometry-consumer branch is not selected."
+  },
   "interpretation": "The short current fork has initialization writes only; it does not exercise the later transition.",
   "extended_transition": {
     "window": {"base": "0xFFDD80", "end": "0xFFDDA0"},
