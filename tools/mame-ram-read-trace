@@ -32,7 +32,7 @@ def main() -> int:
     parser.add_argument("--start-frame", type=int, default=600)
     parser.add_argument("--end-frame", type=int, default=1800)
     parser.add_argument("--max-events", type=int, default=100000)
-    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe"), default="none")
+    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "course_sweep", "course_coin2"), default="none")
     parser.add_argument("--load-state", type=pathlib.Path)
     parser.add_argument("--nothrottle", action="store_true")
     parser.add_argument("--mame", default="mame")

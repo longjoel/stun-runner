@@ -163,6 +163,13 @@ valid but had no subsequent reads of this field in its first 60 relative
 frames. These states are therefore useful for fast branching, but are not yet
 the transition-bearing checkpoint we need.
 
+The newly available `course_sweep` schedule (through frame 2100) and a
+Coin-2/start control were also traced. They produced 1,100 and 54 reads,
+respectively, with no nonzero return values. The discrepancy with the older
+temporal-candidate metadata is now isolated to its historical run provenance;
+that artifact should not be treated as reproducible until its exact snapshot
+inputs are recovered.
+
 ## Recording
 
 Write the run up as `reference/experiments/stunrun/` metadata

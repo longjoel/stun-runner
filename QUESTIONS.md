@@ -305,6 +305,32 @@ relative frames and captured 2,338 reads from 19 PCs, again all zero. This
 confirms the save-state path is useful for long follow-up runs, but this state
 also does not contain the transition-bearing course value.
 
+### Investigation update 4 (2026-09-06, course-select sweep, Agent 2 executed)
+
+New ready-to-run input modes: `course_sweep` (8 post-start button/stick
+slots, frames 900–2010), `course_preface_left` / `course_preface_right`
+(stick + Button 1 before start, start at 800), `course_coin2` (Coin 2 +
+1P start) — in `mame/lua/memory-snapshot.lua` + wrapper choices, covered
+by ROM-free `tests/test_input_modes.py` (mode/branch consistency, lua
+compiles, press/release ordering, coin-before-start).
+
+Negative matrix, all course ≡ 0: all 8 sweep slots; both preface
+variants; Coin 2; a 3600-frame `late_drive` run; a 3600-frame
+coin+start-only run that reproduces the 50→1700 score arc (so the regime
+matches the earlier scoring evidence). A boot-window write trace
+(frames 1–700) shows the only course writes anywhere: two zero-writes
+(frame 36 PC `0x21302`, frame 362 PC `0x24322`); a 2400–2800 trace shows
+zero writes. No snapshot in any run this session shows a nonzero course
+word. Side observation: the sweep run scores (300→1100, mixed 50/500
+awards) while course stays 0, so the 500-award selection fired with a
+zero course word in that regime — the "nonzero" precondition from the
+earlier trace does not generalize, or the selection reads a different
+state there. The frozen "values 3 and 6" claim in
+`reproduction/maincpu/score.h` now carries a provenance-gap caveat.
+Status: ASSUMPTION CONFLICT — the course-3/course-6 differential is
+blocked until a schedule reproduces a nonzero course word. Candidates
+untried: 2-player start, service-mode/DSW selection, race completion.
+
 ### Why it matters
 
 Award selection (`0x03A2E2`: 500 vs 50 on `0xFF9578` nonzero) is

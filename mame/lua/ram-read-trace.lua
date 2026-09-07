@@ -39,6 +39,34 @@ local input_events = input_mode == 'late_drive' and {
     {frame = 1460, port = ':mainpcb:a80000', field = 'P1 Button 1', value = 0},
     {frame = 1550, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 1},
     {frame = 1610, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 0}
+} or input_mode == 'course_sweep' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', value = 1},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', value = 0},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', value = 1},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', value = 0},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', value = 1},
+    {frame = 960, port = ':mainpcb:a80000', field = 'P1 Button 1', value = 0},
+    {frame = 1050, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 1},
+    {frame = 1110, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 0},
+    {frame = 1200, port = ':mainpcb:8BADC.0', field = 'AD Stick X', value = 0},
+    {frame = 1260, port = ':mainpcb:8BADC.0', field = 'AD Stick X', value = 128},
+    {frame = 1350, port = ':mainpcb:8BADC.0', field = 'AD Stick X', value = 255},
+    {frame = 1410, port = ':mainpcb:8BADC.0', field = 'AD Stick X', value = 128},
+    {frame = 1500, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', value = 0},
+    {frame = 1560, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', value = 128},
+    {frame = 1650, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', value = 255},
+    {frame = 1710, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', value = 128},
+    {frame = 1800, port = ':mainpcb:a80000', field = '1 Player Start', value = 1},
+    {frame = 1860, port = ':mainpcb:a80000', field = '1 Player Start', value = 0},
+    {frame = 1950, port = ':mainpcb:a80000', field = 'P1 Button 1', value = 1},
+    {frame = 1950, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 1},
+    {frame = 2010, port = ':mainpcb:a80000', field = 'P1 Button 1', value = 0},
+    {frame = 2010, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 0}
+} or input_mode == 'course_coin2' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 2', value = 1},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 2', value = 0},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', value = 1},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', value = 0}
 } or {}
 local next_event = 1
 local tap
