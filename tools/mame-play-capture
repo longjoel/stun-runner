@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""Launch S.T.U.N. Runner for HUMAN play with course-hunting instrumentation.
+
+Opens a normal playable MAME window (video + sound, real-time) while a Lua
+sidecar watches the course word and score every frame, dumps work RAM plus a
+save state on a fixed cadence, and logs every course/score change. The goal
+is a human-completed race: finish (or crash through) a full race while the
+harness records when 0xFF9578 leaves zero.
+
+No ROMs are needed to inspect this tool; MAME + a verified ROM set are only
+needed at launch. Outputs stay local to the given directory.
+"""
+
+import argparse
+import os
+import pathlib
+import subprocess
+import sys
+
+
+DEFAULT_FRAMES = 21600  # 6 minutes at 60 fps
+DEFAULT_EVERY = 600  # snapshot every 10 seconds
+
+
+INSTRUCTIONS = """\
+You are playing S.T.U.N. Runner live in MAME (real time, sound on).
+MAME default keys (press Tab in the window to remap): coin = 5,
+1 Player Start = 1, steer = arrow keys / mouse, Button 1 = Left Ctrl.
+
+Mission: coin up, start a 1-player game, and COMPLETE a full race.
+Crash or finish, either way keep driving until the auto-exit or close
+the window when done. Watch this terminal: every course/score change
+prints a MAME_PLAY_CHANGE line with the frame number.
+
+Outputs in {output}:
+  course-log.txt        frame-by-frame course/score change log
+  snapshot-<frame>.json full work-RAM dumps every {every} frames
+  state-<frame>.sta     matching save states (rewind with: mame -state <n>)
+                        (pass --no-states to skip save states)
+When a transition appears, report the frame plus what happened on screen.
+"""
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("rompath", type=pathlib.Path,
+                        help="directory containing the stunrun ROM set")
+    parser.add_argument("output", type=pathlib.Path,
+                        help="local output directory (created if missing)")
+    parser.add_argument("--frames", type=int, default=DEFAULT_FRAMES,
+                        help="auto-exit after this many frames "
+                             "(0 = run until the window closes)")
+    parser.add_argument("--every", type=int, default=DEFAULT_EVERY,
+                        help="work-RAM snapshot cadence in frames")
+    parser.add_argument("--no-states", action="store_true",
+                        help="skip MAME save states (snapshots only)")
+    parser.add_argument("--fresh-nvram", action="store_true",
+                        help="boot with empty NVRAM in a temp dir instead of "
+                             "your MAME NVRAM (default: use yours). Stale or "
+                             "corrupt NVRAM is the usual cause of a "
+                             "service-menu boot.")
+    parser.add_argument("--clean-cfg", action="store_true",
+                        help="use a fresh MAME config dir (default keys: "
+                             "coin 5, start 1). Use this if a persisted DIP "
+                             "change in your config forces service/test mode.")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="print the MAME command and exit without launching")
+    parser.add_argument("--mame", default="mame",
+                        help="MAME executable")
+    args = parser.parse_args()
+    if args.frames < 0 or args.every <= 0:
+        parser.error("frames must be >= 0 and every must be positive")
+    if not (args.rompath / "stunrun").is_dir():
+        raise SystemExit(f"missing ROM set directory: {args.rompath}/stunrun")
+    args.output.mkdir(parents=True, exist_ok=True)
+    script = (pathlib.Path(__file__).resolve().parents[1]
+              / "mame" / "lua" / "play-capture.lua")
+    if not script.is_file():
+        raise SystemExit(f"missing lua sidecar: {script}")
+    print(INSTRUCTIONS.format(output=args.output, every=args.every))
+    env = dict(os.environ)
+    env["STUNRUN_PLAY_OUT"] = str(args.output)
+    env["STUNRUN_PLAY_EVERY"] = str(args.every)
+    env["STUNRUN_PLAY_FRAMES"] = str(args.frames)
+    env["STUNRUN_PLAY_STATES"] = "0" if args.no_states else "1"
+    command = [
+        args.mame, "-rompath", str(args.rompath), "stunrun",
+        "-skip_gameinfo",
+        "-seconds_to_run", str(max(60, args.frames // 60 + 60) if args.frames else 86400),
+        "-autoboot_script", str(script),
+    ]
+    if args.fresh_nvram:
+        nvram_dir = args.output / "nvram-fresh"
+        nvram_dir.mkdir(exist_ok=True)
+        command += ["-nvram_directory", str(nvram_dir)]
+    if args.clean_cfg:
+        cfg_dir = args.output / "cfg-fresh"
+        cfg_dir.mkdir(exist_ok=True)
+        command += ["-cfg_directory", str(cfg_dir)]
+    print("+ " + " ".join(command), flush=True)
+    if args.dry_run:
+        return 0
+    proc = subprocess.run(command, env=env)
+    print(f"MAME exited with code {proc.returncode}.")
+    log = args.output / "course-log.txt"
+    if log.is_file():
+        lines = log.read_text(encoding="utf-8").strip().splitlines()
+        print(f"course-log.txt: {len(lines) - 1} change(s) recorded.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
