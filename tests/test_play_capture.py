@@ -73,6 +73,19 @@ class PlayCaptureTests(unittest.TestCase):
             self.assertIn("-nvram_directory", clean.stdout)
             self.assertIn("-cfg_directory", clean.stdout)
 
+    def test_propagates_mame_failure(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as temp:
+            rompath = pathlib.Path(temp) / "roms"
+            (rompath / "stunrun").mkdir(parents=True)
+            out = pathlib.Path(temp) / "out"
+            proc = subprocess.run(
+                [str(WRAPPER), str(rompath), str(out), "--mame",
+                 "/nonexistent/mame"],
+                capture_output=True, text=True, cwd=ROOT)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("No such file", proc.stderr)
+
     def test_no_scripted_inputs(self):
         lua_text = LUA.read_text(encoding="utf-8")
         self.assertNotIn("set_value", lua_text,

@@ -106,7 +106,7 @@ def main() -> int:
     if log.is_file():
         lines = log.read_text(encoding="utf-8").strip().splitlines()
         print(f"course-log.txt: {len(lines) - 1} change(s) recorded.")
-    return 0
+    return proc.returncode
 
 
 if __name__ == "__main__":
