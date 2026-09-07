@@ -300,6 +300,11 @@ nonzero values seen in the earlier long-run snapshot evidence. The full
 provenance is in
 `reference/experiments/stunrun/course-word-reader-trace.metadata.json`.
 
+A branch from the existing `/tmp/stunrun-latedrive6000.sta` then ran 3,000
+relative frames and captured 2,338 reads from 19 PCs, again all zero. This
+confirms the save-state path is useful for long follow-up runs, but this state
+also does not contain the transition-bearing course value.
+
 ### Why it matters
 
 Award selection (`0x03A2E2`: 500 vs 50 on `0xFF9578` nonzero) is

@@ -6,7 +6,8 @@
   "address": {"device": ":mainpcb:maincpu", "space": "program", "base": "0xFF9578", "end": "0xFF9579", "width": "tap-native"},
   "runs": [
     {"id": "late-drive", "input": "late_drive", "start_condition": "reset", "frames": [600, 1800], "events": 698, "reader_pc_count": 43, "nonzero_values": [], "canonical_log_sha256": "4944ecc5ed6a7329e9545d9c7865b5e4b94f7f9023d1a77f20ded60563f69f7d"},
-    {"id": "weapon-probe", "input": "weapon_probe", "start_condition": "reset", "frames": [600, 1800], "events": 753, "reader_pc_count": 43, "nonzero_values": [], "canonical_log_sha256": "01d45bd531a500e6882d66a83dd823d733b514e7e598ac702db26b151c540ee8"}
+    {"id": "weapon-probe", "input": "weapon_probe", "start_condition": "reset", "frames": [600, 1800], "events": 753, "reader_pc_count": 43, "nonzero_values": [], "canonical_log_sha256": "01d45bd531a500e6882d66a83dd823d733b514e7e598ac702db26b151c540ee8"},
+    {"id": "late-drive-state-6000", "input": "none", "start_condition": "load /tmp/stunrun-latedrive6000.sta", "relative_frames": [1, 3000], "events": 2338, "reader_pc_count": 19, "nonzero_values": [], "canonical_log_sha256": "c3036df7a523a91bf709bb64496b06c8430eef816a6d4a74fb7f969935aa9b61"}
   ],
   "save_state_check": {"state": "/tmp/stunrun-latedrive2400.sta", "relative_frames": [1, 60], "events": 0, "result": "state loaded and bounded run completed; no reads of this field occurred in the sampled relative window"},
   "interpretation": "Both schedules are negative controls: they did not reach the nonzero course values seen in other snapshot evidence. No course-3/course-6 stride conclusion is justified yet.",

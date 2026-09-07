@@ -156,9 +156,12 @@ frames 600 and 1800; every returned value was zero. The existing
 zero. The result is a negative control for these schedules, not a refutation
 of the nonzero `0 → 3 → 6` values seen in longer or otherwise different
 captures: neither run reached the transition needed for a course-3/course-6
-differential. The tracer also runs from a loaded save state; the supplied
-2400-frame state was valid but had no subsequent reads of this field in its
-first 60 relative frames.
+differential. A longer branch from `/tmp/stunrun-latedrive6000.sta` ran 3,000
+relative frames and captured 2,338 reads from 19 PCs, still all zero. The
+tracer also runs from a loaded save state; the supplied 2400-frame state was
+valid but had no subsequent reads of this field in its first 60 relative
+frames. These states are therefore useful for fast branching, but are not yet
+the transition-bearing checkpoint we need.
 
 ## Recording
 
