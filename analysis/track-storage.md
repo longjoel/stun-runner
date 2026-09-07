@@ -338,6 +338,12 @@ without expanding the runtime claim: the two slots are structurally proven
 track-table candidates, but their live use still needs a trace or settled RAM
 match.
 
+A bounded `late_drive` startup probe over frames 800–1700 found no reads from
+the alternate-slot window, and a wider positive-control window also found no
+table-copy reader events. The schedule therefore does not reach this loader
+in that interval. This is retained as a path/window negative only; the
+selector's alternate targets remain runtime-unconfirmed rather than unused.
+
 ### Follow-up comparison attempt
 
 The existing long-play recording was replayed while filtering directly for all

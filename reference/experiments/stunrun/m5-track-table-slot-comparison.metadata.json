@@ -63,6 +63,15 @@
     "variable_word_ranges": ["24-24", "27-27", "48-143"],
     "interpretation": "The two statically referenced but previously unobserved slots use the same 384-word layout: common prefix, 96-word slot-specific payload, and common 240-word suffix. Runtime use of those two slots remains unconfirmed."
   },
+  "alternate_slot_latedrive_probe": {
+    "command": "tools/mame-rom-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-static-slot-latedrive --pc-range 0x29760-0x29782 --address-range 0x44C30-0x4552F --rom-end 0x50001 --frames 1800 --start-frame 800 --end-frame 1700 --max-events 50000 --input late_drive --nothrottle",
+    "positive_control_command": "tools/mame-rom-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-static-slot-latedrive-positive --pc-range 0x29760-0x29782 --address-range 0x44C30-0x455FF --rom-end 0x50001 --frames 1800 --start-frame 800 --end-frame 1700 --max-events 50000 --input late_drive --nothrottle",
+    "alternate_slot_event_count": 0,
+    "positive_control_event_count": 0,
+    "canonical_log_sha256": "acf023b4effc86d711fdbfbb9dac828873d4ac50f868774e7acce70b41e1d458",
+    "positive_control_canonical_log_sha256": "98b28bb008cb871f603bd0df975de52ea4dfd4fcf5928acbfc7ba0dd51d5741d",
+    "interpretation": "The late_drive startup schedule does not reach the table-copy reader in the bounded 800-1700 window. This is a path/window negative only; it neither confirms nor excludes runtime use of the alternate selector targets."
+  },
   "snapshot_comparison_reproducer": "tools/analyze-track-tables /tmp/stunrun-roms-system --snapshot /tmp/race2/snapshot-1200.json --snapshot /tmp/race2/snapshot-4800.json --snapshot /tmp/race2/snapshot-5400.json --snapshot /tmp/race2/snapshot-8400.json --snapshot /tmp/race2/snapshot-9000.json --output /tmp/stunrun-track-table-with-snapshots.json",
   "pairwise_snapshot_diff": [
     {"before": 1200, "after": 1800, "track_changed_bytes": 0},
