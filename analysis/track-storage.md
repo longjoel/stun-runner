@@ -280,6 +280,19 @@ late-drive trace saw complete bursts at frames 1290, 1293, and 1297. The
 recorded-race replay saw repeated bursts from frames 1085 through 1293,
 including a split burst across frames 1088–1089.
 
+A narrowed RAM-read trace resolves the apparent twin-buffer ambiguity. Each of
+the three complete `0x02248E` bursts reads 384 unique words from
+`0xFF9584–0xFF9882` and zero words from `0xFF9884–0xFF9B82`. The twin is not an
+alternate input to this FIFO drain. Instead, `0x0298BE` reads the twin while
+`0x0298C0` reads the base in the paired animation/transform path; both paths
+can split across adjacent frames. The safe model is therefore:
+
+```text
+ROM table → base + twin working copies
+                 ├─ 0x0298C0 / 0x0298BE: paired animation/transform reads
+                 └─ 0x02248E: base-only road FIFO drain
+```
+
 Separate read/write taps, using the same deterministic schedule, matched the
 FIFO payload at frames 1290, 1293, and 1297. Other writers also use
 `0xC0000C`, so the matching road subsequence must be identified by PC and
@@ -401,6 +414,9 @@ the observed copy, lane, and transport mechanisms.
   recorded-race replay bursts.
 - `reference/experiments/stunrun/m5-road-fifo-lane-differential.metadata.json` —
   384-read/192-write lane match.
+- `reference/experiments/stunrun/m5-road-transfer-twin-read.metadata.json` —
+  narrow proof that the FIFO drain is base-only and the twin belongs to the
+  paired animation/transform path.
 - `reference/experiments/stunrun/m5-track-table-slot-comparison.metadata.json` —
   targeted cross-slot replay, ROM-content comparison, and its negative
   later-window result.

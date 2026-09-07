@@ -1,0 +1,40 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-road-transfer-twin-read",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Determine whether the road FIFO transfer loop consumes the base buffer, the twin buffer, or alternates between them.",
+  "command": "tools/mame-ram-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-road-transfer-narrow --device :mainpcb:maincpu --base 0xFF9584 --end 0xFF9B83 --frames 1300 --start-frame 1280 --end-frame 1300 --max-events 50000 --input late_drive --nothrottle",
+  "window": {"base": "0xFF9584", "end": "0xFF9B83", "width": 8},
+  "schedule": "late_drive",
+  "result": {
+    "path": "/tmp/stunrun-m5-road-transfer-narrow/result.json",
+    "sha256": "0506ac16632048aa6497b881c65b51c9b3b3e8b243033bb9364c85b9d96df5e3",
+    "event_count": 7296,
+    "truncated": false,
+    "canonical_log_sha256": "d8325a7e308abbf59afe3cd1edd24f30be556d8a4003c8b35c76311491bb059d"
+  },
+  "readers": {
+    "0x02248E": {
+      "frames": [1290, 1293, 1297],
+      "bursts": 3,
+      "words_per_burst": 384,
+      "ranges": ["0xFF9584-0xFF9882"],
+      "base_words": 1152,
+      "twin_words": 0
+    },
+    "0x0298BE": {
+      "frames": [1288, 1290, 1293, 1294, 1297],
+      "ranges": ["0xFF9884-0xFF9B82"],
+      "unique_words": 384,
+      "role": "twin animation/transform read"
+    },
+    "0x0298C0": {
+      "frames": [1288, 1290, 1293, 1294, 1297],
+      "ranges": ["0xFF9584-0xFF9882"],
+      "unique_words": 384,
+      "role": "base animation/transform read"
+    }
+  },
+  "interpretation": "The observed road FIFO transfer loop is base-only. The twin is consumed by the separate paired animation/transform readers, not alternated into the FIFO drain. This does not yet decode the 384-word field semantics."
+}
