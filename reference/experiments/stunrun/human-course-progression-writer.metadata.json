@@ -48,6 +48,15 @@
     "terminal_replay_frame": 21600,
     "result": "PASS: recorded course and writer logs are byte-identical; all recorded snapshots through frame 19800 are byte-identical"
   },
+  "replay_state_samples": [
+    {"frame": 18000, "course": 4, "score": 78265, "elapsed_counter": 5357, "time_remaining_candidate": 5484, "speed_candidate": 2826, "hit_counter": 0, "input_state": 6, "progression_counter": 4},
+    {"frame": 18600, "course": 4, "score": 80265, "elapsed_counter": 5557, "time_remaining_candidate": 2684, "speed_candidate": 2826, "hit_counter": 0, "input_state": 6, "progression_counter": 4},
+    {"frame": 19200, "course": 4, "score": 89265, "elapsed_counter": 5757, "time_remaining_candidate": 0, "speed_candidate": 2826, "hit_counter": 0, "input_state": 6, "progression_counter": 4},
+    {"frame": 19800, "course": 5, "score": 97965, "elapsed_counter": 5955, "time_remaining_candidate": 0, "speed_candidate": 0, "hit_counter": 0, "input_state": 0, "progression_counter": 5},
+    {"frame": 20400, "course": 5, "score": 97965, "elapsed_counter": 6155, "time_remaining_candidate": 0, "speed_candidate": 0, "hit_counter": 0, "input_state": 0, "progression_counter": 5},
+    {"frame": 21000, "course": 5, "score": 97965, "elapsed_counter": 6346, "time_remaining_candidate": 0, "speed_candidate": 0, "hit_counter": 0, "input_state": 7, "progression_counter": 5},
+    {"frame": 21600, "course": 5, "score": 97965, "elapsed_counter": 6543, "time_remaining_candidate": 14526, "speed_candidate": 2016, "hit_counter": 0, "input_state": 7, "progression_counter": 5}
+  ],
   "interpretation": {
     "confirmed": "The normal course progression writes values 1 through 5 at PC 0x0320BC; the write precedes the frame-done observation by one frame.",
     "bounded_caveat": "The later 5-to-4-to-5 writes use different PCs and are retained as terminal cleanup/transition behavior, not folded into the normal progression writer claim.",
