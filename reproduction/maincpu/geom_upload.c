@@ -30,6 +30,29 @@ int stunrun_geom_observed_table_base(unsigned course, uint32_t *base)
     return 1;
 }
 
+int stunrun_geom_selector_table_base(unsigned state, uint32_t *base)
+{
+    static const uint32_t selector[STUNRUN_GEOM_STATE_SELECTOR_COUNT] = {
+        STUNRUN_GEOM_TABLE_C0, STUNRUN_GEOM_TABLE_SLOT_44930,
+        STUNRUN_GEOM_TABLE_SLOT_44C30, STUNRUN_GEOM_TABLE_SLOT_44F30,
+        STUNRUN_GEOM_TABLE_C10, STUNRUN_GEOM_TABLE_C5,
+        STUNRUN_GEOM_TABLE_C0, STUNRUN_GEOM_TABLE_SLOT_44930,
+        STUNRUN_GEOM_TABLE_SLOT_44C30, STUNRUN_GEOM_TABLE_SLOT_44F30,
+        STUNRUN_GEOM_TABLE_C10, STUNRUN_GEOM_TABLE_C5,
+        STUNRUN_GEOM_TABLE_C0, STUNRUN_GEOM_TABLE_SLOT_44930,
+        STUNRUN_GEOM_TABLE_SLOT_44C30, STUNRUN_GEOM_TABLE_C0,
+        STUNRUN_GEOM_TABLE_SLOT_44930, STUNRUN_GEOM_TABLE_SLOT_44C30,
+        STUNRUN_GEOM_TABLE_SLOT_44F30, STUNRUN_GEOM_TABLE_C10,
+        STUNRUN_GEOM_TABLE_C5, STUNRUN_GEOM_TABLE_C0,
+        STUNRUN_GEOM_TABLE_SLOT_44930
+    };
+
+    if (base == NULL || state >= STUNRUN_GEOM_STATE_SELECTOR_COUNT)
+        return 0;
+    *base = selector[state];
+    return 1;
+}
+
 void stunrun_geom_march(const uint16_t *table, uint16_t *image)
 {
     size_t i;

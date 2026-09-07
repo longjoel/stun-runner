@@ -62,6 +62,23 @@ int main(void)
     check(!stunrun_geom_observed_table_base(1u, &base));
     check(!stunrun_geom_observed_table_base(0u, NULL));
 
+    /* Static selector at ROM 0x047406: all 23 entries are literal, while
+     * only four states are promoted as runtime-observed above. */
+    check(stunrun_geom_selector_table_base(0u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C0);
+    check(stunrun_geom_selector_table_base(4u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C10);
+    check(stunrun_geom_selector_table_base(10u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C10);
+    check(stunrun_geom_selector_table_base(11u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C5);
+    check(stunrun_geom_selector_table_base(12u, &base) &&
+          base == STUNRUN_GEOM_TABLE_C0);
+    check(stunrun_geom_selector_table_base(22u, &base) &&
+          base == STUNRUN_GEOM_TABLE_SLOT_44930);
+    check(!stunrun_geom_selector_table_base(23u, &base));
+    check(!stunrun_geom_selector_table_base(0u, NULL));
+
     /* March preserves ascending order over all 384 words. */
     stunrun_geom_march(table, image);
     for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++) {

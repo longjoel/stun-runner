@@ -3,7 +3,7 @@
  * Agent 2 (Implementer) encoding of Agent 1's frozen upload contract.
  * Literal mechanism only — table semantics, field meanings, and the
  * (course, segment) -> table-base map remains unresolved beyond the finite
- * observed course map exposed below.
+ * maps exposed below.
  *
  * Provenance (all OBSERVED-IN-TRACE unless noted):
  * - March readers 0x29760/0x2976E each read the same 384 words at +2
@@ -67,9 +67,14 @@ extern "C" {
 
 /* Observed march-table bases (course, base); shared across courses. */
 #define STUNRUN_GEOM_TABLE_C0 0x44630u
+#define STUNRUN_GEOM_TABLE_SLOT_44930 0x44930u
+#define STUNRUN_GEOM_TABLE_SLOT_44C30 0x44C30u
+#define STUNRUN_GEOM_TABLE_SLOT_44F30 0x44F30u
 #define STUNRUN_GEOM_TABLE_C5 0x45230u
 #define STUNRUN_GEOM_TABLE_C10 0x45530u
-#define STUNRUN_GEOM_TABLE_C11_C12 0x44930u
+#define STUNRUN_GEOM_TABLE_C11_C12 STUNRUN_GEOM_TABLE_SLOT_44930
+#define STUNRUN_GEOM_STATE_SELECTOR_BASE 0x47406u
+#define STUNRUN_GEOM_STATE_SELECTOR_COUNT 23u
 
 /* Twin-copy stride in bytes between the two destination buffers. */
 #define STUNRUN_GEOM_TWIN_STRIDE 0x300u
@@ -87,6 +92,11 @@ extern "C" {
 /* Return an observed ROM-table base for a known course value. The finite map
  * is intentional: no general course stride has been established. */
 int stunrun_geom_observed_table_base(unsigned course, uint32_t *base);
+
+/* Return the literal 23-entry ROM selector at 0x047406. This is a static
+ * state-index contract, not a claim that the index is a displayed course
+ * number or that every entry has been observed at runtime. */
+int stunrun_geom_selector_table_base(unsigned state, uint32_t *base);
 
 /* One march pass: copy STUNRUN_GEOM_MARCH_WORDS words from table to
  * image in ascending address order. NULL pointers are safe no-ops. */

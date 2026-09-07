@@ -72,6 +72,12 @@ references but have not yet been promoted as runtime-observed settled buffers.
 The selector is therefore a finite state-to-slot map, not a stride formula and
 not evidence that each state owns a unique table.
 
+The native/reproduction boundary exposes this literal map through
+`stunrun_geom_selector_table_base()`. It returns the ROM address for all 23
+indices, but deliberately does not load ROM data or assign a semantic name to
+the index. The older `stunrun_geom_observed_table_base()` helper remains the
+smaller four-state runtime-observed contract.
+
 The corresponding listing path at `0x024A14–0x024B40` bounds the index to
 `4..0x16`, uses a second ROM-side nine-byte-per-state table at `0x048180` for
 another resource selector, and then reads the road-table pointer from
