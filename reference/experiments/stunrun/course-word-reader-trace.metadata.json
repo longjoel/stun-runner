@@ -3,7 +3,7 @@
   "experiment": "course-word-reader-trace",
   "target": "stunrun",
   "mame": {"executable": "/usr/bin/mame", "version": "0.289 (mame0289-dirty)", "rompath": "/tmp/stunrun-roms-system"},
-  "address": {"device": ":mainpcb:maincpu", "space": "program", "base": "0xFF9578", "end": "0xFF9579", "width": "tap-native"},
+  "address": {"device": ":mainpcb:maincpu", "space": "program", "base": "0xFF9578", "end": "0xFF957B", "meaningful_word": "0xFF957A", "width": "tap-native"},
   "runs": [
     {"id": "late-drive", "input": "late_drive", "start_condition": "reset", "frames": [600, 1800], "events": 698, "reader_pc_count": 43, "nonzero_values": [], "canonical_log_sha256": "4944ecc5ed6a7329e9545d9c7865b5e4b94f7f9023d1a77f20ded60563f69f7d"},
     {"id": "weapon-probe", "input": "weapon_probe", "start_condition": "reset", "frames": [600, 1800], "events": 753, "reader_pc_count": 43, "nonzero_values": [], "canonical_log_sha256": "01d45bd531a500e6882d66a83dd823d733b514e7e598ac702db26b151c540ee8"},
@@ -12,6 +12,7 @@
     {"id": "course-coin2", "input": "course_coin2", "start_condition": "reset", "frames": [600, 1800], "events": 54, "reader_pc_count": 12, "nonzero_values": [], "canonical_log_sha256": "bcc830c100e4e48a6e95fe4f8d583d59174ef3935b02a339aaa1857bc4ab5bb6"}
   ],
   "save_state_check": {"state": "/tmp/stunrun-latedrive2400.sta", "relative_frames": [1, 60], "events": 0, "result": "state loaded and bounded run completed; no reads of this field occurred in the sampled relative window"},
-  "interpretation": "Both schedules are negative controls: they did not reach the nonzero course values seen in other snapshot evidence. No course-3/course-6 stride conclusion is justified yet.",
-  "artifacts": {"late_drive_result": "/tmp/stunrun-course-read/result.json", "weapon_probe_result": "/tmp/stunrun-course-read-weapon/result.json"}
+  "transition_trace": {"events": 990, "canonical_log_sha256": "902e3baff389891d8adab9afc68467965864a8937791ad0041d157e3b259bdf7", "transitions": [{"frame": 771, "reader_pcs": ["0x02B1EE", "0x02B1F8"], "value": "0x0003"}, {"frame": 927, "reader_pc": "0x02BA9C", "value": "0x0006"}, {"frame": 1504, "reader_pc": "0x02BA9C", "value": "0x0007"}]},
+  "interpretation": "The historical nonzero values are the adjacent input-state word at 0xFF957A within the 0xFF9578 snapshot region. Static listing and direct reads show 0xFF957A is derived digital-input state, while 0xFF9578 is a separate score/course-selection candidate that remains zero in current runs. No course-table stride conclusion is justified yet.",
+  "artifacts": {"late_drive_result": "/tmp/stunrun-course-read/result.json", "weapon_probe_result": "/tmp/stunrun-course-read-weapon/result.json", "full_word_transition_result": "/tmp/stunrun-course-read-long/result.json"}
 }

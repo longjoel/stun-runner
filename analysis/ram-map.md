@@ -35,7 +35,8 @@ not ordinary 68010 work RAM.
 | `0xFFDBA4` | one byte in an indexed table written by `0x030212` from table base `0xFFDB64`; semantic ownership unresolved | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9564–0xFF9567` | elapsed-update counter candidate; `0x024506` increments the longword continuously during the gameplay window | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9568–0xFF956B` | displayed time-remaining mechanism; initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold, and combined with a track-indexed base by HUD routine `0x028CA8` | `DYNAMIC-TIME-REMAINING-CONFIRMED` |
-| `0xFF9578–0xFF9579` | course/track index candidate used for multiple ROM-table lookups and state branches; observed `0 → 3 → 6` | `STATIC + OBSERVED-IN-TRACE` |
+| `0xFF9578–0xFF9579` | separate course/score-selection flag read by the object-award path at `0x03A2B2`, `0x03A2DA`, and `0x03A2F8`; all current runs leave it zero | `STATIC-CANDIDATE; NONZERO TRANSITION UNREPRODUCED` |
+| `0xFF957A–0xFF957B` | input-state word derived from `:mainpcb:a80001` and masked to control-state values; adjacent transition counter at `0xFF957C` | `DYNAMIC-INPUT-STATE-CONFIRMED` |
 | `0xFF9532–0xFF9535` | live score accumulator; cleared at several game-state entries, formatted/displayed by nearby UI paths, and observed receiving monotonic 50-point increments at `0xFF9534` from PC `0x03A2EC` | `DYNAMIC-SCORE-CONFIRMED` |
 | `0xFF9544` | object/event attribute flag; static paths derive it from bit 7 of active object-record fields at `0x0323A4`/`0x03244A`, rather than from a persistent craft-status record | `STATIC-RESOLVED-OBJECT-FLAG` |
 | `0xFFDE8A–0xFFDE94` | six 16-bit event-slot timers; `0x0416D8` reloads a slot from ROM table `0x4EF20`, `0x041644` decrements it, and zero may invoke the event/effect path at `0x041606` when `0xFF9550 == 1` | `STATIC + EVENT-TRACE; NOT-HEALTH` |
@@ -96,13 +97,19 @@ Temporal correlation provides the first high-value gameplay-state candidates.
 `0xFF9568` is initialized from ROM at `0x024372`, decremented through the
 `0x02907E–0x029132` timer/expiry path, and checked against `0x988` at
 `0x032F78`; its observed value falls from `8540` to `7966` in the bounded
-late-drive run. `0xFF9578` is repeatedly used as an index into several ROM
-tables and course/state branches, with observed values `0`, `3`, and `6`.
+late-drive run. The four-byte snapshot region at `0xFF9578` was initially
+mistaken for one course index because its low byte takes values `0`, `3`, and
+`6` in temporal reports. Direct tracing separates the adjacent fields:
+`0xFF957A` is the input-state word, while `0xFF9578` remains a distinct word
+tested by the score-award path. `0x02B1EE`/`0x02B1F8` derive and compare
+`0xFF957A` against the digital control port; `0x02BA9C` derives a second `0..7`
+control state including the `BTST #2` input and stores it through `0x02BAB2`.
+The `0xFF957C` word counts state transitions. The course meaning of
+`0xFF9578` remains open.
 The timer field is now promoted as the displayed time-remaining mechanism:
 `0x028CA8` combines it with the current course index and formats the result
 through the HUD path, while `0x02907E–0x02910A` performs expiry handling and
-score awards. Its displayed unit is still unresolved. The course/track field
-remains a strong selector, but its user-visible numbering is not yet proven.
+score awards. Its displayed unit is still unresolved.
 Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
