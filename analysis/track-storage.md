@@ -47,6 +47,39 @@ general course-proportional stride. Several course values reuse table slots.
 The native code therefore exposes a finite observed lookup and rejects
 unknown values instead of inventing a formula.
 
+The static lookup at ROM `0x047406` makes that reuse explicit. The word at
+`0xFF9578` is used as a zero-based index into 23 longwords:
+
+| State/index | ROM table base | State/index | ROM table base |
+| ---: | ---: | ---: | ---: |
+| 0 | `0x044630` | 12 | `0x044630` |
+| 1 | `0x044930` | 13 | `0x044930` |
+| 2 | `0x044C30` | 14 | `0x044C30` |
+| 3 | `0x044F30` | 15 | `0x044630` |
+| 4 | `0x045530` | 16 | `0x044930` |
+| 5 | `0x045230` | 17 | `0x044C30` |
+| 6 | `0x044630` | 18 | `0x044F30` |
+| 7 | `0x044930` | 19 | `0x045530` |
+| 8 | `0x044C30` | 20 | `0x045230` |
+| 9 | `0x044F30` | 21 | `0x044630` |
+| 10 | `0x045530` | 22 | `0x044930` |
+| 11 | `0x045230` |  |  |
+
+This is the missing storage-level explanation for the runtime observations:
+state 10 selects `0x045530`, state 11 selects `0x045230`, and state 12 wraps
+back to `0x044630`. The entries at `0x044C30` and `0x044F30` are proven ROM
+references but have not yet been promoted as runtime-observed settled buffers.
+The selector is therefore a finite state-to-slot map, not a stride formula and
+not evidence that each state owns a unique table.
+
+The corresponding listing path at `0x024A14–0x024B40` bounds the index to
+`4..0x16`, uses a second ROM-side nine-byte-per-state table at `0x048180` for
+another resource selector, and then reads the road-table pointer from
+`0x047406` before calling `0x0297A6`. It finally stores `0xFF9584` in
+`0xFFDB3C`, the active road-buffer pointer. That is direct evidence that the
+table copy and the later road consumer share the base-buffer contract; the
+second selector's semantic role remains open.
+
 The state/index word at `0xFF9578` is written by the normal progression path
 at `0x0320BC` and was observed to advance `0→1→2→3→4→5` in a human race.
 It controls progression/award behavior, but its displayed track-label meaning
