@@ -356,6 +356,15 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn("STUNRUN_RAM_TRACE_TAP_FRAME", lua)
         self.assertIn("frame == tap_frame", lua)
 
+    def test_ram_read_trace_exposes_pc_filter(self):
+        wrapper = (ROOT / "tools" / "mame-ram-read-trace").read_text(
+            encoding="utf-8")
+        lua = (ROOT / "mame" / "lua" / "ram-read-trace.lua").read_text(
+            encoding="utf-8")
+        self.assertIn('"--pc"', wrapper)
+        self.assertIn("STUNRUN_RAM_READ_PC", wrapper)
+        self.assertIn("pc_filter", lua)
+
 
 if __name__ == "__main__":
     unittest.main()

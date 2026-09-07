@@ -1,0 +1,27 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-gsp-geometry-source-read-trace",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Locate the high-memory source words consumed by the state-dependent GSP FILL XY geometry path.",
+  "checkpoint": {
+    "state": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "relative_trace_frames": [1790, 1800],
+    "window": "0xFF800000–0xFFFFFFFF",
+    "max_events": 10000
+  },
+  "captures": {
+    "left_a7": {"input": "fork_hold_left", "pc": "0xFFF45A10", "result_sha256": "2dbaac6e255af390a3454c7e64eecce02644b1c99eb03e9460a362c8841a55c0", "events_including_instruction_fetch": 2658, "data_reads_after_pc_fetch_filter": 1772, "data_address_range": "0xFFFAE180–0xFFFEA020"},
+    "left_a9": {"input": "fork_hold_left", "pc": "0xFFF45A40", "result_sha256": "2b670873c61482fd34627936cff4a15ae9c9ee3659bf5c8ce6354d6590cdd349", "events_including_instruction_fetch": 1938, "data_reads_after_pc_fetch_filter": 1292, "data_address_range": "0xFFFAE1A0–0xFFFE9F90"},
+    "center_a7": {"input": "fork_center", "pc": "0xFFF45A10", "result_sha256": "26862d332b9ebc995c9e4e7ba86e876a519d6b7a763c3302840e22e1b1b388d0", "events_including_instruction_fetch": 3459, "data_reads_after_pc_fetch_filter": 2306, "data_address_range": "0xFFFAEED0–0xFFFE8C50"},
+    "center_a9": {"input": "fork_center", "pc": "0xFFF45A40", "result_sha256": "3372a2123ee0d2fc7f4728201982db6e26ba1eec7689c6cf7b9536bc3522a0ae", "events_including_instruction_fetch": 2520, "data_reads_after_pc_fetch_filter": 1680, "data_address_range": "0xFFFAEEF0–0xFFFE8C20"}
+  },
+  "observations": {
+    "FFF45A10": "Runtime instruction is MOVE *A5+,A7,1; the filtered reads return 16-bit source words from dynamic GSP high memory.",
+    "FFF45A40": "Runtime instruction is MOVE *A5+,A9,1; it consumes the adjacent source stream used for the second FILL XY coordinate.",
+    "input_dependence": "The identical save-state forks select different source-address streams and read counts before the same endpoint frame.",
+    "instruction_fetch_caveat": "The read tap also reports the instruction fetch at the filtered PC; data-read counts remove only events whose address equals that PC."
+  },
+  "interpretation": "The FILL XY path is fed by dynamic GSP work-RAM records rather than directly by the sampled palette or fixed display registers. This narrows the next producer task to the GSP high-memory record writer/source format, but does not yet assign roadway, object, or HUD semantics to the records."
+}

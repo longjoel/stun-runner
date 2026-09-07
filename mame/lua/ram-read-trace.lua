@@ -12,6 +12,8 @@ local start_address = assert(tonumber(os.getenv('STUNRUN_RAM_READ_BASE')), 'base
 local end_address = assert(tonumber(os.getenv('STUNRUN_RAM_READ_END_ADDRESS')), 'end address is required')
 local tap_end_address = end_address + (end_address % 2 == 0 and 1 or 0)
 local max_events = tonumber(os.getenv('STUNRUN_RAM_READ_MAX_EVENTS') or '100000')
+local pc_filter_text = os.getenv('STUNRUN_RAM_READ_PC') or ''
+local pc_filter = pc_filter_text ~= '' and tonumber(pc_filter_text) or nil
 local frame = 0
 local events = {}
 local input_events = input_mode == 'late_drive' and {
@@ -87,6 +89,15 @@ local input_events = input_mode == 'late_drive' and {
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', value = 0},
     {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', value = 1},
     {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', value = 0}
+} or input_mode == 'fork_hold_left' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', value = 0},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', value = 0},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 0}
+} or input_mode == 'fork_center' and {
+    {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', value = 128},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', value = 0},
+    {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', value = 0},
+    {frame = 1800, port = ':mainpcb:8BADC.0', field = 'AD Stick X', value = 128}
 } or {}
 local next_event = 1
 local tap
@@ -104,7 +115,8 @@ local function install_tap()
     tap = space:install_read_tap(start_address, tap_end_address, 'stunrun_ram_read_trace',
         function(offset, data, mask)
             if frame >= start_frame and frame <= end_frame and offset >= start_address and
-                offset <= end_address and #events < max_events then
+                offset <= end_address and (pc_filter == nil or pc.value == pc_filter) and
+                #events < max_events then
                 events[#events + 1] = {frame = frame, pc = pc.value, address = offset,
                                        data = data, mask = mask}
             end

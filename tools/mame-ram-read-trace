@@ -32,7 +32,9 @@ def main() -> int:
     parser.add_argument("--start-frame", type=int, default=600)
     parser.add_argument("--end-frame", type=int, default=1800)
     parser.add_argument("--max-events", type=int, default=100000)
-    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "course_sweep", "course_coin2", "service_probe", "sw1_all_on"), default="none")
+    parser.add_argument("--pc", type=lambda value: int(value, 0),
+                        help="capture reads only while the CPU PC equals this value")
+    parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "course_sweep", "course_coin2", "service_probe", "sw1_all_on", "fork_hold_left", "fork_center"), default="none")
     parser.add_argument("--load-state", type=pathlib.Path)
     parser.add_argument("--playback", type=pathlib.Path,
                         help="replay a recorded .inp with no scripted inputs")
@@ -94,6 +96,7 @@ def main() -> int:
         "STUNRUN_RAM_READ_BASE": str(args.base),
         "STUNRUN_RAM_READ_END_ADDRESS": str(args.end),
         "STUNRUN_RAM_READ_MAX_EVENTS": str(args.max_events),
+        "STUNRUN_RAM_READ_PC": str(args.pc) if args.pc is not None else "",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -115,6 +118,7 @@ def main() -> int:
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,
         "playback": str(playback) if playback else None,
+        "pc": args.pc,
         "returncode": completed.returncode, "events": events, "event_count": len(events),
         "reader_pcs": sorted({event["pc"] for event in events}),
         "pc_counts": {f"0x{pc:X}": count for pc, count in

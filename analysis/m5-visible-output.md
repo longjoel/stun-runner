@@ -226,3 +226,15 @@ same ten-frame endpoint window. These decoded contexts narrow the next native
 work to GSP geometry/pixel primitives while preserving the semantic caveat:
 the line is not yet proven to be roadway, object, or HUD output. Provenance is
 in `reference/experiments/stunrun/m5-gsp-instruction-fork-trace.metadata.json`.
+
+A PC-filtered GSP read trace then followed the two coordinate loads inside the
+`FILL XY` path. `0xFFF45A10` (`MOVE *A5+,A7,1`) and `0xFFF45A40`
+(`MOVE *A5+,A9,1`) read 16-bit words from dynamic high GSP memory in the
+`0xFFFA…–0xFFFE…` range. After removing the instruction-fetch event at the
+filtered PC, the left fork supplied 1,772 and 1,292 data reads respectively;
+the center fork supplied 2,306 and 1,680. The address streams differ despite
+the identical saved-state origin, which ties the visible fork to changing GSP
+work-record inputs before rasterization. This narrows the producer question to
+the high-memory record writer/source format; it does not yet assign those
+records to roadway, object, or HUD semantics. Provenance is in
+`reference/experiments/stunrun/m5-gsp-geometry-source-read-trace.metadata.json`.
