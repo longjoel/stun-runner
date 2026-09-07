@@ -91,6 +91,29 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(comparison["settled_tail_sha256"],
                              "00c560922d5d536424b96f2d92e6cdda6055330024c3bd693e41cb1734a801a8")
 
+    def test_native_visible_bridge_runner(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            expected = temp / "expected.ppm"
+            actual = temp / "actual.ppm"
+            vram = temp / "vram.bin"
+            palette = temp / "palette.rgb"
+            native = temp / "native"
+            payload = bytes([0x12, 0x34, 0x56])
+            expected.write_bytes(b"P6\n1 1\n255\n" + payload)
+            vram.write_bytes(b"\x00\x00")
+            palette.write_bytes(bytes(768))
+            native.write_text(
+                "#!/bin/sh\ncp '" + str(expected) + "' \"$STUNRUN_RENDER_PPM\"\n",
+                encoding="utf-8")
+            native.chmod(0o755)
+            result = self.run_tool("run-native-visible-bridge", native, vram,
+                                   palette, expected, "--actual", actual)
+            report = json.loads(result.stdout)
+            self.assertEqual(report["schema"],
+                             "stunrun-native-visible-bridge-result/v1")
+            self.assertEqual(report["comparison"]["changed_pixels"], 0)
+
     def test_machine_map_reconciliation_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
             inventory = pathlib.Path(temp) / "inventory.json"

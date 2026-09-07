@@ -142,6 +142,9 @@ completion. A fresh local invocation of the built shell reproduced the paired
 frame with zero changed pixels and zero changed channels; the exact command,
 fixture hashes, and comparison are recorded in
 `reference/experiments/stunrun/m5-native-visible-bridge.metadata.json`.
+The same check is now packaged as `tools/run-native-visible-bridge`, which
+runs the shell, writes the actual PPM, invokes `tools/compare-ppm`, and returns
+failure on either a native-run error or a pixel mismatch.
 
 ## Road-buffer consumer boundary
 
