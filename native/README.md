@@ -73,3 +73,11 @@ ctest --test-dir build/native
 
 Public ROM-free checks: `tests/test_native_shell.py` (pass +
 determinism) alongside the per-slice C tests.
+
+## Rendering boundary (M4 scaffolding)
+
+`render.c` / `render.h` provide a dependency-free 320x240 RGB software
+framebuffer with deterministic clear, pixel, hash, and PPM-write operations.
+The native shell emits a blank-frame hash tagged `mode=blank-scaffold`; this
+proves the host rendering/logging boundary without presenting synthetic pixels
+as reconstructed game output. Evidence-backed drawing begins at M5.

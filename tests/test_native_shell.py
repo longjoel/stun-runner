@@ -25,6 +25,7 @@ SOUND = ROOT / "reproduction" / "sound"
 
 SOURCES = [
     str(ROOT / "native" / "shell.c"),
+    str(ROOT / "native" / "render.c"),
     str(ROOT / "native" / "checkpoint.c"),
     str(ROOT / "native" / "experiment.c"),
     str(ADSP / "adsp_init_image.c"),
@@ -69,6 +70,8 @@ class NativeShellTests(unittest.TestCase):
             self.assertIn("checkpoint frames=600", first.stdout)
             self.assertIn("time-us=10000000", first.stdout)
             self.assertIn("input-hash=0x", first.stdout)
+            self.assertIn("render frame=600 width=320 height=240 "
+                          "hash=0x", first.stdout)
             self.assertIn('checkpoint-json={', first.stdout)
             self.assertIn('"description": "native-shell-transport-model"',
                           first.stdout)

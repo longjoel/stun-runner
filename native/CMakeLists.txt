@@ -55,6 +55,7 @@ add_test(NAME jsa-latch-slice-c COMMAND stunrun-jsa-latch-slice-test)
 # hold. No speculative game logic.
 add_executable(stunrun-native-shell
   shell.c
+  render.c
   checkpoint.c
   experiment.c
   ../reproduction/adsp/adsp_init_image.c
@@ -66,6 +67,9 @@ target_include_directories(stunrun-native-shell PRIVATE
   ../reproduction/adsp ../reproduction/maincpu ../reproduction/sound)
 set_target_properties(stunrun-native-shell PROPERTIES C_STANDARD 99)
 add_test(NAME native-shell COMMAND stunrun-native-shell)
+add_executable(stunrun-render-test render.c render_test.c)
+set_target_properties(stunrun-render-test PROPERTIES C_STANDARD 99)
+add_test(NAME native-render-boundary-c COMMAND stunrun-render-test)
 # arcade-experiment/v1 parser self-check (valid, corrupt, and schema-
 # violating fixtures; no ROMs or MAME involved).
 add_executable(stunrun-experiment-parser-test

@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-**M4 — Native shell**
+**M5 — First visible output**
 
 ## State
 
@@ -18,6 +18,9 @@ M3: **complete** — source-defined ADSP reset/setup slice installs before the
 original upload, reaches a repeatable bounded loop, and matches the
 synchronized non-ADSP checkpoint boundary
 
+M4: **complete** — deterministic native timing/input/rendering boundary, replay,
+checkpoint, and logging scaffolding verified
+
 Original in MAME: **ROM-validated and runtime-inventoried; title checkpoint established**
 
 Step 0 driver mining: **worked example retained; runtime tags reconciled against system MAME 0.289**
@@ -28,23 +31,23 @@ Native target: **deterministic replay/checkpoint scaffolding and evidence-backed
 
 Verification harness: **bounded replay/checkpoint/trace path implemented; M1 machine facts are promoted into selectors and evidence fixtures**
 
-## Immediate objective — M4 native shell
+## Immediate objective — M5 first visible output
 
-Complete the native deterministic shell contract: replay the common experiment
-schema, preserve machine/checkpoint observability, and establish the smallest
-host-side timing/input/rendering boundary needed before visible-output work.
-Keep all game semantics evidence-backed and leave the current five verified
-transport slices intact.
+Use the original MAME title checkpoint and the native shell boundary to identify
+and reproduce the earliest evidence-backed visible output. Keep all game
+semantics evidence-backed and leave the current five verified transport slices
+intact.
 
-### M4 progress
+### M4 completion
 
-The native shell now emits both its deterministic transport summary and a
+The native shell emits deterministic fixed-step timing, a generic replay input
+latch/hash, a blank 320×240 RGB framebuffer hash, transport logging, and a
 one-line `stunrun-checkpoint/v1` document. The checkpoint is explicitly a
 `native-shell-transport-model` artifact: its ADSP image-region summary and
 install selector are derived from the shell model, while unimplemented CPU
-registers remain zero. The public test parses the emitted JSON and checks its
-schema, terminal frame, and selector; rendering remains scaffolding for the
-next step.
+registers remain zero. Rendering remains blank by design until M5 evidence
+supplies actual visible output. Full evidence is in
+`analysis/m4-native-shell.md`.
 
 `tools/mame-replay` now supports `--load-state`: it stages a saved checkpoint
 in an isolated MAME slot, uses a long bounded allowance for states whose

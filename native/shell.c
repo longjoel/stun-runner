@@ -46,6 +46,7 @@
 #include "experiment.h"
 #include "jsa_latch.h"
 #include "checkpoint.h"
+#include "render.h"
 
 static int g_failures = 0;
 static unsigned frame = 0;
@@ -244,6 +245,7 @@ static int run_walk(void)
 {
     static uint32_t image[STUNRUN_ADSP_INIT_STATE_WORDS];
     static uint16_t dm[STUNRUN_ADSP_DM_SIZE];
+    static stunrun_renderer_t renderer;
     stunrun_jsa_latches_t latches;
     stunrun_adsp_control_tally_t tally;
     stunrun_jsa_title_counts_t counts;
@@ -255,6 +257,7 @@ static int run_walk(void)
 
     stunrun_jsa_latches_init(&latches);
     stunrun_adsp_control_tally_init(&tally);
+    stunrun_render_init(&renderer);
 
     for (frame = 0; frame <= g_terminal; frame++) {
         dispatch_inputs();
@@ -349,6 +352,12 @@ static int run_walk(void)
             g_pending++;
     }
 
+    /* Rendering is a deliberately blank native frame boundary until the
+     * first visible-output milestone supplies evidence-backed drawing. */
+    stunrun_render_begin(&renderer, g_terminal, 0u, 0u, 0u);
+    printf("render frame=%u width=%u height=%u hash=0x%08X mode=blank-scaffold\n",
+           renderer.frame, STUNRUN_RENDER_WIDTH, STUNRUN_RENDER_HEIGHT,
+           (unsigned)stunrun_render_hash(&renderer));
     printf("checkpoint frames=%u time-us=%u events=%u pending=%u "
            "input-active=%u input-hash=0x%08X upload=%s "
            "install_ready=%d control=%s counts=%s nmi=%d irq4=%d\n",
