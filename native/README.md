@@ -82,3 +82,7 @@ The native shell emits a blank-frame hash tagged `mode=blank-scaffold`; this
 proves the host rendering/logging boundary without presenting synthetic pixels
 as reconstructed game output. Set `STUNRUN_RENDER_PPM=/path/frame.ppm` to
 write the terminal frame for inspection. Evidence-backed drawing begins at M5.
+
+Convert an MAME PNG to PPM and compare it with the native output using
+`tools/compare-ppm`; the tool reports dimensions, changed pixels/channels, and
+absolute error rather than treating a mismatched image as a vague failure.

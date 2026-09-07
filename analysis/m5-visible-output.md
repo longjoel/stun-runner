@@ -36,3 +36,18 @@ The current native frame is tagged `mode=blank-scaffold`; comparing it against
 the oracle is expected to fail until evidence-backed title rendering is
 implemented. The next investigation is to identify the smallest original
 renderer/palette/command slice needed to reproduce one stable visible region.
+
+The dependency-free `tools/compare-ppm` gate reports that comparison rather
+than reducing it to a single hash. Against the two-run oracle conversion and
+the current native blank frame, the observed result was:
+
+```text
+dimensions: 512x240 on both sides
+changed pixels: 121610 / 122880
+changed channels: 334729
+maximum channel error: 255
+mean channel error: 79.6585205078125
+```
+
+This is the expected negative control and is retained so the first real native
+visual slice can be measured against the same oracle.
