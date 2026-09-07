@@ -63,7 +63,7 @@ residue is a finding — record it, do not re-run with looser settings.
   `tools/mame-ram-write-trace` over it to find the mover PC, then check
   what ROM region that PC reads (IRQ-0005 stride test).
 - A residue range holding small integers that step with the course word
-  `0xFF9578` is a table-index candidate: diff drive captures across
+`0xFF9578` is a separate course/score-selection candidate: diff drive captures across
   courses if a multi-course schedule exists.
 - Residue inside `0xFF4000–0xFF4FFF` despite the ZRAM mask means the
   manifest is wrong: stop and report, do not extend the mask to cover
@@ -144,7 +144,9 @@ These are renderer-table accesses, not evidence that `0xFF9578` is itself a
 ROM table pointer. The trace captured 57,018 events without truncation; opcode
 fetches remain present because MAME read taps observe instruction fetches as
 well as data reads, so data-read summaries explicitly exclude the local code
-window.
+window. The later full-word RAM trace showed that the apparent `3`/`6` values
+were actually at `0xFF957A`, not in the `0xFF9578` course/score word; see
+`analysis/course-word-reassessment.md`.
 
 ### Course-word reader trace
 

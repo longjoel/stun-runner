@@ -33,12 +33,13 @@
       "semantic_status": "DYNAMIC-TIME-REMAINING-CONFIRMED; exact displayed unit remains unresolved"
     },
     "0xff9578": {
-      "classification": "course-track-index-candidate",
-      "observed_values": {"frame_600": 0, "frame_800": 3, "frame_1200": 6, "frame_1800": 6},
+      "classification": "course-score-selection-candidate",
+      "observed_values": {"frame_600": 0, "frame_800": 0, "frame_1200": 0, "frame_1800": 0},
       "writer_trace_sha256": "0c2b70d12a99237fedd9b746fd92b3b9c8648dd7b92b5e6117f8a74e5606cd0a",
-      "static_mechanism": "used to index multiple ROM tables and course/state branches; writes include explicit course-like constants and increment/decrement paths",
-      "semantic_status": "strong course/track candidate; exact user-visible track numbering unresolved"
+      "static_mechanism": "tested by the object-award path at 0x03A2B2/0x03A2DA/0x03A2F8; a nonzero selection remains unobserved",
+      "semantic_status": "STATIC-CANDIDATE; nonzero course/score selection unresolved",
+      "field_width_correction": "The historical 3/6 values were read from adjacent 0xFF957A/0xFF957B, not this word. See course-word-reader-trace.metadata.json."
     }
   },
-  "interpretation": "The temporal and writer evidence, together with the 0x028CA8 track-relative HUD formatting path, confirms 0xFF9568 as the displayed time-remaining mechanism without assuming its unit. The live score and persistent high-score table are independently confirmed by targeted experiments. 0xFF9578 remains a strong course/track selector, but its user-visible numbering is unresolved; craft, armor, and weapon fields remain open targeted experiments."
+  "interpretation": "The temporal and writer evidence confirms 0xFF9568 as the displayed time-remaining mechanism without assuming its unit. The live score and persistent high-score table are independently confirmed by targeted experiments. The earlier course interpretation is superseded: 0xFF9578 remains a score/course-selection candidate, while 0xFF957A is the resolved input-state word. Craft, armor, and weapon fields remain open targeted experiments."
 }

@@ -95,13 +95,22 @@
       "note": "u16 assumed from observed range 8540-7966; wider extent unresolved, so only these two bytes mask."
     },
     {
-      "label": "course-index",
+      "label": "course-score-selection-candidate",
       "base": "0xFF9578",
       "last": "0xFF9579",
-      "category": "explained",
+      "category": "static-candidate",
       "provenance": "analysis/ram-map.md",
-      "confidence": "STATIC-PLUS-OBSERVED-IN-TRACE",
-      "note": "Course/track index, observed 0/3/6; ROM-table selector."
+      "confidence": "STATIC-CANDIDATE",
+      "note": "Distinct word tested by the object-award path; nonzero transition remains unobserved."
+    },
+    {
+      "label": "input-state-word",
+      "base": "0xFF957A",
+      "last": "0xFF957B",
+      "category": "explained",
+      "provenance": "analysis/course-word-reassessment.md",
+      "confidence": "DYNAMIC-INPUT-STATE-CONFIRMED",
+      "note": "Derived from :mainpcb:a80001 and masked control state; observed values 0/3/6/7."
     },
     {
       "label": "object-hit-counter",
