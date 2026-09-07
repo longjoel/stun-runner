@@ -9,6 +9,7 @@ import pathlib
 
 DEFAULT_BASES = (0x44630, 0x44930, 0x45230, 0x45530)
 TABLE_BYTES = 0x300
+RAM_BASE = 0xFF9584
 
 
 def contiguous_ranges(indices: list[int]) -> list[str]:
@@ -35,6 +36,8 @@ def main() -> int:
                         help="384-word table base; repeatable (defaults to four observed slots)")
     parser.add_argument("--output", type=pathlib.Path,
                         help="write the summary JSON here instead of stdout")
+    parser.add_argument("--snapshot", action="append", type=pathlib.Path,
+                        help="compare a v1 main-CPU RAM snapshot; repeatable")
     args = parser.parse_args()
 
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
@@ -58,12 +61,14 @@ def main() -> int:
             region[address] = value
             occupied[address] = 1
 
+    table_payloads = {}
     tables = {}
     for base in bases:
         end = base + TABLE_BYTES
         if end > len(region) or not all(occupied[base:end]):
             raise SystemExit(f"table range 0x{base:X}-0x{end - 1:X} is not fully mapped")
         payload = bytes(region[base:end])
+        table_payloads[base] = payload
         tables[base] = [int.from_bytes(payload[index:index + 2], "big")
                         for index in range(0, TABLE_BYTES, 2)]
 
@@ -91,6 +96,46 @@ def main() -> int:
         "variable_word_ranges": contiguous_ranges(
             [index for index in range(len(first)) if index not in set(common)]),
     }
+    if args.snapshot:
+        comparisons = []
+        for snapshot_path in args.snapshot:
+            snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
+            if snapshot.get("schema") != "stunrun-memory-snapshot/v1":
+                raise SystemExit(f"{snapshot_path}: expected stunrun-memory-snapshot/v1")
+            snapshot_base = snapshot.get("base")
+            if not isinstance(snapshot_base, int) or snapshot.get("width") != 8:
+                raise SystemExit(f"{snapshot_path}: expected an 8-bit snapshot containing 0x{RAM_BASE:X}")
+            values = snapshot.get("values")
+            offset = RAM_BASE - snapshot_base
+            if offset < 0 or not isinstance(values, list) or len(values) < offset + TABLE_BYTES * 2:
+                raise SystemExit(f"{snapshot_path}: snapshot must include base and twin buffers")
+            buffer_bytes = bytes(values[offset:offset + TABLE_BYTES])
+            twin_bytes = bytes(values[offset + TABLE_BYTES:offset + TABLE_BYTES * 2])
+            matches = []
+            for base in bases:
+                table = table_payloads[base]
+                different = [index for index in range(TABLE_BYTES // 2)
+                             if buffer_bytes[index * 2:index * 2 + 2] !=
+                             table[index * 2:index * 2 + 2]]
+                matches.append({
+                    "slot": f"0x{base:05X}",
+                    "different_word_count": len(different),
+                    "different_word_ranges": contiguous_ranges(different),
+                    "exact_word_ranges": contiguous_ranges(
+                        [index for index in range(TABLE_BYTES // 2)
+                         if index not in set(different)]),
+                })
+            matches.sort(key=lambda item: (item["different_word_count"], item["slot"]))
+            comparisons.append({
+                "path": str(snapshot_path),
+                "frame": snapshot.get("frame"),
+                "buffer_sha256": hashlib.sha256(buffer_bytes).hexdigest(),
+                "twin_different_byte_count": sum(
+                    left != right for left, right in zip(buffer_bytes, twin_bytes)),
+                "best": matches[0],
+                "matches": matches,
+            })
+        result["snapshot_comparisons"] = comparisons
     encoded = json.dumps(result, indent=2) + "\n"
     if args.output:
         args.output.write_text(encoded, encoding="utf-8")

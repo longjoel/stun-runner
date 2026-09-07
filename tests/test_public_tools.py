@@ -36,6 +36,56 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(manifest["roms"][0]["filename"], "a.bin")
             self.assertEqual(manifest["roms"][0]["size"], 2)
 
+    def test_track_table_analyzer_snapshot_comparison_without_roms(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            rompath = temp / "roms"
+            romdir = rompath / "stunrun"
+            romdir.mkdir(parents=True)
+            manifest = temp / "manifest.json"
+            output = temp / "analysis.json"
+            snapshot = temp / "snapshot.json"
+            bases = [0x20, 0x320, 0x620, 0x920]
+            region = bytearray(0xC20)
+            for slot, base in enumerate(bases):
+                for word in range(384):
+                    value = 0x1000 + word
+                    if 48 <= word <= 143:
+                        value += slot << 8
+                    if slot == 0 and word == 24:
+                        value ^= 0x00FF
+                    region[base + word * 2:base + word * 2 + 2] = struct.pack(
+                        ">H", value)
+            (romdir / "even.bin").write_bytes(bytes(region[0::2]))
+            (romdir / "odd.bin").write_bytes(bytes(region[1::2]))
+            manifest.write_text(json.dumps({
+                "roms": [
+                    {"filename": "even.bin", "region": "mainpcb:maincpu",
+                     "size": len(region) // 2, "offset": 0},
+                    {"filename": "odd.bin", "region": "mainpcb:maincpu",
+                     "size": len(region) // 2, "offset": 1},
+                ]
+            }), encoding="utf-8")
+            selected = bytes(region[0x620:0x920])
+            selected = bytearray(selected)
+            selected[-48:] = bytes((value ^ 0x55 for value in selected[-48:]))
+            snapshot.write_text(json.dumps({
+                "schema": "stunrun-memory-snapshot/v1",
+                "base": 0xFF9584,
+                "width": 8,
+                "values": list(selected) * 2,
+            }), encoding="utf-8")
+            base_args = [argument for base in bases
+                         for argument in ("--base", hex(base))]
+            result = self.run_tool(
+                "analyze-track-tables", rompath, "--manifest", manifest,
+                *base_args, "--snapshot", snapshot, "--output", output,
+            )
+            self.assertEqual(result.returncode, 0)
+            comparison = json.loads(output.read_text())["snapshot_comparisons"][0]
+            self.assertEqual(comparison["best"]["slot"], "0x00620")
+            self.assertEqual(comparison["best"]["different_word_ranges"], ["360-383"])
+
     def test_machine_map_reconciliation_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
             inventory = pathlib.Path(temp) / "inventory.json"

@@ -143,6 +143,12 @@ the preceding raw-base/scaled-twin copy loop, including divisor values other
 than the observed `1` case. Its focused native test is
 `road-buffer-math-slice-c`.
 
+For future RAM work, `tools/analyze-track-tables` also accepts repeated
+`--snapshot PATH` arguments. It reports the best matching ROM slot, exact and
+different word ranges, buffer hashes, and base/twin differences without
+printing buffer contents. This makes settled-versus-in-flight classification
+repeatable from ordinary `stunrun-memory-snapshot/v1` artifacts.
+
 The reusable snapshot workflow is:
 
 1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.
