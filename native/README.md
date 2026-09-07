@@ -102,8 +102,9 @@ covering `0xFF9584–0xFF9B83` to produce this fixture; the exporter rejects a
 nonmatching `+0x300` twin before writing it.
 The shared C slice exposes only the observed finite course-to-ROM-base map;
 unknown course values are rejected because no general stride is established.
-The same fixture then passes through the observed 384-word base-buffer drain
-to the host-side FIFO model at `0xC0000C`; payload semantics remain open.
+The same fixture then passes through the observed 384-read/192-write
+base-buffer drain to the host-side FIFO model at `0xC0000C`; payload semantics
+remain open.
 
 Convert an MAME PNG to PPM and compare it with the native output using
 `tools/compare-ppm`; the tool reports dimensions, changed pixels/channels, and

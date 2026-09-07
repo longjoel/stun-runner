@@ -13,12 +13,14 @@
 extern "C" {
 #endif
 
-#define STUNRUN_ROAD_FIFO_WORDS 384u
+#define STUNRUN_ROAD_FIFO_SOURCE_WORDS 384u
+#define STUNRUN_ROAD_FIFO_WRITES 192u
 #define STUNRUN_ROAD_FIFO_PC 0x02248Eu
 #define STUNRUN_ROAD_FIFO_DEST 0xC0000Cu
 
-/* Copy one observed complete base-buffer burst into a host FIFO fixture.
- * Returns STUNRUN_ROAD_FIFO_WORDS only for valid complete buffers. */
+/* Emit the observed tap-level FIFO shape for one complete base-buffer burst:
+ * 384 source halfword reads produce 192 writes matching source[0], source[2],
+ * ... source[382]. This is a bus/lane contract, not payload semantics. */
 size_t stunrun_road_fifo_drain(const uint16_t *base, size_t words,
                                uint16_t *fifo_out, size_t fifo_cap);
 

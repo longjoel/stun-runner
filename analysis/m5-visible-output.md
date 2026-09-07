@@ -154,3 +154,7 @@ The same read tracer now accepts the recorded race input directly; replaying
 `/tmp/race/r1.inp` captured repeated base-buffer bursts through frame 1293,
 including a split burst across frames 1088–1089. That replay result is in
 `reference/experiments/stunrun/m5-road-buffer-recorded-replay.metadata.json`.
+Separate deterministic read/write taps further match the `0x02248E` FIFO
+payload to every other source read: 384 source reads correspond to 192 FIFO
+writes in the three-frame control window. This lane-level contract is recorded
+in `reference/experiments/stunrun/m5-road-fifo-lane-differential.metadata.json`.

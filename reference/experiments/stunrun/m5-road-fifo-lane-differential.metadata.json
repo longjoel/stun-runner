@@ -1,0 +1,31 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-road-fifo-lane-differential",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "experiments": {
+    "read": "/tmp/stunrun-m5-road-read-fresh/result.json",
+    "write": "/tmp/stunrun-m5-road-fifo-write/result.json",
+    "schedule": "late_drive",
+    "read_command": "tools/mame-ram-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-road-read-fresh --base 0xFF9584 --end 0xFF9B83 --frames 1300 --start-frame 1280 --end-frame 1300 --max-events 50000 --input late_drive --nothrottle",
+    "write_command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-road-fifo-write --device :mainpcb:maincpu --base 0xC0000C --end 0xC0000D --frames 1300 --start-frame 1280 --end-frame 1300 --max-events 50000 --tap-frame 10 --input late_drive --nothrottle"
+  },
+  "matched_bursts": {
+    "reader_pc": "0x02248E",
+    "writer_pc": "0x02248E",
+    "source_reads": 384,
+    "fifo_writes": 192,
+    "selection": "write[i] == read[2*i]",
+    "frames": {
+      "1290": {"write_subsequence_offset": 0, "writes": 192},
+      "1293": {"write_subsequence_offset": 2333, "writes": 192},
+      "1297": {"write_subsequence_offset": 661, "writes": 192}
+    }
+  },
+  "observation": "Independent deterministic late_drive traces match the FIFO payload to every other 16-bit read in three road bursts. Other writes to 0xC0000C surround the matched subsequence, so this records a lane-level transfer shape and does not classify the surrounding FIFO traffic.",
+  "limitation": "The read and write taps were run separately; a combined Lua tap was not promoted because installing both tap types suppressed the read callback in this MAME Lua environment.",
+  "provenance": {
+    "read_log_sha256": "95aa404a86ef4921a6406aefd1fe1fe0e510b884713ac624cb198530a12a4ac0",
+    "write_log_sha256": "8eecf38fd3cecd65d4db3a06560ab7104fb4688cb35869724d18390f82dd6157"
+  }
+}
