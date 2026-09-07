@@ -1,0 +1,35 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_save_state_road_buffer_fixture",
+  "tools": ["tools/mame-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/race/state-1200.sta",
+    "sha256": "69968e398327914fc79d610ec8b7d615eab2c092a470db13f5e6eec349598712",
+    "capture_description": "recorded human-race checkpoint at frame 1200; local regenerable artifact, not committed"
+  },
+  "capture": {
+    "device": ":mainpcb:maincpu",
+    "space": "program",
+    "base_window": "0xFF9584–0xFF9883",
+    "twin_window": "0xFF9884–0xFF9B83",
+    "bytes_each": 768,
+    "relative_frames": [2, 10, 30],
+    "input": "none"
+  },
+  "repeats": {
+    "run_a_result_sha256": "6867a3d5c8844cf28f0d753aea7838d8491939526fc8d913be179d9aa95e357d",
+    "run_b_result_sha256": "6867a3d5c8844cf28f0d753aea7838d8491939526fc8d913be179d9aa95e357d",
+    "snapshot_hash_mismatches": 0
+  },
+  "base_twin_comparison": {
+    "frame_2_different_bytes": 0,
+    "frame_10_different_bytes": 0,
+    "frame_30_different_bytes": 0,
+    "interpretation": "Both observed 768-byte copies are settled and byte-identical in this checkpoint window."
+  },
+  "observation": "A saved human-race state can provide a deterministic road-buffer producer fixture without replaying the race. The fixture is sufficient to exercise the literal twin-buffer consumer/renderer boundary, but not to infer field semantics.",
+  "semantic_status": "TWIN_ROAD_BUFFER_FIXTURE_CONFIRMED; FIELDS_UNRESOLVED",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + REPEATABLE-SAVE-STATE-CAPTURE"
+}
