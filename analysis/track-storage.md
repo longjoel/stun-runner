@@ -91,6 +91,19 @@ do not match a complete slot. This explains why a narrow ROM-read trace around
 the nominal transition frame can miss the load: the useful source identity is
 more reliably recovered from the settled RAM buffer immediately afterward.
 
+The write trace around the first course-10 load separates the two mechanisms:
+
+- PC `0x029760` writes the 24-word base tail during the table copy.
+- PC `0x02977E` writes the corresponding twin-copy data.
+- PC `0x0298C0` then rewrites the 24-word base tail at frames 954, 955, 958,
+  960, 962, 964, and 967.
+
+The `0x0298C0` writes show a repeated-byte sequence descending from roughly
+`0xA3` toward `0x19`, with a distinct final record. This is consistent with a
+time/ramp or animation update, but its logical meaning is still unknown. The
+important storage fact is now stronger than “the tail changes”: the ROM copy
+and the later base-only animation writer are separate, observable mechanisms.
+
 The reusable snapshot workflow is:
 
 1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.

@@ -74,6 +74,17 @@
     }
   ],
   "in_flight_transition_frames": [4800, 8400, 13200],
+  "tail_writer_trace": {
+    "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-tail-write-c10 --device :mainpcb:maincpu --base 0xFF9854 --end 0xFF9B83 --frames 1000 --start-frame 900 --end-frame 1000 --tap-frame 1 --max-events 10000 --playback /tmp/race2/r2.inp --nothrottle",
+    "canonical_log_sha256": "9a6f046f8fa34be3650868f27fcbd507d37cc8e80de1763ff5939978fa72b998",
+    "events": 1152,
+    "writers": {
+      "0x029760": {"frames": [954], "base_tail_lane_events": 48},
+      "0x02977E": {"frames": [954], "twin_tail_lane_events": 48},
+      "0x0298C0": {"frames": [954, 955, 958, 960, 962, 964, 967], "base_tail_lane_events_per_frame": 48}
+    },
+    "interpretation": "The table-copy writers and the later base-only tail animation writer are distinct PCs; the repeated tail values descend during the observed update pass."
+  },
   "filter": "--pc-range 0x0-0x50000 with --address-range covering each known 0x300-byte slot",
   "observation": "The first course-10 table load is reproducible, but the later transition windows do not show reads from any known table slot under a broad PC filter. This does not invalidate the RAM-derived course-to-slot map; it leaves the later loader path or replay timing unresolved.",
   "confidence": "POSITIVE-CONTROL-OBSERVED; LATER-WINDOW-NEGATIVE-OBSERVED"
