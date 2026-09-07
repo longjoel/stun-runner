@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+"""Compare two MAME play-capture directories byte-for-byte."""
+
+import argparse
+import hashlib
+import json
+import pathlib
+import sys
+
+
+def digest(path: pathlib.Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def compare_file(left: pathlib.Path, right: pathlib.Path, label: str) -> dict:
+    if not left.is_file() or not right.is_file():
+        missing = []
+        if not left.is_file():
+            missing.append(str(left))
+        if not right.is_file():
+            missing.append(str(right))
+        return {"name": label, "equal": False, "reason": "missing", "paths": missing}
+    left_hash, right_hash = digest(left), digest(right)
+    return {"name": label, "equal": left_hash == right_hash,
+            "left_sha256": left_hash, "right_sha256": right_hash,
+            "left_size": left.stat().st_size, "right_size": right.stat().st_size}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("recorded", type=pathlib.Path)
+    parser.add_argument("replay", type=pathlib.Path)
+    parser.add_argument("--output", type=pathlib.Path)
+    parser.add_argument("--require-snapshots", action="store_true",
+                        help="fail if either directory has no snapshots or the sets differ")
+    args = parser.parse_args()
+    if not args.recorded.is_dir() or not args.replay.is_dir():
+        parser.error("both capture paths must be directories")
+
+    checks = [
+        compare_file(args.recorded / "course-log.txt",
+                     args.replay / "course-log.txt", "course-log.txt"),
+        compare_file(args.recorded / "course-writes.txt",
+                     args.replay / "course-writes.txt", "course-writes.txt"),
+    ]
+    left_snapshots = {path.name for path in args.recorded.glob("snapshot-*.json")}
+    right_snapshots = {path.name for path in args.replay.glob("snapshot-*.json")}
+    common = sorted(left_snapshots & right_snapshots,
+                    key=lambda name: int(name.removeprefix("snapshot-").removesuffix(".json")))
+    snapshot_sets_equal = left_snapshots == right_snapshots
+    checks.append({"name": "snapshot-set", "equal": snapshot_sets_equal,
+                   "left_count": len(left_snapshots), "right_count": len(right_snapshots),
+                   "left_only": sorted(left_snapshots - right_snapshots),
+                   "right_only": sorted(right_snapshots - left_snapshots)})
+    for name in common:
+        checks.append(compare_file(args.recorded / name, args.replay / name, name))
+
+    result = {
+        "schema": "stunrun-play-capture-comparison/v1",
+        "recorded": str(args.recorded), "replay": str(args.replay),
+        "common_snapshot_count": len(common),
+        "checks": checks,
+        # A replay may run beyond the recorded session.  Common snapshots
+        # must match; an unequal set is informational unless the caller asks
+        # for exact set equality with --require-snapshots.
+        "equal": all(check["equal"] for check in checks[:2]) and
+                  all(check["equal"] for check in checks[3:]),
+    }
+    if args.require_snapshots:
+        result["equal"] = result["equal"] and bool(left_snapshots) and snapshot_sets_equal
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        sys.stdout.write(encoded)
+    return 0 if result["equal"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
