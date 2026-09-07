@@ -234,6 +234,15 @@ The first oracle pipeline should support deterministic launch/input, bounded wai
   and `0xFFF479E0`), narrowing the renderer path while preserving the semantic
   selector caveat.
 
+The M5 track-storage slice is now evidence-backed through the native boundary:
+observed 384-word ROM slots share 286 words, settled RAM snapshots match the
+selected slot through word 359, and the remaining runtime update is explained
+by raw-base/scaled-twin copy loops plus full-buffer byte subtract/add passes.
+The literal copy/arithmetic behavior is covered by
+`road-buffer-math-slice-c`; the native shell still consumes a pre-transform
+fixture and does not claim a native gameplay producer. Human-facing detail is
+in `analysis/track-storage.md`.
+
 ## Completed baseline slices
 
 - Canonical working set: `stunrun`, S.T.U.N. Runner (rev 6), 25 ROM files; MAME `-verifyroms` passes.
