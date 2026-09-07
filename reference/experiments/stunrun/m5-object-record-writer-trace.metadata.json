@@ -18,5 +18,21 @@
   "address_range_observed": ["0xFFDD86", "0xFFDDC2"],
   "canonical_log_sha256": "8e5969214d335c5f418058dd01061a5bf12c99f9706dd11043f5125cd566fb01",
   "truncated": false,
-  "interpretation": "CURRENT FORK HAS INITIALIZATION WRITES ONLY. The loaded object-record bytes remain stable through frame 180; this trace does not exercise a live spawn/update transition and does not establish field semantics."
+  "interpretation": "The short current fork has initialization writes only; it does not exercise the later transition.",
+  "extended_transition": {
+    "window": {"base": "0xFFDD80", "end": "0xFFDDA0"},
+    "relative_frames": [2, 600],
+    "clear_write_frame": 220,
+    "update_start_frame": 303,
+    "update_last_observed_frame": 599,
+    "forks": {
+      "center": {"input": "none", "path": "/tmp/stunrun-m5-object-writers-current-600-center", "event_count": 4094, "canonical_log_sha256": "dc1331c9a446691efefcceef09e6a52c81ea71e8454fd0973726fd9fa3b98f26", "frame_300_snapshot_sha256": "036fde50ef1836196fd1060df985c3710e77d415860768b668004fe607cf8050", "frame_600_snapshot_sha256": "8d5523b06cd346d5abc881319c7cc58d246e42f9304774e76d320fdd9e629ac8"},
+      "left": {"input": "fork_hold_left", "path": "/tmp/stunrun-m5-object-writers-current-600-left", "event_count": 4226, "canonical_log_sha256": "07fcbf48be33a28e34b5ed77831249da445d712b2c1e84e600eb1673be0e09b5", "frame_300_snapshot_sha256": "f1a49977b79a2946018822899352f6dad09a277a92e2dc16ee01b3e6d9a080a8", "frame_600_snapshot_sha256": "e6c9e01dd3ab25995fbf4e2a0c95823fb9c12038c455d42f26958f7ab8f1df59", "additional_writer_pcs": ["0x03D208", "0x03D234", "0x03D238", "0x03D23C", "0x03D240"]},
+      "right": {"input": "fork_hold_right", "path": "/tmp/stunrun-m5-object-writers-current-600-right", "event_count": 4232, "canonical_log_sha256": "bd817c0dc499d482ba9fb40fe6dd787b8c0b37a66e85ffb79bbb9fca013b91b7", "frame_300_snapshot_sha256": "8dcb8a452e916b49b79c8515ea841101a4351932b9afebd49b32ee3aaf57f839", "frame_600_snapshot_sha256": "db0b4cc0d8dd2cc1b0883510c823b64ea9f1e049cdf043a4e48246ad26fffd03"}
+    },
+    "directional_snapshot_offsets": ["0xFFDD86", "0xFFDD87", "0xFFDD88", "0xFFDD90", "0xFFDD91"],
+    "static_record_base": "0xFFDD86",
+    "record_stride": 16,
+    "semantic_status": "DIRECTIONAL_OBJECT_ANIMATION_RECORD; NOT_ARMOR_WEAPON_SCORE_TIMER"
+  }
 }
