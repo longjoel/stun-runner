@@ -158,6 +158,52 @@ local events = input_mode == 'fork_button2_sweep' and {
     {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
     {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
     {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'course_sweep' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 900, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 960, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 1050, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'press'},
+    {frame = 1110, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'},
+    {frame = 1200, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
+    {frame = 1260, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 1350, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 255},
+    {frame = 1410, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 1500, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', action = 'set', value = 0},
+    {frame = 1560, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', action = 'set', value = 128},
+    {frame = 1650, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', action = 'set', value = 255},
+    {frame = 1710, port = ':mainpcb:8BADC.2', field = 'AD Stick Y', action = 'set', value = 128},
+    {frame = 1800, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 1860, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'},
+    {frame = 1950, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 1950, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'press'},
+    {frame = 2010, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 2010, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'release'}
+} or input_mode == 'course_preface_left' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 690, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 0},
+    {frame = 700, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 740, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 745, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 800, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 830, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'course_coin2' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 2', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 2', action = 'release'},
+    {frame = 750, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 780, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
+} or input_mode == 'course_preface_right' and {
+    {frame = 650, port = ':mainpcb:IN0', field = 'Coin 1', action = 'press'},
+    {frame = 680, port = ':mainpcb:IN0', field = 'Coin 1', action = 'release'},
+    {frame = 690, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 255},
+    {frame = 700, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'press'},
+    {frame = 740, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
+    {frame = 745, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
+    {frame = 800, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
+    {frame = 830, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
 } or {}
 local next_event = 1
 

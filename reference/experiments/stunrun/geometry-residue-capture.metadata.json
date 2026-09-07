@@ -36,5 +36,60 @@
   },
   "observation": "The repeated drive capture is deterministic and produces a growing masked RAM differential, but no monotonic track cursor or ROM record stride is established by snapshots alone.",
   "confidence": "OBSERVED-IN-TWO-INDEPENDENT-MAME-CAPTURES",
-  "next_question": "Trace writer PCs for persistent residue and pair them with 68010 ROM reads to test sequential versus indexed geometry access."
+  "next_question": "Trace writer PCs for persistent residue and pair them with 68010 ROM reads to test sequential versus indexed geometry access.",
+  "followup_session": {
+    "by": "Agent 2 (Implementer), 2026-09-06",
+    "roms": "stunrun.7z extracted to a private staging dir outside the repo; tools/check-roms: romset stunrun is good (MAME 0.289)",
+    "repeatability": "title-600 and drive-1800 snapshot hashes reproduced bit-for-bit from the prior session (b90ce2e2 / ed79052b); independent A/B replicas within this session also identical; frame-600 values identical across input schedules (snapshot hash covers the input label, values do not differ)",
+    "mask_note": "analysis/known-regions.json was briefly overwritten with a 3-region subset mid-session and restored from git; all chain outputs below use the restored committed mask (explained=4, tracked=29, residue=2956 in 599 ranges)",
+    "series": {
+      "fine_drive_60frame": "/tmp/geom-fine (late_drive, 600-1800 step 60, 21 snapshots; endpoint reproduces ed79052b)",
+      "kill_criterion_late": "/tmp/geom-late (input late: coin+start, no steer/button; gameplay state diverges after frame 900)"
+    },
+    "write_trace": {
+      "result": "/tmp/geom-trace/result.json (local only)",
+      "window": "0xFF9500-0xFF9C00, frames 1280-1420, late_drive",
+      "events": 16219,
+      "truncated": false
+    },
+    "classifier_chain": "mask -> temporal(coarse 5-frame + fine 21-frame) -> adjacency -> shape -> width -> modes(drive vs empty title-control) -> writers; title-control residue is empty",
+    "findings": [
+      "twin buffers: 15 residue ranges form identical pairs at +0x300 stride (e.g. 0xFF9609<->0xFF9909 len 258, 0xFF97A0<->0xFF9AA0 len 177); uploads are staged plateaus (stable 600-1260, transition ~1300, new plateau) with both copies moving in lockstep",
+      "disjoint writer-PC groups: base copy <- {0x296EA,0x29786,0x29820,0x29878,0x298B4,0x29980,0x299BA}; twin copy <- {0x29708,0x29794,0x2986E,0x29914,0x29930}; base-copy writers never touch the twin copy and vice versa",
+      "upload is input-coupled: the ~1300 transition occurs under late_drive but twin cells never change under input late",
+      "kill criterion FIRED for cursor candidates: 0xFF8016 (+4861), 0xFF9492 (+1214, exactly 1/frame), 0xFFDB38 (+4861/+4867) advance identically with and without drive inputs, so all three are clock-driven, not distance cursors; 0xFF8016 and 0xFFDB38 move in lockstep (identical deltas)",
+      "no monotonic word at 60-frame granularity beyond those three clock-driven words"
+    ],
+    "rom_read_trace": {
+      "result": "/tmp/geom-romread/result.json (local only)",
+      "tool": "tools/mame-rom-read-trace (peer-agent work, untracked at time of run)",
+      "pc_range": "0x29600-0x29A00",
+      "window": "frames 1260-1340, late_drive",
+      "events": 50939,
+      "truncated": false,
+      "fetch_vs_data": "49400+ events are instruction fetches (addr within 16 of PC); 1564 data reads from 12 PCs",
+      "march": "PCs 0x29760/0x2976E read 384 DISTINCT words sequentially from ROM 0x44630-0x4492E (step +2, each word read twice), frames 1286-1288: a sequential march, not indexed jumps",
+      "header": "0x20074=0x0002 (copy count: the two twin copies), 0x20076=0x22DA (meaning unresolved), read ~4 times each by PCs 0x29760-0x29782/0x298C0-0x298C4",
+      "march_head_words": "0x44630: 0x0000, 0x00FF, 0x2A00, 0xD709, 0x0A71, 0xFF73, 0x4200, 0xFF57 (semantics unresolved)"
+    },
+    "perframe_series": {
+      "result": "/tmp/geom-perframe (local only)",
+      "window": "frames 1280-1300 step 1, late_drive, 21 snapshots",
+      "ticks": "0xFF8016 +4/frame rock-steady; 0xFF9492 +1 every 2 frames; 0xFFDB38 stair-steps +15 every 3-4 frames (same mean rate, quantized shadow)",
+      "upload_dynamics": "twin head byte 0xFF9609 holds 104 through 1286 then steps down per frame (74,65,56,47,38...) past 1300: bulk ROM march ends 1288 but per-frame updates continue",
+      "cursor_verdict": "no distance cursor at 1-frame resolution; the three monotonic words are clocks"
+    },
+    "course_select_probes": {
+      "new_modes": ["course_sweep", "course_preface_left", "course_preface_right", "course_coin2"],
+      "coverage": "tests/test_input_modes.py (5 tests, ROM-free)",
+      "result": "ASSUMPTION CONFLICT: course word 0 in every run; nonzero course not reproduced",
+      "negatives": ["8 post-start sweep slots", "pre-start stick-L/R + Button1", "Coin 2", "3600-frame late_drive", "3600-frame coin+start-only (score arc 50-1700 reproduced)"],
+      "boot_trace": "/tmp/geom-courseboot (frames 1-700): only two zero-writes to 0xFF9578 (frame 36 PC 0x21302, frame 362 PC 0x24322)",
+      "mid_trace": "/tmp/geom-coursetrace (frames 2400-2800): zero writes to 0xFF9570-0xFF9580",
+      "untried": ["Service Mode / SW1-DIP course selection", "race completion"],
+      "ioport_probe_2026_09_06": "1P-only: 1 Player Start, P1 Button 1/2, AD Stick X/Y, Coin 1/2, Service Mode, Diagnostic jumper, SW1:1-8; no 2-player start (2P selection ruled out)"
+    },
+    "confidence": "OBSERVED-IN-TRACE (this session, determinism cross-checked against prior session hashes)",
+    "artifacts_local_only": ["/tmp/geom-title-a", "/tmp/geom-title-b", "/tmp/geom-drive-a", "/tmp/geom-drive-b", "/tmp/geom-series", "/tmp/geom-fine", "/tmp/geom-late", "/tmp/geom-trace", "/tmp/geom-masked", "/tmp/geom-control", "/tmp/geom-temporal", "/tmp/geom-fine-temporal", "/tmp/geom-adjacency", "/tmp/geom-shape", "/tmp/geom-width", "/tmp/geom-modes", "/tmp/geom-writers"]
+  }
 }

@@ -321,15 +321,18 @@ matches the earlier scoring evidence). A boot-window write trace
 (frames 1–700) shows the only course writes anywhere: two zero-writes
 (frame 36 PC `0x21302`, frame 362 PC `0x24322`); a 2400–2800 trace shows
 zero writes. No snapshot in any run this session shows a nonzero course
-word. Side observation: the sweep run scores (300→1100, mixed 50/500
-awards) while course stays 0, so the 500-award selection fired with a
-zero course word in that regime — the "nonzero" precondition from the
-earlier trace does not generalize, or the selection reads a different
-state there. The frozen "values 3 and 6" claim in
+word. Side observation: the sweep run's score climbs 0→300→500→650→750→1100
+in steps that are all multiples of 50 and below 500, consistent with
+pure +50 low awards under course 0 — supporting the selection model
+rather than contradicting it. The frozen "values 3 and 6" claim in
 `reproduction/maincpu/score.h` now carries a provenance-gap caveat.
 Status: ASSUMPTION CONFLICT — the course-3/course-6 differential is
-blocked until a schedule reproduces a nonzero course word. Candidates
-untried: 2-player start, service-mode/DSW selection, race completion.
+blocked until a schedule reproduces a nonzero course word. A live
+ioport probe (2026-09-06) shows 1P-only inputs: 1 Player Start, P1
+Buttons 1/2, AD Stick X/Y, Coin 1/2, Service Mode, Diagnostic jumper,
+SW1:1–8 — no 2-player start exists, so 2P selection is off the table.
+Candidates untried: Service Mode / SW1-DIP course selection,
+race completion.
 
 ### Why it matters
 

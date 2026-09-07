@@ -46,7 +46,10 @@ extern "C" {
 #define STUNRUN_SCORE_AWARD_LOW 0x32u
 #define STUNRUN_SCORE_AWARD_HIGH 0x1F4u
 
-/* Observed course-index values (selection input domain). */
+/* Claimed course-index values (selection input domain). Provenance gap
+ * recorded 2026-09-06: no live MAME run this session reproduced a nonzero
+ * course word (see QUESTIONS.md IRQ-0005); the nonzero=>500 selection
+ * behavior itself is OBSERVED-IN-TRACE. */
 #define STUNRUN_SCORE_COURSE_ZERO 0u
 #define STUNRUN_SCORE_COURSE_A 3u
 #define STUNRUN_SCORE_COURSE_B 6u
