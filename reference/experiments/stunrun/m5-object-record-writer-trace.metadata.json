@@ -55,6 +55,14 @@
     "entry_counts": {"0x02B7E8": 204, "0x02F470": 204, "0x03CF40": 3848, "0x03D120": 3852, "0x03D1A0": 3853, "0x03E5C4": 0, "0x03E51C": 0, "0x03E3FC": 0},
     "interpretation": "The common FIFO primitive executes through caller 0x02B7E8, while the candidate 0x03E5C4/0x03E51C/0x03E3FC record-consumer path remains unobserved."
   },
+  "saved_state_long_instruction_trace": {
+    "path": "/tmp/stunrun-m5-object-instr-state-long/maincpu-68010.trace",
+    "sha256": "89b62658c80f672f82332650fb094f501ab16b708ce313b35b2d36b007435728",
+    "saved_state": "/tmp/stunrun-latedrive1200.sta",
+    "relative_frames": [600, 1800],
+    "entry_counts": {"0x02B7E8": 0, "0x02F470": 0, "0x03CF40": 2757, "0x03D120": 2761, "0x03D1A0": 2767, "0x03E5C4": 0, "0x03E51C": 0, "0x03E3FC": 0},
+    "interpretation": "The frame-1200 saved state remains on the object updater path through relative frame 1800; the candidate consumer branch is not selected."
+  },
   "interpretation": "The short current fork has initialization writes only; it does not exercise the later transition.",
   "extended_transition": {
     "window": {"base": "0xFFDD80", "end": "0xFFDDA0"},

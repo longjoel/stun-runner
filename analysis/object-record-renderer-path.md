@@ -124,3 +124,15 @@ The later-checkpoint trace is
 The reset-to-`late_drive` trace is
 `/tmp/stunrun-m5-late-instr/maincpu-68010.trace` with SHA-256
 `992037d9b7b5a71160b9740bdca8ddf43b5954d91d0f54bb4c9d7fd32188c827`.
+
+The saved-state trace then extended the frame-1200 checkpoint through
+relative frames 600–1800. It observed 2,757 calls to `0x03CF40`, 2,761
+entries to `0x03D120`, and 2,767 to `0x03D1A0`, with zero entries to
+`0x02B7E8`, `0x02F470`, `0x03E5C4`, `0x03E51C`, or `0x03E3FC`. This is a
+bounded negative: running longer from this checkpoint does not select the
+candidate consumer branch. The next search belongs at reset/start or a
+specific event transition.
+
+The long trace is
+`/tmp/stunrun-m5-object-instr-state-long/maincpu-68010.trace` with SHA-256
+`89b62658c80f672f82332650fb094f501ab16b708ce313b35b2d36b007435728`.
