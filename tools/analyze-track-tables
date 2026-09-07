@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""Summarize observed S.T.U.N. Runner ROM track-table slots without dumping ROM bytes."""
+
+import argparse
+import hashlib
+import json
+import pathlib
+
+
+DEFAULT_BASES = (0x44630, 0x44930, 0x45230, 0x45530)
+TABLE_BYTES = 0x300
+
+
+def contiguous_ranges(indices: list[int]) -> list[str]:
+    if not indices:
+        return []
+    ranges = []
+    start = previous = indices[0]
+    for value in indices[1:]:
+        if value != previous + 1:
+            ranges.append(f"{start}-{previous}")
+            start = value
+        previous = value
+    ranges.append(f"{start}-{previous}")
+    return ranges
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rompath", type=pathlib.Path,
+                        help="directory containing the validated stunrun ROM set")
+    parser.add_argument("--manifest", type=pathlib.Path,
+                        default=pathlib.Path("roms/stunrun.manifest.json"))
+    parser.add_argument("--base", action="append", type=lambda value: int(value, 0),
+                        help="384-word table base; repeatable (defaults to four observed slots)")
+    parser.add_argument("--output", type=pathlib.Path,
+                        help="write the summary JSON here instead of stdout")
+    args = parser.parse_args()
+
+    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    bases = args.base or list(DEFAULT_BASES)
+    files = [item for item in manifest["roms"] if item["region"] == "mainpcb:maincpu"]
+    if not files:
+        raise SystemExit("manifest has no mainpcb:maincpu ROM files")
+    region_size = max(item["offset"] + 2 * item["size"] for item in files)
+    region = bytearray(region_size)
+    occupied = bytearray(region_size)
+    rom_root = args.rompath / "stunrun"
+    for item in files:
+        data = (rom_root / item["filename"]).read_bytes()
+        if len(data) != item["size"]:
+            raise SystemExit(f"size mismatch for {item['filename']}")
+        offset = item["offset"]
+        for index, value in enumerate(data):
+            address = offset + 2 * index
+            if occupied[address]:
+                raise SystemExit(f"overlapping main CPU ROM placement at 0x{address:X}")
+            region[address] = value
+            occupied[address] = 1
+
+    tables = {}
+    for base in bases:
+        end = base + TABLE_BYTES
+        if end > len(region) or not all(occupied[base:end]):
+            raise SystemExit(f"table range 0x{base:X}-0x{end - 1:X} is not fully mapped")
+        payload = bytes(region[base:end])
+        tables[base] = [int.from_bytes(payload[index:index + 2], "big")
+                        for index in range(0, TABLE_BYTES, 2)]
+
+    first = tables[bases[0]]
+    common = [index for index in range(len(first))
+              if all(tables[base][index] == first[index] for base in bases[1:])]
+    result = {
+        "schema": "stunrun-track-table-analysis/v1",
+        "manifest": str(args.manifest),
+        "rompath": str(args.rompath),
+        "table_word_count": TABLE_BYTES // 2,
+        "table_bases": [f"0x{base:05X}" for base in bases],
+        "slots": {
+            f"0x{base:05X}": {
+                "sha256": hashlib.sha256(bytes(region[base:base + TABLE_BYTES])).hexdigest(),
+                "block_sha256_48_words": [
+                    hashlib.sha256(bytes(region[base + offset:base + offset + 0x60])).hexdigest()
+                    for offset in range(0, TABLE_BYTES, 0x60)
+                ],
+            }
+            for base in bases
+        },
+        "common_word_ranges": contiguous_ranges(common),
+        "common_word_count": len(common),
+        "variable_word_ranges": contiguous_ranges(
+            [index for index in range(len(first)) if index not in set(common)]),
+    }
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
