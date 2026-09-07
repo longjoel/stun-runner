@@ -47,6 +47,33 @@
     "course_0_extra_prefix_differences": [24, 27],
     "interpretation": "common header/prefix plus a 96-word slot-specific payload plus a common 240-word suffix; semantic field assignments remain unknown"
   },
+  "ram_snapshot_slot_matches": [
+    {
+      "frames": [1200, 4200],
+      "course_word": 10,
+      "matching_slot": "0x045530",
+      "exact_word_range": "0-359",
+      "tail_word_range": "360-383",
+      "representative_buffer_sha256": "dc9bff8d2c67480f9a147d32baac534a95928b30ff89338a5c3846d5fcffe5f9"
+    },
+    {
+      "frames": [5400, 7800],
+      "course_word": 11,
+      "matching_slot": "0x045230",
+      "exact_word_range": "0-359",
+      "tail_word_range": "360-383",
+      "representative_buffer_sha256": "57e1cbddb98d73fa9a53f1a422609fc793250206702d67fceeaf4ef0020d4e17"
+    },
+    {
+      "frames": [9000, 12600],
+      "course_word": 12,
+      "matching_slot": "0x044630",
+      "exact_word_range": "0-359",
+      "tail_word_range": "360-383",
+      "representative_buffer_sha256": "2b26947b005f5b5c8d211bf024386b343b2934f8791ec70542f9a2812511026e"
+    }
+  ],
+  "in_flight_transition_frames": [4800, 8400, 13200],
   "filter": "--pc-range 0x0-0x50000 with --address-range covering each known 0x300-byte slot",
   "observation": "The first course-10 table load is reproducible, but the later transition windows do not show reads from any known table slot under a broad PC filter. This does not invalidate the RAM-derived course-to-slot map; it leaves the later loader path or replay timing unresolved.",
   "confidence": "POSITIVE-CONTROL-OBSERVED; LATER-WINDOW-NEGATIVE-OBSERVED"

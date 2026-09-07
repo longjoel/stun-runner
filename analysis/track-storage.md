@@ -77,6 +77,20 @@ followed by a bounded runtime tail update; it is not evidence that the whole
 RAM buffer is a permanently direct ROM image. The tail's field meaning and
 writer remain unresolved.
 
+The longer recorded race shows the same mechanism across transitions. Stable
+snapshots match these source slots through word 359:
+
+| Recorded frame range | RAM course word | Matching ROM slot | Tail status |
+| ---: | ---: | ---: | --- |
+| 1200–4200 | 10 | `0x045530` | words 360–383 differ |
+| 5400–7800 | 11 | `0x045230` | words 360–383 differ |
+| 9000–12600 | 12 | `0x044630` | words 360–383 differ |
+
+Snapshots at frames 4800, 8400, and 13200 are transition/in-flight states and
+do not match a complete slot. This explains why a narrow ROM-read trace around
+the nominal transition frame can miss the load: the useful source identity is
+more reliably recovered from the settled RAM buffer immediately afterward.
+
 The reusable snapshot workflow is:
 
 1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.
