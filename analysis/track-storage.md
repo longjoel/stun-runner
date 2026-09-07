@@ -149,6 +149,12 @@ different word ranges, buffer hashes, and base/twin differences without
 printing buffer contents. This makes settled-versus-in-flight classification
 repeatable from ordinary `stunrun-memory-snapshot/v1` artifacts.
 
+The companion `tools/diff-memory-snapshot` confirms the transition boundary in
+the same recording: the track window changes by 0 bytes from frames 1200→1800,
+by 1,221 bytes from 4800→5400, and by 182 bytes from 8400→9000. The first is
+a stable roadway interval; the latter two are transition updates affecting
+the base/twin storage, not merely a course-word display change.
+
 The reusable snapshot workflow is:
 
 1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.
