@@ -77,6 +77,12 @@ window. The result is retained as a MAME instrumentation boundary: the region
 may be device-consumed or write-only from this space, and the negative result
 does not invalidate the direct write trace.
 
+Exact-race snapshots of both downstream families show 232/256 base words and
+190/256 twin words changing from 1280→1290, with neither changing from
+1290→1300. At frame 1290 the downstream values are not raw work-buffer copies:
+only 24 base and 66 twin positions match. The `MOVE …,1` lane/device
+transformation therefore remains an explicit UNKNOWN boundary.
+
 The 256-word sequential copy is now represented by
 `stunrun_gsp_display_copy()` in the dependency-free C slice. Base and twin
 callers provide separate source arrays; the function copies exactly the

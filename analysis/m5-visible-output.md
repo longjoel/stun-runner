@@ -311,3 +311,7 @@ input for the next producer/consumer correlation step.
 The ordinary GSP read tap observes no readback from the first downstream copy
 destination, so that address family remains a device-boundary observation
 rather than a directly sampled visible framebuffer.
+
+The exact-race downstream snapshots confirm synchronized updates but show that
+the destination values are transformed rather than raw work-buffer copies.
+This is the next format-recovery target; no pixel interpretation is promoted.
