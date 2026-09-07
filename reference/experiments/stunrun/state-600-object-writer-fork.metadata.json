@@ -1,0 +1,31 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "state_600_object_writer_fork",
+  "tools": ["tools/mame-ram-write-trace"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/race/state-600.sta",
+    "sha256": "c6b812558a4859a91937805da2224910a820be06d9d2d742332dfeb4153c73eb",
+    "description": "recorded-race gameplay checkpoint at source frame 600; local artifact, not committed"
+  },
+  "trace": {
+    "range": "0xFFDD00–0xFFDDFF",
+    "relative_frames": [10, 300],
+    "inputs": ["fork_hold_left", "fork_hold_right"],
+    "left_result_sha256": "5a0deca203c6914b5ef51453276d8a85c32d5a040ef3194769918960aeb352ac",
+    "right_result_sha256": "44ee12a65ce6209e86b9ef0369ea7bceaef94175f517f98f5bb97f14f5ae6e38",
+    "event_count_each": 8867,
+    "writer_pcs_union": [
+      "0x03CFCC", "0x03D002", "0x03D18C", "0x03D18E", "0x03D192",
+      "0x03D1B2", "0x03D20E", "0x03D212", "0x03D218", "0x03D21C",
+      "0x03D224", "0x03D22A", "0x03D238", "0x03D294", "0x03D298",
+      "0x03D29C", "0x03D2A0", "0x03D2A8", "0x03D2AC"
+    ],
+    "left_only_writer_pcs": ["0x03D238", "0x03D294", "0x03D298", "0x03D29C"],
+    "right_only_writer_pcs": []
+  },
+  "observation": "Both relative forks produce the same high-volume 16-byte object-record update pipeline and identical event count. Steering selects different interpolation destinations near 0xFFDD8C versus 0xFFDD90 and changes the participating writer subset, but this remains object/animation state rather than evidence of armor, weapon, ammunition, or spawn-table ownership.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + SAME-STATE-FORK-WRITER-TRACE",
+  "caveat": "The save state and raw trace logs are local artifacts and depend on the pinned MAME build and validated ROM set."
+}
