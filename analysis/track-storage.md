@@ -130,7 +130,9 @@ name: in the long race, settled course buffers have `0xFF954E = 1` and
 (`0x0005/0x001A` at frame 4800 and `0x008A/0x0017` at frame 8400). Those
 transition buffers are also the snapshots that fail to match a complete ROM
 slot. The values are useful selectors for future experiments, not proof that
-`0xFF9550` is a particular gameplay mode.
+`0xFF9550` is a particular gameplay mode. Static XREFs show that `0xFF9550`
+is a broader game-state dispatch latch; its involvement in the road transform
+is one consumer of a shared state machine.
 
 The byte arithmetic is now represented literally in
 `reproduction/maincpu/road_buffer_math.c`. It is a standalone slice rather than
