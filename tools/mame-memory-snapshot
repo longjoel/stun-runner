@@ -32,6 +32,8 @@ def main() -> int:
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--save-state", type=pathlib.Path, help="save a MAME state at the final requested frame")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
+    parser.add_argument("--playback", type=pathlib.Path,
+                        help="replay a recorded .inp instead of scripted inputs")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
     if args.frames <= 0 or args.count <= 0 or args.base < 0 or args.address_stride <= 0:
@@ -51,10 +53,26 @@ def main() -> int:
         slot_directory.mkdir()
         shutil.copy2(args.load_state, slot_directory / "1.sta")
         state_directory = str(state_stage)
+    if args.load_state and args.playback:
+        parser.error("--load-state and --playback are mutually exclusive")
+    playback = None
+    if args.playback:
+        if not args.playback.is_file():
+            raise SystemExit(f"input recording does not exist: {args.playback}")
+        playback = args.playback.resolve()
+        if args.input != "none":
+            parser.error("--playback requires --input none")
+    config_args = ["-noreadconfig", "-nowriteconfig",
+                   "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save"]
+    playback_args = []
+    if playback is not None:
+        config_args = []
+        playback_args = ["-input_directory", str(playback.parent),
+                         "-playback", playback.name]
     command = [
         args.mame, "-rompath", str(args.rompath), "stunrun", "-video", "none",
-        "-sound", "none", "-skip_gameinfo", "-noreadconfig", "-nowriteconfig",
-        "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save",
+        "-sound", "none", "-skip_gameinfo", *config_args,
+        *playback_args,
         "-state_directory", state_directory, "-statename", "%g",
         "-seconds_to_run",
         str(86400 if args.load_state else max(2, (args.frames + 59) // 60 + 1)),
@@ -78,6 +96,7 @@ def main() -> int:
         "STUNRUN_MEMORY_TARGETS": targets,
         "STUNRUN_MEMORY_OUT": str(args.output),
         "STUNRUN_MEMORY_INPUT": args.input,
+        "STUNRUN_MEMORY_PLAYBACK": str(playback) if playback else "",
         "STUNRUN_MEMORY_SAVE_STATE": str(args.save_state) if args.save_state else "",
         # Loading is performed by MAME's command-line state option.  Avoid
         # asking the Lua script to load the same state a second time.
@@ -125,6 +144,7 @@ def main() -> int:
         "width": args.width,
         "address_stride": args.address_stride,
         "input": args.input,
+        "playback": str(playback) if playback else None,
         "save_state": str(args.save_state) if args.save_state else None,
         "load_state": str(args.load_state) if args.load_state else None,
         "returncode": completed.returncode,

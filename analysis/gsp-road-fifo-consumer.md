@@ -84,5 +84,10 @@ covered by `gsp-work-buffer-consumer-slice-c`.
 MAME's native input replay path, and suppresses scripted inputs. This makes
 recorded races reusable for CPU instruction tracing.
 
+`tools/mame-memory-snapshot` now accepts the same `--playback INP` form. A
+real MAME smoke run replayed `/tmp/race/r1.inp` and captured the requested GSP
+range at frame 30, so exact recorded input can now drive both instruction
+traces and memory snapshots.
+
 The provenance record is
 `reference/experiments/stunrun/m5-gsp-road-fifo-consumer.metadata.json`.

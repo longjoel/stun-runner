@@ -291,6 +291,11 @@ to `0xF5800000–0xF5800FF0`, across the same eight burst frames. This closes a
 work-buffer-to-display-memory transport boundary, but not the display-device
 format or a native game-state producer.
 
+The snapshot harness now supports recorded `.inp` playback as well as the
+instruction-trace wrapper. This permits exact-race GSP/RAM snapshots at the
+same frames used by the consumer traces, without substituting a synthetic
+input schedule.
+
 A fresh build of the integrated native shell was verified through
 `tools/run-native-visible-bridge` using the captured VRAM/palette fixture. The
 512×240 PPM matched the expected frame exactly: zero changed pixels, zero

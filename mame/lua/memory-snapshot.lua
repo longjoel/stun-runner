@@ -48,6 +48,7 @@ local limit = tonumber(os.getenv('STUNRUN_MEMORY_FRAMES') or '600')
 local target_text = os.getenv('STUNRUN_MEMORY_TARGETS') or tostring(limit)
 local output = assert(os.getenv('STUNRUN_MEMORY_OUT'), 'STUNRUN_MEMORY_OUT is required')
 local input_mode = os.getenv('STUNRUN_MEMORY_INPUT') or 'none'
+local playback = os.getenv('STUNRUN_MEMORY_PLAYBACK') or ''
 local save_state_path = os.getenv('STUNRUN_MEMORY_SAVE_STATE') or ''
 local load_state_path = os.getenv('STUNRUN_MEMORY_LOAD_STATE') or ''
 local frame = 0
@@ -65,7 +66,7 @@ local device = assert(machine.devices[device_tag], 'unknown device: ' .. device_
 local space = assert(device.spaces[space_name], 'unknown space: ' .. space_name)
 local reader = width == 8 and space.read_u8 or width == 16 and space.read_u16 or space.read_u32
 
-local events = input_mode == 'fork_button2_sweep' and {
+local events = playback ~= '' and {} or (input_mode == 'fork_button2_sweep' and {
     {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
     {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 1', action = 'release'},
     {frame = 2, port = ':mainpcb:a80000', field = 'P1 Button 2', action = 'press'},
@@ -285,7 +286,7 @@ local events = input_mode == 'fork_button2_sweep' and {
     {frame = 745, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
     {frame = 800, port = ':mainpcb:a80000', field = '1 Player Start', action = 'press'},
     {frame = 830, port = ':mainpcb:a80000', field = '1 Player Start', action = 'release'}
-} or {}
+} or {})
 local next_event = 1
 
 local function apply_event(event)

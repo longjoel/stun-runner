@@ -103,6 +103,13 @@ class InputModeTests(unittest.TestCase):
                               capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
+    def test_snapshot_supports_recorded_playback(self):
+        wrapper = WRAPPER.read_text(encoding="utf-8")
+        lua = LUA.read_text(encoding="utf-8")
+        self.assertIn('"--playback"', wrapper)
+        self.assertIn("STUNRUN_MEMORY_PLAYBACK", wrapper)
+        self.assertIn("playback ~= ''", lua)
+
 
 if __name__ == "__main__":
     unittest.main()
