@@ -117,6 +117,13 @@ exercise the identity case. The static caller at `0x02446C` visibly pushes
 `1` as that loader's divisor argument before calling `0x0296AA`; other callers
 must not be assumed to use the same value without a corresponding trace.
 
+The same state machine uses `0xFF954E` as a countdown gate: for example,
+`0x02991C` decrements it and calls the subtract loop while it remains nonzero,
+while `0x029ADE` decrements it and calls the add loop. The startup path loads
+`0x78` there before entering the roadway path. This is a transform/ramp timer
+candidate, not the separately established HUD time-remaining field at
+`0xFF9568–0xFF956B`.
+
 The byte arithmetic is now represented literally in
 `reproduction/maincpu/road_buffer_math.c`. It is a standalone slice rather than
 part of the fixture shell: the shell's captured geometry input represents a
