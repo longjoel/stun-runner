@@ -97,6 +97,26 @@
     },
     "interpretation": "The table-copy writers and the later base-only tail animation writer are distinct PCs; the repeated tail values descend during the observed update pass."
   },
+  "full_buffer_transform_traces": {
+    "subtract": {
+      "pc": "0x0298C0",
+      "frames": [954, 955, 957, 958, 960, 962, 964, 967],
+      "events": 5376,
+      "base_window": "0xFF9584-0xFF9882",
+      "twin_events": 0,
+      "canonical_log_sha256": "64aec42771fff1d0fc90c3f605dc8154e22b157056334b232fc0ceb9b227e3b1",
+      "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-transform-full-c10 --device :mainpcb:maincpu --base 0xFF9584 --end 0xFF9B83 --frames 1000 --start-frame 900 --end-frame 1000 --tap-frame 1 --pc 0x298C0 --max-events 10000 --playback /tmp/race2/r2.inp --nothrottle"
+    },
+    "add": {
+      "pc": "0x0298FA",
+      "frames": [1347, 1348, 1351, 1352, 1355, 1358, 1361, 1364],
+      "events": 5376,
+      "base_window": "0xFF9584-0xFF9882",
+      "twin_events": 0,
+      "canonical_log_sha256": "1c33825547bebe79c735fab8f6d1711429bbce3bb6654dea50e928daa2ff1cba",
+      "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-transform-full-add-latedrive --device :mainpcb:maincpu --base 0xFF9584 --end 0xFF9B83 --frames 1400 --start-frame 1340 --end-frame 1370 --tap-frame 1 --pc 0x298FA --max-events 10000 --input late_drive --nothrottle"
+    }
+  },
   "static_mechanism": {
     "listing": "/tmp/stunrun-listing-ff9578/maincpu-68010.lst",
     "copy_loop": "0x029760 copies raw source bytes to the base; 0x02977E divides each source byte by the parameter at frame-local A6+0x17 before storing to the twin",

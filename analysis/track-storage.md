@@ -118,6 +118,13 @@ performs `base[i] = base[i] + twin[i]`. Thus the trace sees only the tail
 because that was the selected address window; the animation routines are not
 tail-only routines.
 
+Full-window write taps make the ownership unambiguous. During the course-10
+replay, `0x0298C0` produced 5,376 lane events over the complete base window
+(`0xFF9584–0xFF9882`) and zero writes in the twin window; the paired
+`0x0298FA` pass produced the same 5,376/zero-twin shape. Each is therefore a
+repeated full-buffer base transform, with the apparent tail ramp caused by the
+selected bytes' values rather than by a tail-specific writer.
+
 The table-copy listing also shows that the base loop copies raw source bytes,
 while the twin loop divides each source byte by a stack parameter before
 storing it. In the settled race snapshots that parameter is `1` at
