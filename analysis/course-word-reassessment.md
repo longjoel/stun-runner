@@ -32,6 +32,28 @@ of the field during frames 600–900, and `sw1_all_on` read `0xFF9578` as zero
 while changing only the adjacent `0xFF957A` input-state word. See
 `reference/experiments/stunrun/course-flag-config-matrix.metadata.json`.
 
+## Static follow-up on the separate word
+
+The fresh 68010 listing shows that `0xFF9578` is not merely an untouched
+configuration byte. It is a persistent state/index word with several
+executable writers:
+
+| Writer | Mechanism | Evidence-backed implication |
+| ---: | --- | --- |
+| `0x02B63E` | stores a byte selected from ROM table `0x0473CA`, indexed by `0xFF9B88` | state is initialized from a ROM-driven selector |
+| `0x0252EC` | increments the word after the state/score presentation path | state advances during a transition |
+| `0x02572C`, `0x02577A`, `0x0257C8`, `0x025814` | stores `0x000F`, `0x000D`, `0x000C`, or `0x0004` and mirrors the value to `0xFF9556` | explicit state branches select different content/configuration |
+| `0x0320BC` | increments it while adding an entry from ROM table `0x04AF7E` to the score accumulator | state controls a progression/award sequence |
+| `0x0320FA`, `0x032104` | remaps state `8` to `12` and state `11` to `17` under object/event flags | later progression states are normalized explicitly |
+
+The state is also used as an index into ROM tables at `0x047406`, `0x048180`,
+and `0x048068` in the `0x0249EC–0x024B36` path. This makes `0xFF9578` a
+strong course/mode/progression candidate, but does not by itself prove that
+its value is the displayed track number. The current late-drive writer trace
+still observed only zero-valued writes at `0x021302`, `0x024322`, `0x02B63E`,
+and `0x02B95E`; reaching the nonzero branches requires a new gameplay
+transition or a save state taken there.
+
 Evidence: `reference/experiments/stunrun/course-word-reader-trace.metadata.json`,
 `/tmp/stunrun-course-read-long/result.json`, and the main-CPU listing around
 `0x02B1D0` and `0x02BA68`.

@@ -100,8 +100,8 @@
       "last": "0xFF9579",
       "category": "static-candidate",
       "provenance": "analysis/ram-map.md",
-      "confidence": "STATIC-CANDIDATE",
-      "note": "Distinct word tested by the object-award path; nonzero transition remains unobserved."
+      "confidence": "STATIC-STRONG-CANDIDATE",
+      "note": "Distinct state/index word tested by the object-award path; writers at 0x0252EC, 0x02572C/0x02577A/0x0257C8/0x025814, 0x02B63E, and 0x0320BC/0x0320FA/0x032104 select progression values, but nonzero transition remains unobserved."
     },
     {
       "label": "input-state-word",
