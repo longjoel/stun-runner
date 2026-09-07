@@ -247,6 +247,33 @@ Save states are local regenerable artifacts and must carry the ROM/MAME,
 experiment schedule, capture frame, and checkpoint hashes in metadata before
 being used as canonical evidence.
 
+### Human-play capture
+
+When a deterministic input schedule cannot yet reach a gameplay transition,
+`tools/mame-play-capture` provides a bounded, real-time capture session. It
+records course/score changes, periodic full work-RAM snapshots, and matching
+MAME save states without injecting scripted inputs:
+
+```text
+tools/mame-play-capture /tmp/stunrun-roms-system /tmp/stunrun-human-run \
+  --frames 21600 --every 600 --clean-cfg
+```
+
+The operator can close the window after the relevant transition; use
+`--frames 0` for a manually terminated session. A captured `state-N.sta` can
+then seed the existing relative-frame tools, for example:
+
+```text
+tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-fork \
+  --device :mainpcb:maincpu --base 0xff8000 --count 0x80000 \
+  --frames 300 --targets 2,60,300 --load-state /tmp/stunrun-human-run/state-N.sta \
+  --input none --nothrottle
+```
+
+The capture directory is evidence staging, not a canonical fixture by
+itself. Promote a checkpoint only with its ROM/MAME identity, capture frame,
+screen/event observation, and hashes recorded in experiment metadata.
+
 Writer traces can use the same saved checkpoints with
 `tools/mame-ram-write-trace --load-state STATE`; the trace frame range is then
 relative to the loaded state and the tool stages the state in an isolated MAME
