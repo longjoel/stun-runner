@@ -67,8 +67,6 @@ def decode(args):
             # occupy one multisync VRAM row.
             row_base = ((y // 4) << 10) & mask
             color_index = (y & 3) << 9
-            first_x = 0
-            last_x = width
         else:
             dpyadr = (dpy_start + y * dpy_step) & 0xffff
             if display["dpyctl"] & 0x0400:
@@ -80,15 +78,14 @@ def decode(args):
             color_index = ((yoffset << 9) + ((coladdr & 0xff) << 3)
                            - 7 + (fine & 7))
             row_base = (rowaddr << 10) & mask
-            first_x = heblnk
-            last_x = min(width, hsblnk)
-        for output_x in range(first_x, last_x):
-            source_x = output_x if args.visible_layout else output_x - first_x
+        for destination_x in range(width):
+            if not args.visible_layout and heblnk + destination_x >= hsblnk:
+                break
+            source_x = destination_x
             index = (color_index + source_x) & 0x7ff
             word = vram[(row_base + (index >> 1)) & mask]
             color = (word >> 8) & 0xff if index & 1 else word & 0xff
             r, g, b = colors[color]
-            destination_x = output_x if args.visible_layout else source_x
             offset = (y * width + destination_x) * 3
             pixel_data[offset:offset + 3] = bytes((r, g, b))
     args.output.write_bytes(

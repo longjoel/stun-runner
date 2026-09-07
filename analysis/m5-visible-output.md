@@ -100,8 +100,8 @@ pixel-equivalent yet. With the frame-600 captures and explicit
 
 ```text
 dimensions: 512x240 on both sides
-changed pixels: 60343 / 122880
-mean channel error: 28.99599880642361
+changed pixels: 40806 / 122880
+mean channel error: 10.939640299479167
 ```
 
 This is a useful positive boundary, not an M5 completion claim. The remaining
