@@ -19,22 +19,22 @@ processors:
     type: m68010
     role_hint: main_cpu
     evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
-    canonical_device_tag: null
+    canonical_device_tag: ":mainpcb:maincpu"
   - id: gsp
     type: tms34010
     role_hint: graphics_signal_processor
     evidence: MAME-CONFIRMED plus OBSERVED-IN-TRACE
-    canonical_device_tag: null
+    canonical_device_tag: ":mainpcb:gsp"
   - id: adsp
     type: adsp2100
     role_hint: math_geometry_dsp
     evidence: MAME-CONFIRMED
-    canonical_device_tag: null
+    canonical_device_tag: ":mainpcb:adsp"
   - id: soundcpu
     type: 6502-class
     role_hint: jsa_ii_sound_cpu
     evidence: MAME-CONFIRMED
-    canonical_device_tag: null
+    canonical_device_tag: ":mainpcb:jsa:cpu"
 
 excluded_optional_processors:
   - id: msp
@@ -48,6 +48,13 @@ non_cpu_devices:
     role_hint: pixel_processor_or_expander
     evidence: MAME-CONFIRMED
     software_target: false
+    runtime_inventory_status: not_instantiated_as_separate_device
+    runtime_inventory_evidence: reference/inventory/stunrun.reconciliation.json
+    notes:
+      - The pinned runtime inventory exposes no separate tms34012 device tag.
+      - Treat PSP/expander behavior as board/GSP address-space behavior until a
+        stronger source or handler-level observation identifies an independent
+        device boundary.
   - id: jsa2
     type: atari_jsa_ii
     role_hint: sound_board
