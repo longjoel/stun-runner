@@ -150,3 +150,7 @@ PC `0x0298BE` read the twin for animation while `0x0298C0` read the base.
 This narrows the native producer boundary to base-buffer → FIFO transfer,
 while leaving broader lifetime/scheduling semantics open. Provenance is in
 `reference/experiments/stunrun/m5-road-buffer-consumer-trace.metadata.json`.
+The same read tracer now accepts the recorded race input directly; replaying
+`/tmp/race/r1.inp` captured repeated base-buffer bursts through frame 1293,
+including a split burst across frames 1088–1089. That replay result is in
+`reference/experiments/stunrun/m5-road-buffer-recorded-replay.metadata.json`.

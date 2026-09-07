@@ -1,0 +1,46 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-road-buffer-recorded-replay",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "experiment": {
+    "tool": "tools/mame-ram-read-trace",
+    "command": "tools/mame-ram-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-road-read-playback --base 0xFF9584 --end 0xFF9B83 --frames 1300 --start-frame 850 --end-frame 1300 --max-events 50000 --playback /tmp/race/r1.inp --nothrottle",
+    "recording": "/tmp/race/r1.inp",
+    "window": "0xFF9584-0xFF9B83",
+    "frames": [850, 1300],
+    "roms": "/tmp/stunrun-roms-system"
+  },
+  "result": {
+    "event_count": 41088,
+    "truncated": false,
+    "reader_pcs": ["0x02248E", "0x0298BE", "0x0298C0", "0x0298F8", "0x0298FA"],
+    "pc_counts": {
+      "0x02248E": 8832,
+      "0x0298BE": 10752,
+      "0x0298C0": 10752,
+      "0x0298F8": 5376,
+      "0x0298FA": 5376
+    },
+    "road_consumer_bursts": {
+      "pc": "0x02248E",
+      "full_burst_frames": [1085, 1092, 1096, 1099, 1103, 1106,
+                            1142, 1143, 1145, 1146, 1149, 1152, 1155,
+                            1158, 1162, 1280, 1284, 1287, 1290, 1293],
+      "split_burst_frames": {"1088": 248, "1089": 136},
+      "address_shape": "each complete burst reads 0xFF9584 through 0xFF9882 in ascending 16-bit steps"
+    },
+    "event_stream_sha256": {
+      "0x02248E": "6a2e3edac605e64e336a4edab9fb5025b40d2baa937abcb8ca8bc11824de8463",
+      "0x0298BE": "40e5139d4cd9db91e3a34f2793580b81b4ee4208b1af0eb503c929afb4c3cae9",
+      "0x0298C0": "05dd80a181ffeeb89e82c9012a0217ad4d9868186a874928b71586d1ddb2b035",
+      "0x0298F8": "b514a0be51fe0bc207226a6cffa09706e3c6ebed16420472e343262fa49b7ee4",
+      "0x0298FA": "ff3bfeea9a250a3c74b197295e4eb631cf0be045b832cbe3c98827503a619730"
+    }
+  },
+  "observation": "Recorded input playback produces repeated base-buffer consumer bursts at 0x02248E. The read tracer now supports --playback and records the recording path in its result metadata. The animation reader PCs cover both base and twin windows; this experiment does not assign payload semantics or prove that every FIFO write corresponds one-for-one to a RAM read.",
+  "provenance": {
+    "raw_result": "/tmp/stunrun-m5-road-read-playback/result.json",
+    "raw_log": "/tmp/stunrun-m5-road-read-playback/mame.log"
+  }
+}

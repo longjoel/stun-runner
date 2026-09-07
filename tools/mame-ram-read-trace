@@ -34,6 +34,8 @@ def main() -> int:
     parser.add_argument("--max-events", type=int, default=100000)
     parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "course_sweep", "course_coin2", "service_probe", "sw1_all_on"), default="none")
     parser.add_argument("--load-state", type=pathlib.Path)
+    parser.add_argument("--playback", type=pathlib.Path,
+                        help="replay a recorded .inp with no scripted inputs")
     parser.add_argument("--nothrottle", action="store_true")
     parser.add_argument("--mame", default="mame")
     args = parser.parse_args()
@@ -41,6 +43,15 @@ def main() -> int:
         parser.error("invalid address or frame range")
     if args.load_state and not args.load_state.is_file():
         raise SystemExit(f"save state does not exist: {args.load_state}")
+    if args.load_state and args.playback:
+        parser.error("--load-state and --playback are mutually exclusive")
+    playback = None
+    if args.playback:
+        playback = args.playback.resolve()
+        if not playback.is_file():
+            raise SystemExit(f"missing input recording: {args.playback}")
+        if args.input != "none":
+            parser.error("--playback requires --input none")
     args.output.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
     state_stage = None
@@ -62,6 +73,13 @@ def main() -> int:
     ]
     if args.load_state:
         command += ["-state", "1"]
+    if playback is not None:
+        for flag in ("-noreadconfig", "-nowriteconfig",
+                     "-cfg_directory", "/tmp/stunrun-mame-cfg",
+                     "-nonvram_save"):
+            command.remove(flag)
+        command += ["-input_directory", str(playback.parent),
+                    "-playback", playback.name]
     if args.nothrottle:
         command.insert(command.index("-seconds_to_run"), "-nothrottle")
     environment = {
@@ -96,6 +114,7 @@ def main() -> int:
         "load_state": str(args.load_state) if args.load_state else None,
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,
+        "playback": str(playback) if playback else None,
         "returncode": completed.returncode, "events": events, "event_count": len(events),
         "reader_pcs": sorted({event["pc"] for event in events}),
         "pc_counts": {f"0x{pc:X}": count for pc, count in
