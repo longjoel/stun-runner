@@ -1,0 +1,23 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_object_record_input_differential",
+  "date": "2026-09-07",
+  "target": "stunrun",
+  "purpose": "Test whether early steering forks from one saved live-drive state alter the object-record window or distinguish steering direction.",
+  "mame": "0.289 (mame0289-dirty)",
+  "saved_state": "/tmp/stunrun-latedrive1200.sta",
+  "window": {"base": "0xFFDD00", "bytes": 256, "width": 8},
+  "run": {"frames": 180, "targets": [2, 30, 39, 60, 90, 120, 121, 122, 123, 150, 180], "nothrottle": true},
+  "forks": [
+    {"input": "fork_center", "path": "/tmp/stunrun-m5-object-fork-center", "canonical_log_sha256": "17b03a1d91e0ebf7dc1fdf042f912570d457037fba9a5d5aeaf5d1ecb6ff8fd0", "frame_180_snapshot_sha256": "1833ed119947f650f82b87110d4fb7f974e7bf870a29722b634844e9bb59c54a", "frame_180_nonzero": 49},
+    {"input": "fork_hold_left", "path": "/tmp/stunrun-m5-object-fork-left", "canonical_log_sha256": "e82ca6637264185b54a16a99200c883f472c7a10fb8982fa48c5fd9bb315f6d3", "frame_180_snapshot_sha256": "0a987b250bdeaf1083c5ea5ca59cb58316cbf8d47c6b14fd1ed030c0c6ba7690", "frame_180_nonzero": 49},
+    {"input": "fork_hold_right", "path": "/tmp/stunrun-m5-object-fork-right", "canonical_log_sha256": "1e7a70f84725b8293623e630e0144540bef006a3742f1de2d05f6a93f7b65279", "frame_180_snapshot_sha256": "27714f28031ff498423b327d37fbfd1d299fb55f3f33fe8baca5c5ba0901a7ca", "frame_180_nonzero": 49}
+  ],
+  "comparison": {
+    "fork_snapshots_pairwise_identical": true,
+    "common_sampled_frames": [2, 30, 39, 60, 90, 120, 121, 122, 123, 150, 180],
+    "fork_vs_no_input_frame_2_differing_offsets": [187],
+    "fork_vs_no_input_frame_180_differing_offsets": [96, 130, 132, 134, 136, 138, 144, 155, 160, 170, 176, 187, 192, 209]
+  },
+  "interpretation": "EARLY INPUT-EVENT FORK CHANGES LIFECYCLE; DIRECTIONAL STEERING EFFECT NOT SHOWN. The three fork modes are identical to one another, so this experiment does not establish left/center/right semantics or a position-locked spawn trigger."
+}
