@@ -183,8 +183,19 @@
         "changed_words": {"1280_to_1290": 190, "1290_to_1300": 0}
       }
     },
-    "work_buffer_value_matches_at_1290": {"base": 24, "twin": 66},
-    "interpretation": "The two downstream destination families have synchronized update timing but are not raw word-for-word copies of the sampled work-buffer families; transfer lane/device transformation remains UNKNOWN."
+    "snapshot_cross_run_value_matches_at_1290": {"base": 24, "twin": 66},
+    "snapshot_pairing_caveat": "The source and destination snapshots were captured by separate MAME invocations and are not valid same-event pairs.",
+    "event_level_payload_correlation": {
+      "source_read_result_sha256": "43d5eef6c632c99b66abe02ad032b75d9c9308b7c8ea00723daf6e85a617c92c",
+      "base_source_pc": "0xFFF4AA60",
+      "base_write_result_sha256": "ee40b6f04f4c76823ab29f9d8df9c94adec41bad536d5d8b8b6c3ea947d6bed3",
+      "twin_source_pc": "0xFFF4AAD0",
+      "twin_write_result_sha256": "14bd9830ef9bad3eaf42a76e12d5e7d6c5f6a8226696c58d049249816c5bfb29",
+      "base_value_matches": 2048,
+      "twin_value_matches": 2048,
+      "interpretation": "At the traced event boundary, each source read value equals its corresponding downstream write value; no transfer transformation is promoted."
+    },
+    "interpretation": "The two downstream destination families have synchronized update timing and exact same-event raw-copy payloads. Buffer/device roles and pixel semantics remain UNKNOWN."
   },
   "negative_probe": {
     "gsp_fifo_memory_read_events": 0,

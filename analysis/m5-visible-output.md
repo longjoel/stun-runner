@@ -312,6 +312,8 @@ The ordinary GSP read tap observes no readback from the first downstream copy
 destination, so that address family remains a device-boundary observation
 rather than a directly sampled visible framebuffer.
 
-The exact-race downstream snapshots confirm synchronized updates but show that
-the destination values are transformed rather than raw work-buffer copies.
-This is the next format-recovery target; no pixel interpretation is promoted.
+The exact-race downstream snapshots confirm synchronized updates. Their values
+must not be paired against source snapshots from separate MAME invocations;
+same-event read/write traces show all 2,048 values copied exactly across the
+two passes. Destination device interpretation remains the next format target;
+no pixel interpretation is promoted.
