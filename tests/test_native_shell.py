@@ -14,6 +14,7 @@ import json
 import os
 import pathlib
 import shutil
+import struct
 import subprocess
 import tempfile
 import unittest
@@ -27,6 +28,7 @@ SOUND = ROOT / "reproduction" / "sound"
 SOURCES = [
     str(ROOT / "native" / "shell.c"),
     str(ROOT / "native" / "render.c"),
+    str(ROOT / "native" / "gsp_video.c"),
     str(ROOT / "native" / "checkpoint.c"),
     str(ROOT / "native" / "experiment.c"),
     str(ADSP / "adsp_init_image.c"),
@@ -155,6 +157,27 @@ class NativeShellTests(unittest.TestCase):
             header = b"P6\n512 240\n255\n"
             self.assertTrue(payload.startswith(header))
             self.assertEqual(len(payload), len(header) + 512 * 240 * 3)
+
+    def test_shell_consumes_optional_gsp_video_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = pathlib.Path(directory)
+            binary = self.compile_shell(directory)
+            vram = directory / "vram.bin"
+            palette = directory / "palette.rgb"
+            frame = directory / "gsp-frame.ppm"
+            vram.write_bytes(b"".join(struct.pack("<H", value)
+                                         for value in (0x0101, 0, 0, 0)))
+            palette.write_bytes(bytes(256 * 3))
+            env = dict(os.environ)
+            env["STUNRUN_GSP_VRAM_BIN"] = str(vram)
+            env["STUNRUN_GSP_PALETTE_BIN"] = str(palette)
+            env["STUNRUN_RENDER_PPM"] = str(frame)
+            run = subprocess.run([str(binary)], env=env,
+                                 capture_output=True, text=True, check=False)
+            self.assertEqual(run.returncode, 0,
+                             f"shell failed:\n{run.stdout}")
+            self.assertIn("mode=gsp-visible-state", run.stdout)
+            self.assertTrue(frame.is_file())
 
     def test_shell_refuses_unrunnable_inputs_loudly(self):
         with tempfile.TemporaryDirectory() as directory:

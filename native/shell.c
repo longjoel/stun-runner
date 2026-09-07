@@ -48,6 +48,7 @@
 #include "jsa_latch.h"
 #include "checkpoint.h"
 #include "render.h"
+#include "gsp_video.h"
 
 static int g_failures = 0;
 static unsigned frame = 0;
@@ -247,6 +248,7 @@ static int run_walk(void)
     static uint32_t image[STUNRUN_ADSP_INIT_STATE_WORDS];
     static uint16_t dm[STUNRUN_ADSP_DM_SIZE];
     static stunrun_renderer_t renderer;
+    stunrun_gsp_video_state_t video;
     const char *render_path;
     stunrun_jsa_latches_t latches;
     stunrun_adsp_control_tally_t tally;
@@ -256,10 +258,14 @@ static int run_walk(void)
     const char *counts_state = "skipped";
     size_t emitted;
     unsigned i;
+    const char *gsp_vram_path = getenv("STUNRUN_GSP_VRAM_BIN");
+    const char *gsp_palette_path = getenv("STUNRUN_GSP_PALETTE_BIN");
+    const char *render_mode = "blank-scaffold";
 
     stunrun_jsa_latches_init(&latches);
     stunrun_adsp_control_tally_init(&tally);
     stunrun_render_init(&renderer);
+    stunrun_gsp_video_init(&video);
 
     for (frame = 0; frame <= g_terminal; frame++) {
         dispatch_inputs();
@@ -357,6 +363,24 @@ static int run_walk(void)
     /* Rendering is a deliberately blank native frame boundary until the
      * first visible-output milestone supplies evidence-backed drawing. */
     stunrun_render_begin(&renderer, g_terminal, 0u, 0u, 0u);
+    if ((gsp_vram_path != NULL && gsp_vram_path[0] != '\0') !=
+        (gsp_palette_path != NULL && gsp_palette_path[0] != '\0')) {
+        printf("shell: gsp-video requires both binary paths\n");
+        g_failures++;
+    } else if (gsp_vram_path != NULL && gsp_vram_path[0] != '\0') {
+        if (!stunrun_gsp_video_load(&video, gsp_vram_path,
+                                    gsp_palette_path)) {
+            printf("shell: gsp-video load=error\n");
+            g_failures++;
+        } else if (!stunrun_render_gsp_visible(&renderer, video.vram_words,
+                                                video.vram_word_count,
+                                                video.palette_rgb)) {
+            printf("shell: gsp-video render=error\n");
+            g_failures++;
+        } else {
+            render_mode = "gsp-visible-state";
+        }
+    }
     render_path = getenv("STUNRUN_RENDER_PPM");
     if (render_path != NULL && render_path[0] != '\0') {
         if (!stunrun_render_write_ppm(&renderer, render_path)) {
@@ -366,9 +390,9 @@ static int run_walk(void)
             printf("shell: render-output path=%s status=written\n", render_path);
         }
     }
-    printf("render frame=%u width=%u height=%u hash=0x%08X mode=blank-scaffold\n",
+    printf("render frame=%u width=%u height=%u hash=0x%08X mode=%s\n",
            renderer.frame, STUNRUN_RENDER_WIDTH, STUNRUN_RENDER_HEIGHT,
-           (unsigned)stunrun_render_hash(&renderer));
+           (unsigned)stunrun_render_hash(&renderer), render_mode);
     printf("checkpoint frames=%u time-us=%u events=%u pending=%u "
            "input-active=%u input-hash=0x%08X upload=%s "
            "install_ready=%d control=%s counts=%s nmi=%d irq4=%d\n",
@@ -381,6 +405,7 @@ static int run_walk(void)
            latches.nmi_asserted ? 1 : 0,
            latches.irq4_asserted ? 1 : 0);
     emit_model_checkpoint(image, STUNRUN_ADSP_INIT_STATE_WORDS);
+    stunrun_gsp_video_free(&video);
     if (g_failures == 0)
         printf("RESULT PASS\n");
     else

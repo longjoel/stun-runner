@@ -1,5 +1,6 @@
 import json
 import pathlib
+import struct
 import subprocess
 import tempfile
 import unittest
@@ -110,6 +111,28 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn("STUNRUN_GSP_STATE_SCREEN", lua)
         self.assertIn("screen:snapshot", lua)
         self.assertIn("fine_scroll", lua)
+
+    def test_export_gsp_native_state_writes_little_endian_fixture(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            common = {
+                "schema": "stunrun-memory-snapshot/v1",
+                "device": ":mainpcb:gsp", "space": "program",
+                "base": 0, "count": 4, "width": 16,
+            }
+            vram = temp / "vram.json"
+            lo = temp / "lo.json"
+            hi = temp / "hi.json"
+            vram.write_text(json.dumps({**common, "values": [1, 0x2345, 3, 4]}), encoding="utf-8")
+            lo.write_text(json.dumps({**common, "values": [0x1000] * 256}), encoding="utf-8")
+            hi.write_text(json.dumps({**common, "values": [0x0020] * 256}), encoding="utf-8")
+            vram_out = temp / "vram.bin"
+            palette_out = temp / "palette.rgb"
+            self.run_tool("export-gsp-native-state", vram, lo, hi,
+                          "--vram-out", vram_out, "--palette-out", palette_out)
+            self.assertEqual(vram_out.read_bytes(), b"".join(
+                struct.pack("<H", value) for value in (1, 0x2345, 3, 4)))
+            self.assertEqual(palette_out.read_bytes(), bytes([0x10, 0, 0x20]) * 256)
 
     def test_analyze_memory_candidates_ranks_persistent_diffs(self):
         with tempfile.TemporaryDirectory() as temp:

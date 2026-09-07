@@ -56,6 +56,7 @@ add_test(NAME jsa-latch-slice-c COMMAND stunrun-jsa-latch-slice-test)
 add_executable(stunrun-native-shell
   shell.c
   render.c
+  gsp_video.c
   checkpoint.c
   experiment.c
   ../reproduction/adsp/adsp_init_image.c
@@ -70,6 +71,9 @@ add_test(NAME native-shell COMMAND stunrun-native-shell)
 add_executable(stunrun-render-test render.c render_test.c)
 set_target_properties(stunrun-render-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-render-boundary-c COMMAND stunrun-render-test)
+add_executable(stunrun-gsp-video-test gsp_video.c gsp_video_test.c)
+set_target_properties(stunrun-gsp-video-test PROPERTIES C_STANDARD 99)
+add_test(NAME native-gsp-video-boundary-c COMMAND stunrun-gsp-video-test)
 # arcade-experiment/v1 parser self-check (valid, corrupt, and schema-
 # violating fixtures; no ROMs or MAME involved).
 add_executable(stunrun-experiment-parser-test

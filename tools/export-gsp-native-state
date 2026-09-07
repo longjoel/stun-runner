@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Export captured GSP word/palette snapshots for the native video bridge."""
+
+import argparse
+import json
+import pathlib
+import struct
+
+
+def snapshot(path):
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schema") != "stunrun-memory-snapshot/v1":
+        raise SystemExit(f"{path}: expected a memory snapshot")
+    return value["values"]
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("vram", type=pathlib.Path)
+    parser.add_argument("palette_lo", type=pathlib.Path)
+    parser.add_argument("palette_hi", type=pathlib.Path)
+    parser.add_argument("--vram-out", type=pathlib.Path, required=True)
+    parser.add_argument("--palette-out", type=pathlib.Path, required=True)
+    args = parser.parse_args()
+    words = snapshot(args.vram)
+    lo = snapshot(args.palette_lo)
+    hi = snapshot(args.palette_hi)
+    if len(words) == 0 or len(words) & (len(words) - 1):
+        raise SystemExit("VRAM snapshot word count must be a power of two")
+    if len(lo) < 256 or len(hi) < 256:
+        raise SystemExit("palette snapshots must contain 256 words")
+    args.vram_out.parent.mkdir(parents=True, exist_ok=True)
+    args.palette_out.parent.mkdir(parents=True, exist_ok=True)
+    args.vram_out.write_bytes(b"".join(struct.pack("<H", word & 0xffff)
+                                         for word in words))
+    palette = bytearray()
+    for index in range(256):
+        palette.extend(((lo[index] >> 8) & 0xff, lo[index] & 0xff,
+                        hi[index] & 0xff))
+    args.palette_out.write_bytes(palette)
+    print(json.dumps({
+        "schema": "stunrun-native-gsp-state/v1",
+        "vram_words": len(words),
+        "vram_output": str(args.vram_out),
+        "palette_entries": 256,
+        "palette_output": str(args.palette_out),
+    }, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

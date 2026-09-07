@@ -84,10 +84,14 @@ The `stunrun_render_gsp_visible` primitive applies the evidence-backed
 four-lines-per-VRAM-row layout and 16-bit word byte lanes to a supplied GSP
 VRAM/palette state; it does not provide that state or claim a complete game
 renderer.
-The native shell emits a blank-frame hash tagged `mode=blank-scaffold`; this
-proves the host rendering/logging boundary without presenting synthetic pixels
-as reconstructed game output. Set `STUNRUN_RENDER_PPM=/path/frame.ppm` to
-write the terminal frame for inspection. Evidence-backed drawing begins at M5.
+With no video-state inputs the native shell emits a blank-frame hash tagged
+`mode=blank-scaffold`; this proves the host rendering/logging boundary without
+presenting synthetic pixels as reconstructed game output. For paired MAME
+evidence, export snapshots with `tools/export-gsp-native-state` and set
+`STUNRUN_GSP_VRAM_BIN`, `STUNRUN_GSP_PALETTE_BIN`, and optionally
+`STUNRUN_RENDER_PPM=/path/frame.ppm`. The shell then reports
+`mode=gsp-visible-state` and renders through the native primitive. This is a
+fixture bridge, not yet a native game-state producer.
 
 Convert an MAME PNG to PPM and compare it with the native output using
 `tools/compare-ppm`; the tool reports dimensions, changed pixels/channels, and

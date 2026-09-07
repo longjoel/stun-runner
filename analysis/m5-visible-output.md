@@ -133,6 +133,9 @@ that the memory/register capture and rendered oracle can be collected from one
 deterministic run.
 
 The native renderer now has a matching pure C primitive for this recovered
-layout, covered by `native-render-boundary-c`. It consumes caller-supplied GSP
-words and 256-entry RGB palette data; the native shell does not yet populate
-those inputs, so its terminal frame remains the deliberate blank scaffold.
+layout, covered by `native-render-boundary-c`. A fixture bridge exports the
+captured words/palette through `tools/export-gsp-native-state`; when those
+binary inputs are supplied to the native shell, its `gsp-visible-state` frame
+is byte-identical to the paired MAME screen. The shell still has no native
+game-state producer, so this proves renderer integration rather than full M5
+completion.
