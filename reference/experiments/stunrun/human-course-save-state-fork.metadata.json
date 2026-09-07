@@ -1,0 +1,32 @@
+{
+  "schema": "stunrun-save-state-ram-fork/v1",
+  "experiment": "human-course-save-state-fork",
+  "target": "stunrun",
+  "mame": {
+    "executable": "/usr/bin/mame",
+    "version": "0.289 (mame0289-dirty)",
+    "rompath": "/tmp/stunrun-roms-system",
+    "rom_validation": "tools/check-roms passed before source capture"
+  },
+  "source_capture": {
+    "experiment": "human-course-progression-recorded",
+    "state": "/tmp/stunrun-course-recorded/state-19800.sta",
+    "state_sha256": "91370d9e4b1be23f2660a7ad1d89811274da91315da3b3883b1ec9b124ef133e",
+    "ram_snapshot": "/tmp/stunrun-course-recorded/snapshot-19800.json",
+    "ram_snapshot_sha256": "584e127fff202b0975f55f4b2ff200344fcd18bf5a0f6481ceeb762f646536bc",
+    "capture_frame": 19800,
+    "captured_course": 5,
+    "captured_score": 97965
+  },
+  "fork": {
+    "tool": "tools/mame-memory-snapshot",
+    "load_state": "/tmp/stunrun-course-recorded/state-19800.sta",
+    "input": "none",
+    "relative_frames": [2, 60, 600],
+    "observed_course": [5, 5, 5],
+    "observed_score": [97965, 97965, 97965],
+    "result": "PASS: the fork began from the saved live gameplay state and advanced 600 relative frames without replaying the preceding 19800 frames"
+  },
+  "raw_artifacts": "Fork snapshots remain local under /tmp/stunrun-state-fork-proof-*; this metadata commits provenance only.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME"
+}

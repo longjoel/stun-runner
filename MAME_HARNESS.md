@@ -224,10 +224,14 @@ For expensive deterministic setup paths, `tools/mame-memory-snapshot` can
 capture a MAME save state at the final requested frame and later fork from it:
 
 ```text
-tools/mame-memory-snapshot ... --frames 1800 --targets 1800 \
+tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-checkpoint \
+  --device :mainpcb:maincpu --base 0xff8000 --count 0x80000 \
+  --frames 1800 --targets 1800 \
   --save-state /tmp/stunrun-gameplay.sta --nothrottle
 
-tools/mame-memory-snapshot ... --frames 300 --targets 2,60,300 \
+tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-fork \
+  --device :mainpcb:maincpu --base 0xff8000 --count 0x80000 \
+  --frames 300 --targets 2,60,300 \
   --load-state /tmp/stunrun-gameplay.sta --input none --nothrottle
 ```
 
