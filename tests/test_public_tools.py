@@ -36,6 +36,37 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(manifest["roms"][0]["filename"], "a.bin")
             self.assertEqual(manifest["roms"][0]["size"], 2)
 
+    def test_analyze_gsp_vram_write_trace_groups_writers(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            trace = temp / "writes.json"
+            output = temp / "summary.json"
+            trace.write_text(json.dumps({
+                "schema": "stunrun-ram-write-trace-result/v1",
+                "device": ":mainpcb:gsp", "space": "program",
+                "base": 0x2000000, "end": 0x20000FF,
+                "capture_start_frame": 10, "capture_end_frame": 12,
+                "events": [
+                    {"frame": 10, "pc": 0xFFF46590, "address": 0x2000000,
+                     "data": 1, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0xFFF46590, "address": 0x2000010,
+                     "data": 2, "mask": 0xFFFF},
+                    {"frame": 12, "pc": 0xFFF43030, "address": 0x2000040,
+                     "data": 3, "mask": 0xFFFF},
+                ],
+            }), encoding="utf-8")
+            self.run_tool("analyze-gsp-vram-write-trace", trace,
+                          "--label", "0xFFF46590=PIXBLT", "-o", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["schema"],
+                             "stunrun-gsp-vram-write-summary/v1")
+            self.assertEqual(report["writers"]["0xFFF46590"]["label"], "PIXBLT")
+            self.assertEqual(report["writers"]["0xFFF46590"]["event_count"], 2)
+            self.assertEqual(report["writers"]["0xFFF46590"]["address_ranges"], [
+                {"start": 0x2000000, "end": 0x2000000, "count": 1},
+                {"start": 0x2000010, "end": 0x2000010, "count": 1},
+            ])
+
     def test_track_table_analyzer_snapshot_comparison_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)
