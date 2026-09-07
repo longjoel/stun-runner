@@ -85,6 +85,18 @@ Do not treat that combination as continuation from the checkpoint; use a
 relative scripted input schedule, or create a dedicated suffix recording from
 the loaded state.
 
+Instruction traces can also fork from a saved state without replaying setup:
+
+```sh
+tools/mame-trace /tmp/stunrun-roms-system /tmp/object-trace \
+  :mainpcb:maincpu 310 mame none 300 \
+  --load-state /tmp/stunrun-latedrive1200.sta
+```
+
+The trace and its frame counter are relative to the loaded state. The wrapper
+stages the state in a private MAME slot and removes that temporary staging
+directory after MAME exits.
+
 The frame-1800 rendered-scene fixture in
 `reference/checkpoints/m1-rendered-scene/state.json` uses the same compact
 schema and is byte-for-byte repeatable across two fresh configurations. The

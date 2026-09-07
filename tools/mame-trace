@@ -2,11 +2,11 @@
 set -euo pipefail
 
 usage() {
-    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY CPU_TAG [FRAMES] [MAME_EXE] [INPUT] [TRACE_START_FRAME]" >&2
+    echo "usage: $0 ROMPATH OUTPUT_DIRECTORY CPU_TAG [FRAMES] [MAME_EXE] [INPUT] [TRACE_START_FRAME] [--load-state STATE]" >&2
     exit 2
 }
 
-[[ $# -ge 3 && $# -le 7 ]] || usage
+[[ $# -ge 3 && $# -le 9 ]] || usage
 rompath=$1
 output=$2
 cpu=$3
@@ -14,6 +14,12 @@ frames=${4:-60}
 mame_exe=${5:-mame}
 input_mode=${6:-none}
 trace_start_frame=${7:-1}
+load_state=
+if [[ $# -gt 7 ]]; then
+    [[ $# -eq 9 && $8 == "--load-state" ]] || usage
+    load_state=$9
+    [[ -f "$load_state" ]] || { echo "save state does not exist: $load_state" >&2; exit 2; }
+fi
 [[ "$frames" =~ ^[1-9][0-9]*$ ]] || { echo "frames must be a positive integer" >&2; exit 2; }
 [[ "$trace_start_frame" =~ ^[1-9][0-9]*$ && "$trace_start_frame" -le "$frames" ]] || { echo "trace start frame must be in 1..frames" >&2; exit 2; }
 [[ "$input_mode" == "none" || "$input_mode" == "coin_start" || "$input_mode" == "coin2_start" || "$input_mode" == "coin2_early" || "$input_mode" == "service" || "$input_mode" == "sw_off" || "$input_mode" == "sw_off_none" || "$input_mode" == "drive" || "$input_mode" == "late" || "$input_mode" == "late_drive" ]] || { echo "unsupported input mode: $input_mode" >&2; exit 2; }
@@ -30,6 +36,21 @@ case "$cpu" in
 esac
 
 trace="$output/$id.trace"
+state_directory=
+state_args=()
+seconds_to_run=$(( (frames + 59) / 60 + 1 ))
+if [[ -n "$load_state" ]]; then
+    state_directory=$(mktemp -d /tmp/stunrun-trace-state.XXXXXX)
+    mkdir -p "$state_directory/stunrun"
+    cp "$load_state" "$state_directory/stunrun/1.sta"
+    cleanup_state() {
+        rm -f "$state_directory/stunrun/1.sta"
+        rmdir "$state_directory/stunrun" "$state_directory" 2>/dev/null || true
+    }
+    trap cleanup_state EXIT
+    state_args=(-state_directory "$state_directory" -statename %g -state 1)
+    seconds_to_run=86400
+fi
 STUNRUN_TRACE_OUT="$trace" \
 STUNRUN_TRACE_CPU="$cpu" \
 STUNRUN_TRACE_FRAMES="$frames" \
@@ -39,7 +60,7 @@ SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-dummy}" \
 "$mame_exe" -rompath "$rompath" stunrun \
     -video none -sound none -skip_gameinfo -noreadconfig -nowriteconfig \
     -cfg_directory /tmp/stunrun-mame-cfg -nonvram_save \
-    -debug -debugger none -seconds_to_run "$(( (frames + 59) / 60 + 1 ))" \
+    "${state_args[@]}" -debug -debugger none -seconds_to_run "$seconds_to_run" \
     -autoboot_script "$repo_dir/mame/lua/trace.lua" \
     >"$output/mame.log" 2>&1
 
