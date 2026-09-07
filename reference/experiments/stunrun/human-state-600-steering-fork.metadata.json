@@ -1,0 +1,38 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "human_state_600_steering_fork",
+  "tools": ["tools/mame-memory-snapshot", "tools/diff-memory-snapshot"],
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state_artifact": "/tmp/stunrun-human-live/state-600.sta",
+    "sha256": "65870b98010918dbb94cf19f1922f4a193acdd7996616d48925ad48d9d524760",
+    "description": "human-play checkpoint at source frame 600; local artifact, not committed"
+  },
+  "fork": {
+    "relative_frames": 300,
+    "target": 300,
+    "status_range": "0xFF9500–0xFF95FF",
+    "craft_range": "0xFFDD00–0xFFDDFF",
+    "left": {
+      "input": "fork_hold_left",
+      "status_result_sha256": "533505aa8f24b86c23a795c9d885cc0a22778228f0137d9876218a35713b4c0d",
+      "craft_result_sha256": "a7575cbc5d211dff191be1244c47028adf77aba1672626aaed5bc7f1afd5ca75"
+    },
+    "right": {
+      "input": "fork_hold_right",
+      "status_result_sha256": "79a3c5c02a4b6a70341d9a217110a0dfc8fb0c2b0bd94571b953caee491c9fbc",
+      "craft_result_sha256": "0767347c6b73bc2944433a01b9d9ce86c649ffffd83c43110406c521888302a4"
+    }
+  },
+  "comparison": {
+    "status_changed_count": 0,
+    "craft_changed_count": 6,
+    "craft_changed_addresses": [
+      "0xFFDD82", "0xFFDD86", "0xFFDD87", "0xFFDD88", "0xFFDD8A", "0xFFDD90"
+    ]
+  },
+  "observation": "Independent left/right branches from the same live gameplay state leave the complete status window byte-identical while changing six bytes in the object/animation window. This supports the existing object/renderer interpretation and provides no evidence for armor, weapon, ammunition, score, timer, or track state.",
+  "confidence": "OBSERVED-IN-INSTALLED-MAME + SAME-STATE-FORK-DIFFERENTIAL",
+  "caveat": "The save state and raw snapshots are local artifacts and depend on the pinned MAME build and validated ROM set."
+}
