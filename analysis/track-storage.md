@@ -323,6 +323,16 @@ capture does not prove that every changed VRAM word came from the road FIFO.
 The current label remains **ROAD FIFO → GSP DISPLAY TIMING OBSERVED; FIELD
 SEMANTICS UNKNOWN**.
 
+The lane-level payload check adds one more boundary. At frames 1290, 1293,
+and 1297, the 192 road FIFO values each match the even-indexed words of the
+same-frame 384-word base buffer, exactly. In the mixed FIFO trace those
+subsequences begin at event offsets 9,347, 12,691, and 16,036. The 192 payload
+values have no broad verbatim representation in the corresponding 32,768-word
+GSP VRAM snapshots (zero or one value present, depending on the frame), so the
+road stream is not simply copied into visible VRAM. The safe mechanism model is
+now **base buffer → every-other-word FIFO lane → GSP-side interpretation →
+display memory**; the GSP-side command/geometry format remains unknown.
+
 ## A visible pattern inside one ROM table
 
 The traced course-0 table at `0x044630` is 384 words long. Looking only at

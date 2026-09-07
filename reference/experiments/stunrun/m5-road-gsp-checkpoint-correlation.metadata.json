@@ -35,5 +35,17 @@
     "1290_to_1293": {"main_road_bytes_changed": 606, "gsp_vram_words_changed": 0},
     "1293_to_1297": {"main_road_bytes_changed": 606, "gsp_vram_words_changed": 3306}
   },
+  "fifo_payload_check": {
+    "trace": "/tmp/stunrun-m5-road-fifo-pc/result.json",
+    "trace_sha256": "15e4981cbba8787520b527923531abf7c6be124395b24fd840fabbce5703ff4d",
+    "reader_pc": "0x02248E",
+    "fifo_writer_address": "0xC0000C",
+    "burst_words": 192,
+    "source_selection": "base_buffer_words[0], words[2], ... words[382]",
+    "subsequence_offsets": {"1290": 9347, "1293": 12691, "1297": 16036},
+    "source_matches": {"1290": 192, "1293": 192, "1297": 192},
+    "direct_vram_value_matches": {"1290": 1, "1293": 0, "1297": 1},
+    "interpretation": "The road FIFO lane is an exact every-other-word selection from the base buffer. The payload is not a raw copy into the sampled GSP VRAM, implying GSP-side interpretation or buffering."
+  },
   "interpretation": "The road buffer changes continuously while the GSP-visible VRAM update is bursty and delayed across these landmarks. This supports a buffered/display-scheduled consumer boundary but does not attribute every VRAM change to the road FIFO or decode table fields."
 }

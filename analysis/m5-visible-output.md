@@ -171,3 +171,9 @@ and 1293 while GSP VRAM remains byte-identical, then 3,306 GSP words change by
 frame 1297. This is the first bounded timing evidence for a buffered/display-
 scheduled road consumer; it is not yet a decoded geometry format. Provenance is
 in `reference/experiments/stunrun/m5-road-gsp-checkpoint-correlation.metadata.json`.
+
+The same record now includes a payload check: every 192-word road burst exactly
+matches the even words of its 384-word source buffer, while the values do not
+appear verbatim across the downstream GSP VRAM snapshot. This strengthens the
+producer boundary and indicates GSP-side interpretation, but still does not
+identify curvature, width, or scanline fields.
