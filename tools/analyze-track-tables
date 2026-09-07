@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize observed S.T.U.N. Runner ROM track-table slots without dumping ROM bytes."""
+"""Summarize S.T.U.N. Runner ROM track-table slots without dumping ROM bytes."""
 
 import argparse
 import hashlib
@@ -7,7 +7,7 @@ import json
 import pathlib
 
 
-DEFAULT_BASES = (0x44630, 0x44930, 0x45230, 0x45530)
+DEFAULT_BASES = (0x44630, 0x44930, 0x44C30, 0x44F30, 0x45230, 0x45530)
 TABLE_BYTES = 0x300
 RAM_BASE = 0xFF9584
 STATE_TABLE_BASE = 0x47406
@@ -35,7 +35,7 @@ def main() -> int:
     parser.add_argument("--manifest", type=pathlib.Path,
                         default=pathlib.Path("roms/stunrun.manifest.json"))
     parser.add_argument("--base", action="append", type=lambda value: int(value, 0),
-                        help="384-word table base; repeatable (defaults to four observed slots)")
+                        help="384-word table base; repeatable (defaults to all six selector targets)")
     parser.add_argument("--output", type=pathlib.Path,
                         help="write the summary JSON here instead of stdout")
     parser.add_argument("--snapshot", action="append", type=pathlib.Path,

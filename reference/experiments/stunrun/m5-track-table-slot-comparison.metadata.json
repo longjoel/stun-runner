@@ -32,7 +32,7 @@
   "rom_content_comparison": {
     "source": "/tmp/stunrun-roms-system/stunrun",
     "manifest": "roms/stunrun.manifest.json",
-    "reproducer": "tools/analyze-track-tables /tmp/stunrun-roms-system --output /tmp/stunrun-track-table-analysis.json",
+    "reproducer": "tools/analyze-track-tables /tmp/stunrun-roms-system --base 0x44630 --base 0x44930 --base 0x45230 --base 0x45530 --output /tmp/stunrun-track-table-analysis.json",
     "reconstruction": "mainpcb:maincpu ROM_LOAD16_BYTE files placed at their manifest offsets; each source byte occupies the corresponding even/odd byte lane",
     "slot_sha256": {
       "0x044630": "dda9cba51823fb32da9bc1551288589f0f15a3fce1f938c9ea290b84b4f7a648",
