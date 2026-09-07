@@ -46,7 +46,7 @@ class PublicToolTests(unittest.TestCase):
             output = temp / "analysis.json"
             snapshot = temp / "snapshot.json"
             bases = [0x20, 0x320, 0x620, 0x920]
-            region = bytearray(0xC20)
+            region = bytearray(0x47406 + 23 * 4)
             for slot, base in enumerate(bases):
                 for word in range(384):
                     value = 0x1000 + word
@@ -56,6 +56,10 @@ class PublicToolTests(unittest.TestCase):
                         value ^= 0x00FF
                     region[base + word * 2:base + word * 2 + 2] = struct.pack(
                         ">H", value)
+            selector = [0x44630, 0x44930, 0x45230] + [0x44630] * 20
+            for index, value in enumerate(selector):
+                region[0x47406 + index * 4:0x4740A + index * 4] = struct.pack(
+                    ">I", value)
             (romdir / "even.bin").write_bytes(bytes(region[0::2]))
             (romdir / "odd.bin").write_bytes(bytes(region[1::2]))
             manifest.write_text(json.dumps({
@@ -86,6 +90,9 @@ class PublicToolTests(unittest.TestCase):
             comparison = report["snapshot_comparisons"][0]
             self.assertEqual(report["common_tail_sha256"],
                              "d54e3b376eb4d0fc96fd4af38c020e99c1e4b54d38d65edc4e97e2e72eeec18d")
+            self.assertEqual(report["state_table_selector"]["entry_count"], 23)
+            self.assertEqual(report["state_table_selector"]["state_to_table"][10],
+                             {"state": 10, "rom_base": "0x44630"})
             self.assertEqual(comparison["best"]["slot"], "0x00620")
             self.assertEqual(comparison["best"]["different_word_ranges"], ["360-383"])
             self.assertEqual(comparison["settled_tail_sha256"],

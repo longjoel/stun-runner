@@ -234,7 +234,9 @@ different word ranges, whole-buffer and settled-tail hashes, and base/twin
 differences; when applicable it also reports the common ROM-tail hash. This
 makes
 settled-versus-in-flight classification repeatable from ordinary
-`stunrun-memory-snapshot/v1` artifacts.
+`stunrun-memory-snapshot/v1` artifacts. When the supplied ROM manifest maps
+the selector region, the same report now emits the complete 23-entry
+`0x047406` state-to-table lookup under `state_table_selector`.
 
 The companion `tools/diff-memory-snapshot` confirms the transition boundary in
 the same recording: the track window changes by 0 bytes from frames 1200→1800,

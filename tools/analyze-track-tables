@@ -10,6 +10,8 @@ import pathlib
 DEFAULT_BASES = (0x44630, 0x44930, 0x45230, 0x45530)
 TABLE_BYTES = 0x300
 RAM_BASE = 0xFF9584
+STATE_TABLE_BASE = 0x47406
+STATE_TABLE_COUNT = 23
 
 
 def contiguous_ranges(indices: list[int]) -> list[str]:
@@ -75,6 +77,14 @@ def main() -> int:
     first = tables[bases[0]]
     common = [index for index in range(len(first))
               if all(tables[base][index] == first[index] for base in bases[1:])]
+    state_to_table = None
+    selector_end = STATE_TABLE_BASE + STATE_TABLE_COUNT * 4
+    if selector_end <= len(region) and all(occupied[STATE_TABLE_BASE:selector_end]):
+        state_to_table = [
+            {"state": state, "rom_base": f"0x{int.from_bytes(region[offset:offset + 4], 'big'):05X}"}
+            for state, offset in enumerate(
+                range(STATE_TABLE_BASE, selector_end, 4))
+        ]
     result = {
         "schema": "stunrun-track-table-analysis/v1",
         "manifest": str(args.manifest),
@@ -95,6 +105,11 @@ def main() -> int:
         "common_word_count": len(common),
         "variable_word_ranges": contiguous_ranges(
             [index for index in range(len(first)) if index not in set(common)]),
+        "state_table_selector": {
+            "rom_base": f"0x{STATE_TABLE_BASE:05X}",
+            "entry_count": STATE_TABLE_COUNT,
+            "state_to_table": state_to_table,
+        },
         "common_tail_sha256": (
             hashlib.sha256(table_payloads[bases[0]][0x2D0:0x300]).hexdigest()
             if all(table_payloads[base][0x2D0:0x300] ==
