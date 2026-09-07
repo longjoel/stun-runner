@@ -32,10 +32,20 @@
     {
       "relative_frame": 137,
       "observation": "The same record area is reinitialized with five nonzero records; 0xFFDD02 remains zero."
+    },
+    {
+      "relative_frame": 220,
+      "writer_trace": {
+        "window": "0xFFDD80–0xFFDDA0",
+        "events": 17,
+        "writer_pc": "0x021302",
+        "result_sha256": "d5f4f6c24b62704cbce6c1335b219e54a7b6b8ee78b9bd8ae08823f4ee629a20"
+      },
+      "observation": "PC 0x021302 clears the object-record words in one bounded reset pass; this is reset/game-state handling, not a spawn writer."
     }
   ],
   "observation": "A full per-frame object-window series resumed from a saved state is byte-repeatable across independent runs and exposes deterministic transition boundaries without replaying setup.",
   "semantic_status": "DETERMINISTIC-TRANSITIONS-OBSERVED; SPAWN-SEMANTICS-UNRESOLVED",
   "confidence": "OBSERVED-IN-INSTALLED-MAME",
-  "limitation": "The record clear/reinitialization is not sufficient to distinguish object spawn, game-state transition, or renderer reset; an independent gameplay selector and writer trace are required."
+  "limitation": "The frame-39 and frame-137 snapshot boundaries have no main-CPU writer events in their narrow tap windows and remain unresolved; the later frame-220 clear is explicitly attributed to reset/game-state handling."
 }
