@@ -284,3 +284,11 @@ The paired writer values are not identical copies: only 21 of 896 same-position
 writes match between the base and twin traces (for example `0xBD08` versus
 `0x6565`). The native boundary must therefore preserve separate output streams;
 shared cadence alone does not justify duplicating one buffer into the other.
+
+A fresh build of the integrated native shell was verified through
+`tools/run-native-visible-bridge` using the captured VRAM/palette fixture. The
+512×240 PPM matched the expected frame exactly: zero changed pixels, zero
+changed channels, and SHA-256
+`c9b94f3f2a76ed95ffbfe6ab2a3601ffec8235fea62a691ba2fa100875a320d9`. This
+confirms the shell-level `stunrun_gsp_video_render` path; the fixture remains
+externally supplied and is not a native game-state producer.

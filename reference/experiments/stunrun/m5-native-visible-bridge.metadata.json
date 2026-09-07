@@ -27,5 +27,11 @@
     "max_abs_error": 0,
     "mean_abs_error": 0.0
   },
+  "fresh_integrated_verification": {
+    "native_binary_sha256": "42ef8bb93a28058e7e5ece2e09a2a163f078cac247a0f4bc6c7a9f36658c9626",
+    "actual_sha256": "c9b94f3f2a76ed95ffbfe6ab2a3601ffec8235fea62a691ba2fa100875a320d9",
+    "changed_pixels": 0,
+    "changed_channels": 0
+  },
   "interpretation": "The recovered VRAM layout, palette conversion, and native visible-frame renderer are pixel-exact for this captured state. The captured state is supplied externally; this does not establish a native producer for game state or M5 completion."
 }

@@ -73,7 +73,7 @@ add_test(NAME native-shell COMMAND stunrun-native-shell)
 add_executable(stunrun-render-test render.c render_test.c)
 set_target_properties(stunrun-render-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-render-boundary-c COMMAND stunrun-render-test)
-add_executable(stunrun-gsp-video-test gsp_video.c gsp_video_test.c)
+add_executable(stunrun-gsp-video-test gsp_video.c render.c gsp_video_test.c)
 set_target_properties(stunrun-gsp-video-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-gsp-video-boundary-c COMMAND stunrun-gsp-video-test)
 # Literal GSP indexed-record addressing and raw field positions from the M5

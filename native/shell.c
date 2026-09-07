@@ -451,9 +451,7 @@ static int run_walk(void)
                                     gsp_palette_path)) {
             printf("shell: gsp-video load=error\n");
             g_failures++;
-        } else if (!stunrun_render_gsp_visible(&renderer, video.vram_words,
-                                                video.vram_word_count,
-                                                video.palette_rgb)) {
+        } else if (!stunrun_gsp_video_render(&video, &renderer)) {
             printf("shell: gsp-video render=error\n");
             g_failures++;
         } else {
