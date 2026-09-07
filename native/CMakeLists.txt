@@ -118,6 +118,15 @@ target_include_directories(stunrun-fifo-block-slice-test PRIVATE
   ../reproduction/maincpu)
 set_target_properties(stunrun-fifo-block-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME fifo-block-slice-c COMMAND stunrun-fifo-block-slice-test)
+# Literal trajectory coordinate initialization and clamp mechanism from the
+# 0x0387C6-0x038A14 listing slice.
+add_executable(stunrun-trajectory-state-slice-test
+  ../reproduction/maincpu/trajectory_state.c
+  ../reproduction/maincpu/trajectory_state_test.c)
+target_include_directories(stunrun-trajectory-state-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-trajectory-state-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME trajectory-state-slice-c COMMAND stunrun-trajectory-state-slice-test)
 # Course-table march and twin-buffer fan-out against the traced upload
 # mechanism (384-word +2 march, count-gated dual copy, 0x300 stride).
 add_executable(stunrun-geom-upload-slice-test
