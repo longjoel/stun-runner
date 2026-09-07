@@ -91,18 +91,29 @@ do not match a complete slot. This explains why a narrow ROM-read trace around
 the nominal transition frame can miss the load: the useful source identity is
 more reliably recovered from the settled RAM buffer immediately afterward.
 
-The write trace around the first course-10 load separates the two mechanisms:
+The write trace around the first course-10 load separates the two mechanisms,
+and the static listing explains the operation:
 
 - PC `0x029760` writes the 24-word base tail during the table copy.
 - PC `0x02977E` writes the corresponding twin-copy data.
-- PC `0x0298C0` then rewrites the 24-word base tail at frames 954, 955, 958,
-  960, 962, 964, and 967.
+- PC `0x0298C0` then writes the observed 24-word base-tail slice at frames
+  954, 955, 958, 960, 962, 964, and 967.
 
 The `0x0298C0` writes show a repeated-byte sequence descending from roughly
 `0xA3` toward `0x19`, with a distinct final record. This is consistent with a
 time/ramp or animation update, but its logical meaning is still unknown. The
-important storage fact is now stronger than “the tail changes”: the ROM copy
-and the later base-only animation writer are separate, observable mechanisms.
+listing shows that `0x0298C0` is actually the body of a 768-byte loop:
+`base[i] = base[i] - twin[i]` for each byte. The paired loop at `0x0298FA`
+performs `base[i] = base[i] + twin[i]`. Thus the trace sees only the tail
+because that was the selected address window; the animation routines are not
+tail-only routines.
+
+The table-copy listing also shows that the base loop copies raw source bytes,
+while the twin loop divides each source byte by a stack parameter before
+storing it. In the settled race snapshots that parameter is `1` at
+`0xFF954E`, which explains the observed byte-for-byte twin. The storage
+mechanism therefore supports a scaled twin even though the current fixtures
+exercise the identity case.
 
 The reusable snapshot workflow is:
 
