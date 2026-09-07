@@ -139,3 +139,14 @@ binary inputs are supplied to the native shell, its `gsp-visible-state` frame
 is byte-identical to the paired MAME screen. The shell still has no native
 game-state producer, so this proves renderer integration rather than full M5
 completion.
+
+## Road-buffer consumer boundary
+
+A fresh bounded 68010 read trace over the recorded `late_drive` schedule
+captured the road-buffer consumer at PC `0x02248E`. It performed three
+complete 384-word sequential drains of `0xFF9584–0xFF9882` at frames 1290,
+1293, and 1297. The same PC did not read the twin window in this interval;
+PC `0x0298BE` read the twin for animation while `0x0298C0` read the base.
+This narrows the native producer boundary to base-buffer → FIFO transfer,
+while leaving broader lifetime/scheduling semantics open. Provenance is in
+`reference/experiments/stunrun/m5-road-buffer-consumer-trace.metadata.json`.

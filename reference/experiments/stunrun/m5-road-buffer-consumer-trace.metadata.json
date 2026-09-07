@@ -1,0 +1,48 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-road-buffer-consumer-trace",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "experiment": {
+    "tool": "tools/mame-ram-read-trace",
+    "command": "tools/mame-ram-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-road-read-fresh --base 0xFF9584 --end 0xFF9B83 --frames 1300 --start-frame 1280 --end-frame 1300 --max-events 50000 --input late_drive --nothrottle",
+    "start": "power_on",
+    "input": "late_drive",
+    "window": "0xFF9584-0xFF9B83",
+    "frames": [1280, 1300],
+    "roms": "/tmp/stunrun-roms-system"
+  },
+  "result": {
+    "event_count": 7296,
+    "truncated": false,
+    "pc_counts": {
+      "0x02248E": 1152,
+      "0x0298BE": 3072,
+      "0x0298C0": 3072
+    },
+    "consumer_pc": {
+      "pc": "0x02248E",
+      "frames": {
+        "1290": {"reads": 384, "first": "0xFF9584", "last": "0xFF9882"},
+        "1293": {"reads": 384, "first": "0xFF9584", "last": "0xFF9882"},
+        "1297": {"reads": 384, "first": "0xFF9584", "last": "0xFF9882"}
+      },
+      "address_shape": "384 sequential 16-bit reads over the base buffer; no reads from 0xFF9884-0xFF9B82 by this PC"
+    },
+    "animation_readers": {
+      "0x0298BE": "reads the twin window in this interval",
+      "0x0298C0": "reads the base window in this interval"
+    },
+    "event_stream_sha256": {
+      "0x02248E": "d8a2c3abe5501d2aa4ae3a077bfb208d1d13e72affe0f632a8300e9e8e66e663",
+      "0x0298BE": "0f0893e83807ccf05c8e4dcd59e5af37f050b7cbe450adac1375857861a787b8",
+      "0x0298C0": "fc3099df5a685b292db81c080cc0d055b1b8c52fd59a356f4af6623aa1913bd4"
+    }
+  },
+  "observation": "The observed FIFO-transfer PC drains the base road buffer in three complete sequential bursts. The twin is not consumed by that PC in this window; it is read by the separate animation path. This resolves the earlier twin-read question for the observed transfer interval only and does not claim a universal lifetime rule.",
+  "provenance": {
+    "raw_result": "/tmp/stunrun-m5-road-read-fresh/result.json",
+    "raw_log": "/tmp/stunrun-m5-road-read-fresh/mame.log",
+    "analysis": "analysis/road-upload-path.md"
+  }
+}
