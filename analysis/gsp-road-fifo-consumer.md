@@ -55,6 +55,13 @@ writer covered 128 corresponding addresses from `0xFFF70660` through
 `0xFFF71640`. The differing initial offsets are retained as observed selector
 state, not assigned a semantic buffer role.
 
+The two output streams must not be modeled as identical copies. In the first
+captured burst, corresponding writes include base `0xBD08` versus twin
+`0x6565`, and only 21 of 896 same-position write pairs have equal data. The
+trace supports shared loop structure and cadence, but the source reads or
+lane state feeding `A0` and `A1` remain distinct. Any native model must keep
+those streams separate until the source-side relationship is proven.
+
 ## Replay support
 
 `tools/mame-trace` now accepts `--playback INP` in the same positional slot as

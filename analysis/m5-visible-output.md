@@ -279,3 +279,8 @@ The base-side addresses advance by `0x20` from `0xFFF6F650`; the twin-side
 family begins at `0xFFF70660` and follows the same count. The offset difference
 is recorded literally and is not yet a semantic front/back or road/object
 classification.
+
+The paired writer values are not identical copies: only 21 of 896 same-position
+writes match between the base and twin traces (for example `0xBD08` versus
+`0x6565`). The native boundary must therefore preserve separate output streams;
+shared cadence alone does not justify duplicating one buffer into the other.

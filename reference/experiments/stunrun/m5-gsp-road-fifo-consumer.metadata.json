@@ -96,6 +96,9 @@
     "burst_frames": [1280, 1283, 1286, 1289, 1292, 1295, 1298],
     "writes_per_burst": 128,
     "mask": "0xFFFF",
+    "same_position_data_matches": 21,
+    "same_position_data_total": 896,
+    "paired_data_equality": false,
     "interpretation": "The runtime loop writes both destination families with the same seven-burst cadence and count. Buffer roles and payload semantics remain UNKNOWN."
   },
   "negative_probe": {
