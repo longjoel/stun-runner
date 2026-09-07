@@ -84,7 +84,13 @@ another resource selector, and then reads the road-table pointer from
 `0x047406` before calling `0x0297A6`. It finally stores `0xFF9584` in
 `0xFFDB3C`, the active road-buffer pointer. That is direct evidence that the
 table copy and the later road consumer share the base-buffer contract; the
-second selector's semantic role remains open.
+second selector's semantic role remains open. More specifically, the code
+uses `state * 9` to select a byte from `0x048180`, scales that byte by four,
+and indexes a separate longword table at `0x048068`; that pointer is passed as
+another argument to the transition routine. The road-table argument in the
+same call is independently loaded from `0x047406`. Thus `0x048180` must not be
+reported as a second geometry-table array merely because it is indexed by the
+same state word.
 
 The state/index word at `0xFF9578` is written by the normal progression path
 at `0x0320BC` and was observed to advance `0→1→2→3→4→5` in a human race.
