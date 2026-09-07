@@ -146,6 +146,20 @@ fetches remain present because MAME read taps observe instruction fetches as
 well as data reads, so data-read summaries explicitly exclude the local code
 window.
 
+### Course-word reader trace
+
+`tools/mame-ram-read-trace` provides the complementary RAM-read tap needed to
+separate actual selector use from ROM opcode fetches. On a fresh
+`late_drive` run, `0xFF9578–0xFF9579` was read 698 times by 43 PCs between
+frames 600 and 1800; every returned value was zero. The existing
+`weapon_probe` schedule produced 753 reads by the same reader set, also all
+zero. The result is a negative control for these schedules, not a refutation
+of the nonzero `0 → 3 → 6` values seen in longer or otherwise different
+captures: neither run reached the transition needed for a course-3/course-6
+differential. The tracer also runs from a loaded save state; the supplied
+2400-frame state was valid but had no subsequent reads of this field in its
+first 60 relative frames.
+
 ## Recording
 
 Write the run up as `reference/experiments/stunrun/` metadata

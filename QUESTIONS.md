@@ -226,6 +226,23 @@ provenance in
 (`followup_session`); snapshots and classifier outputs are local-only
 under `/tmp/geom-*`.
 
+### Investigation update 3 (2026-09-06, ROM-read sequencing, Agent 2 executed)
+
+Sequential-march vs indexed-access is ANSWERED for the twin-buffer
+uploader: PCs `0x29760`/`0x2976E` read 384 distinct words sequentially
+from ROM `0x44630–0x4492E` (step +2, each word read twice) over frames
+1286–1288 — a sequential march, supporting H2's march half while H2's
+cursor half stays dead. Header words `0x20074=0x0002` (copy count: the
+two twin copies) and `0x20076=0x22DA` (meaning unresolved) are read a
+handful of times each. ~97% of the 50,939 trace events are instruction
+fetches, not data reads — future traces must exclude addr-near-PC.
+A 21-frame per-frame series (1280–1300) confirms the clocks at 1-frame
+resolution (`0xFF8016` +4/frame, `0xFF9492` +1/2 frames, `0xFFDB38`
+quantized stair-steps) and shows per-frame twin updates continuing past
+the bulk march (scroll/animation, not just upload). Cursor hunt CLOSED
+at 1-frame resolution. Still open: course-dependent table selection
+(needs course-3 vs course-6 input schedules, which do not exist yet).
+
 ---
 
 ## IRQ-0005
@@ -274,6 +291,14 @@ This does not yet identify a course-indexed table or establish a stride. MAME
 read taps include opcode fetches, so the summary explicitly excludes the
 local code window; the result and provenance are in
 `reference/experiments/stunrun/geometry-rom-read-trace.metadata.json`.
+
+A complementary RAM-read tap then sampled `0xFF9578–0xFF9579` directly. The
+`late_drive` run yielded 698 reads from 43 PCs and the existing `weapon_probe`
+run yielded 753 reads from the same 43-PC reader set; all returned zero. This
+is a schedule-specific negative control, because neither run reached the
+nonzero values seen in the earlier long-run snapshot evidence. The full
+provenance is in
+`reference/experiments/stunrun/course-word-reader-trace.metadata.json`.
 
 ### Why it matters
 
