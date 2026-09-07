@@ -8,6 +8,7 @@ local limit = tonumber(os.getenv('STUNRUN_GSP_STATE_FRAMES') or '1800')
 local target_text = os.getenv('STUNRUN_GSP_STATE_TARGETS') or '600,1800'
 local input_mode = os.getenv('STUNRUN_GSP_STATE_INPUT') or 'none'
 local detail = os.getenv('STUNRUN_GSP_STATE_DETAIL') == '1'
+local screen_output = os.getenv('STUNRUN_GSP_STATE_SCREEN') or ''
 local frame = 0
 local targets = {}
 for value in string.gmatch(target_text, '[^,]+') do targets[tonumber(value)] = true end
@@ -126,6 +127,11 @@ local function snapshot()
         frame, tostring(state.display.dpyadr), tostring(state.display.dpytap),
         tostring(state.display.dpystart), tostring(state.display.heblnk),
         tostring(state.display.hsblnk), tostring(state.display.dpyctl)))
+    if screen_output ~= '' then
+        local screen = assert(machine.screens[':mainpcb:screen'], 'screen not found')
+        assert(screen:snapshot(screen_output) == nil, 'screen snapshot failed')
+        print('M1_GSP_SCREEN frame=' .. frame .. ' path=' .. screen_output)
+    end
     if detail then
         print(string.format('M1_GSP_CONTROL frame=%d lo=%s hi=%s', frame,
             nonzero_words(0xf4000000, 128), nonzero_words(0xf4800000, 128)))

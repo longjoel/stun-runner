@@ -105,3 +105,10 @@ mean channel error: 28.99599880642361
 This is a useful positive boundary, not an M5 completion claim. The remaining
 work is to capture the display parameters at the actual scanline/update point
 or reconcile MAME's screenshot crop with the frame-boundary register sample.
+
+The GSP-state tool now accepts `--screen PATH` and calls MAME's
+`screen:snapshot()` at the requested frame. A frame-600 paired run produced a
+`512×240` PNG with the canonical oracle hash
+`9aa7b12be07ef28b5796c64e67e722b595664cd09b8c5daead3d7a3707b9e85`, proving
+that the memory/register capture and rendered oracle can be collected from one
+deterministic run.

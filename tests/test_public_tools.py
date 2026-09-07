@@ -103,6 +103,13 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn("STUNRUN_MEMORY_STRIDE", tool)
         self.assertIn("offset * address_stride", lua)
 
+    def test_gsp_state_snapshot_can_pair_screen_output(self):
+        tool = (ROOT / "tools" / "mame-gsp-state-snapshot").read_text()
+        lua = (ROOT / "mame" / "lua" / "gsp-state-snapshot.lua").read_text()
+        self.assertIn("--screen", tool)
+        self.assertIn("STUNRUN_GSP_STATE_SCREEN", lua)
+        self.assertIn("screen:snapshot", lua)
+
     def test_analyze_memory_candidates_ranks_persistent_diffs(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

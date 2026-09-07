@@ -21,6 +21,7 @@ DISPLAY = re.compile(
     r"M1_GSP_DISPLAY frame=(\d+) dpyadr=(\S+) dpytap=(\S+) "
     r"dpystart=(\S+) heblnk=(\S+) hsblnk=(\S+) dpyctl=(\S+)"
 )
+SCREEN = re.compile(r"M1_GSP_SCREEN frame=(\d+) path=(.+)")
 
 
 def main() -> int:
@@ -37,6 +38,8 @@ def main() -> int:
                         help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--detail", action="store_true",
                         help="also record nonzero GSP control-register words")
+    parser.add_argument("--screen", type=pathlib.Path,
+                        help="save the exact MAME screen at each requested frame")
     args = parser.parse_args()
     if args.frames <= 0:
         parser.error("--frames must be positive")
@@ -74,6 +77,7 @@ def main() -> int:
         "STUNRUN_GSP_STATE_TARGETS": args.targets,
         "STUNRUN_GSP_STATE_INPUT": args.input,
         "STUNRUN_GSP_STATE_DETAIL": "1" if args.detail else "0",
+        "STUNRUN_GSP_STATE_SCREEN": str(args.screen) if args.screen else "",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -108,11 +112,17 @@ def main() -> int:
         }
         for match in DISPLAY.finditer(text)
     }
+    screens = {
+        int(match.group(1)): match.group(2)
+        for match in SCREEN.finditer(text)
+    }
     for snapshot in snapshots:
         if snapshot["frame"] in controls:
             snapshot["control_nonzero"] = controls[snapshot["frame"]]
         if snapshot["frame"] in displays:
             snapshot["display"] = displays[snapshot["frame"]]
+        if snapshot["frame"] in screens:
+            snapshot["screen"] = screens[snapshot["frame"]]
     canonical = re.sub(r"output=[^\n]+", "output=<output>", text)
     result = {
         "schema": "stunrun-gsp-state-snapshot-result/v1",
@@ -125,6 +135,8 @@ def main() -> int:
     (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     if completed.returncode or len(snapshots) != len(args.targets.split(',')):
         raise SystemExit(f"GSP state snapshot failed; see {log}")
+    if args.screen and not args.screen.is_file():
+        raise SystemExit(f"MAME did not produce screen snapshot: {args.screen}")
     print(json.dumps(result, separators=(",", ":")))
 
 

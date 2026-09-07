@@ -74,7 +74,9 @@ def decode(args):
             x = heblnk + output_x
             if x >= hsblnk:
                 break
-            index = (color_index + x) & 0x7ff
+            # MAME starts coloridx at coladdr when x reaches HEBLNK; x is
+            # the destination coordinate, not an additive source offset.
+            index = (color_index + output_x) & 0x7ff
             word = vram[(row_base + (index >> 1)) & mask]
             color = (word >> 8) & 0xff if index & 1 else word & 0xff
             r, g, b = colors[color]
