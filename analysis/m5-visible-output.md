@@ -108,6 +108,23 @@ This is a useful positive boundary, not an M5 completion claim. The remaining
 work is to capture the display parameters at the actual scanline/update point
 or reconcile MAME's screenshot crop with the frame-boundary register sample.
 
+The decoder also has an explicitly empirical `--visible-layout` mode. Applying
+the paired frame-600 VRAM and palette captures with that mode yields a
+byte-identical screen:
+
+```text
+changed pixels: 0 / 122880
+changed channels: 0
+mean channel error: 0.0
+sha256: c9b94f3f2a76ed95ffbfe6ab2a3601ffec8235fea62a691ba2fa100875a320d9
+```
+
+The recovered layout is four 512-byte visible lines per 2048-byte multisync
+VRAM row (`row = y // 4`, `byte offset = (y % 4) * 512`). This is strong
+evidence for the VRAM word/byte lane and palette interpretation. It is still
+an analysis decoder, not the native implementation, so M5 remains open until
+the native renderer consumes an evidence-backed equivalent state.
+
 The GSP-state tool now accepts `--screen PATH` and calls MAME's
 `screen:snapshot()` at the requested frame. A frame-600 paired run produced a
 `512×240` PNG with the canonical oracle hash

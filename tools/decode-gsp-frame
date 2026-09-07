@@ -61,27 +61,35 @@ def decode(args):
     heblnk = max(0, display["heblnk"] * 2)
     hsblnk = display["hsblnk"] * 2
     for y in range(height):
-        dpyadr = (dpy_start + y * dpy_step) & 0xffff
-        if display["dpyctl"] & 0x0400:
-            rowaddr = dpyadr >> 4
+        if args.visible_layout:
+            # Paired MAME screen/VRAM captures establish this visible raster
+            # layout exactly for the title checkpoint: four 512-byte lines
+            # occupy one multisync VRAM row.
+            row_base = ((y // 4) << 10) & mask
+            color_index = (y & 3) << 9
+            first_x = 0
+            last_x = width
         else:
-            rowaddr = (dpyadr ^ 0xfffc) >> 4
-        coladdr = ((dpyadr & 0x007c) << 4) | (dpy_tap & 0x3fff)
-        yoffset = (dpy_start - dpyadr) & 3
-        color_index = ((yoffset << 9) + ((coladdr & 0xff) << 3)
-                       - 7 + (fine & 7))
-        row_base = (rowaddr << 10) & mask
-        for output_x in range(width):
-            x = heblnk + output_x
-            if x >= hsblnk:
-                break
-            # MAME starts coloridx at coladdr when x reaches HEBLNK; x is
-            # the destination coordinate, not an additive source offset.
-            index = (color_index + output_x) & 0x7ff
+            dpyadr = (dpy_start + y * dpy_step) & 0xffff
+            if display["dpyctl"] & 0x0400:
+                rowaddr = dpyadr >> 4
+            else:
+                rowaddr = (dpyadr ^ 0xfffc) >> 4
+            coladdr = ((dpyadr & 0x007c) << 4) | (dpy_tap & 0x3fff)
+            yoffset = (dpy_start - dpyadr) & 3
+            color_index = ((yoffset << 9) + ((coladdr & 0xff) << 3)
+                           - 7 + (fine & 7))
+            row_base = (rowaddr << 10) & mask
+            first_x = heblnk
+            last_x = min(width, hsblnk)
+        for output_x in range(first_x, last_x):
+            source_x = output_x if args.visible_layout else output_x - first_x
+            index = (color_index + source_x) & 0x7ff
             word = vram[(row_base + (index >> 1)) & mask]
             color = (word >> 8) & 0xff if index & 1 else word & 0xff
             r, g, b = colors[color]
-            offset = (y * width + output_x) * 3
+            destination_x = output_x if args.visible_layout else source_x
+            offset = (y * width + destination_x) * 3
             pixel_data[offset:offset + 3] = bytes((r, g, b))
     args.output.write_bytes(
         b"P6\n" + f"{width} {height}\n255\n".encode("ascii") + pixel_data
@@ -95,6 +103,7 @@ def decode(args):
         "dpy_step": dpy_step,
         "dpy_tap": dpy_tap,
         "fine_scroll": fine & 7,
+        "layout": "empirical-visible-linear" if args.visible_layout else "literal-scanline",
         "heblnk_pixels": heblnk,
         "hsblnk_pixels": hsblnk,
         "output": str(args.output),
@@ -115,6 +124,8 @@ def main():
     parser.add_argument("--dpy-step", type=lambda value: int(value, 0))
     parser.add_argument("--dpy-tap", type=lambda value: int(value, 0))
     parser.add_argument("--fine-scroll", type=lambda value: int(value, 0))
+    parser.add_argument("--visible-layout", action="store_true",
+                        help="use the paired-capture-visible four-lines-per-row layout")
     args = parser.parse_args()
     if args.width <= 0 or args.lines <= 0:
         parser.error("width and lines must be positive")
