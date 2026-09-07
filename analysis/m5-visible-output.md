@@ -285,6 +285,12 @@ writes match between the base and twin traces (for example `0xBD08` versus
 `0x6565`). The native boundary must therefore preserve separate output streams;
 shared cadence alone does not justify duplicating one buffer into the other.
 
+The traced GSP then copies the two streams onward: `0xFFF4AA60` writes 2,048
+full-word values to `0xF5000000–0xF5000FF0`, while `0xFFF4AAD0` writes 2,048
+to `0xF5800000–0xF5800FF0`, across the same eight burst frames. This closes a
+work-buffer-to-display-memory transport boundary, but not the display-device
+format or a native game-state producer.
+
 A fresh build of the integrated native shell was verified through
 `tools/run-native-visible-bridge` using the captured VRAM/palette fixture. The
 512×240 PPM matched the expected frame exactly: zero changed pixels, zero

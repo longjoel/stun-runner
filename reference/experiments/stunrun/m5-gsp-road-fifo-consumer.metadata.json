@@ -101,6 +101,32 @@
     "paired_data_equality": false,
     "interpretation": "The runtime loop writes both destination families with the same seven-burst cadence and count. Buffer roles and payload semantics remain UNKNOWN."
   },
+  "downstream_display_copy_trace": {
+    "source_setup": {
+      "entry": "0xFFF4AA10",
+      "source_base": "0xFFF6F650",
+      "first_destination": "0xF5000000",
+      "second_destination": "0xF5800000",
+      "loop_counter": "0x80"
+    },
+    "first_pass": {
+      "pc": "0xFFF4AA60",
+      "result_sha256": "ee40b6f04f4c76823ab29f9d8df9c94adec41bad536d5d8b8b6c3ea947d6bed3",
+      "event_count": 2048,
+      "address_range": "0xF5000000–0xF5000FF0",
+      "address_step": "0x10"
+    },
+    "second_pass": {
+      "pc": "0xFFF4AAD0",
+      "result_sha256": "14bd9830ef9bad3eaf42a76e12d5e7d6c5f6a8226696c58d049249816c5bfb29",
+      "event_count": 2048,
+      "address_range": "0xF5800000–0xF5800FF0",
+      "address_step": "0x10"
+    },
+    "burst_frames": [1280, 1281, 1284, 1287, 1290, 1293, 1296, 1299],
+    "mask": "0xFFFF",
+    "interpretation": "Both work-buffer streams are copied into separate downstream address families with the same cadence; destination device format and payload semantics remain UNKNOWN."
+  },
   "negative_probe": {
     "gsp_fifo_memory_read_events": 0,
     "window": "0xC0000C–0xC0000D",

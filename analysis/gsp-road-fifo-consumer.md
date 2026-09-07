@@ -62,6 +62,15 @@ trace supports shared loop structure and cadence, but the source reads or
 lane state feeding `A0` and `A1` remain distinct. Any native model must keep
 those streams separate until the source-side relationship is proven.
 
+The next GSP routine, entered from `0xFFF42260`, copies the work-buffer
+families onward. `0xFFF4AA10` sets `A0=0xFFF6F650`, `A1=0xF5000000`, and
+`A2=0x80`; after the first loop, the second pass uses `A1=0xF5800000` while
+continuing the source pointer. Direct write taps captured 2,048 full-word
+writes to each destination over eight bursts at frames 1280, 1281, 1284,
+1287, 1290, 1293, 1296, and 1299. This is a stronger work-buffer-to-display-
+memory boundary, but the destination device layout and payload semantics are
+still UNKNOWN.
+
 ## Replay support
 
 `tools/mame-trace` now accepts `--playback INP` in the same positional slot as
