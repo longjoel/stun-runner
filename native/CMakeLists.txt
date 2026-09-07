@@ -145,6 +145,13 @@ target_include_directories(stunrun-road-fifo-slice-test PRIVATE
   ../reproduction/maincpu)
 set_target_properties(stunrun-road-fifo-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME road-fifo-slice-c COMMAND stunrun-road-fifo-slice-test)
+add_executable(stunrun-road-buffer-math-slice-test
+  ../reproduction/maincpu/road_buffer_math.c
+  ../reproduction/maincpu/road_buffer_math_test.c)
+target_include_directories(stunrun-road-buffer-math-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-road-buffer-math-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME road-buffer-math-slice-c COMMAND stunrun-road-buffer-math-slice-test)
 # Object-hit -> award-select -> score-add chain with instruction-stream
 # immediates (0x1F4 at 0x3A2E6, dest words 0xFFDD02/0xFF9532).
 add_executable(stunrun-award-path-slice-test

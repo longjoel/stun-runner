@@ -115,6 +115,13 @@ storing it. In the settled race snapshots that parameter is `1` at
 mechanism therefore supports a scaled twin even though the current fixtures
 exercise the identity case.
 
+The byte arithmetic is now represented literally in
+`reproduction/maincpu/road_buffer_math.c`. It is a standalone slice rather than
+part of the fixture shell: the shell's captured geometry input represents a
+pre-transform buffer, while this C slice models the later subtract/add phase
+with 8-bit wraparound and a configurable byte count. Its focused native test
+is `road-buffer-math-slice-c`.
+
 The reusable snapshot workflow is:
 
 1. Load a recorded race checkpoint with `tools/mame-memory-snapshot`.
