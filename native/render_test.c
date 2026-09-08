@@ -28,6 +28,26 @@ int main(void)
             !stunrun_render_blit(&renderer, source, 2u, 2u, -1, -1))
             return 1;
     }
+    {
+        /* Character '0' captured from the inferred 0xFFF5DBC0 8x8 source
+         * table. Its LSB-first rows are 1C, 36, 63, 63, 63, 36, 1C, 00. */
+        static const uint16_t glyph_zero[4] = {
+            0x361Cu, 0x6363u, 0x3663u, 0x001Cu
+        };
+        if (!stunrun_render_gsp_glyph_8x8(&renderer, glyph_zero, 64, 213,
+                                          0xFFu, 0xFEu, 0u) ||
+            renderer.pixels[((size_t)213u * STUNRUN_RENDER_WIDTH + 66u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)214u * STUNRUN_RENDER_WIDTH + 65u) * 3u + 1u] !=
+                0xFEu ||
+            renderer.pixels[((size_t)215u * STUNRUN_RENDER_WIDTH + 64u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)213u * STUNRUN_RENDER_WIDTH + 64u) * 3u] !=
+                0u ||
+            renderer.pixels[((size_t)220u * STUNRUN_RENDER_WIDTH + 66u) * 3u] !=
+                0u)
+            return 1;
+    }
     if (!stunrun_render_fill_xy(&renderer, 4, 6, 2, 3, 0xA1u, 0xB2u,
                                 0xC3u) ||
         renderer.pixels[((size_t)3u * STUNRUN_RENDER_WIDTH + 2u) * 3u] !=

@@ -70,6 +70,29 @@ int stunrun_render_blit(stunrun_renderer_t *renderer, const uint8_t *source,
     return 1;
 }
 
+int stunrun_render_gsp_glyph_8x8(stunrun_renderer_t *renderer,
+                                 const uint16_t source_words[4],
+                                 int destination_x, int destination_y,
+                                 uint8_t red, uint8_t green, uint8_t blue)
+{
+    unsigned source_y;
+
+    if (renderer == NULL || source_words == NULL)
+        return 0;
+    for (source_y = 0; source_y < 8u; source_y++) {
+        unsigned source_x;
+        for (source_x = 0; source_x < 8u; source_x++) {
+            unsigned bit_index = source_y * 8u + source_x;
+            if ((source_words[bit_index / 16u] >> (bit_index % 16u) & 1u) != 0u)
+                (void)stunrun_render_set_pixel(
+                    renderer, (unsigned)(destination_x + (int)source_x),
+                    (unsigned)(destination_y + (int)source_y), red, green,
+                    blue);
+        }
+    }
+    return 1;
+}
+
 int stunrun_render_fill_xy(stunrun_renderer_t *renderer, int x0, int y0,
                            int x1, int y1, uint8_t red, uint8_t green,
                            uint8_t blue)

@@ -279,6 +279,16 @@ byte selected by `ANDI 0x7F` is consequently mapped by the loop as
 VRAM write. This is a register/data-flow contract; the address-unit and pixel
 lane interpretation still require an independent glyph rendering match.
 
+That glyph match is now established. The four captured source words for `0`
+decode LSB-first to row masks `1C, 36, 63, 63, 63, 36, 1C, 00`. An independent
+crop of the frame-1797 oracle at screenshot origin `(64,213)`, selecting the
+foreground RGB `(255,254,0)`, produced the identical eight masks. The native
+renderer now contains this bounded primitive as
+`stunrun_render_gsp_glyph_8x8`, with transparent zero bits and explicit
+foreground color; `native-render-boundary-c` covers its edge and mask behavior.
+This proves one glyph’s source packing and raster orientation, while the full
+record-to-coordinate producer remains outside the current native shell.
+
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
 `0x02070610–0x020773D0` at frame 1793 and

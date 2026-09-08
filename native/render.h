@@ -29,6 +29,13 @@ int stunrun_render_set_pixel(stunrun_renderer_t *renderer, unsigned x,
 int stunrun_render_blit(stunrun_renderer_t *renderer, const uint8_t *source,
                         unsigned source_width, unsigned source_height,
                         int destination_x, int destination_y);
+/* Evidence-backed GSP PIXBLT candidate: four little-endian 16-bit words hold
+ * an 8x8 one-bit tile, with pixels consumed least-significant-bit first. A
+ * zero source bit is transparent; a one bit receives the supplied color. */
+int stunrun_render_gsp_glyph_8x8(stunrun_renderer_t *renderer,
+                                 const uint16_t source_words[4],
+                                 int destination_x, int destination_y,
+                                 uint8_t red, uint8_t green, uint8_t blue);
 /* Clipped inclusive-coordinate fill counterpart for the traced GSP FILL XY
  * operation. Bounds may be supplied in either order; this is a raster
  * primitive only and assigns no meaning to the coordinates. */

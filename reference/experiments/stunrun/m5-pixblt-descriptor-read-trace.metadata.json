@@ -59,6 +59,15 @@
         "frame_1793": {"screen_sha256": "4b6777d6d0ad9174e274b3d3930b070b4afb7b59e9800e0dac6f7fcce5a17a18", "visible_hud_text": "LEVEL, MPH, and speed readout"},
         "frame_1797": {"screen_sha256": "c2e9fa4d03033335bc64eb13aa3c7fba0658b1e753f907c2abdc3e0d99c3a1f0", "visible_hud_text": "TIME 0:35.0, LEVEL, MPH, and Credits: 0"}
       },
+      "glyph_zero_oracle_match": {
+        "frame": 1797,
+        "screenshot_crop_origin": [64, 213],
+        "foreground_rgb": [255, 254, 0],
+        "source_words": ["0x361C", "0x6363", "0x3663", "0x001C"],
+        "source_lsb_first_row_masks": ["0x1C", "0x36", "0x63", "0x63", "0x63", "0x36", "0x1C", "0x00"],
+        "screenshot_row_masks": ["0x1C", "0x36", "0x63", "0x63", "0x63", "0x36", "0x1C", "0x00"],
+        "match": true
+      },
       "unique_destination_addresses": 992,
       "log_sha256": "fdef6d6940da336de3d56c882f8e0d622f977d18b44844a0acefffb1c0251e06"
     },
