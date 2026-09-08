@@ -11,7 +11,20 @@
     {"id": "normal-b", "path": "/tmp/stunrun-m5-spawn-r1-full-b", "result_sha256": "94ef074117f3b0a993e3d7e485e2053572f5315be03294e8e0aedb20b85e4b25", "canonical_log_sha256": "9e18f9820cf11aeec41dd2a1300caca6b0591c9eb7569a50a93280c0cdf1069b", "delay": null},
     {"id": "wall-delay", "path": "/tmp/stunrun-m5-spawn-r1-full-delay", "result_sha256": "5d6e3ec6eafdb10605ab906dcf41d6dd24005d8ab1ae72868370d7ecf65ed143", "canonical_log_sha256": "662ef6eaf0fb0663d1790b1a12c64c376db34b5407515968a455982247f180fc", "delay": {"frame": 900, "seconds": 2}}
   ],
-  "observations": {"event_stream_equal": true, "first_event_frame": 37, "last_event_frame": 1799, "transition_frame": 883},
+  "observations": {
+    "event_stream_equal": true,
+    "first_event_frame": 37,
+    "last_event_frame": 1799,
+    "transition_frame": 883,
+    "course_write_sidecar": {
+      "path": "/tmp/stunrun-m5-course-write-r1/result.json",
+      "result_sha256": "ec64cb83e076e82cd725b9c02330a386d896a028deb056dff02c944a6e5c103d",
+      "canonical_log_sha256": "54750f09adc0fa411e337c5bc0771a0f46d8b86ae2a900e8ef5abf926ce0b6d8",
+      "frames": [850, 900],
+      "writes": {"0xFF9578": [], "0xFF957A": ["0x0003 at 852–876", "0x0002 at 879"], "0xFF957C": ["0x0000 at 879", "0x0000 at 882"]},
+      "interpretation": "The object-window transition burst at frame 883 follows input/transition-state writes to 0xFF957A/0xFF957C; no course-index write to 0xFF9578 occurs in this interval."
+    }
+  },
   "verdict": "WALL-CLOCK-INVARIANT; FRAME-LOCKED VS POSITION-LOCKED NOT DISCRIMINATED",
-  "interpretation": "A deliberate two-second wall-clock pause at emulated frame 900 leaves the complete recorded input and 0xFFDD00 write event stream unchanged. The run is deterministic and not wall-clock-triggered. Because the replay trajectory and emulated frame counter are identical in all runs, this experiment cannot distinguish an emulated-frame trigger from a track-position trigger."
+  "interpretation": "A deliberate two-second wall-clock pause at emulated frame 900 leaves the complete recorded input and 0xFFDD00 write event stream unchanged. The run is deterministic and not wall-clock-triggered. Because the replay trajectory and emulated frame counter are identical in all runs, this experiment cannot distinguish an emulated-frame trigger from a track-position trigger. The sidecar also shows that the frame-883 object burst is not accompanied by a course-index write to 0xFF9578; it follows writes to the adjacent input/transition-state fields 0xFF957A/0xFF957C."
 }

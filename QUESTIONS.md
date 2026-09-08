@@ -577,3 +577,5 @@ same replay keeps emulated frame and track trajectory coupled. Provenance and
 exact hashes are in
 `reference/experiments/stunrun/m5-object-record-wall-delay.metadata.json`;
 human-facing detail is in `analysis/object-record-wall-delay.md`.
+The paired `0xFF9578–0xFF957D` sidecar shows no course-index write at the
+frame-883 burst; only adjacent input/transition-state fields change before it.

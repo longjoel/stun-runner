@@ -31,5 +31,12 @@ The transition burst is a literal spawn/update landmark only. The writer PCs
 and address offsets identify touched bytes, but do not prove object identity,
 track position, armor, weapons, ammunition, or a spawn counter.
 
+A sidecar write trace over `0xFF9578–0xFF957D` shows that the frame-883 burst
+is not a course-index transition: `0xFF9578` is not written in frames 850–900.
+Instead, `0xFF957A` changes from `0x0003` to `0x0002` at frame 879 and the
+adjacent `0xFF957C` transition field is written at frames 879/882. This ties
+the observed burst to an input/transition-state neighborhood, while leaving
+the object trigger and track-position relationship unresolved.
+
 Full provenance and hashes are in
 `reference/experiments/stunrun/m5-object-record-wall-delay.metadata.json`.
