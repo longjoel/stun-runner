@@ -38,6 +38,7 @@ SOURCES = [
     str(MAINCPU / "geom_upload.c"),
     str(MAINCPU / "road_fifo.c"),
     str(ROOT / "reproduction" / "gsp" / "text_cursor.c"),
+    str(ROOT / "reproduction" / "gsp" / "text_record.c"),
     str(SOUND / "jsa_latch.c"),
 ]
 
@@ -241,6 +242,43 @@ class NativeShellTests(unittest.TestCase):
             self.assertEqual(run.returncode, 0,
                              f"shell failed:\n{run.stdout}\n{run.stderr}")
             self.assertIn("mode=gsp-text-cursor-fixture", run.stdout)
+            payload = frame.read_bytes()
+            header = b"P6\n512 240\n255\n"
+            self.assertEqual(payload[len(header) +
+                                    ((224 * 512 + 213) * 3):
+                                    len(header) + ((224 * 512 + 213) * 3) + 3],
+                             bytes((0xFF, 0xFE, 0x00)))
+
+    def test_shell_consumes_gsp_text_record_fixture(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = pathlib.Path(directory)
+            binary = self.compile_shell(directory)
+            table = [0] * (128 * 4)
+            table[0x43 * 4:0x43 * 4 + 4] = [0x633E, 0x0303,
+                                             0x6303, 0x003E]
+            table[0x72 * 4:0x72 * 4 + 4] = [0x0000, 0x6E3E,
+                                             0x0606, 0x0006]
+            table_path = directory / "text-table.bin"
+            records_path = directory / "text-records.bin"
+            frame = directory / "record-frame.ppm"
+            table_path.write_bytes(b"".join(struct.pack("<H", value)
+                                               for value in table))
+            records_path.write_bytes(b"".join(struct.pack("<H", value)
+                for value in (0x4013, 0, 0x00D4, 0x0108,
+                              0x7243, 0x0000, 0, 0)))
+            env = dict(os.environ)
+            env.update({
+                "STUNRUN_GSP_TEXT_TABLE_BIN": str(table_path),
+                "STUNRUN_GSP_TEXT_RECORD_BIN": str(records_path),
+                "STUNRUN_GSP_TEXT_RECORD_BASE": "0xFFFEA7D0",
+                "STUNRUN_GSP_TEXT_Y_BIAS": "0x28",
+                "STUNRUN_RENDER_PPM": str(frame),
+            })
+            run = subprocess.run([str(binary)], env=env,
+                                 capture_output=True, text=True, check=False)
+            self.assertEqual(run.returncode, 0,
+                             f"shell failed:\n{run.stdout}\n{run.stderr}")
+            self.assertIn("mode=gsp-text-record-fixture", run.stdout)
             payload = frame.read_bytes()
             header = b"P6\n512 240\n255\n"
             self.assertEqual(payload[len(header) +

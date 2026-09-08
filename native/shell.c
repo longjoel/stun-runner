@@ -52,6 +52,7 @@
 #include "render.h"
 #include "gsp_video.h"
 #include "text_cursor.h"
+#include "text_record.h"
 
 static int g_failures = 0;
 static unsigned frame = 0;
@@ -242,6 +243,62 @@ static int render_text_fixture(stunrun_renderer_t *renderer,
     return 1;
 }
 
+static int render_text_record_fixture(stunrun_renderer_t *renderer,
+                                       const char *table_path,
+                                       const char *records_path)
+{
+    uint16_t table[128u * 4u];
+    uint16_t words[1024u];
+    stunrun_gsp_text_record_t record;
+    stunrun_gsp_text_glyph_t glyphs[2048u];
+    size_t table_count = 0u;
+    size_t word_count = 0u;
+    size_t record_index;
+    uint32_t record_base;
+    uint32_t y_bias;
+
+    if (!load_word_fixture(table_path, table, sizeof(table) / sizeof(*table),
+                           &table_count) || table_count != 128u * 4u ||
+        !load_word_fixture(records_path, words, sizeof(words) / sizeof(*words),
+                           &word_count) ||
+        word_count == 0u || word_count % STUNRUN_GSP_TEXT_RECORD_WORDS != 0u ||
+        !parse_fixture_u32("STUNRUN_GSP_TEXT_RECORD_BASE", &record_base) ||
+        !parse_fixture_u32("STUNRUN_GSP_TEXT_Y_BIAS", &y_bias))
+        return 0;
+    for (record_index = 0u;
+         record_index < word_count / STUNRUN_GSP_TEXT_RECORD_WORDS;
+         record_index++) {
+        const uint16_t *packed;
+        uint32_t descriptor;
+        uint32_t a1;
+        size_t glyph_count;
+        size_t glyph_index;
+        stunrun_gsp_text_record_load(
+            words + record_index * STUNRUN_GSP_TEXT_RECORD_WORDS, &record);
+        if (!stunrun_gsp_text_record_cursor(
+                record_base + (uint32_t)(record_index * 0x80u), &record,
+                &descriptor, &a1, &packed))
+            return 0;
+        (void)descriptor;
+        glyph_count = stunrun_gsp_text_cursor_decode(
+            descriptor, a1, (int)y_bias, packed, 4u, glyphs,
+            sizeof(glyphs) / sizeof(*glyphs));
+        if (glyph_count == 0u)
+            return 0;
+        for (glyph_index = 0u; glyph_index < glyph_count; glyph_index++)
+            if (!stunrun_render_gsp_glyph_from_table(
+                    renderer, table, sizeof(table) / sizeof(*table),
+                    glyphs[glyph_index].glyph_code, glyphs[glyph_index].x,
+                    glyphs[glyph_index].y, 0xFFu, 0xFEu, 0u))
+                return 0;
+    }
+    printf("shell: gsp-text-record fixture=loaded records=%u words=%u "
+           "base=0x%08X y-bias=%u\n",
+           (unsigned)(word_count / STUNRUN_GSP_TEXT_RECORD_WORDS),
+           (unsigned)word_count, (unsigned)record_base, (unsigned)y_bias);
+    return 1;
+}
+
 static uint32_t geometry_sum(const uint16_t *words)
 {
     uint32_t sum = 0;
@@ -394,6 +451,7 @@ static int run_walk(void)
     const char *geometry_table_path = getenv("STUNRUN_GEOM_TABLE_BIN");
     const char *gsp_text_table_path = getenv("STUNRUN_GSP_TEXT_TABLE_BIN");
     const char *gsp_text_words_path = getenv("STUNRUN_GSP_TEXT_WORDS_BIN");
+    const char *gsp_text_record_path = getenv("STUNRUN_GSP_TEXT_RECORD_BIN");
     const char *render_mode = "blank-scaffold";
     uint16_t geometry_table[STUNRUN_GEOM_MARCH_WORDS];
     uint16_t geometry_base[STUNRUN_GEOM_MARCH_WORDS];
@@ -549,10 +607,22 @@ static int run_walk(void)
                              gsp_text_table_path[0] != '\0';
         int has_text_words = gsp_text_words_path != NULL &&
                              gsp_text_words_path[0] != '\0';
-        if ((has_text_table != has_text_words) ||
-            (has_text_table && (has_vram || has_rgb || has_low || has_high))) {
-            printf("shell: gsp-text requires table plus words and excludes gsp-video\n");
+        int has_text_records = gsp_text_record_path != NULL &&
+                               gsp_text_record_path[0] != '\0';
+        int has_any_text = has_text_table || has_text_words || has_text_records;
+        if (has_any_text && (!has_text_table ||
+            (has_text_words == has_text_records) ||
+            (has_text_table && (has_vram || has_rgb || has_low || has_high)))) {
+            printf("shell: gsp-text requires table plus exactly one of words/records and excludes gsp-video\n");
             g_failures++;
+        } else if (has_text_records) {
+            if (!render_text_record_fixture(&renderer, gsp_text_table_path,
+                                            gsp_text_record_path)) {
+                printf("shell: gsp-text-record load=error\n");
+                g_failures++;
+            } else {
+                render_mode = "gsp-text-record-fixture";
+            }
         } else if (has_text_table) {
             if (!render_text_fixture(&renderer, gsp_text_table_path,
                                      gsp_text_words_path)) {

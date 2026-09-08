@@ -124,6 +124,13 @@ renders the glyphs in the supplied table at the observed A1 cells. This is a
 reproducible native producer boundary for captured HUD data; it deliberately
 does not infer a live game-state source for those files.
 
+For the upstream record boundary, provide the same table through
+`STUNRUN_GSP_TEXT_TABLE_BIN`, replace the packed-word input with
+`STUNRUN_GSP_TEXT_RECORD_BIN` (a sequence of 8-word little-endian records),
+and set `STUNRUN_GSP_TEXT_RECORD_BASE` plus `STUNRUN_GSP_TEXT_Y_BIAS`. The
+shell derives each record's descriptor address and A1 cursor from its raw
+header and reports `mode=gsp-text-record-fixture`.
+
 `tools/export-gsp-text-fixture` converts the captured
 `stunrun-memory-snapshot/v1` glyph-table JSON to the table binary and accepts
 descriptor words in source order, for example:

@@ -66,6 +66,7 @@ add_executable(stunrun-native-shell
   ../reproduction/maincpu/geom_upload.c
   ../reproduction/maincpu/road_fifo.c
   ../reproduction/gsp/text_cursor.c
+  ../reproduction/gsp/text_record.c
   ../reproduction/sound/jsa_latch.c)
 target_include_directories(stunrun-native-shell PRIVATE
   ../reproduction/adsp ../reproduction/maincpu ../reproduction/gsp
