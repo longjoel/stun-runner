@@ -249,6 +249,17 @@ returned zero events. This is an instrumentation boundary: the MAME tap does
 not expose that pixel operation as an ordinary data read at the filtered PC.
 The exact commands, counts, and log hashes are recorded in
 `reference/experiments/stunrun/m5-pixblt-descriptor-read-trace.metadata.json`.
+The reusable ROM-free decoder for this observation is
+`tools/analyze-packed-text-trace`; for example:
+
+```sh
+tools/analyze-packed-text-trace <ram-read-result.json> \\
+  --pc 0xFFF464E0 --output packed-text.json
+```
+
+It removes the instruction-fetch tap events, collapses the interleaved
+duplicate bus observations, and preserves both the raw words and decoded byte
+stream for review.
 
 The blit setup also loads a fixed `8 × 8` dimension pair from
 `0xFFF5DB00`/`0xFFF5DB10`, followed by the split pointer words `0xDBC0` and
