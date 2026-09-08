@@ -139,3 +139,14 @@ Nearest writes were `-3: 1,938`, `-4: 221`, `-5: 26`, `+2: 180`, `+3: 460`,
 separate-run comparison, but it still does not identify a producer routine or
 assign meanings to record fields. Provenance is recorded in
 `reference/experiments/stunrun/m5-gsp-record-source-same-run.metadata.json`.
+
+Offline attribution of the same capture gives the individual writer PCs a
+useful negative test. The broad `FILL XY` writer at `0xFFF454E0` accounts for
+7,066 writes and overlaps 2,108 of the dynamic source addresses, but none of
+its 2,403 matching reads is same-frame. `LINE 0` at `0xFFF45DD0` accounts for
+869 writes and overlaps 128 addresses, again with zero same-frame matches.
+The other tested renderer/parser PCs show the same zero-match result. These
+are therefore shared VRAM writers or staged-buffer activity, not yet a
+verified record producer. The result should remain a renderer boundary until
+an instruction-order capture or a producer-side source trace identifies the
+write phase.

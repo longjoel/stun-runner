@@ -25,6 +25,14 @@
     "same_frame_overlap_read_count": 0,
     "nearest_write_delta_frames": {"-5": 26, "-4": 221, "-3": 1938, "2": 180, "3": 460, "4": 380, "5": 837}
   },
+  "writer_pc_checks": [
+    {"pc": "0xFFF454E0", "write_event_count": 7066, "overlap_address_count": 2108, "overlap_read_count": 2403, "same_frame_overlap_read_count": 0},
+    {"pc": "0xFFF45DD0", "write_event_count": 869, "overlap_address_count": 128, "overlap_read_count": 128, "same_frame_overlap_read_count": 0},
+    {"pc": "0xFFF45500", "write_event_count": 805, "overlap_address_count": 206, "overlap_read_count": 227, "same_frame_overlap_read_count": 0},
+    {"pc": "0xFFF45460", "write_event_count": 390, "overlap_address_count": 118, "overlap_read_count": 154, "same_frame_overlap_read_count": 0},
+    {"pc": "0xFFF45A10", "write_event_count": 90, "overlap_address_count": 16, "overlap_read_count": 16, "same_frame_overlap_read_count": 0},
+    {"pc": "0xFFF45090", "write_event_count": 57, "overlap_address_count": 15, "overlap_read_count": 15, "same_frame_overlap_read_count": 0}
+  ],
   "start_condition": {
     "load_state": "/tmp/stunrun-latedrive2400.sta",
     "input": "fork_center",
