@@ -181,6 +181,35 @@ class NativeShellTests(unittest.TestCase):
             self.assertIn("mode=gsp-visible-state", run.stdout)
             self.assertTrue(frame.is_file())
 
+    def test_shell_consumes_raw_gsp_palette_planes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = pathlib.Path(directory)
+            binary = self.compile_shell(directory)
+            vram = directory / "vram.bin"
+            low = directory / "palette-low.bin"
+            high = directory / "palette-high.bin"
+            frame = directory / "gsp-raw-frame.ppm"
+            vram.write_bytes(b"".join(struct.pack("<H", value)
+                                         for value in (0x0707, 0, 0, 0)))
+            low.write_bytes(b"".join(struct.pack("<H", 0x1234)
+                                        for _ in range(256)))
+            high.write_bytes(b"".join(struct.pack("<H", 0xABCD)
+                                         for _ in range(256)))
+            env = dict(os.environ)
+            env["STUNRUN_GSP_VRAM_BIN"] = str(vram)
+            env["STUNRUN_GSP_PALETTE_LOW_BIN"] = str(low)
+            env["STUNRUN_GSP_PALETTE_HIGH_BIN"] = str(high)
+            env["STUNRUN_RENDER_PPM"] = str(frame)
+            run = subprocess.run([str(binary)], env=env,
+                                 capture_output=True, text=True, check=False)
+            self.assertEqual(run.returncode, 0,
+                             f"shell failed:\n{run.stdout}\n{run.stderr}")
+            self.assertIn("mode=gsp-visible-state", run.stdout)
+            payload = frame.read_bytes()
+            header = b"P6\n512 240\n255\n"
+            self.assertEqual(payload[len(header):len(header) + 3],
+                             bytes((0x12, 0x34, 0xCD)))
+
     def test_shell_consumes_optional_geometry_fixture(self):
         with tempfile.TemporaryDirectory() as directory:
             directory = pathlib.Path(directory)

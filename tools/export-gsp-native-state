@@ -21,6 +21,8 @@ def main():
     parser.add_argument("palette_hi", type=pathlib.Path)
     parser.add_argument("--vram-out", type=pathlib.Path, required=True)
     parser.add_argument("--palette-out", type=pathlib.Path, required=True)
+    parser.add_argument("--palette-low-out", type=pathlib.Path)
+    parser.add_argument("--palette-high-out", type=pathlib.Path)
     args = parser.parse_args()
     words = snapshot(args.vram)
     lo = snapshot(args.palette_lo)
@@ -38,12 +40,25 @@ def main():
         palette.extend(((lo[index] >> 8) & 0xff, lo[index] & 0xff,
                         hi[index] & 0xff))
     args.palette_out.write_bytes(palette)
+    if (args.palette_low_out is None) != (args.palette_high_out is None):
+        raise SystemExit("raw palette output requires both low and high paths")
+    if args.palette_low_out is not None:
+        args.palette_low_out.parent.mkdir(parents=True, exist_ok=True)
+        args.palette_high_out.parent.mkdir(parents=True, exist_ok=True)
+        args.palette_low_out.write_bytes(b"".join(
+            struct.pack("<H", word & 0xffff) for word in lo[:256]))
+        args.palette_high_out.write_bytes(b"".join(
+            struct.pack("<H", word & 0xffff) for word in hi[:256]))
     print(json.dumps({
         "schema": "stunrun-native-gsp-state/v1",
         "vram_words": len(words),
         "vram_output": str(args.vram_out),
         "palette_entries": 256,
         "palette_output": str(args.palette_out),
+        "palette_low_output": (str(args.palette_low_out)
+                               if args.palette_low_out is not None else None),
+        "palette_high_output": (str(args.palette_high_out)
+                                if args.palette_high_out is not None else None),
     }, sort_keys=True))
 
 

@@ -297,6 +297,8 @@ static int run_walk(void)
     unsigned i;
     const char *gsp_vram_path = getenv("STUNRUN_GSP_VRAM_BIN");
     const char *gsp_palette_path = getenv("STUNRUN_GSP_PALETTE_BIN");
+    const char *gsp_palette_low_path = getenv("STUNRUN_GSP_PALETTE_LOW_BIN");
+    const char *gsp_palette_high_path = getenv("STUNRUN_GSP_PALETTE_HIGH_BIN");
     const char *geometry_table_path = getenv("STUNRUN_GEOM_TABLE_BIN");
     const char *render_mode = "blank-scaffold";
     uint16_t geometry_table[STUNRUN_GEOM_MARCH_WORDS];
@@ -442,20 +444,35 @@ static int run_walk(void)
     /* Rendering is a deliberately blank native frame boundary until the
      * first visible-output milestone supplies evidence-backed drawing. */
     stunrun_render_begin(&renderer, g_terminal, 0u, 0u, 0u);
-    if ((gsp_vram_path != NULL && gsp_vram_path[0] != '\0') !=
-        (gsp_palette_path != NULL && gsp_palette_path[0] != '\0')) {
-        printf("shell: gsp-video requires both binary paths\n");
-        g_failures++;
-    } else if (gsp_vram_path != NULL && gsp_vram_path[0] != '\0') {
-        if (!stunrun_gsp_video_load(&video, gsp_vram_path,
-                                    gsp_palette_path)) {
+    {
+        int has_vram = gsp_vram_path != NULL && gsp_vram_path[0] != '\0';
+        int has_rgb = gsp_palette_path != NULL && gsp_palette_path[0] != '\0';
+        int has_low = gsp_palette_low_path != NULL &&
+                      gsp_palette_low_path[0] != '\0';
+        int has_high = gsp_palette_high_path != NULL &&
+                       gsp_palette_high_path[0] != '\0';
+        if (!has_vram || (has_rgb && (has_low || has_high)) ||
+            (!has_rgb && (has_low != has_high))) {
+            if (has_vram || has_rgb || has_low || has_high) {
+                printf("shell: gsp-video requires VRAM plus either RGB or both raw palette planes\n");
+                g_failures++;
+            }
+        } else if (has_rgb || has_low) {
+            int loaded = has_rgb ?
+                stunrun_gsp_video_load(&video, gsp_vram_path,
+                                       gsp_palette_path) :
+                stunrun_gsp_video_load_palette_planes(
+                    &video, gsp_vram_path, gsp_palette_low_path,
+                    gsp_palette_high_path);
+            if (!loaded) {
             printf("shell: gsp-video load=error\n");
             g_failures++;
-        } else if (!stunrun_gsp_video_render(&video, &renderer)) {
+            } else if (!stunrun_gsp_video_render(&video, &renderer)) {
             printf("shell: gsp-video render=error\n");
             g_failures++;
-        } else {
+            } else {
             render_mode = "gsp-visible-state";
+            }
         }
     }
     render_path = getenv("STUNRUN_RENDER_PPM");

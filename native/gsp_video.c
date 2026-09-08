@@ -5,6 +5,7 @@
 #include <string.h>
 
 static int power_of_two(size_t value);
+static int read_file_exact(const char *path, void *data, size_t size);
 
 int stunrun_gsp_palette_decode(const uint16_t *palette_low,
                                const uint16_t *palette_high,
@@ -85,6 +86,21 @@ int stunrun_gsp_video_set_vram_bytes(stunrun_gsp_video_state_t *state,
 static int power_of_two(size_t value)
 {
     return value != 0u && (value & (value - 1u)) == 0u;
+}
+
+static int read_file_exact(const char *path, void *data, size_t size)
+{
+    FILE *file;
+    int ok;
+
+    if (path == NULL || data == NULL)
+        return 0;
+    file = fopen(path, "rb");
+    if (file == NULL)
+        return 0;
+    ok = fread(data, 1, size, file) == size && fgetc(file) == EOF;
+    fclose(file);
+    return ok;
 }
 
 void stunrun_gsp_video_init(stunrun_gsp_video_state_t *state)
@@ -172,4 +188,66 @@ int stunrun_gsp_video_render(const stunrun_gsp_video_state_t *state,
     return stunrun_render_gsp_visible(renderer, state->vram_words,
                                       state->vram_word_count,
                                       state->palette_rgb);
+}
+
+int stunrun_gsp_video_load_palette_planes(stunrun_gsp_video_state_t *state,
+                                          const char *vram_path,
+                                          const char *palette_low_path,
+                                          const char *palette_high_path)
+{
+    FILE *vram_file = NULL;
+    long vram_bytes;
+    uint8_t *vram_data = NULL;
+    uint8_t low_bytes[256u * 2u];
+    uint8_t high_bytes[256u * 2u];
+    uint16_t low[256u];
+    uint16_t high[256u];
+    stunrun_gsp_video_state_t loaded;
+    size_t index;
+
+    if (state == NULL || vram_path == NULL || palette_low_path == NULL ||
+        palette_high_path == NULL)
+        return 0;
+    stunrun_gsp_video_init(&loaded);
+    vram_file = fopen(vram_path, "rb");
+    if (vram_file == NULL || fseek(vram_file, 0, SEEK_END) != 0)
+        goto fail;
+    vram_bytes = ftell(vram_file);
+    if (vram_bytes <= 0 || (vram_bytes % 2) != 0 ||
+        fseek(vram_file, 0, SEEK_SET) != 0)
+        goto fail;
+    vram_data = (uint8_t *)malloc((size_t)vram_bytes);
+    if (vram_data == NULL ||
+        fread(vram_data, 1, (size_t)vram_bytes, vram_file) !=
+            (size_t)vram_bytes || fgetc(vram_file) != EOF ||
+        !read_file_exact(palette_low_path, low_bytes, sizeof(low_bytes)) ||
+        !read_file_exact(palette_high_path, high_bytes, sizeof(high_bytes)))
+        goto fail;
+    fclose(vram_file);
+    vram_file = NULL;
+    for (index = 0; index < 256u; index++) {
+        low[index] = (uint16_t)low_bytes[index * 2u] |
+                     ((uint16_t)low_bytes[index * 2u + 1u] << 8);
+        high[index] = (uint16_t)high_bytes[index * 2u] |
+                      ((uint16_t)high_bytes[index * 2u + 1u] << 8);
+    }
+    if (!stunrun_gsp_video_set_vram_bytes(&loaded, vram_data,
+                                          (size_t)vram_bytes) ||
+        !stunrun_gsp_video_set_palette_planes(&loaded, low, high))
+        goto fail;
+    free(vram_data);
+    free(state->vram_words);
+    state->vram_words = loaded.vram_words;
+    state->vram_word_count = loaded.vram_word_count;
+    memcpy(state->palette_rgb, loaded.palette_rgb, sizeof(state->palette_rgb));
+    loaded.vram_words = NULL;
+    stunrun_gsp_video_free(&loaded);
+    return 1;
+
+fail:
+    free(vram_data);
+    stunrun_gsp_video_free(&loaded);
+    if (vram_file != NULL)
+        fclose(vram_file);
+    return 0;
 }

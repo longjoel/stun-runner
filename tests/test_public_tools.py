@@ -250,11 +250,21 @@ class PublicToolTests(unittest.TestCase):
             hi.write_text(json.dumps({**common, "values": [0x0020] * 256}), encoding="utf-8")
             vram_out = temp / "vram.bin"
             palette_out = temp / "palette.rgb"
+            low_out = temp / "palette-low.bin"
+            high_out = temp / "palette-high.bin"
             self.run_tool("export-gsp-native-state", vram, lo, hi,
                           "--vram-out", vram_out, "--palette-out", palette_out)
             self.assertEqual(vram_out.read_bytes(), b"".join(
                 struct.pack("<H", value) for value in (1, 0x2345, 3, 4)))
             self.assertEqual(palette_out.read_bytes(), bytes([0x10, 0, 0x20]) * 256)
+            self.run_tool("export-gsp-native-state", vram, lo, hi,
+                          "--vram-out", vram_out, "--palette-out", palette_out,
+                          "--palette-low-out", low_out,
+                          "--palette-high-out", high_out)
+            self.assertEqual(low_out.read_bytes(),
+                             struct.pack("<H", 0x1000) * 256)
+            self.assertEqual(high_out.read_bytes(),
+                             struct.pack("<H", 0x0020) * 256)
 
     def test_export_geometry_native_state_validates_twin_and_writes_words(self):
         with tempfile.TemporaryDirectory() as temp:

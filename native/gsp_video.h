@@ -38,6 +38,12 @@ void stunrun_gsp_video_init(stunrun_gsp_video_state_t *state);
 void stunrun_gsp_video_free(stunrun_gsp_video_state_t *state);
 int stunrun_gsp_video_load(stunrun_gsp_video_state_t *state,
                            const char *vram_path, const char *palette_path);
+/* Load little-endian raw palette-plane snapshots without preconverting them
+ * to RGB. Each palette file contains exactly 256 16-bit words. */
+int stunrun_gsp_video_load_palette_planes(stunrun_gsp_video_state_t *state,
+                                          const char *vram_path,
+                                          const char *palette_low_path,
+                                          const char *palette_high_path);
 /* Render a loaded GSP state through the evidence-backed visible layout. */
 int stunrun_gsp_video_render(const stunrun_gsp_video_state_t *state,
                              stunrun_renderer_t *renderer);

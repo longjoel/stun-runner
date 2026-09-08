@@ -108,7 +108,12 @@ evidence, export snapshots with `tools/export-gsp-native-state` and set
 `STUNRUN_GSP_VRAM_BIN`, `STUNRUN_GSP_PALETTE_BIN`, and optionally
 `STUNRUN_RENDER_PPM=/path/frame.ppm`. The shell then reports
 `mode=gsp-visible-state` and renders through the native primitive. This is a
-fixture bridge, not yet a native game-state producer.
+fixture bridge, not yet a native game-state producer. Raw little-endian MAME
+palette snapshots can be supplied directly with
+`STUNRUN_GSP_PALETTE_LOW_BIN` and `STUNRUN_GSP_PALETTE_HIGH_BIN`; the shell
+then applies the evidence-backed two-plane decode in C instead of requiring
+the RGB export step. `tools/export-gsp-native-state` can emit those files with
+`--palette-low-out` and `--palette-high-out` alongside its existing RGB output.
 
 The optional `STUNRUN_GEOM_TABLE_BIN` input accepts a 768-byte big-endian
 table fixture and exercises the evidence-backed 384-word road-buffer upload
