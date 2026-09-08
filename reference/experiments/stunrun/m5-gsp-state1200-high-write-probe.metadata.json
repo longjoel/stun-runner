@@ -1,0 +1,43 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-state1200-high-write-probe",
+  "target": "stunrun",
+  "purpose": "Bound the recurring GSP high-memory producer activity from a reusable frame-1200 save state.",
+  "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-producer-1200 --device :mainpcb:gsp --base 0xFFF80000 --end 0xFFFFFFFF --frames 60 --start-frame 1 --end-frame 60 --tap-frame 1 --max-events 50000 --registers --load-state /tmp/race2/state-1200.sta --input none --nothrottle",
+  "start_condition": {
+    "save_state": "/tmp/race2/state-1200.sta",
+    "relative_frames": "1-60",
+    "input": "none"
+  },
+  "result": {
+    "path": "/tmp/stunrun-m5-gsp-producer-1200/result.json",
+    "sha256": "0292b6ae77362170308fb2bb3c06cbde9412313bbf6affc3127ed0a4bece2bc9",
+    "canonical_log_sha256": "91ed9957a55a7b767e384595164c9aeca32b93c114ec93965101fd3ad8b2518d",
+    "event_count": 1567,
+    "truncated": false,
+    "frame_counts": {
+      "1": 570,
+      "2": 85,
+      "3-59": 16
+    },
+    "address_range": "0xFFF982F0-0xFFF98760",
+    "address_count": 72,
+    "outlier_address": "0xFFFCFC00",
+    "outlier_count": 1,
+    "writer_pcs": [
+      "0xFFF41060", "0xFFF412D0", "0xFFF414C0", "0xFFF418A0",
+      "0xFFF41C00", "0xFFF41C10", "0xFFF42060", "0xFFF42120",
+      "0xFFF42140", "0xFFF42290", "0xFFF42E90", "0xFFF43D20",
+      "0xFFF43D40", "0xFFF45060", "0xFFF454A0", "0xFFF46210",
+      "0xFFF46230", "0xFFF462E0", "0xFFF46300", "0xFFF46320",
+      "0xFFF47030", "0xFFF47900", "0xFFF488D0"
+    ]
+  },
+  "observations": {
+    "recurring_block": "After initialization, each relative frame 3-59 emits exactly 16 full-word writes into 0xFFF98670-0xFFF98760, with a stable set of pointer-like and control-like values.",
+    "initialization": "Relative frame 1 emits 570 writes and relative frame 2 emits 85 writes across the surrounding 0xFFF982F0-0xFFF98760 region.",
+    "pointer_landmark": "The only write outside the main block is one write at 0xFFFCFC00 from PC 0xFFF418A0.",
+    "record_writer_proximity": "PC 0xFFF45060 writes 0xFFF98510/0xFFF98520 during the initialization burst; this is a candidate staging/descriptor write site, not yet a proven indexed-record producer."
+  },
+  "interpretation": "This is direct GSP-side high-memory staging activity following a saved gameplay state. The recurring block and writer PCs are now bounded for a follow-up read/write correlation. No word, pointer, or block is promoted to track, road, object, HUD, craft, weapon, or armor semantics."
+}

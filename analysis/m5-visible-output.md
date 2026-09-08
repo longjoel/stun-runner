@@ -551,3 +551,29 @@ must not be paired against source snapshots from separate MAME invocations;
 same-event read/write traces show all 2,048 values copied exactly across the
 two passes. Destination device interpretation remains the next format target;
 no pixel interpretation is promoted.
+
+## Frame-1200 GSP producer lead
+
+The reusable frame-1200 save state provides a shorter route back toward the
+upstream producer than replaying the whole course. A 60-frame GSP write trace
+over `0xFFF80000–0xFFFFFFFF` produced 1,567 events without truncation. Relative
+frame 1 contains a 570-write initialization burst, frame 2 contains 85 writes,
+and every frame from 3 through 59 contains exactly 16 writes.
+
+The recurring writes occupy 72 word addresses in
+`0xFFF982F0–0xFFF98760`, with the steady-state 16-word block concentrated in
+`0xFFF98670–0xFFF98760`. The only outside write is one transaction at
+`0xFFFCFC00`. The writer set contains the dispatch/record-adjacent PCs
+`0xFFF41060`, `0xFFF45060`, `0xFFF454A0`, and the surrounding setup routines.
+This is the strongest current direct lead for a GSP-side staged producer after
+the fork boundary.
+
+The trace establishes timing, address range, and writer ownership only. The
+values may be pointers, descriptors, control words, or payload, but their
+meaning is still `UNKNOWN`; no track, road, object, HUD, craft, weapon, or
+armor field is assigned. The full command, hashes, and writer inventory are
+recorded in
+`reference/experiments/stunrun/m5-gsp-state1200-high-write-probe.metadata.json`.
+The next bounded step is to correlate reads from this block against the known
+`0xFFF45000` indexed-record walk and the downstream `FILL XY`/display-copy
+passes in the same save-state window.
