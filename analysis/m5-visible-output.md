@@ -302,6 +302,11 @@ implements the measured `& 0x7F` code selection and four-word tile stride.
 It is a reusable renderer boundary only; the native shell does not pretend to
 own the live GSP high-memory cursor until that producer is independently
 reconstructed.
+The captured source words for the complete `Credits:` run are also covered by
+the native renderer regression at oracle placement `(212,224)`. This checks
+the eight-character sequence and its 8-pixel advance as one bounded HUD
+fixture; it supplies glyph codes explicitly and does not claim to reconstruct
+the live GSP record cursor.
 
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:

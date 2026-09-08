@@ -86,6 +86,56 @@ int main(void)
             return 1;
     }
     {
+        static const uint8_t codes[] = {
+            0x43u, 0x72u, 0x65u, 0x64u, 0x69u, 0x74u, 0x73u, 0x3Au
+        };
+        static const uint16_t words[][4] = {
+            {0x633Eu, 0x0303u, 0x6303u, 0x003Eu},
+            {0x0000u, 0x6E3Eu, 0x0606u, 0x0006u},
+            {0x0000u, 0x663Cu, 0x067Eu, 0x003Cu},
+            {0x6060u, 0x667Cu, 0x6666u, 0x007Cu},
+            {0x0018u, 0x181Cu, 0x1818u, 0x003Cu},
+            {0x1818u, 0x187Eu, 0x1818u, 0x0070u},
+            {0x0000u, 0x063Cu, 0x603Cu, 0x003Eu},
+            {0x0000u, 0x1818u, 0x1800u, 0x0018u},
+        };
+        static const uint8_t masks[][8] = {
+            {0x3Eu, 0x63u, 0x03u, 0x03u, 0x03u, 0x63u, 0x3Eu, 0x00u},
+            {0x00u, 0x00u, 0x3Eu, 0x6Eu, 0x06u, 0x06u, 0x06u, 0x00u},
+            {0x00u, 0x00u, 0x3Cu, 0x66u, 0x7Eu, 0x06u, 0x3Cu, 0x00u},
+            {0x60u, 0x60u, 0x7Cu, 0x66u, 0x66u, 0x66u, 0x7Cu, 0x00u},
+            {0x18u, 0x00u, 0x1Cu, 0x18u, 0x18u, 0x18u, 0x3Cu, 0x00u},
+            {0x18u, 0x18u, 0x7Eu, 0x18u, 0x18u, 0x18u, 0x70u, 0x00u},
+            {0x00u, 0x00u, 0x3Cu, 0x06u, 0x3Cu, 0x60u, 0x3Eu, 0x00u},
+            {0x00u, 0x00u, 0x18u, 0x18u, 0x00u, 0x18u, 0x18u, 0x00u},
+        };
+        uint16_t source_table[128u * 4u] = {0};
+        size_t glyph;
+        stunrun_render_begin(&renderer, 18u, 0u, 0u, 0u);
+        for (glyph = 0; glyph < sizeof(codes); glyph++)
+            memcpy(source_table + (size_t)codes[glyph] * 4u, words[glyph],
+                   sizeof(words[glyph]));
+        if (!stunrun_render_gsp_text_8x8(
+                &renderer, source_table, sizeof(source_table) / sizeof(*source_table),
+                codes, sizeof(codes), 212, 224, 0xFFu, 0xFEu, 0u))
+            return 1;
+        for (glyph = 0; glyph < sizeof(codes); glyph++) {
+            unsigned y;
+            for (y = 0; y < 8u; y++) {
+                unsigned x;
+                for (x = 0; x < 8u; x++) {
+                    size_t offset = ((size_t)(224 + y) * STUNRUN_RENDER_WIDTH +
+                                     212u + glyph * 8u + x) * 3u;
+                    int set = (masks[glyph][y] & (1u << x)) != 0u;
+                    if ((renderer.pixels[offset] != (set ? 0xFFu : 0u)) ||
+                        (renderer.pixels[offset + 1u] != (set ? 0xFEu : 0u)) ||
+                        renderer.pixels[offset + 2u] != 0u)
+                        return 1;
+                }
+            }
+        }
+    }
+    {
         uint16_t source_table[128u * 4u] = {0};
         static const uint8_t text[] = {0x43u, 0x72u};
         source_table[0x43u * 4u] = 0x633Eu;
