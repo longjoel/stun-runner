@@ -85,6 +85,27 @@ int main(void)
                 0u)
             return 1;
     }
+    {
+        uint16_t source_table[128u * 4u] = {0};
+        static const uint8_t text[] = {0x43u, 0x72u};
+        source_table[0x43u * 4u] = 0x633Eu;
+        source_table[0x43u * 4u + 1u] = 0x0303u;
+        source_table[0x43u * 4u + 2u] = 0x6303u;
+        source_table[0x43u * 4u + 3u] = 0x003Eu;
+        source_table[0x72u * 4u + 1u] = 0x6E3Eu;
+        source_table[0x72u * 4u + 2u] = 0x0606u;
+        source_table[0x72u * 4u + 3u] = 0x0006u;
+        if (!stunrun_render_gsp_text_8x8(
+                &renderer, source_table, sizeof(source_table) / sizeof(*source_table),
+                text, sizeof(text), 212, 224, 0xFFu, 0xFEu, 0u) ||
+            renderer.pixels[((size_t)224u * STUNRUN_RENDER_WIDTH + 213u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)226u * STUNRUN_RENDER_WIDTH + 220u) * 3u] !=
+                0u ||
+            renderer.pixels[((size_t)226u * STUNRUN_RENDER_WIDTH + 221u) * 3u] !=
+                0xFFu)
+            return 1;
+    }
     if (!stunrun_render_fill_xy(&renderer, 4, 6, 2, 3, 0xA1u, 0xB2u,
                                 0xC3u) ||
         renderer.pixels[((size_t)3u * STUNRUN_RENDER_WIDTH + 2u) * 3u] !=

@@ -1,6 +1,7 @@
 /* See render.h for the deliberately small M4 rendering contract. */
 #include "render.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -109,6 +110,32 @@ int stunrun_render_gsp_glyph_from_table(stunrun_renderer_t *renderer,
     return stunrun_render_gsp_glyph_8x8(
         renderer, source_table + offset, destination_x, destination_y,
         red, green, blue);
+}
+
+int stunrun_render_gsp_text_8x8(stunrun_renderer_t *renderer,
+                                const uint16_t *source_table,
+                                size_t source_word_count,
+                                const uint8_t *glyph_codes,
+                                size_t glyph_count,
+                                int destination_x, int destination_y,
+                                uint8_t red, uint8_t green, uint8_t blue)
+{
+    size_t index;
+
+    if (renderer == NULL || source_table == NULL || glyph_codes == NULL ||
+        source_word_count < 128u * 4u)
+        return 0;
+    for (index = 0; index < glyph_count; index++) {
+        int x;
+        if (index > (size_t)(INT_MAX - destination_x) / 8u)
+            return 0;
+        x = destination_x + (int)(index * 8u);
+        if (!stunrun_render_gsp_glyph_from_table(
+                renderer, source_table, source_word_count, glyph_codes[index],
+                x, destination_y, red, green, blue))
+            return 0;
+    }
+    return 1;
 }
 
 int stunrun_render_fill_xy(stunrun_renderer_t *renderer, int x0, int y0,
