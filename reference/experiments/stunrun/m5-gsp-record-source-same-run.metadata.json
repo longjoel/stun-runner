@@ -42,16 +42,22 @@
     "nothrottle": true
   },
   "order_capture": {
-    "path": "/tmp/stunrun-m5-same-run-order/result.json",
-    "sha256": "20b36ada308fa16f42d9151a394768d0bc93755b3e33a99652c999bb2dea4088",
-    "correlation_path": "/tmp/stunrun-m5-same-run-order/correlation.json",
-    "correlation_sha256": "d99f8481289243e2381fd8352e02d9c724cb43a598e5ac4ca5b3d52bfefd9ac3",
+    "path": "/tmp/stunrun-m5-nearest-writer/result.json",
+    "sha256": "63916c7eef8ed3d79d57b060d9acde99ec8a16c5402eb6d2b49d27db0b4f2dc8",
+    "correlation_path": "/tmp/stunrun-m5-nearest-writer/correlation.json",
+    "correlation_sha256": "e4aa6cd6c1f56feed58c569590368684c6b6471d71c6655d884e4945a089067d",
     "read_pcs": ["0xFFF45000", "0xFFF45090", "0xFFF450F0", "0xFFF45110"],
     "read_event_count": 1010,
     "same_frame_overlap_read_count": 0,
     "same_order_overlap_read_count": 0,
     "nearest_write_order_before_read_count": 525,
-    "nearest_write_order_after_read_count": 485
+    "nearest_write_order_after_read_count": 485,
+    "nearest_write_pc_counts": {
+      "0xFFF454E0": 488,
+      "0xFFF45500": 52,
+      "0xFFF45DD0": 42,
+      "0xFFF45480": 41
+    }
   },
   "interpretation": "Same-run capture removes the separate-invocation caveat, but zero same-frame and same-order matches still do not identify a producer routine or establish record-field semantics."
 }

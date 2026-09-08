@@ -46,10 +46,12 @@ def main() -> int:
                 (args.max_address is None or address <= args.max_address))
 
     writes_by_address = collections.defaultdict(set)
+    write_events_by_address = collections.defaultdict(list)
     write_pcs_by_address = collections.defaultdict(set)
     selected_writes = [event for event in write_events if in_range(event)]
     for event in selected_writes:
         writes_by_address[event["address"]].add(event["frame"])
+        write_events_by_address[event["address"]].append(event)
         if isinstance(event.get("pc"), int):
             write_pcs_by_address[event["address"]].add(event["pc"])
 
@@ -69,6 +71,7 @@ def main() -> int:
     same_order = 0
     order_before_read = 0
     order_after_read = 0
+    nearest_write_pcs = collections.Counter()
     overlap_reads = 0
     for event in selected_reads:
         frames = writes_by_address.get(event["address"], set())
@@ -84,9 +87,16 @@ def main() -> int:
                         if write_event["address"] == event["address"] and
                         isinstance(write_event.get("order"), int)]
         if isinstance(event.get("order"), int) and write_orders:
-            order_deltas = [order - event["order"] for order in write_orders]
-            nearest_order = min(order_deltas, key=abs)
+            ordered_writes = write_events_by_address[event["address"]]
+            nearest_write = min(
+                (write_event for write_event in ordered_writes
+                 if isinstance(write_event.get("order"), int)),
+                key=lambda write_event: abs(write_event["order"] - event["order"]),
+            )
+            nearest_order = nearest_write["order"] - event["order"]
             nearest_order_deltas[nearest_order] += 1
+            if isinstance(nearest_write.get("pc"), int):
+                nearest_write_pcs[nearest_write["pc"]] += 1
             if nearest_order == 0:
                 same_order += 1
             elif nearest_order < 0:
@@ -117,6 +127,10 @@ def main() -> int:
         },
         "nearest_write_order_before_read_count": order_before_read,
         "nearest_write_order_after_read_count": order_after_read,
+        "nearest_write_pc_counts": {
+            f"0x{pc:X}": count for pc, count in
+            sorted(nearest_write_pcs.items(), key=lambda item: (-item[1], item[0]))
+        },
         "nearest_write_delta_frames": {
             str(delta): count for delta, count in sorted(nearest_deltas.items())
         },

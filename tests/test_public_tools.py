@@ -107,6 +107,36 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["nearest_write_delta_frames"],
                              {"-3": 1, "0": 1})
 
+    def test_analyze_gsp_read_write_correlation_uses_event_order(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            writes = temp / "writes.json"
+            reads = temp / "reads.json"
+            output = temp / "correlation.json"
+            writes.write_text(json.dumps({
+                "schema": "stunrun-ram-write-trace-result/v1",
+                "device": ":mainpcb:gsp", "events": [
+                    {"frame": 8, "pc": 0x100, "address": 0x2000,
+                     "data": 1, "mask": 0xFFFF, "order": 1},
+                    {"frame": 16, "pc": 0x110, "address": 0x2000,
+                     "data": 2, "mask": 0xFFFF, "order": 5},
+                ]
+            }), encoding="utf-8")
+            reads.write_text(json.dumps({
+                "schema": "stunrun-ram-read-trace-result/v1",
+                "device": ":mainpcb:gsp", "events": [
+                    {"frame": 11, "pc": 0xFFF45A10, "address": 0x2000,
+                     "data": 1, "mask": 0xFFFF, "order": 4},
+                ]
+            }), encoding="utf-8")
+            self.run_tool("analyze-gsp-read-write-correlation", writes, reads,
+                          "--read-pc", "0xFFF45A10", "--output", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["nearest_write_order_delta"], {"1": 1})
+            self.assertEqual(report["nearest_write_order_before_read_count"], 0)
+            self.assertEqual(report["nearest_write_order_after_read_count"], 1)
+            self.assertEqual(report["nearest_write_pc_counts"], {"0x110": 1})
+
     def test_analyze_packed_text_trace_decodes_words_and_filters_fetches(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)
