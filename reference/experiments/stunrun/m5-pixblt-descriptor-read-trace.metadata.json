@@ -20,7 +20,8 @@
       "data_events_after_fetch_filter": 198,
       "data_address_range": "0xFFFBA880–0xFFFEBEC0",
       "unique_address_data_pairs": 102,
-      "log_sha256": "89cbe61910b0a311c32a72c1846563f2c2307e3c45db3660e462f42de5d8280c"
+      "log_sha256": "89cbe61910b0a311c32a72c1846563f2c2307e3c45db3660e462f42de5d8280c",
+      "register_capture": {"events": 396, "data_events": 198, "log_sha256": "41a564b6dbbbba097460ec420b714e6b044d036e0edf1e529bb51914d8d5948f", "first_data_samples": [{"address": "0xFFFBA880", "data": "0x3A30", "a0": "0xFFFBA880", "a1": "0x00FD0040", "a5": "2"}, {"address": "0xFFFBA880", "data": "0x3A30", "a0": "0xFFFBA888", "a1": "0x00FD0048", "a5": "0"}]}
     },
     "descriptor_center": {
       "input": "fork_center",
@@ -29,7 +30,8 @@
       "data_events_after_fetch_filter": 132,
       "data_address_range": "0xFFFBAA40–0xFFFEA9E0",
       "unique_address_data_pairs": 68,
-      "log_sha256": "68916d50c2a71eed149d679c3706a6708af24464cf51c836b3e590396b787247"
+      "log_sha256": "68916d50c2a71eed149d679c3706a6708af24464cf51c836b3e590396b787247",
+      "register_capture": {"events": 264, "data_events": 132, "log_sha256": "f9611b923c2dac4624ca74448f10a470a24a52d86ab1b112395d9db4bdb748a5", "first_data_samples": [{"address": "0xFFFEA4C0", "data": "0x3A30", "a0": "0xFFFEA4C0", "a1": "0x00FD0040", "a5": "2"}, {"address": "0xFFFEA4C0", "data": "0x3A30", "a0": "0xFFFEA4C8", "a1": "0x00FD0048", "a5": "0"}]}
     },
     "pixel_source_center": {
       "input": "fork_center",
@@ -164,7 +166,8 @@
     "fork_stream_comparison": {"left_decoded_record_count": 102, "center_decoded_record_count": 68, "shared_prefixes": ["0:35.0", "0:00.0", "Credits: 0"], "state_dependent_prefixes": {"left": "...589...", "center": "...591..."}, "interpretation": "Static labels persist across the forks while at least one numeric HUD field changes; the descriptor producer is state-dependent even when the text tile format is shared."},
     "read_tap_boundary": "Filtering ordinary RAM reads to PC 0xFFF46590 and 0x02000000–0x0200FFFF produced no events. The PIXBLT source operation is therefore not exposed as an ordinary data read at that filtered PC by this MAME tap.",
     "destination_writes": "Filtering ordinary RAM writes to PC 0xFFF46590 produced two 688-write bursts into GSP VRAM, with different destination ranges on frames 1793 and 1797.",
-    "destination_cursor": "An opt-in register tap at the same PC captured A10=0xFFF5DBC0 and A11=64 throughout both bursts. A0 is post-incremented by 8 per glyph, alternating low/high byte lanes from each descriptor word; A1 advances by 8-pixel cells. Samples map 0:35.0 to x=64..104,y=213 and Credits: to x=212..220,y=224. The y relation is checkpoint-specific until the coordinate producer is traced more broadly.",
+    "destination_cursor": "An opt-in register tap at the same PC captured A10=0xFFF5DBC0 and A11=64 throughout both bursts. A0 is post-incremented by 8 per glyph, alternating low/high byte lanes from each descriptor word; A1 advances by 8-pixel cells. Samples map 0:35.0 to x=64..104,y=213 and Credits: to x=212..220,y=224. The left fork retains the same A1 cell sequence even though its descriptor addresses differ. The y relation is still a checkpoint-scoped observation until the coordinate producer is traced more broadly.",
+    "source_cursor": "Register capture at descriptor-read PC 0xFFF464E0 shows A0 equal to the source descriptor word address and A1 already equal to the destination cell. In the center fork, 0xFFFEA4C0:0x3A30 is observed with A1=0x00FD0040, then A0=0xFFFEA4C8/A1=0x00FD0048; the left fork has the same A1 sequence with a different source base 0xFFFBA880. A5 is 2 on the first read of a descriptor sequence and 0 thereafter in the sampled records. A10/A11 remain 0xFFF5DBC0/64.",
     "destination_shape": "Under the verified empirical visible layout, each burst covers exactly eight raster rows and spans HUD-width x positions; this is consistent with 8-pixel-high text/tile output.",
     "glyph_setup": "The runtime table lookup supplies 8 and 8 as the two dimensions; the following lookup supplies the split pointer 0xFFF5DBC0. A 512-word snapshot at that base contains 380 nonzero words at each sampled frame.",
     "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."

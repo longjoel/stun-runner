@@ -16,6 +16,8 @@ import tempfile
 EVENT = re.compile(
     r"M1_RAM_READ frame=(\d+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
     r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
+    r"(?: a0=([0-9A-Fa-f]+) a1=([0-9A-Fa-f]+) a5=([0-9A-Fa-f]+)"
+    r" a10=([0-9A-Fa-f]+) a11=([0-9A-Fa-f]+))?"
 )
 DONE = re.compile(r"M1_RAM_READ_DONE frames=(\d+) events=(\d+) truncated=(true|false)")
 
@@ -34,6 +36,8 @@ def main() -> int:
     parser.add_argument("--max-events", type=int, default=100000)
     parser.add_argument("--pc", type=lambda value: int(value, 0),
                         help="capture reads only while the CPU PC equals this value")
+    parser.add_argument("--registers", action="store_true",
+                        help="also capture GSP A0/A1/A5/A10/A11 (GSP device only)")
     parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "course_sweep", "course_coin2", "service_probe", "sw1_all_on", "fork_hold_left", "fork_center"), default="none")
     parser.add_argument("--load-state", type=pathlib.Path)
     parser.add_argument("--playback", type=pathlib.Path,
@@ -97,6 +101,7 @@ def main() -> int:
         "STUNRUN_RAM_READ_END_ADDRESS": str(args.end),
         "STUNRUN_RAM_READ_MAX_EVENTS": str(args.max_events),
         "STUNRUN_RAM_READ_PC": str(args.pc) if args.pc is not None else "",
+        "STUNRUN_RAM_READ_REGISTERS": "1" if args.registers else "0",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -107,9 +112,17 @@ def main() -> int:
     finally:
         if state_stage is not None:
             shutil.rmtree(state_stage, ignore_errors=True)
+    matches = list(EVENT.finditer(text))
     events = [{"frame": int(m.group(1)), "pc": int(m.group(2), 16),
                "address": int(m.group(3), 16), "data": int(m.group(4), 16),
-               "mask": int(m.group(5), 16)} for m in EVENT.finditer(text)]
+               "mask": int(m.group(5), 16)} for m in matches]
+    for event, match in zip(events, matches):
+        if match.group(6) is not None:
+            event.update({"a0": int(match.group(6), 16),
+                          "a1": int(match.group(7), 16),
+                          "a5": int(match.group(8), 16),
+                          "a10": int(match.group(9), 16),
+                          "a11": int(match.group(10), 16)})
     done = DONE.findall(text)
     result = {
         "schema": "stunrun-ram-read-trace-result/v1",
@@ -119,6 +132,7 @@ def main() -> int:
         "capture_end_frame": args.end_frame, "input": args.input,
         "playback": str(playback) if playback else None,
         "pc": args.pc,
+        "registers": args.registers,
         "returncode": completed.returncode, "events": events, "event_count": len(events),
         "reader_pcs": sorted({event["pc"] for event in events}),
         "pc_counts": {f"0x{pc:X}": count for pc, count in

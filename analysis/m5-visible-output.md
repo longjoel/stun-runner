@@ -349,6 +349,15 @@ that the fork-dependent state primarily changes the descriptor stream, not the
 cursor encoding. It remains a bounded cross-fork observation, not a universal
 coordinate formula.
 
+The preceding descriptor-read trace now has register capture as well. At
+`0xFFF464E0`, A0 equals the source descriptor word address and A1 already
+contains the destination cell. The center fork begins with
+`0xFFFEA4C0:0x3A30` at A1=`0x00FD0040`, then advances A0 to
+`0xFFFEA4C8` and A1 to `0x00FD0048`; the left fork repeats the same A1 values
+from source base `0xFFFBA880`. A10/A11 remain the glyph-table base and 64-word
+stride. This connects the dynamic source-record address to the stable live
+cursor and is the next direct input to a native producer reconstruction.
+
 The native shell now has an explicit `gsp-text-cursor-fixture` mode. It loads
 the captured 512-word glyph table and packed descriptor words, applies the
 captured A0/A1 seeds plus caller-supplied y bias, and renders each decoded glyph

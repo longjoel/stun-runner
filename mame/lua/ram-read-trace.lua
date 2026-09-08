@@ -14,6 +14,7 @@ local tap_end_address = end_address + (end_address % 2 == 0 and 1 or 0)
 local max_events = tonumber(os.getenv('STUNRUN_RAM_READ_MAX_EVENTS') or '100000')
 local pc_filter_text = os.getenv('STUNRUN_RAM_READ_PC') or ''
 local pc_filter = pc_filter_text ~= '' and tonumber(pc_filter_text) or nil
+local capture_registers = os.getenv('STUNRUN_RAM_READ_REGISTERS') == '1'
 local frame = 0
 local events = {}
 local input_events = input_mode == 'late_drive' and {
@@ -118,7 +119,12 @@ local function install_tap()
                 offset <= end_address and (pc_filter == nil or pc.value == pc_filter) and
                 #events < max_events then
                 events[#events + 1] = {frame = frame, pc = pc.value, address = offset,
-                                       data = data, mask = mask}
+                                       data = data, mask = mask,
+                                       a0 = capture_registers and device.state['A0'].value or nil,
+                                       a1 = capture_registers and device.state['A1'].value or nil,
+                                       a5 = capture_registers and device.state['A5'].value or nil,
+                                       a10 = capture_registers and device.state['A10'].value or nil,
+                                       a11 = capture_registers and device.state['A11'].value or nil}
             end
         end)
 end
@@ -132,8 +138,14 @@ emu.register_frame_done(function()
     end
     if frame >= limit then
         for _, event in ipairs(events) do
-            print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
-                event.frame, event.pc, event.address, event.data, event.mask))
+            if capture_registers then
+                print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X a0=%08X a1=%08X a5=%08X a10=%08X a11=%08X',
+                    event.frame, event.pc, event.address, event.data, event.mask,
+                    event.a0, event.a1, event.a5, event.a10, event.a11))
+            else
+                print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
+                    event.frame, event.pc, event.address, event.data, event.mask))
+            end
         end
         print(string.format('M1_RAM_READ_DONE frames=%d events=%d truncated=%s output=%s',
             frame, #events, tostring(#events >= max_events), output))
