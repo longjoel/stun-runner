@@ -587,3 +587,14 @@ producer-to-consumer claim for these checkpoints, while leaving open an earlier,
 different address translation, or a device-side access not visible to this
 program-space tap. The negative result is recorded in
 `reference/experiments/stunrun/m5-gsp-producer-read-negative.metadata.json`.
+
+An earlier comparison from the frame-600 save state found that the same block
+is much more active during the first 120 relative frames: 47,024 of 69,058
+captured GSP writes land in `0xFFF982F0–0xFFF98760`. The dominant writers are
+the routine family at `0xFFF47E20`, `0xFFF46210`, `0xFFF47E40`, and
+`0xFFF46230`; a separate `0xFFFCFC00` transaction recurs every three frames.
+The indexed-reader PC `0xFFF45A10` still produced zero reads from the full
+high-memory window in that same early interval. This strengthens the distinction
+between an early staging/producer activity pattern and a proven direct
+record-to-renderer feed. The command and hashes are in
+`reference/experiments/stunrun/m5-gsp-state600-high-write-probe.metadata.json`.

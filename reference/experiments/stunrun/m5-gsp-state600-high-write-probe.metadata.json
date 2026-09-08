@@ -1,0 +1,32 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-state600-high-write-probe",
+  "target": "stunrun",
+  "purpose": "Compare early post-title GSP high-memory staging activity with the later frame-1200 producer lead.",
+  "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-producer-600 --device :mainpcb:gsp --base 0xFFF80000 --end 0xFFFFFFFF --frames 120 --start-frame 1 --end-frame 120 --tap-frame 1 --max-events 100000 --registers --load-state /tmp/race2/state-600.sta --input none --nothrottle",
+  "start_condition": {
+    "save_state": "/tmp/race2/state-600.sta",
+    "relative_frames": "1-120",
+    "input": "none"
+  },
+  "result": {
+    "path": "/tmp/stunrun-m5-gsp-producer-600/result.json",
+    "sha256": "0704407106faddf392e73e4db2ed9b08ecfddd717c215e2c712780b7ab09e88a",
+    "canonical_log_sha256": "c1c2584f819d4fd6c28882891d7f5b21f0956edec38af0b6efa34b20b8e99437",
+    "event_count": 69058,
+    "truncated": false,
+    "sampled_block": "0xFFF982F0-0xFFF98760",
+    "sampled_block_event_count": 47024,
+    "pointer_landmark": {"address": "0xFFFCFC00", "event_count": 40, "frame_period": 3},
+    "dominant_writer_pcs": [
+      "0xFFF47E20", "0xFFF46210", "0xFFF47E40", "0xFFF46230",
+      "0xFFF47030", "0xFFF462E0"
+    ]
+  },
+  "paired_read_probe": {
+    "command": "tools/mame-ram-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-indexed-reads-600 --device :mainpcb:gsp --base 0xFFF80000 --end 0xFFFFFFFF --frames 120 --start-frame 1 --end-frame 120 --max-events 50000 --registers --pc 0xFFF45A10 --load-state /tmp/race2/state-600.sta --input none --nothrottle",
+    "event_count": 0,
+    "canonical_log_sha256": "04a4bf241217cae5e160b86c5d08a5aff8657e6230589acea5e621b03e440aab"
+  },
+  "interpretation": "The early state has substantial recurring writes to the sampled high-memory block, but the specific FILL XY-adjacent reader PC 0xFFF45A10 was not observed reading the high-memory window. This bounds an early GSP staging/producer activity pattern without proving a direct indexed-record or visible-output relationship. No semantic field assignments are made."
+}
