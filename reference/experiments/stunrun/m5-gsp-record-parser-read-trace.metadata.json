@@ -17,6 +17,20 @@
     "center_index": {"input": "fork_center", "pc": "0xFFF45000", "result_sha256": "fe4b79377dd129f059cc34c5121c6db6dd5b4debb0f4ea878941afe0f620cdb1", "events": 2024, "data_reads": 1012, "data_address_range": "0xFFFB90C0–0xFFFEA3D0", "register_capture": {"events": 1012, "log_sha256": "b926d6b565fefe5d500c0586b961c747019cc7ff4b10a6c002d9feb745f11e62", "first_samples": [{"address": "0xFFFE8C70", "data": "0x0001", "a0": "0x00018A20", "a1": "0xFFFD0250", "a5": "0xFFFD0250", "a10": "0xFFF5A170"}, {"address": "0xFFFE8C80", "data": "0x0011", "a0": "0x80480000", "a1": "0xFFFD0250", "a5": "0xFFFD0360", "a10": "0x00000000"}]}},
     "center_record": {"input": "fork_center", "pc": "0xFFF45090", "result_sha256": "eb026c78e6ca92d8c2bc2d537e3faa3ab92889789b144784847becc4eadd991", "events": 2020, "data_reads": 1010, "data_address_range": "0xFFFA0260–0xFFFE8B60", "register_capture": {"events": 1010, "log_sha256": "8c5e6d40a54a57d8073a0c530dcd6337bce1ee1be533ebae28acb34afd595df9", "first_samples": [{"address": "0xFFFD0260", "data": "0x0130", "a0": "0x00018A20", "a1": "0xFFFD0250", "a5": "0xFFFD0260", "a10": "0xFFF5A170"}, {"address": "0xFFFD0360", "data": "0x0130", "a0": "0x80480000", "a1": "0xFFFD0250", "a5": "0xFFFD0360", "a10": "0x00000000"}]}}
   },
+  "fresh_full_replay": {
+    "command": "tools/mame-ram-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-record-source-canonical-full --device :mainpcb:gsp --base 0xFFF80000 --end 0xFFFFFFFF --frames 1800 --start-frame 1790 --end-frame 1800 --max-events 100000 --registers --load-state /tmp/stunrun-latedrive2400.sta --input fork_center --nothrottle",
+    "result_sha256": "e0b1ad8e8bb200c8c295bd33c745ef294964e995300685ff797e51843e96daa5",
+    "canonical_log_sha256": "cf0b6537f84fe282130d972198f3d53d9926543709062aed3f86ffee7ea14df5",
+    "event_count": 21418,
+    "truncated": false,
+    "reader_samples": {
+      "index_pc_0xFFF45000": {"events": 1012, "unique_data_addresses": 808, "address_range": "0xFFFB90C0–0xFFFEA3D0"},
+      "record_pc_0xFFF45090": {"events": 1010, "unique_data_addresses": 952, "address_range": "0xFFFA0260–0xFFFE8B60"},
+      "record_pc_0xFFF450F0": {"events": 1010, "unique_data_addresses": 952, "address_range": "0xFFFA0270–0xFFFE8B70"},
+      "record_pc_0xFFF45110": {"events": 1010, "unique_data_addresses": 952, "address_range": "0xFFFA0280–0xFFFE8B80"}
+    },
+    "source_example": {"frame": 1791, "address": "0xFFFD0260", "data": "0x0130", "a5": "0xFFFD0260", "a1": "0xFFFD0250"}
+  },
   "literal_sequence": {
     "index_reader": ["MOVE *A3+,A5,0", "ZEXT A5,0", "CMPXY A12,A5", "SLL 4h,A5", "ADD A1,A5"],
     "record_stride_bytes": 16,

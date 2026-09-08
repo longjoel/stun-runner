@@ -70,6 +70,21 @@ produced by this exact indexed walk. The native implementation should retain
 the indexed lookup, 16-byte stride, low-byte table lookup, and branch conditions as
 mechanism until a producer-side correlation proves more.
 
+The complete canonical center-fork replay provides the strongest current source
+address census. Across relative frames 1790–1800 it captured 21,418 GSP reads
+without truncation. The index-load PC `0xFFF45000` read 1,012 data events from
+`0xFFFB90C0–0xFFFEA3D0` (808 unique addresses). The first three record-load
+sites read 1,010 events each; at `0xFFF45090` they cover 952 unique addresses
+from `0xFFFA0260–0xFFFE8B60`, with the paired `A8` and `A6` loads advancing by
+two bytes. A representative frame-1791 record begins at `0xFFFD0260`, reads
+`0x0130`, and has `A5=0xFFFD0260` with `A1=0xFFFD0250`.
+
+This identifies the actual dynamic record source window used by the indexed
+reader and separates it from the previously tested `0xFFF98xxx` stack traffic.
+It still does not establish who populates the source records or what their
+fields mean. The full replay hashes and per-PC counts are recorded in
+`reference/experiments/stunrun/m5-gsp-record-parser-read-trace.metadata.json`.
+
 ## Human-readable evidence anchors
 
 - Center parser trace: first sampled record reads `0x0130` at
