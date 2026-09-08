@@ -259,6 +259,17 @@ must write into the GSP VRAM pixel space, but the irregular destination ranges
 and unresolved source records are not enough to infer a rectangle or texture
 format yet.
 
+The raw descriptor words also expose a likely text path. Interpreting each
+16-bit word in little-endian byte order gives `0:35.0` at `0xFFFEA4C0` from
+`3A30 3533 302E 0000`, and `Credits: 0 ` at `0xFFFEA810` from
+`7243 6465 7469 3A73 3020 0020`. These are byte-level observations, not yet
+semantic assignments: the `PIXBLT` loop consumes the low-byte-sized operand and
+the role of the companion byte, glyph stride, and coordinates still needs to
+be established. Nevertheless, the evidence shifts the most economical next
+probe toward a HUD/text blit fixture rather than assuming this loop is road
+geometry. The raw counts and hashes remain in
+`reference/experiments/stunrun/m5-pixblt-descriptor-read-trace.metadata.json`.
+
 The preceding GSP parser is now bounded directly. At `0xFFF45000`, the
 runtime sequence is `MOVE *A3+,A5`, zero extension, `CMPXY`, `SLL 4h,A5`, and
 `ADD A1,A5`: the selected record address is therefore a base plus a 16-byte

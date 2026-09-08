@@ -54,9 +54,13 @@
   "observations": {
     "descriptor_instruction": "The runtime instruction at 0xFFF464E0 is MOVE *A0+,A5,0; the following code masks A5 with 0x7F and uses it to form the PIXBLT source offset.",
     "source_records": "The descriptor loads come from dynamic addresses in the mirrored high GSP VRAM window, and the left and center forks select different address streams.",
+    "packed_text_examples": [
+      {"address": "0xFFFEA4C0", "words": ["0x3A30", "0x3533", "0x302E", "0x0000"], "little_endian_bytes": "0:35.0", "status": "observed byte decoding; display role not yet proven"},
+      {"address": "0xFFFEA810", "words": ["0x7243", "0x6465", "0x7469", "0x3A73", "0x3020", "0x0020"], "little_endian_bytes": "Credits: 0 ", "status": "observed byte decoding; display role not yet proven"}
+    ],
     "read_tap_boundary": "Filtering ordinary RAM reads to PC 0xFFF46590 and 0x02000000–0x0200FFFF produced no events. The PIXBLT source operation is therefore not exposed as an ordinary data read at that filtered PC by this MAME tap.",
     "destination_writes": "Filtering ordinary RAM writes to PC 0xFFF46590 produced two 688-write bursts into GSP VRAM, with different destination ranges on frames 1793 and 1797.",
     "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."
   },
-  "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT without claiming a decoded descriptor format. The next native blit step still requires a stronger observation of the hardware source/destination operation or a literal descriptor-to-VRAM correlation."
+  "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT and provides two reproducible packed-text examples. The loop is now a likely HUD/text blitter candidate, but the glyph selection, coordinate fields, and display role remain unproven."
 }
