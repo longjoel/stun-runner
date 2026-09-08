@@ -34,6 +34,21 @@
     }
   },
   "read_source_provenance": "reference/experiments/stunrun/m5-gsp-geometry-source-read-trace.metadata.json",
+  "frame_correlation": {
+    "same_frame_source_write_read_pairs": 0,
+    "center_nearest_write_delta_frames": {
+      "-3": 1560,
+      "+5": 746
+    },
+    "left_nearest_write_delta_frames": {
+      "-3": 802,
+      "+5": 656,
+      "+6": 216,
+      "-4": 82,
+      "+4": 16
+    },
+    "interpretation": "Frame-level correlation is consistent with an 8-frame staged/ring source pool; separate captures do not establish instruction ordering."
+  },
   "conclusion": "Every high-memory address consumed by the two FILL XY coordinate loads also receives a GSP write during the matched visible-fork interval. The source records are actively generated or rewritten by the GSP pipeline; semantic ownership remains UNKNOWN.",
   "confidence": "SAVE-STATE-MATCHED-WRITE-READ-CORRELATION"
 }

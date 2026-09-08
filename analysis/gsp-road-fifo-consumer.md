@@ -181,5 +181,17 @@ field meanings remain UNKNOWN. The native target should therefore preserve
 the high-memory record source as a separate input to the geometry primitives
 until a writer/consumer pair is tied to one visible region.
 
+The frame correlation gives the producer boundary a timing shape. There were
+zero same-frame write/read pairs for the source addresses in either fork. In
+the center branch, the nearest write for the read addresses was three frames
+earlier for 1,560 reads and five frames later for 746 reads on the A7 stream
+(the A9 stream has the corresponding 1,136/544 split). The left branch has the
+same dominant three-before/five-after pattern, with smaller four-, six-, and
+four-frames-before transition groups. Because the write and read traces are
+separate captures, this is frame-level correlation rather than instruction
+ordering, but it is consistent with an 8-frame staged/ring pool. It is not
+consistent with a producer overwriting the exact consumed record in place on
+the read frame.
+
 Provenance is in
 `reference/experiments/stunrun/m5-gsp-high-write-fork-1790.metadata.json`.
