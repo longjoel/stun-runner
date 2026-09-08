@@ -57,3 +57,8 @@ emits the decoded bytes plus A0-before/A0-after and A1 cursor values:
 tools/analyze-gsp-text-cursor descriptor-register-trace/result.json \\
   --pc 0xFFF464E0 --output cursor-analysis.json
 ```
+
+The report additionally exposes one entry per non-NUL low/high glyph lane,
+including its descriptor address, lane number, A0, and A1. On the captured
+center trace this reduces 264 bus events to 68 descriptor words and 108
+non-NUL glyph entries.

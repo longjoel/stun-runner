@@ -50,15 +50,29 @@ def main() -> int:
                 "bytes_hex": bytes((word & 0xff, word >> 8)).hex(),
                 "text": printable(bytes((word & 0xff, word >> 8))),
                 "a0_before": event["a0"], "a0_after": event["a0"],
-                "a1": event["a1"], "a5": event["a5"],
+                "a1": event["a1"], "a1_after": event["a1"],
+                "a5": event["a5"],
                 "a10": event["a10"], "a11": event["a11"]}}
         else:
             pending["record"]["a0_after"] = event["a0"]
+            pending["record"]["a1_after"] = event["a1"]
     if pending is not None:
         records.append(pending["record"])
 
     payload = b"".join(bytes((record["word"] & 0xff,
                                record["word"] >> 8)) for record in records)
+    glyphs = []
+    for record in records:
+        for lane, code, a0, a1 in (
+                (0, record["word"] & 0xff, record["a0_before"], record["a1"]),
+                (1, record["word"] >> 8, record["a0_after"], record["a1_after"])):
+            if code == 0:
+                continue
+            glyphs.append({
+                "frame": record["frame"], "descriptor_address": record["address"],
+                "lane": lane, "glyph_code": code, "a0": a0, "a1": a1,
+                "text": printable(bytes((code,))),
+            })
     result = {
         "schema": "stunrun-gsp-text-cursor-analysis/v1",
         "trace": str(args.trace), "pc": args.pc,
@@ -66,6 +80,8 @@ def main() -> int:
         "decoded_record_count": len(records),
         "decoded_bytes_hex": payload.hex(),
         "decoded_text": printable(payload),
+        "glyph_count": len(glyphs),
+        "glyphs": glyphs,
         "records": records,
     }
     encoded = json.dumps(result, indent=2) + "\n"

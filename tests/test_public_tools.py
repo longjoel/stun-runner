@@ -133,6 +133,15 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["records"][0]["a0_before"], 0x2000)
             self.assertEqual(report["records"][0]["a0_after"], 0x2008)
             self.assertEqual(report["records"][0]["a1"], 0xFD0040)
+            self.assertEqual(report["glyph_count"], 2)
+            self.assertEqual(report["glyphs"], [
+                {"frame": 1793, "descriptor_address": 0x2000,
+                 "lane": 0, "glyph_code": ord("C"), "a0": 0x2000,
+                 "a1": 0xFD0040, "text": "C"},
+                {"frame": 1793, "descriptor_address": 0x2000,
+                 "lane": 1, "glyph_code": ord("r"), "a0": 0x2008,
+                 "a1": 0xFD0048, "text": "r"},
+            ])
 
     def test_export_gsp_text_fixture_writes_little_endian_inputs(self):
         with tempfile.TemporaryDirectory() as temp:
