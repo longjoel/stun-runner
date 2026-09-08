@@ -115,3 +115,20 @@ synthetic schedule.
 
 The provenance record is
 `reference/experiments/stunrun/m5-gsp-road-fifo-consumer.metadata.json`.
+
+## High-memory producer check
+
+The saved-state renderer forks were then used to check the upstream producer
+without replaying the long race. A GSP program-space write trace over
+`0xFFF80000–0xFFFFFFFF`, relative frames 1–10 from the common
+`/tmp/stunrun-latedrive2400.sta` checkpoint, captured 1,878 events for both
+`fork_hold_left` and `fork_center`. The complete event sequences were
+byte-identical, including writer PCs and values. This is a useful negative
+result: the left/center visible difference is not caused by a new high-memory
+record write in that renderer window. It selects different preexisting
+records through the already documented indexed read path.
+
+The probe therefore moves the native producer target earlier than the
+renderer fork. It does not identify the record writer or assign semantics to
+the high-memory fields. Provenance is in
+`reference/experiments/stunrun/m5-gsp-fork-high-write-probe.metadata.json`.

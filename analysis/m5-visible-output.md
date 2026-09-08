@@ -273,6 +273,16 @@ driven path changes 235/256 sampled words at `0xFFF6F650` and 195/256 at
 two-buffer update boundary as a native-facing synchronization point without
 inventing payload semantics.
 
+A common-save-state fork probe then traced all GSP writes in
+`0xFFF80000–0xFFFFFFFF` for the ten-frame renderer window used by the
+left/center visible differential. Both forks produced 1,878 events and the
+event sequences were byte-identical. The input-dependent read streams are
+therefore consuming records that were already present at the fork boundary;
+the upstream record producer remains earlier in the state-building path.
+This negative result prevents treating the renderer window itself as the
+native record-production step. See
+`reference/experiments/stunrun/m5-gsp-fork-high-write-probe.metadata.json`.
+
 PC-filtered writes further bound the transfer shape: each destination receives
 896 full-word writes in seven 128-write bursts across the 1280–1298 window.
 The base-side addresses advance by `0x20` from `0xFFF6F650`; the twin-side

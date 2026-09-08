@@ -1,0 +1,53 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-gsp-fork-high-write-probe",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Check whether the left/center visible fork writes the high GSP work-record region during the 10-frame renderer window.",
+  "checkpoint": {
+    "state": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "relative_frames": [1, 10]
+  },
+  "write_window": {
+    "device": ":mainpcb:gsp",
+    "space": "program",
+    "base": "0xFFF80000",
+    "end": "0xFFFFFFFF",
+    "tap_frame": 1,
+    "max_events": 100000
+  },
+  "captures": {
+    "left": {
+      "input": "fork_hold_left",
+      "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system OUTPUT --device :mainpcb:gsp --space program --base 0xFFF80000 --end 0xFFFFFFFF --frames 10 --start-frame 1 --end-frame 10 --tap-frame 1 --max-events 100000 --load-state /tmp/stunrun-latedrive2400.sta --input fork_hold_left --nothrottle",
+      "event_count": 1878,
+      "truncated": false,
+      "result_sha256": "2af36974a9955c1f932564ca62a3b2dcc3c28fc920feb4908126b2f60a8581a2",
+      "canonical_log_sha256": "abaedff3a71b4b619ce10689439a8a6015c89a64e2d4712bdfaa0cfc88945f7b"
+    },
+    "center": {
+      "input": "fork_center",
+      "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system OUTPUT --device :mainpcb:gsp --space program --base 0xFFF80000 --end 0xFFFFFFFF --frames 10 --start-frame 1 --end-frame 10 --tap-frame 1 --max-events 100000 --load-state /tmp/stunrun-latedrive2400.sta --input fork_center --nothrottle",
+      "event_count": 1878,
+      "truncated": false,
+      "result_sha256": "0205483fef7b1534984d6198e10940ef1fae73003851d93b8a2c381729ed8afa",
+      "canonical_log_sha256": "a1300edaf2ab55e4f5a0d3e74b588d6433ad0d41f00ac53808bd28ff0f7561bd"
+    }
+  },
+  "comparison": {
+    "event_sequences_equal": true,
+    "top_writer_pcs": {
+      "0xFFF45060": 514,
+      "0xFFF46210": 396,
+      "0xFFF46230": 176,
+      "0xFFF41C10": 90,
+      "0xFFF462E0": 88,
+      "0xFFF47030": 74,
+      "0xFFF42060": 60,
+      "0xFFF40F50": 59
+    },
+    "instruction_trace_sha256": "caa7c7c9928bf1853b6572638dd5af4fdc6f15c461798b5b778afd02106fd26a"
+  },
+  "interpretation": "The two visible forks perform byte-identical writes to the sampled high GSP memory during the renderer window. Their differing indexed-record read streams therefore select preexisting records; the record producer or earlier state-building phase must be traced separately. No field semantics are promoted."
+}
