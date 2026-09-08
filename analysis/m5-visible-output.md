@@ -293,6 +293,11 @@ The same check now succeeds for source-table index `0x43` (`C`): words
 `3E,63,03,03,03,63,3E,00`. Two independent glyphs therefore validate the
 generic source addressing and orientation; color selection and the broader
 text-record cursor/coordinate producer remain separate work.
+The native table-backed helper `stunrun_render_gsp_glyph_from_table` now
+implements the measured `& 0x7F` code selection and four-word tile stride.
+It is a reusable renderer boundary only; the native shell does not pretend to
+own the live GSP high-memory cursor until that producer is independently
+reconstructed.
 
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
