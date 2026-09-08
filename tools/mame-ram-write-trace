@@ -16,6 +16,8 @@ import tempfile
 EVENT = re.compile(
     r"M1_RAM_WRITE frame=(\d+) pc=([0-9A-Fa-f]+) addr=([0-9A-Fa-f]+) "
     r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
+    r"(?: a0=([0-9A-Fa-f]+) a1=([0-9A-Fa-f]+) a5=([0-9A-Fa-f]+)"
+    r" a10=([0-9A-Fa-f]+) a11=([0-9A-Fa-f]+))?"
 )
 DONE = re.compile(r"M1_RAM_WRITE_DONE frames=(\d+) events=(\d+) truncated=(true|false) output=(.+)")
 
@@ -34,6 +36,8 @@ def main() -> int:
     parser.add_argument("--max-events", type=int, default=50000)
     parser.add_argument("--pc", type=lambda value: int(value, 0),
                         help="capture writes only while the CPU PC equals this value")
+    parser.add_argument("--registers", action="store_true",
+                        help="also capture GSP A0/A1/A5/A10/A11 (GSP device only)")
     parser.add_argument("--tap-frame", type=int, default=10,
                         help="install the write tap at this relative frame "
                              "(default: 10; use 1 to catch early input paths)")
@@ -105,6 +109,7 @@ def main() -> int:
         "STUNRUN_RAM_TRACE_MAX_EVENTS": str(args.max_events),
         "STUNRUN_RAM_TRACE_TAP_FRAME": str(args.tap_frame),
         "STUNRUN_RAM_TRACE_PC": str(args.pc) if args.pc is not None else "",
+        "STUNRUN_RAM_TRACE_REGISTERS": "1" if args.registers else "0",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -118,6 +123,13 @@ def main() -> int:
     events = [{"frame": int(m.group(1)), "pc": int(m.group(2), 16),
                "address": int(m.group(3), 16), "data": int(m.group(4), 16),
                "mask": int(m.group(5), 16)} for m in EVENT.finditer(text)]
+    for event, match in zip(events, EVENT.finditer(text)):
+        if match.group(6) is not None:
+            event.update({"a0": int(match.group(6), 16),
+                          "a1": int(match.group(7), 16),
+                          "a5": int(match.group(8), 16),
+                          "a10": int(match.group(9), 16),
+                          "a11": int(match.group(10), 16)})
     done = DONE.findall(text)
     result = {
         "schema": "stunrun-ram-write-trace-result/v1",
@@ -126,6 +138,7 @@ def main() -> int:
         "frames": args.frames, "capture_start_frame": args.start_frame,
         "capture_end_frame": args.end_frame, "input": args.input,
         "tap_frame": args.tap_frame,
+        "registers": args.registers,
         "pc": args.pc,
         "playback": str(playback) if playback else None,
         "returncode": completed.returncode, "events": events,

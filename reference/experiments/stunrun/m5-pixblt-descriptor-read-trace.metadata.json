@@ -91,6 +91,26 @@
       "unique_destination_addresses": 992,
       "log_sha256": "fdef6d6940da336de3d56c882f8e0d622f977d18b44844a0acefffb1c0251e06"
     },
+    "pixel_destination_registers_center": {
+      "input": "fork_center",
+      "pc": "0xFFF46590",
+      "registers": ["A0", "A1", "A5", "A10", "A11"],
+      "events": 1376,
+      "frames": [1793, 1797],
+      "canonical_log_sha256": "6860f49cca931ca1eae607ceb7880717f93499a917205edde0b31b5d691bc2cc",
+      "constant_setup": {"A10": "0xFFF5DBC0", "A11": "64"},
+      "samples": [
+        {"frame": 1793, "a0_after": "0xFFFEA4C8", "a1": "0x00FD0040", "source_word": "0xFFFEA4C0", "lane": "low", "glyph": "0", "screen_cell": [64, 213]},
+        {"frame": 1793, "a0_after": "0xFFFEA4D0", "a1": "0x00FD0048", "source_word": "0xFFFEA4C0", "lane": "high", "glyph": ":", "screen_cell": [72, 213]},
+        {"frame": 1793, "a0_after": "0xFFFEA4D8", "a1": "0x00FD0050", "source_word": "0xFFFEA4D0", "lane": "low", "glyph": "3", "screen_cell": [80, 213]},
+        {"frame": 1793, "a0_after": "0xFFFEA4E0", "a1": "0x00FD0058", "source_word": "0xFFFEA4D0", "lane": "high", "glyph": "5", "screen_cell": [88, 213]},
+        {"frame": 1793, "a0_after": "0xFFFEA4E8", "a1": "0x00FD0060", "source_word": "0xFFFEA4E0", "lane": "low", "glyph": ".", "screen_cell": [96, 213]},
+        {"frame": 1793, "a0_after": "0xFFFEA4F0", "a1": "0x00FD0068", "source_word": "0xFFFEA4E0", "lane": "high", "glyph": "0", "screen_cell": [104, 213]},
+        {"frame": 1793, "a0_after": "0xFFFEA818", "a1": "0x010800D4", "source_word": "0xFFFEA810", "lane": "low", "glyph": "C", "screen_cell": [212, 224]},
+        {"frame": 1793, "a0_after": "0xFFFEA820", "a1": "0x010800DC", "source_word": "0xFFFEA810", "lane": "high", "glyph": "r", "screen_cell": [220, 224]}
+      ],
+      "coordinate_observation": "A0 is post-incremented by 8 address units per glyph; A1 advances by 8 in the low 16 bits per glyph. For these samples, screen_y equals the high A1 word minus 0x28."
+    },
     "glyph_table_center": {
       "input": "fork_center",
       "pc": "0xFFF46AD0",
@@ -133,6 +153,7 @@
     "fork_stream_comparison": {"left_decoded_record_count": 102, "center_decoded_record_count": 68, "shared_prefixes": ["0:35.0", "0:00.0", "Credits: 0"], "state_dependent_prefixes": {"left": "...589...", "center": "...591..."}, "interpretation": "Static labels persist across the forks while at least one numeric HUD field changes; the descriptor producer is state-dependent even when the text tile format is shared."},
     "read_tap_boundary": "Filtering ordinary RAM reads to PC 0xFFF46590 and 0x02000000–0x0200FFFF produced no events. The PIXBLT source operation is therefore not exposed as an ordinary data read at that filtered PC by this MAME tap.",
     "destination_writes": "Filtering ordinary RAM writes to PC 0xFFF46590 produced two 688-write bursts into GSP VRAM, with different destination ranges on frames 1793 and 1797.",
+    "destination_cursor": "An opt-in register tap at the same PC captured A10=0xFFF5DBC0 and A11=64 throughout both bursts. A0 is post-incremented by 8 per glyph, alternating low/high byte lanes from each descriptor word; A1 advances by 8-pixel cells. Samples map 0:35.0 to x=64..104,y=213 and Credits: to x=212..220,y=224. The y relation is checkpoint-specific until the coordinate producer is traced more broadly.",
     "destination_shape": "Under the verified empirical visible layout, each burst covers exactly eight raster rows and spans HUD-width x positions; this is consistent with 8-pixel-high text/tile output.",
     "glyph_setup": "The runtime table lookup supplies 8 and 8 as the two dimensions; the following lookup supplies the split pointer 0xFFF5DBC0. A 512-word snapshot at that base contains 380 nonzero words at each sampled frame.",
     "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."

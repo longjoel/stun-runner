@@ -327,6 +327,18 @@ low-byte/high-byte word order, stops at the first NUL, and renders the complete
 label through the table selector. Its regression uses the captured `Credits:`
 words; this is the closest native text slice currently justified by the oracle.
 
+The destination write probe now also captures the GSP register state at
+`0xFFF46590` through the reusable `--registers` option. `A10` remains
+`0xFFF5DBC0` and `A11` remains `64`, while `A0` is post-incremented by eight
+address units for each emitted glyph. Consecutive glyphs alternate the low and
+high byte lanes of each descriptor word. `A1` advances by eight in its low
+halfword, matching eight-pixel horizontal cells: the sampled `0:35.0` glyphs
+land at `(64,213)` through `(104,213)`, and `Credits:` begins at `(212,224)`.
+For this checkpoint the high `A1` halfword maps to screen y as `high - 0x28`;
+that translation remains checkpoint-specific until the coordinate producer is
+traced. This is the first register-level cursor contract for the live text
+blitter, while the native shell still awaits a reconstructed producer.
+
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
 `0x02070610–0x020773D0` at frame 1793 and
