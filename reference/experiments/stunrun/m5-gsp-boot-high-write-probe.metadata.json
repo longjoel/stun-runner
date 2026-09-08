@@ -1,0 +1,48 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-gsp-boot-high-write-probe",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Locate the first bounded high-GSP-memory activity from power-on and identify the dispatch structures around it.",
+  "write_trace": {
+    "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system OUTPUT --device :mainpcb:gsp --space program --base 0xFFF80000 --end 0xFFFFFFFF --frames 600 --start-frame 1 --end-frame 600 --tap-frame 1 --max-events 500000 --input none --nothrottle",
+    "event_count": 69290,
+    "truncated": false,
+    "first_write_frame": 78,
+    "first_nonzero_write_frame": 405,
+    "first_nonzero_write_frame_event_count": 6454,
+    "result_sha256": "acb4a9b5ed2dbb4b43b572cb1b5f82a2635f73cbecacd0660b11997480e0611c",
+    "canonical_log_sha256": "d600006c2a45f6bfdc3878c5e6fc19cdc872dad81a16340da75f839571a51ff6"
+  },
+  "instruction_trace": {
+    "command": "tools/mame-trace /tmp/stunrun-roms-system OUTPUT :mainpcb:gsp 600 mame none 1",
+    "sha256": "d872a409a8ecd69d1ce47a5064fa8df1c82c255b1b48848f999749b8aa69558f",
+    "literal_dispatch_sequence": [
+      "0xFFF40D70: MOVI 0x0203C000,B4",
+      "0xFFF40DA0: MOVI 0xFFFCFC00,A3",
+      "0xFFF40E00: MOVI 0xFFF9FC00,A2",
+      "0xFFF40F00: MOVB @0xFFF716A0,@0xFFF716B0",
+      "0xFFF41030: MOVI 0xFFF9FC00,A3",
+      "0xFFF41060: MOVE *A3,A0,0",
+      "0xFFF41F50: MOVE @0xFFF716A0,A0",
+      "0xFFF41F90: MOVB A0,@0xFFF716A0"
+    ]
+  },
+  "high_window_summary": {
+    "nonzero_fffa_to_fffc_events": 2383,
+    "nonzero_fffc_to_fffe_events": 3323,
+    "dominant_writer_pcs_fffa_to_fffc": {
+      "0xFFF40F50": 1162,
+      "0xFFF41060": 463,
+      "0xFFF40F90": 437,
+      "0xFFF40F80": 238
+    },
+    "dominant_writer_pcs_fffc_to_fffe": {
+      "0xFFF40F50": 1311,
+      "0xFFF41060": 1188,
+      "0xFFF40F90": 491,
+      "0xFFF40F80": 246
+    }
+  },
+  "interpretation": "The first nonzero high-memory activity is a concentrated frame-405 burst, followed by frame-410 dispatch activity. The trace exposes queue/pointer landmarks but does not yet prove that these high-memory writes are the indexed geometry-record producer or assign field semantics."
+}

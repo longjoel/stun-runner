@@ -140,3 +140,13 @@ events, but its dominant PCs are register-save/restore and renderer routines;
 it does not expose a bulk record upload. These cells are retained as
 unresolved state deltas, not promoted track fields. Provenance is in
 `reference/experiments/stunrun/m5-gsp-title-high-write-probe.metadata.json`.
+
+The power-on follow-up finally supplies an earlier timing lead. A bounded
+600-frame high-memory write trace first sees any writes at frame 78; the first
+nonzero writes in the `0xFFFA…–0xFFFE…` region arrive in a concentrated
+6,454-event burst at frame 405, with another dispatch burst at frame 410.
+The accompanying instruction trace shows queue/pointer setup around
+`0xFFF9FC00`, `0xFFFCFC00`, `0xFFF716A0`, and `0xFFF71670`. These are now the
+next producer candidates, but the trace does not yet prove that they are the
+geometry-record writer. Provenance is in
+`reference/experiments/stunrun/m5-gsp-boot-high-write-probe.metadata.json`.

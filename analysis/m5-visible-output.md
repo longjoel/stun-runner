@@ -289,6 +289,14 @@ the full write trace is dominated by stack/register-save and renderer PCs.
 Those deltas remain UNKNOWN rather than being labeled as track state. See
 `reference/experiments/stunrun/m5-gsp-title-high-write-probe.metadata.json`.
 
+The power-on high-memory trace adds the first producer timing lead: the first
+nonzero `0xFFFA…–0xFFFE…` writes occur in a 6,454-event frame-405 burst,
+followed by dispatch activity at frame 410. GSP code around that boundary
+initializes and drains queue-like regions at `0xFFF9FC00`/`0xFFFCFC00` and
+maintains pointers near `0xFFF716A0`/`0xFFF71670`. These remain literal
+producer candidates, not semantic track labels. See
+`reference/experiments/stunrun/m5-gsp-boot-high-write-probe.metadata.json`.
+
 PC-filtered writes further bound the transfer shape: each destination receives
 896 full-word writes in seven 128-write bursts across the 1280–1298 window.
 The base-side addresses advance by `0x20` from `0xFFF6F650`; the twin-side
