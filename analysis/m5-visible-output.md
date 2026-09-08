@@ -278,8 +278,11 @@ and unresolved source records are not enough to infer a rectangle or texture
 format yet.
 
 Mapping each destination word through the verified visible-layout formula makes
-the shape much clearer: the frame-1793 burst covers exactly `y=112–119`, and
-the frame-1797 burst covers exactly `y=52–59`; both span x positions `14–506`.
+the shape much clearer: the frame-1793 burst covers logical rows `y=112–119`,
+and the frame-1797 burst covers logical rows `y=52–59`; both span x positions
+`14–506`. These are VRAM-layout rows, not final screenshot rows—the display
+registers remap them during scanout. The corresponding screenshots visibly
+contain HUD text: frame 1797 shows `TIME 0:35.0`, `LEVEL`, and `Credits: 0`.
 There are 496 unique mapped word positions per burst. The eight-row height,
 combined with the `8 × 8` source dimensions and packed HUD strings in the
 source records, is strong evidence that this `PIXBLT` path is drawing text or

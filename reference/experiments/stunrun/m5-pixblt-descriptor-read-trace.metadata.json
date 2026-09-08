@@ -49,10 +49,15 @@
       },
       "empirical_visible_layout_mapping": {
         "address_to_word": "word_index = (address - 0x02000000) / 16",
-        "frame_1793_pixel_rows": "y=112–119",
-        "frame_1797_pixel_rows": "y=52–59",
+        "frame_1793_logical_rows": "y=112–119",
+        "frame_1797_logical_rows": "y=52–59",
         "x_positions": "14–506 (120 distinct word-aligned positions)",
-        "unique_mapped_word_positions_per_frame": 496
+        "unique_mapped_word_positions_per_frame": 496,
+        "scanout_caveat": "These are logical rows in the empirical linear layout, not final screenshot y coordinates; the display registers remap them during scanout."
+      },
+      "screen_observations": {
+        "frame_1793": {"screen_sha256": "4b6777d6d0ad9174e274b3d3930b070b4afb7b59e9800e0dac6f7fcce5a17a18", "visible_hud_text": "LEVEL, MPH, and speed readout"},
+        "frame_1797": {"screen_sha256": "c2e9fa4d03033335bc64eb13aa3c7fba0658b1e753f907c2abdc3e0d99c3a1f0", "visible_hud_text": "TIME 0:35.0, LEVEL, MPH, and Credits: 0"}
       },
       "unique_destination_addresses": 992,
       "log_sha256": "fdef6d6940da336de3d56c882f8e0d622f977d18b44844a0acefffb1c0251e06"
