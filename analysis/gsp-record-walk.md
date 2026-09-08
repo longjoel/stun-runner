@@ -150,3 +150,12 @@ are therefore shared VRAM writers or staged-buffer activity, not yet a
 verified record producer. The result should remain a renderer boundary until
 an instruction-order capture or a producer-side source trace identifies the
 write phase.
+
+The tracer now has an optional `--order` mode. It assigns one monotonically
+increasing sequence number across both taps before the events are printed,
+so grouped log output does not destroy read/write ordering. A fresh
+order-enabled capture of the indexed reader found 525 nearest overlapping
+writes before a read and 485 after a read, with zero same-order matches. This
+confirms that the event taps are observing distinct accesses in one execution;
+the wide distribution means the current address set still contains staged
+renderer traffic, so an instruction-level producer claim remains premature.

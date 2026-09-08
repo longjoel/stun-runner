@@ -31,10 +31,12 @@ local read_tap_end_address = read_end_address ~= nil and
 local read_max_events = tonumber(os.getenv('STUNRUN_RAM_READ_MAX_EVENTS') or '50000')
 local read_pc_text = os.getenv('STUNRUN_RAM_READ_PC') or ''
 local read_pc_filter = read_pc_text ~= '' and tonumber(read_pc_text) or nil
+local capture_order = os.getenv('STUNRUN_RAM_TRACE_ORDER') == '1'
 local frame = 0
 local events = {}
 local read_events = {}
 local next_event = 1
+local next_order = 1
 local tap
 local read_tap
 
@@ -130,11 +132,13 @@ local function install_tap()
                 (pc_filter ~= nil and pc.value ~= pc_filter) then return end
             events[#events + 1] = {frame = frame, pc = pc.value, address = offset,
                                    data = data, mask = mask,
+                                   order = capture_order and next_order or nil,
                                    a0 = capture_registers and device.state['A0'].value or nil,
                                    a1 = capture_registers and device.state['A1'].value or nil,
                                    a5 = capture_registers and device.state['A5'].value or nil,
                                    a10 = capture_registers and device.state['A10'].value or nil,
                                    a11 = capture_registers and device.state['A11'].value or nil}
+            if capture_order then next_order = next_order + 1 end
         end)
     if read_start_address ~= nil and read_end_address ~= nil then
         read_tap = space:install_read_tap(read_start_address, read_tap_end_address,
@@ -148,11 +152,13 @@ local function install_tap()
                 read_events[#read_events + 1] = {
                     frame = frame, pc = pc.value, address = offset,
                     data = data, mask = mask,
+                    order = capture_order and next_order or nil,
                     a0 = capture_registers and device.state['A0'].value or nil,
                     a1 = capture_registers and device.state['A1'].value or nil,
                     a5 = capture_registers and device.state['A5'].value or nil,
                     a10 = capture_registers and device.state['A10'].value or nil,
                     a11 = capture_registers and device.state['A11'].value or nil}
+                if capture_order then next_order = next_order + 1 end
             end)
     end
 end
@@ -173,12 +179,14 @@ emu.register_frame_done(function()
     if frame >= limit then
         for _, event in ipairs(events) do
             if capture_registers then
-                print(string.format('M1_RAM_WRITE frame=%d pc=%08X addr=%08X data=%08X mask=%08X a0=%08X a1=%08X a5=%08X a10=%08X a11=%08X',
+                print(string.format('M1_RAM_WRITE frame=%d pc=%08X addr=%08X data=%08X mask=%08X a0=%08X a1=%08X a5=%08X a10=%08X a11=%08X%s',
                     event.frame, event.pc, event.address, event.data, event.mask,
-                    event.a0, event.a1, event.a5, event.a10, event.a11))
+                    event.a0, event.a1, event.a5, event.a10, event.a11,
+                    capture_order and (' order=' .. event.order) or ''))
             else
-                print(string.format('M1_RAM_WRITE frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
-                    event.frame, event.pc, event.address, event.data, event.mask))
+                print(string.format('M1_RAM_WRITE frame=%d pc=%08X addr=%08X data=%08X mask=%08X%s',
+                    event.frame, event.pc, event.address, event.data, event.mask,
+                    capture_order and (' order=' .. event.order) or ''))
             end
         end
         print(string.format('M1_RAM_WRITE_DONE frames=%d events=%d truncated=%s output=%s',
@@ -186,14 +194,14 @@ emu.register_frame_done(function()
         if read_start_address ~= nil and read_end_address ~= nil then
             for _, event in ipairs(read_events) do
                 if capture_registers then
-                    print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X a0=%08X a1=%08X a5=%08X a10=%08X a11=%08X',
+                    print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X a0=%08X a1=%08X a5=%08X a10=%08X a11=%08X%s',
                         event.frame, event.pc, event.address, event.data,
                         event.mask, event.a0, event.a1, event.a5, event.a10,
-                        event.a11))
+                        event.a11, capture_order and (' order=' .. event.order) or ''))
                 else
-                    print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
+                    print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X%s',
                         event.frame, event.pc, event.address, event.data,
-                        event.mask))
+                        event.mask, capture_order and (' order=' .. event.order) or ''))
                 end
             end
             print(string.format('M1_RAM_READ_DONE frames=%d events=%d truncated=%s output=%s',

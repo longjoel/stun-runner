@@ -41,5 +41,17 @@
     "registers": true,
     "nothrottle": true
   },
-  "interpretation": "Same-run capture removes the separate-invocation caveat, but zero same-frame matches still do not identify a producer routine or establish record-field semantics."
+  "order_capture": {
+    "path": "/tmp/stunrun-m5-same-run-order/result.json",
+    "sha256": "20b36ada308fa16f42d9151a394768d0bc93755b3e33a99652c999bb2dea4088",
+    "correlation_path": "/tmp/stunrun-m5-same-run-order/correlation.json",
+    "correlation_sha256": "d99f8481289243e2381fd8352e02d9c724cb43a598e5ac4ca5b3d52bfefd9ac3",
+    "read_pcs": ["0xFFF45000", "0xFFF45090", "0xFFF450F0", "0xFFF45110"],
+    "read_event_count": 1010,
+    "same_frame_overlap_read_count": 0,
+    "same_order_overlap_read_count": 0,
+    "nearest_write_order_before_read_count": 525,
+    "nearest_write_order_after_read_count": 485
+  },
+  "interpretation": "Same-run capture removes the separate-invocation caveat, but zero same-frame and same-order matches still do not identify a producer routine or establish record-field semantics."
 }

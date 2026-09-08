@@ -18,6 +18,7 @@ EVENT = re.compile(
     r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
     r"(?: a0=([0-9A-Fa-f]+) a1=([0-9A-Fa-f]+) a5=([0-9A-Fa-f]+)"
     r" a10=([0-9A-Fa-f]+) a11=([0-9A-Fa-f]+))?"
+    r"(?: order=(\d+))?"
 )
 DONE = re.compile(r"M1_RAM_WRITE_DONE frames=(\d+) events=(\d+) truncated=(true|false) output=(.+)")
 
@@ -38,6 +39,8 @@ def main() -> int:
                         help="capture writes only while the CPU PC equals this value")
     parser.add_argument("--registers", action="store_true",
                         help="also capture GSP A0/A1/A5/A10/A11 (GSP device only)")
+    parser.add_argument("--order", action="store_true",
+                        help="include shared same-run read/write event order")
     parser.add_argument("--tap-frame", type=int, default=10,
                         help="install the write tap at this relative frame "
                              "(default: 10; use 1 to catch early input paths)")
@@ -120,6 +123,7 @@ def main() -> int:
         "STUNRUN_RAM_TRACE_DELAY_SECONDS": str(args.delay_seconds),
         "STUNRUN_RAM_TRACE_PC": str(args.pc) if args.pc is not None else "",
         "STUNRUN_RAM_TRACE_REGISTERS": "1" if args.registers else "0",
+        "STUNRUN_RAM_TRACE_ORDER": "1" if args.order else "0",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),
     }
     try:
@@ -140,6 +144,8 @@ def main() -> int:
                           "a5": int(match.group(8), 16),
                           "a10": int(match.group(9), 16),
                           "a11": int(match.group(10), 16)})
+        if match.group(11) is not None:
+            event["order"] = int(match.group(11))
     done = DONE.findall(text)
     result = {
         "schema": "stunrun-ram-write-trace-result/v1",

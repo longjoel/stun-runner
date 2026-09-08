@@ -64,7 +64,11 @@ def main() -> int:
         selected_reads.append(event)
 
     nearest_deltas = collections.Counter()
+    nearest_order_deltas = collections.Counter()
     same_frame = 0
+    same_order = 0
+    order_before_read = 0
+    order_after_read = 0
     overlap_reads = 0
     for event in selected_reads:
         frames = writes_by_address.get(event["address"], set())
@@ -76,6 +80,19 @@ def main() -> int:
         nearest_deltas[nearest] += 1
         if nearest == 0:
             same_frame += 1
+        write_orders = [write_event.get("order") for write_event in selected_writes
+                        if write_event["address"] == event["address"] and
+                        isinstance(write_event.get("order"), int)]
+        if isinstance(event.get("order"), int) and write_orders:
+            order_deltas = [order - event["order"] for order in write_orders]
+            nearest_order = min(order_deltas, key=abs)
+            nearest_order_deltas[nearest_order] += 1
+            if nearest_order == 0:
+                same_order += 1
+            elif nearest_order < 0:
+                order_before_read += 1
+            else:
+                order_after_read += 1
 
     source_addresses = {event["address"] for event in selected_reads}
     overlap_addresses = source_addresses & set(writes_by_address)
@@ -94,6 +111,12 @@ def main() -> int:
         "overlap_address_count": len(overlap_addresses),
         "overlap_read_count": overlap_reads,
         "same_frame_overlap_read_count": same_frame,
+        "same_order_overlap_read_count": same_order,
+        "nearest_write_order_delta": {
+            str(delta): count for delta, count in sorted(nearest_order_deltas.items())
+        },
+        "nearest_write_order_before_read_count": order_before_read,
+        "nearest_write_order_after_read_count": order_after_read,
         "nearest_write_delta_frames": {
             str(delta): count for delta, count in sorted(nearest_deltas.items())
         },

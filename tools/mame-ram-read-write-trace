@@ -16,6 +16,7 @@ READ = re.compile(
     r"data=([0-9A-Fa-f]+) mask=([0-9A-Fa-f]+)"
     r"(?: a0=([0-9A-Fa-f]+) a1=([0-9A-Fa-f]+) a5=([0-9A-Fa-f]+)"
     r" a10=([0-9A-Fa-f]+) a11=([0-9A-Fa-f]+))?"
+    r"(?: order=(\d+))?"
 )
 READ_DONE = re.compile(
     r"M1_RAM_READ_DONE frames=(\d+) events=(\d+) truncated=(true|false)"
@@ -40,6 +41,8 @@ def main() -> int:
     parser.add_argument("--pc", type=lambda x: int(x, 0))
     parser.add_argument("--read-pc", type=lambda x: int(x, 0))
     parser.add_argument("--registers", action="store_true")
+    parser.add_argument("--order", action="store_true",
+                        help="include shared same-run read/write event order")
     parser.add_argument("--tap-frame", type=int, default=10)
     parser.add_argument("--input", default="none")
     parser.add_argument("--load-state", type=pathlib.Path)
@@ -54,6 +57,8 @@ def main() -> int:
                "--frames", str(args.frames), "--start-frame", str(args.start_frame),
                "--end-frame", str(args.end_frame), "--max-events", str(args.max_events),
                "--tap-frame", str(args.tap_frame), "--input", args.input]
+    if args.order:
+        command.append("--order")
     if args.pc is not None:
         command += ["--pc", hex(args.pc)]
     if args.registers:
@@ -85,6 +90,8 @@ def main() -> int:
             event.update({"a0": int(match.group(6), 16), "a1": int(match.group(7), 16),
                           "a5": int(match.group(8), 16), "a10": int(match.group(9), 16),
                           "a11": int(match.group(10), 16)})
+        if match.group(11) is not None:
+            event["order"] = int(match.group(11))
         reads.append(event)
     done = READ_DONE.findall(log_text)
     result = {
