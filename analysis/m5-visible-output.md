@@ -376,6 +376,12 @@ the two time strings, a speed-like string, and `Credits:` for follow-up. This
 is a pattern classifier, not a semantic assignment; its criterion and output
 are documented with the producer evidence.
 
+Across the same trace window, the four candidates relocate between frame 1788
+and frame 1796 while retaining their payloads and A1 coordinates. The source
+record bases therefore participate in a rotating or double-buffered producer
+scheme; a native implementation must carry record-base state rather than
+binding `0xFFFEA4C0` or `0xFFFEA810` as permanent addresses.
+
 The exporter/native path was then exercised with the actual frame-1788 write
 trace: records at `0xFFFEA480`, `0xFFFEA500`, and `0xFFFEA7D0` were extracted
 without hand-entering their words, passed through the record-to-cursor slice,
