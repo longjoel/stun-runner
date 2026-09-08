@@ -1,0 +1,30 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-native-text-fixture",
+  "target": "stunrun",
+  "purpose": "Run the native GSP text-cursor fixture from the captured glyph table and packed HUD descriptor words, then compare glyph crops with the MAME oracle masks.",
+  "inputs": {
+    "glyph_snapshot": {
+      "path": "/tmp/stunrun-m5-pixblt-glyph-source-center-1800/snapshot-1793.json",
+      "schema": "stunrun-memory-snapshot/v1",
+      "base": "0xFFF5DBC0",
+      "count": 512,
+      "snapshot_sha256": "d84d79299195ebeadf8e8441a4dd5b4f6ceb7318be0dc1c11ab1dca023afcde8"
+    },
+    "descriptor_words": ["0x7243", "0x6465", "0x7469", "0x3A73", "0x3020", "0x0020"],
+    "cursor": {"a0": "0xFFFEA810", "a1": "0x010800D4", "y_bias": "0x28"}
+  },
+  "native_run": {
+    "binary": "build/native/stunrun-native-shell",
+    "mode": "gsp-text-cursor-fixture",
+    "frame": 600,
+    "glyph_count": 11,
+    "render_hash": "0xE2AE6E36",
+    "ppm_sha256": "782ffc08a83f130e4f7bf1700896e8d215351f57991f5235a9e4baccb3ad62ea"
+  },
+  "oracle_crop_checks": [
+    {"glyph": "C", "origin": [212, 224], "row_masks": ["0x3E", "0x63", "0x03", "0x03", "0x03", "0x63", "0x3E", "0x00"], "match": true},
+    {"glyph": "r", "origin": [220, 224], "row_masks": ["0x00", "0x00", "0x3E", "0x6E", "0x06", "0x06", "0x06", "0x00"], "match": true}
+  ],
+  "interpretation": "The captured source table, packed descriptor stream, and register-derived cursor inputs produce exact independent C and r glyph crops in the native framebuffer. This validates the executable text fixture boundary, not a live game-state producer or a complete M5 frame."
+}

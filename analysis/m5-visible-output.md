@@ -356,6 +356,10 @@ through the verified table-backed primitive. This closes the executable
 fixture path from captured descriptor bytes to native pixels without claiming
 that the fixture files are produced by reconstructed game state; the separate
 whole-VRAM bridge remains the exact full-frame oracle path.
+The first run from the actual captured 512-word table reproduced the `C` and
+`r` crops byte-for-byte at `(212,224)` and `(220,224)`; command inputs, hashes,
+and row-mask comparisons are recorded in
+`reference/experiments/stunrun/m5-native-text-fixture.metadata.json`.
 
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
