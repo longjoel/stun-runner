@@ -67,6 +67,41 @@ class PublicToolTests(unittest.TestCase):
                 {"start": 0x2000010, "end": 0x2000010, "count": 1},
             ])
 
+    def test_analyze_packed_text_trace_decodes_words_and_filters_fetches(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            trace = temp / "reads.json"
+            output = temp / "text.json"
+            trace.write_text(json.dumps({
+                "schema": "stunrun-ram-read-trace-result/v1",
+                "events": [
+                    {"frame": 10, "pc": 0x464E0, "address": 0x464E0,
+                     "data": 0x9405, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0x464E0, "address": 0x1000,
+                     "data": 0x7243, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0x464E0, "address": 0x1000,
+                     "data": 0x7243, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0x464E0, "address": 0x1010,
+                     "data": 0x6465, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0x464E0, "address": 0x464E0,
+                     "data": 0x9405, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0x464E0, "address": 0x1020,
+                     "data": 0x7469, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0x464E0, "address": 0x464E0,
+                     "data": 0x9405, "mask": 0xFFFF},
+                    {"frame": 10, "pc": 0x464E0, "address": 0x1030,
+                     "data": 0x3A73, "mask": 0xFFFF},
+                ],
+            }), encoding="utf-8")
+            self.run_tool("analyze-packed-text-trace", trace, "--pc",
+                          hex(0x464E0), "--output", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["schema"],
+                             "stunrun-packed-text-analysis/v1")
+            self.assertEqual(report["decoded_record_count"], 4)
+            self.assertEqual(report["decoded_text"], "Credits:")
+            self.assertEqual(report["records"][0]["bytes_hex"], "4372")
+
     def test_track_table_analyzer_snapshot_comparison_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

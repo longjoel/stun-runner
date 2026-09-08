@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Decode packed little-endian text candidates from a RAM-read trace."""
+
+import argparse
+import json
+import pathlib
+import string
+
+
+def printable_text(data: bytes) -> str:
+    return "".join(chr(value) if chr(value) in string.printable and value not in (10, 13)
+                   else f"\\x{value:02X}" for value in data)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("trace", type=pathlib.Path,
+                        help="stunrun-ram-read-trace result JSON")
+    parser.add_argument("--pc", type=lambda value: int(value, 0),
+                        help="retain events captured at this instruction PC")
+    parser.add_argument("--output", type=pathlib.Path)
+    args = parser.parse_args()
+
+    source = json.loads(args.trace.read_text(encoding="utf-8"))
+    if source.get("schema") != "stunrun-ram-read-trace-result/v1":
+        raise SystemExit(f"{args.trace}: expected a RAM read trace result")
+    events = source.get("events")
+    if not isinstance(events, list):
+        raise SystemExit(f"{args.trace}: missing events list")
+    if args.pc is not None:
+        events = [event for event in events if event.get("pc") == args.pc]
+
+    records = []
+    previous = None
+    for event in events:
+        required = ("frame", "pc", "address", "data", "mask")
+        if any(key not in event for key in required):
+            raise SystemExit(f"{args.trace}: malformed event")
+        key = tuple(event[key] for key in required)
+        if args.pc is not None and event["address"] == args.pc:
+            continue
+        if key == previous:
+            continue
+        word = event["data"] & 0xFFFF
+        data = bytes((word & 0xFF, word >> 8))
+        records.append({
+            "frame": event["frame"],
+            "pc": event["pc"],
+            "address": event["address"],
+            "word": word,
+            "bytes_hex": data.hex(),
+            "text": printable_text(data),
+        })
+        previous = key
+
+    payload = b"".join(bytes((record["word"] & 0xFF,
+                               record["word"] >> 8)) for record in records)
+    result = {
+        "schema": "stunrun-packed-text-analysis/v1",
+        "trace": str(args.trace),
+        "pc": args.pc,
+        "source_event_count": len(source["events"]),
+        "decoded_record_count": len(records),
+        "decoded_bytes_hex": payload.hex(),
+        "decoded_text": printable_text(payload),
+        "records": records,
+    }
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
