@@ -141,12 +141,13 @@ it does not expose a bulk record upload. These cells are retained as
 unresolved state deltas, not promoted track fields. Provenance is in
 `reference/experiments/stunrun/m5-gsp-title-high-write-probe.metadata.json`.
 
-The power-on follow-up finally supplies an earlier timing lead. A bounded
-600-frame high-memory write trace first sees any writes at frame 78; the first
-nonzero writes in the `0xFFFA…–0xFFFE…` region arrive in a concentrated
-6,454-event burst at frame 405, with another dispatch burst at frame 410.
-The accompanying instruction trace shows queue/pointer setup around
-`0xFFF9FC00`, `0xFFFCFC00`, `0xFFF716A0`, and `0xFFF71670`. These are now the
-next producer candidates, but the trace does not yet prove that they are the
-geometry-record writer. Provenance is in
-`reference/experiments/stunrun/m5-gsp-boot-high-write-probe.metadata.json`.
+The power-on follow-up supplies an earlier timing lead, with an important
+qualification. A bounded 600-frame high-memory write trace first sees any
+writes at frame 78; the first nonzero burst at frame 405 is 6,454 events, but
+6,332 of them come from the broad `0xFFF59A50` initialization/clear path over
+`0xFFF80000–0xFFF98BB0`. It is not evidence of a geometry-record upload.
+The stronger recurring lead is a pair of 64-word transactions at
+`0xFFF9FC00` and `0xFFFCFC00`, serviced by the `0xFFF41060` sentinel-dispatch
+sequence and pointers near `0xFFF716A0`/`0xFFF71670`. Their payload and
+semantics remain UNKNOWN. Provenance is in
+`reference/experiments/stunrun/m5-gsp-queue-dispatch-probe.metadata.json`.

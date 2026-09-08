@@ -1,0 +1,41 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-gsp-queue-dispatch-probe",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Separate boot-time high-memory initialization from recurring GSP queue/dispatch activity.",
+  "source_capture": "reference/experiments/stunrun/m5-gsp-boot-high-write-probe.metadata.json",
+  "observations": {
+    "first_nonzero_high_window_frame": 405,
+    "frame_405_event_count": 6454,
+    "frame_405_primary_writer": "0xFFF59A50 MOVE A7,*A11,1",
+    "frame_405_primary_address_range": "0xFFF80000–0xFFF98BB0",
+    "queue_a": {
+      "base": "0xFFF9FC00",
+      "initial_clear_frame": 79,
+      "recurring_full_transaction_words": 64,
+      "recurring_full_transaction_frames": [445, 446, 450, 453, 456, 459, 462, 465, 468, 471, 474, 477, 480, 483, 486, 489, 492, 495, 498, 501, 504, 507, 510, 513, 516, 519, 522, 525, 528, 531, 534, 537, 540, 543, 546, 549, 552, 555, 558, 561, 564, 567, 570, 573, 576, 579, 582, 585, 588, 591, 594, 597]
+    },
+    "queue_b": {
+      "base": "0xFFFCFC00",
+      "initial_clear_frame": 80,
+      "recurring_full_transaction_words": 64,
+      "first_full_transaction_frame": 410,
+      "paired_transaction_frame": 445
+    }
+  },
+  "dispatcher_sequence": [
+    "0xFFF40D70: MOVI 0x0203C000,B4",
+    "0xFFF40DA0: MOVI 0xFFFCFC00,A3",
+    "0xFFF40E00: MOVI 0xFFF9FC00,A2",
+    "0xFFF40F00: MOVB @0xFFF716A0,@0xFFF716B0",
+    "0xFFF41030: MOVI 0xFFF9FC00,A3",
+    "0xFFF41060: MOVE *A3,A0,0",
+    "0xFFF41070: CMPI 0xFFFF,A0",
+    "0xFFF410F0: MOVI 0xFFFCFC00,A3",
+    "0xFFF41120: MOVE *A3,A0,0",
+    "0xFFF41F50: MOVE @0xFFF716A0,A0",
+    "0xFFF41F90: MOVB A0,@0xFFF716A0"
+  ],
+  "interpretation": "Frame 405 is dominated by a broad initialization/clear writer and must not be called a geometry-record upload. The recurring 64-word queue transactions and the 0xFFF41060 sentinel-dispatch sequence are stronger upstream renderer candidates, but their payload and semantics remain UNKNOWN."
+}
