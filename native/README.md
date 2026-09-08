@@ -124,6 +124,17 @@ renders the glyphs in the supplied table at the observed A1 cells. This is a
 reproducible native producer boundary for captured HUD data; it deliberately
 does not infer a live game-state source for those files.
 
+`tools/export-gsp-text-fixture` converts the captured
+`stunrun-memory-snapshot/v1` glyph-table JSON to the table binary and accepts
+descriptor words in source order, for example:
+
+```sh
+tools/export-gsp-text-fixture snapshot-1793.json \\
+  --table-out glyph-table.bin --words-out credits-words.bin \\
+  --word 0x7243 --word 0x6465 --word 0x7469 --word 0x3A73 \\
+  --word 0x3020 --word 0x0020
+```
+
 The optional `STUNRUN_GEOM_TABLE_BIN` input accepts a 768-byte big-endian
 table fixture and exercises the evidence-backed 384-word road-buffer upload
 and twin-copy boundary. It intentionally does not select a course or assign

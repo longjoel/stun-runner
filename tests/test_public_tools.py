@@ -103,6 +103,30 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["records"][0]["bytes_hex"], "4372")
             self.assertEqual(report["lane_text"], {"low": "Ceis", "high": "rdt:"})
 
+    def test_export_gsp_text_fixture_writes_little_endian_inputs(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            snapshot = temp / "table.json"
+            table = [0] * 512
+            table[0x43 * 4] = 0x633E
+            snapshot.write_text(json.dumps({
+                "schema": "stunrun-memory-snapshot/v1",
+                "base": 0xFFF5DBC0, "count": 512, "width": 16,
+                "values": table,
+            }), encoding="utf-8")
+            table_out = temp / "table.bin"
+            words_out = temp / "words.bin"
+            result = self.run_tool(
+                "export-gsp-text-fixture", snapshot,
+                "--table-out", table_out, "--words-out", words_out,
+                "--word", "0x7243", "--word", "0x0000")
+            self.assertEqual(json.loads(result.stdout)["descriptor_words"], 2)
+            self.assertEqual(table_out.stat().st_size, 1024)
+            self.assertEqual(table_out.read_bytes()[0x43 * 8:0x43 * 8 + 2],
+                             struct.pack("<H", 0x633E))
+            self.assertEqual(words_out.read_bytes(),
+                             struct.pack("<HH", 0x7243, 0x0000))
+
     def test_track_table_analyzer_snapshot_comparison_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Export an observed GSP glyph-table snapshot and packed text words."""
+
+import argparse
+import json
+import pathlib
+import struct
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("table_snapshot", type=pathlib.Path,
+                        help="stunrun-memory-snapshot/v1 at 0xFFF5DBC0")
+    parser.add_argument("--table-out", type=pathlib.Path, required=True)
+    parser.add_argument("--words-out", type=pathlib.Path, required=True)
+    parser.add_argument("--word", action="append", required=True,
+                        help="packed descriptor word (repeat in source order)")
+    args = parser.parse_args()
+    snapshot = json.loads(args.table_snapshot.read_text(encoding="utf-8"))
+    if snapshot.get("schema") != "stunrun-memory-snapshot/v1":
+        raise SystemExit("table snapshot must use stunrun-memory-snapshot/v1")
+    if snapshot.get("base") != 0xFFF5DBC0 or snapshot.get("count") != 512 or \
+            snapshot.get("width") != 16 or len(snapshot.get("values", [])) != 512:
+        raise SystemExit("table snapshot must be base 0xFFF5DBC0/count 512/width 16")
+    words = [int(value, 0) for value in args.word]
+    if any(value < 0 or value > 0xffff for value in words):
+        raise SystemExit("descriptor words must be 16-bit values")
+    args.table_out.parent.mkdir(parents=True, exist_ok=True)
+    args.words_out.parent.mkdir(parents=True, exist_ok=True)
+    args.table_out.write_bytes(b"".join(
+        struct.pack("<H", value & 0xffff) for value in snapshot["values"]))
+    args.words_out.write_bytes(b"".join(
+        struct.pack("<H", value) for value in words))
+    print(json.dumps({
+        "schema": "stunrun-gsp-text-fixture/v1",
+        "table_words": 512,
+        "descriptor_words": len(words),
+        "table_output": str(args.table_out),
+        "words_output": str(args.words_out),
+    }, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
