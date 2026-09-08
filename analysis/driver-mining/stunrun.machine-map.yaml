@@ -278,6 +278,19 @@ regions:
       - multisync_gsp_map routes this aperture to the GSP VRAM handlers
       - the installed runtime's visible VRAM captures use this address family with the configured address stride
 
+  - name: gsp_vram_backing_and_mirror
+    processor: gsp
+    start: 0xff800000
+    end: 0xffffffff
+    access: rw
+    evidence: MAME-CONFIRMED
+    candidate_selector: gsp.vram_backing
+    mame_handlers:
+      - shared gsp_vram RAM
+    notes:
+      - multisync_gsp_map defines 0xff800000-0xffbfffff as shared gsp_vram with a 0x0400000 mirror
+      - high addresses such as 0xfff9fc00 and 0xfffcfc00 are therefore VRAM-backed aliases/staging locations, not independently instantiated queue devices
+
   - name: gsp_palette_low
     processor: gsp
     start: 0xf5000000

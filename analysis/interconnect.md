@@ -17,6 +17,7 @@ not game-level semantics.
 | JSA interrupt callback | Step 0 driver-mining record | Sound board is wired into the main-board interrupt path; runtime behavior remains to be measured. |
 | MSP | runtime reconciliation | No active MSP device is present for this target. |
 | GSP VRAM aperture | `multisync_gsp_map`; `hdgsp_vram_2bpp_r/w` | The target maps `0x02000000–0x020fffff` to the GSP VRAM handlers. |
+| GSP shared VRAM backing | `multisync_gsp_map`; shared `gsp_vram` with `0x0400000` mirror | `0xFF800000–0xFFFFFFFF` is the GSP RAM backing/mirror; high renderer records are VRAM-backed addresses. |
 | GSP palette planes | `multisync_gsp_map`; `hdgsp_paletteram_lo/hi_r/w` | `0xF5000000–0xF5000FFF` and `0xF5800000–0xF5800FFF` are the low/high palette RAM planes. |
 
 ## Observed-in-trace

@@ -294,8 +294,9 @@ correction: the 6,454-event frame-405 burst is predominantly a broad
 initialization/clear operation, not a proven record upload. The recurring
 64-word transactions at `0xFFF9FC00`/`0xFFFCFC00`, plus the
 `0xFFF41060` sentinel dispatch and `0xFFF716A0`/`0xFFF71670` pointers, are the
-stronger literal candidates. They remain unassigned queue/renderer machinery,
-not semantic track labels. See
+stronger literal candidates. The driver map places the two regions in mirrored
+shared GSP VRAM, so they are VRAM-backed staging/renderer machinery rather than
+proven standalone queues; they are not semantic track labels. See
 `reference/experiments/stunrun/m5-gsp-queue-dispatch-probe.metadata.json`.
 
 PC-filtered writes further bound the transfer shape: each destination receives
