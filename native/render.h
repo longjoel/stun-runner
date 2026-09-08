@@ -54,6 +54,16 @@ int stunrun_render_gsp_text_8x8(stunrun_renderer_t *renderer,
                                 size_t glyph_count,
                                 int destination_x, int destination_y,
                                 uint8_t red, uint8_t green, uint8_t blue);
+/* Expand the captured packed-text word order (low byte, then high byte) and
+ * stop at the first NUL byte. */
+int stunrun_render_gsp_packed_text_8x8(stunrun_renderer_t *renderer,
+                                       const uint16_t *source_table,
+                                       size_t source_word_count,
+                                       const uint16_t *packed_words,
+                                       size_t packed_word_count,
+                                       int destination_x, int destination_y,
+                                       uint8_t red, uint8_t green,
+                                       uint8_t blue);
 /* Clipped inclusive-coordinate fill counterpart for the traced GSP FILL XY
  * operation. Bounds may be supplied in either order; this is a raster
  * primitive only and assigns no meaning to the coordinates. */

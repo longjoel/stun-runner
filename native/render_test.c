@@ -156,6 +156,40 @@ int main(void)
                 0xFFu)
             return 1;
     }
+    {
+        static const uint16_t packed_credits[] = {
+            0x7243u, 0x6465u, 0x7469u, 0x3A73u, 0x3020u, 0x0020u
+        };
+        uint16_t source_table[128u * 4u] = {0};
+        static const uint16_t words[][4] = {
+            {0x633Eu, 0x0303u, 0x6303u, 0x003Eu},
+            {0x0000u, 0x6E3Eu, 0x0606u, 0x0006u},
+            {0x0000u, 0x663Cu, 0x067Eu, 0x003Cu},
+            {0x6060u, 0x667Cu, 0x6666u, 0x007Cu},
+            {0x0018u, 0x181Cu, 0x1818u, 0x003Cu},
+            {0x1818u, 0x187Eu, 0x1818u, 0x0070u},
+            {0x0000u, 0x063Cu, 0x603Cu, 0x003Eu},
+            {0x0000u, 0x1818u, 0x1800u, 0x0018u},
+        };
+        size_t glyph;
+        stunrun_render_begin(&renderer, 19u, 0u, 0u, 0u);
+        for (glyph = 0; glyph < 8u; glyph++)
+            memcpy(source_table + (size_t)("Credits:"[glyph]) * 4u,
+                   words[glyph], sizeof(words[glyph]));
+        if (!stunrun_render_gsp_packed_text_8x8(
+                &renderer, source_table, sizeof(source_table) / sizeof(*source_table),
+                packed_credits, sizeof(packed_credits) / sizeof(*packed_credits),
+                212, 224, 0xFFu, 0xFEu, 0u) ||
+            renderer.pixels[((size_t)224u * STUNRUN_RENDER_WIDTH + 213u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)226u * STUNRUN_RENDER_WIDTH + 221u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)230u * STUNRUN_RENDER_WIDTH + 271u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)231u * STUNRUN_RENDER_WIDTH + 271u) * 3u] !=
+                0u)
+            return 1;
+    }
     if (!stunrun_render_fill_xy(&renderer, 4, 6, 2, 3, 0xA1u, 0xB2u,
                                 0xC3u) ||
         renderer.pixels[((size_t)3u * STUNRUN_RENDER_WIDTH + 2u) * 3u] !=

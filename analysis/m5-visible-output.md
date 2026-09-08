@@ -315,6 +315,10 @@ the native renderer regression at oracle placement `(212,224)`. This checks
 the eight-character sequence and its 8-pixel advance as one bounded HUD
 fixture; it supplies glyph codes explicitly and does not claim to reconstruct
 the live GSP record cursor.
+The native `stunrun_render_gsp_packed_text_8x8` helper now expands the observed
+low-byte/high-byte word order, stops at the first NUL, and renders the complete
+label through the table selector. Its regression uses the captured `Credits:`
+words; this is the closest native text slice currently justified by the oracle.
 
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:

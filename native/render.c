@@ -138,6 +138,40 @@ int stunrun_render_gsp_text_8x8(stunrun_renderer_t *renderer,
     return 1;
 }
 
+int stunrun_render_gsp_packed_text_8x8(stunrun_renderer_t *renderer,
+                                       const uint16_t *source_table,
+                                       size_t source_word_count,
+                                       const uint16_t *packed_words,
+                                       size_t packed_word_count,
+                                       int destination_x, int destination_y,
+                                       uint8_t red, uint8_t green,
+                                       uint8_t blue)
+{
+    size_t word_index;
+    size_t glyph_index = 0u;
+
+    if (renderer == NULL || source_table == NULL || packed_words == NULL ||
+        source_word_count < 128u * 4u)
+        return 0;
+    for (word_index = 0; word_index < packed_word_count; word_index++) {
+        unsigned lane;
+        for (lane = 0; lane < 2u; lane++) {
+            unsigned code = (packed_words[word_index] >> (lane * 8u)) & 0xffu;
+            if (code == 0u)
+                return 1;
+            if (glyph_index > (size_t)(INT_MAX - destination_x) / 8u)
+                return 0;
+            if (!stunrun_render_gsp_glyph_from_table(
+                    renderer, source_table, source_word_count, code,
+                    destination_x + (int)(glyph_index * 8u), destination_y,
+                    red, green, blue))
+                return 0;
+            glyph_index++;
+        }
+    }
+    return 1;
+}
+
 int stunrun_render_fill_xy(stunrun_renderer_t *renderer, int x0, int y0,
                            int x1, int y1, uint8_t red, uint8_t green,
                            uint8_t blue)
