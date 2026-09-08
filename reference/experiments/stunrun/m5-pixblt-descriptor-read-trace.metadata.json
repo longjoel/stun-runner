@@ -172,5 +172,5 @@
     "glyph_setup": "The runtime table lookup supplies 8 and 8 as the two dimensions; the following lookup supplies the split pointer 0xFFF5DBC0. A 512-word snapshot at that base contains 380 nonzero words at each sampled frame.",
     "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."
   },
-  "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT, provides two reproducible packed-text examples, and bounds an 8x8 source-tile table at 0xFFF5DBC0. The loop is a likely HUD/text blitter candidate, but glyph selection, pixel bit order, coordinate fields, and display role remain unproven."
+  "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT, provides reproducible packed-text examples, and bounds an 8x8 source-tile table at 0xFFF5DBC0. Independent 0, C, and r crops prove the table addressing and LSB-first pixel orientation; register captures connect descriptor A0 reads to stable A1 destination cells across two forks. The live producer, broader coordinate transform, and complete frame composition remain unproven."
 }
