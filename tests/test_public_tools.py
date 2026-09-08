@@ -101,6 +101,7 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["decoded_record_count"], 4)
             self.assertEqual(report["decoded_text"], "Credits:")
             self.assertEqual(report["records"][0]["bytes_hex"], "4372")
+            self.assertEqual(report["lane_text"], {"low": "Ceis", "high": "rdt:"})
 
     def test_track_table_analyzer_snapshot_comparison_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:

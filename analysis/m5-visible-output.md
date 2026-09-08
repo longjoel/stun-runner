@@ -260,6 +260,14 @@ tools/analyze-packed-text-trace <ram-read-result.json> \\
 It removes the instruction-fetch tap events, collapses the interleaved
 duplicate bus observations, and preserves both the raw words and decoded byte
 stream for review.
+The analyzer also reports the low and high byte lanes independently, which is
+important here because the GSP byte-sized operand can select one lane from a
+packed 16-bit record without treating the companion byte as another glyph in
+the same iteration.
+For the words `7243 6465 7469 3A73`, the interleaved stream is `Credits:`;
+the separate lanes are `Ceis` and `rdt:`. This is the current producer
+constraint: reconstructing the live cursor requires its byte-lane state as well
+as its high-memory word address.
 
 The blit setup also loads a fixed `8 × 8` dimension pair from
 `0xFFF5DB00`/`0xFFF5DB10`, followed by the split pointer words `0xDBC0` and

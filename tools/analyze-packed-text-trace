@@ -55,6 +55,8 @@ def main() -> int:
 
     payload = b"".join(bytes((record["word"] & 0xFF,
                                record["word"] >> 8)) for record in records)
+    low_lane = bytes(record["word"] & 0xFF for record in records)
+    high_lane = bytes(record["word"] >> 8 for record in records)
     result = {
         "schema": "stunrun-packed-text-analysis/v1",
         "trace": str(args.trace),
@@ -63,6 +65,10 @@ def main() -> int:
         "decoded_record_count": len(records),
         "decoded_bytes_hex": payload.hex(),
         "decoded_text": printable_text(payload),
+        "lane_text": {
+            "low": printable_text(low_lane),
+            "high": printable_text(high_lane),
+        },
         "records": records,
     }
     encoded = json.dumps(result, indent=2) + "\n"
