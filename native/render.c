@@ -93,6 +93,24 @@ int stunrun_render_gsp_glyph_8x8(stunrun_renderer_t *renderer,
     return 1;
 }
 
+int stunrun_render_gsp_glyph_from_table(stunrun_renderer_t *renderer,
+                                        const uint16_t *source_table,
+                                        size_t source_word_count,
+                                        unsigned glyph_code,
+                                        int destination_x, int destination_y,
+                                        uint8_t red, uint8_t green,
+                                        uint8_t blue)
+{
+    size_t offset;
+
+    if (source_table == NULL || source_word_count < 128u * 4u)
+        return 0;
+    offset = (size_t)(glyph_code & 0x7fu) * 4u;
+    return stunrun_render_gsp_glyph_8x8(
+        renderer, source_table + offset, destination_x, destination_y,
+        red, green, blue);
+}
+
 int stunrun_render_fill_xy(stunrun_renderer_t *renderer, int x0, int y0,
                            int x1, int y1, uint8_t red, uint8_t green,
                            uint8_t blue)

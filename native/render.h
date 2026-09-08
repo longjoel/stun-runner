@@ -36,6 +36,15 @@ int stunrun_render_gsp_glyph_8x8(stunrun_renderer_t *renderer,
                                  const uint16_t source_words[4],
                                  int destination_x, int destination_y,
                                  uint8_t red, uint8_t green, uint8_t blue);
+/* Select one tile using the traced source = base + (code & 0x7f) * 64
+ * address formula. The table contains four 16-bit words per tile. */
+int stunrun_render_gsp_glyph_from_table(stunrun_renderer_t *renderer,
+                                        const uint16_t *source_table,
+                                        size_t source_word_count,
+                                        unsigned glyph_code,
+                                        int destination_x, int destination_y,
+                                        uint8_t red, uint8_t green,
+                                        uint8_t blue);
 /* Clipped inclusive-coordinate fill counterpart for the traced GSP FILL XY
  * operation. Bounds may be supplied in either order; this is a raster
  * primitive only and assigns no meaning to the coordinates. */

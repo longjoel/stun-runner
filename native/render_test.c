@@ -68,6 +68,23 @@ int main(void)
                 0u)
             return 1;
     }
+    {
+        uint16_t source_table[128u * 4u] = {0};
+        source_table[0x43u * 4u] = 0x633Eu;
+        source_table[0x43u * 4u + 1u] = 0x0303u;
+        source_table[0x43u * 4u + 2u] = 0x6303u;
+        source_table[0x43u * 4u + 3u] = 0x003Eu;
+        if (!stunrun_render_gsp_glyph_from_table(
+                &renderer, source_table, sizeof(source_table) / sizeof(*source_table),
+                0xC3u, 300, 100, 4u, 5u, 6u) ||
+            renderer.pixels[((size_t)100u * STUNRUN_RENDER_WIDTH + 301u) * 3u] !=
+                4u ||
+            renderer.pixels[((size_t)101u * STUNRUN_RENDER_WIDTH + 300u) * 3u + 1u] !=
+                5u ||
+            renderer.pixels[((size_t)103u * STUNRUN_RENDER_WIDTH + 302u) * 3u] !=
+                0u)
+            return 1;
+    }
     if (!stunrun_render_fill_xy(&renderer, 4, 6, 2, 3, 0xA1u, 0xB2u,
                                 0xC3u) ||
         renderer.pixels[((size_t)3u * STUNRUN_RENDER_WIDTH + 2u) * 3u] !=
