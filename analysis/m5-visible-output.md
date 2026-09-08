@@ -388,16 +388,18 @@ contain HUD text: frame 1797 shows `TIME 0:35.0`, `LEVEL`, and `Credits: 0`.
 There are 496 unique mapped word positions per burst. The eight-row height,
 combined with the `8 × 8` source dimensions and packed HUD strings in the
 source records, is strong evidence that this `PIXBLT` path is drawing text or
-small HUD tiles. It still does not prove the source bit order or assign each
-record to a particular on-screen label.
+small HUD tiles. The later source-table crops and register captures prove the
+LSB-first glyph orientation and the A0/A1 cursor mechanism, but do not assign
+every dynamic record to a semantic game field.
 
 The raw descriptor words also expose a likely text path. Interpreting each
 16-bit word in little-endian byte order gives `0:35.0` at `0xFFFEA4C0` from
 `3A30 3533 302E 0000`, and `Credits: 0 ` at `0xFFFEA810` from
 `7243 6465 7469 3A73 3020 0020`. These are byte-level observations, not yet
 semantic assignments: the `PIXBLT` loop consumes the low-byte-sized operand and
-the role of the companion byte, glyph stride, and coordinates still needs to
-be established. Nevertheless, the evidence shifts the most economical next
+the companion byte supplies the alternating high-lane glyph. The glyph stride
+and checkpoint cursor coordinates are now established; broader producer
+semantics remain open. Nevertheless, the evidence shifts the most economical next
 probe toward a HUD/text blit fixture rather than assuming this loop is road
 geometry. The raw counts and hashes remain in
 `reference/experiments/stunrun/m5-pixblt-descriptor-read-trace.metadata.json`.

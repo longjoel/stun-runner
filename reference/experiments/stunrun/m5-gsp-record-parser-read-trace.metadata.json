@@ -14,8 +14,8 @@
   "captures": {
     "left_index": {"input": "fork_hold_left", "pc": "0xFFF45000", "result_sha256": "fd0011c390fb29da753a33eee187b382a4256bb7564568dd9484a885651f8f2f", "events": 1710, "data_reads": 855, "data_address_range": "0xFF(FB)A4C0–0xFF(FE)B8B0"},
     "left_record": {"input": "fork_hold_left", "pc": "0xFFF45090", "result_sha256": "b3e912e4a2780181921f394c5aeeabfd252d6892fde316e405b4205c0e56fa09", "events": 1704, "data_reads": 852, "data_address_range": "0xFFFA0260–0xFFFE9FD0"},
-    "center_index": {"input": "fork_center", "pc": "0xFFF45000", "result_sha256": "fe4b79377dd129f059cc34c5121c6db6dd5b4debb0f4ea878941afe0f620cdb1", "events": 2024, "data_reads": 1012, "data_address_range": "0xFFFB90C0–0xFFFEA3D0"},
-    "center_record": {"input": "fork_center", "pc": "0xFFF45090", "result_sha256": "eb026c78e6ca92d8c2bc2d537e3faa3ab92889789b144784847becc4eadd991", "events": 2020, "data_reads": 1010, "data_address_range": "0xFFFA0260–0xFFFE8B60"}
+    "center_index": {"input": "fork_center", "pc": "0xFFF45000", "result_sha256": "fe4b79377dd129f059cc34c5121c6db6dd5b4debb0f4ea878941afe0f620cdb1", "events": 2024, "data_reads": 1012, "data_address_range": "0xFFFB90C0–0xFFFEA3D0", "register_capture": {"events": 1012, "log_sha256": "b926d6b565fefe5d500c0586b961c747019cc7ff4b10a6c002d9feb745f11e62", "first_samples": [{"address": "0xFFFE8C70", "data": "0x0001", "a0": "0x00018A20", "a1": "0xFFFD0250", "a5": "0xFFFD0250", "a10": "0xFFF5A170"}, {"address": "0xFFFE8C80", "data": "0x0011", "a0": "0x80480000", "a1": "0xFFFD0250", "a5": "0xFFFD0360", "a10": "0x00000000"}]}},
+    "center_record": {"input": "fork_center", "pc": "0xFFF45090", "result_sha256": "eb026c78e6ca92d8c2bc2d537e3faa3ab92889789b144784847becc4eadd991", "events": 2020, "data_reads": 1010, "data_address_range": "0xFFFA0260–0xFFFE8B60", "register_capture": {"events": 1010, "log_sha256": "8c5e6d40a54a57d8073a0c530dcd6337bce1ee1be533ebae28acb34afd595df9", "first_samples": [{"address": "0xFFFD0260", "data": "0x0130", "a0": "0x00018A20", "a1": "0xFFFD0250", "a5": "0xFFFD0260", "a10": "0xFFF5A170"}, {"address": "0xFFFD0360", "data": "0x0130", "a0": "0x80480000", "a1": "0xFFFD0250", "a5": "0xFFFD0360", "a10": "0x00000000"}]}}
   },
   "literal_sequence": {
     "index_reader": ["MOVE *A3+,A5,0", "ZEXT A5,0", "CMPXY A12,A5", "SLL 4h,A5", "ADD A1,A5"],
@@ -27,6 +27,7 @@
     "center_index_example": "At frame 1791 the index stream includes 0x0001, 0x0011, 0x0021, ... at 16-byte address steps.",
     "center_record_example": "At frame 1791 the record reader observes repeated 0x0130 words at addresses 0xFFFD0260, 0xFFFD0360, ...; this is a literal value observation, not a semantic label.",
     "input_dependence": "Left and center forks select different index/data address streams and read counts from the same saved-state origin.",
+    "register_capture": "The register-enabled center trace shows A5 tracking the selected record address at 0xFFF45090 while A1 remains 0xFFFD0250 during the sampled parser walk. At 0xFFF45000, A5 advances through the selected 16-byte record destinations after the index read; A10 begins at 0xFFF5A170 in the first sample and is zero in later sampled iterations. These are literal register observations, not field-semantic assignments.",
     "instruction_fetch_caveat": "Each result includes the instruction-fetch event at the filtered PC; data_reads excludes events whose address equals that PC."
   },
   "interpretation": "The GSP has an indexed 16-byte record walk feeding its geometry renderer. The record layout and addressing mechanism are now strong native-slice candidates; field ownership and whether the records represent road, object, or HUD primitives remain UNKNOWN."
