@@ -48,6 +48,26 @@ int main(void)
                 0u)
             return 1;
     }
+    {
+        /* Character 'C' at source-table index 0x43, independently matched
+         * against the oracle's Credits label at (212,224). */
+        static const uint16_t glyph_c[4] = {
+            0x633Eu, 0x0303u, 0x6303u, 0x003Eu
+        };
+        if (!stunrun_render_gsp_glyph_8x8(&renderer, glyph_c, 212, 224,
+                                          0xFFu, 0xFEu, 0u) ||
+            renderer.pixels[((size_t)224u * STUNRUN_RENDER_WIDTH + 213u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)225u * STUNRUN_RENDER_WIDTH + 212u) * 3u + 1u] !=
+                0xFEu ||
+            renderer.pixels[((size_t)227u * STUNRUN_RENDER_WIDTH + 213u) * 3u] !=
+                0xFFu ||
+            renderer.pixels[((size_t)224u * STUNRUN_RENDER_WIDTH + 212u) * 3u] !=
+                0u ||
+            renderer.pixels[((size_t)231u * STUNRUN_RENDER_WIDTH + 213u) * 3u] !=
+                0u)
+            return 1;
+    }
     if (!stunrun_render_fill_xy(&renderer, 4, 6, 2, 3, 0xA1u, 0xB2u,
                                 0xC3u) ||
         renderer.pixels[((size_t)3u * STUNRUN_RENDER_WIDTH + 2u) * 3u] !=

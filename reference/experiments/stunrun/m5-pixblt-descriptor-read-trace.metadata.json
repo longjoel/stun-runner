@@ -68,6 +68,16 @@
         "screenshot_row_masks": ["0x1C", "0x36", "0x63", "0x63", "0x63", "0x36", "0x1C", "0x00"],
         "match": true
       },
+      "glyph_c_oracle_match": {
+        "frame": 1797,
+        "screenshot_crop_origin": [212, 224],
+        "foreground_rgb": [255, 254, 0],
+        "source_table_index": "0x43",
+        "source_words": ["0x633E", "0x0303", "0x6303", "0x003E"],
+        "source_lsb_first_row_masks": ["0x3E", "0x63", "0x03", "0x03", "0x03", "0x63", "0x3E", "0x00"],
+        "screenshot_row_masks": ["0x3E", "0x63", "0x03", "0x03", "0x03", "0x63", "0x3E", "0x00"],
+        "match": true
+      },
       "unique_destination_addresses": 992,
       "log_sha256": "fdef6d6940da336de3d56c882f8e0d622f977d18b44844a0acefffb1c0251e06"
     },

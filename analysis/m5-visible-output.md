@@ -288,6 +288,11 @@ renderer now contains this bounded primitive as
 foreground color; `native-render-boundary-c` covers its edge and mask behavior.
 This proves one glyph’s source packing and raster orientation, while the full
 record-to-coordinate producer remains outside the current native shell.
+The same check now succeeds for source-table index `0x43` (`C`): words
+`633E 0303 6303 003E` match the oracle crop at `(212,224)` with row masks
+`3E,63,03,03,03,63,3E,00`. Two independent glyphs therefore validate the
+generic source addressing and orientation; color selection and the broader
+text-record cursor/coordinate producer remain separate work.
 
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
