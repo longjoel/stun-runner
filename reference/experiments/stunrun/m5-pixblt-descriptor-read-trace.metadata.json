@@ -36,12 +36,26 @@
       "pc": "0xFFF46590",
       "events": 0,
       "log_sha256": "04e05b8eef738f6ed9b866304e22569f4e5f58ff2ffaf724e213a92189a3f25c"
+    },
+    "pixel_destination_center": {
+      "input": "fork_center",
+      "pc": "0xFFF46590",
+      "events": 1376,
+      "frames": [1793, 1797],
+      "events_per_frame": 688,
+      "destination_ranges_by_frame": {
+        "1793": "0x02070610–0x020773D0",
+        "1797": "0x02034610–0x0203B3D0"
+      },
+      "unique_destination_addresses": 992,
+      "log_sha256": "fdef6d6940da336de3d56c882f8e0d622f977d18b44844a0acefffb1c0251e06"
     }
   },
   "observations": {
     "descriptor_instruction": "The runtime instruction at 0xFFF464E0 is MOVE *A0+,A5,0; the following code masks A5 with 0x7F and uses it to form the PIXBLT source offset.",
     "source_records": "The descriptor loads come from dynamic addresses in the mirrored high GSP VRAM window, and the left and center forks select different address streams.",
     "read_tap_boundary": "Filtering ordinary RAM reads to PC 0xFFF46590 and 0x02000000–0x0200FFFF produced no events. The PIXBLT source operation is therefore not exposed as an ordinary data read at that filtered PC by this MAME tap.",
+    "destination_writes": "Filtering ordinary RAM writes to PC 0xFFF46590 produced two 688-write bursts into GSP VRAM, with different destination ranges on frames 1793 and 1797.",
     "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."
   },
   "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT without claiming a decoded descriptor format. The next native blit step still requires a stronger observation of the hardware source/destination operation or a literal descriptor-to-VRAM correlation."

@@ -250,6 +250,15 @@ not expose that pixel operation as an ordinary data read at the filtered PC.
 The exact commands, counts, and log hashes are recorded in
 `reference/experiments/stunrun/m5-pixblt-descriptor-read-trace.metadata.json`.
 
+The complementary write probe does expose the `PIXBLT` destination. On the
+center fork, `0xFFF46590` generated two 688-write bursts in the same window:
+`0x02070610–0x020773D0` at frame 1793 and
+`0x02034610–0x0203B3D0` at frame 1797. Across both bursts there were 992
+unique destination addresses. This establishes that the native blit boundary
+must write into the GSP VRAM pixel space, but the irregular destination ranges
+and unresolved source records are not enough to infer a rectangle or texture
+format yet.
+
 The preceding GSP parser is now bounded directly. At `0xFFF45000`, the
 runtime sequence is `MOVE *A3+,A5`, zero extension, `CMPXY`, `SLL 4h,A5`, and
 `ADD A1,A5`: the selected record address is therefore a base plus a 16-byte
