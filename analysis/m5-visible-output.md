@@ -293,6 +293,10 @@ The same check now succeeds for source-table index `0x43` (`C`): words
 `3E,63,03,03,03,63,3E,00`. Two independent glyphs therefore validate the
 generic source addressing and orientation; color selection and the broader
 text-record cursor/coordinate producer remain separate work.
+It also succeeds for lowercase source-table index `0x72` (`r`): words
+`0000 6E3E 0606 0006` match the crop at `(220,224)` with masks
+`00,00,3E,6E,06,06,06,00`. The renderer format is therefore consistent across
+digits, uppercase letters, and lowercase letters.
 The native table-backed helper `stunrun_render_gsp_glyph_from_table` now
 implements the measured `& 0x7F` code selection and four-word tile stride.
 It is a reusable renderer boundary only; the native shell does not pretend to
