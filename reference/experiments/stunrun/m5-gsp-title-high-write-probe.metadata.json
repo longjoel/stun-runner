@@ -1,0 +1,37 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-gsp-title-high-write-probe",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Check high GSP work-record changes immediately after the title-era save state without replaying the complete simulation.",
+  "checkpoint": {
+    "state": "/tmp/stunrun-human-live/state-600.sta",
+    "sha256": "65870b98010918dbb94cf19f1922f4a193acdd7996616d48925ad48d9d524760",
+    "relative_frames": [1, 60]
+  },
+  "window": {
+    "device": ":mainpcb:gsp",
+    "space": "program",
+    "base": "0xFFF80000",
+    "end": "0xFFFFFFFF",
+    "snapshot_count": 32768,
+    "snapshot_width": 16,
+    "snapshot_address_stride": 16
+  },
+  "snapshot": {
+    "input": "fork_center",
+    "changed_sampled_words": 5,
+    "changed_addresses": ["0xFFF98750", "0xFFFA0350", "0xFFFD0070", "0xFFFD0080", "0xFFFD0350"],
+    "frame_1_json_sha256": "1b7605e9ae8e19a76867bc7ca9722c1d6f0fd107cea44a171c6fec95efd12202",
+    "frame_60_json_sha256": "da359ea1a5d116338da0fe071bb74def162bcda97265952090c8d6264086f813"
+  },
+  "write_trace": {
+    "event_count": 34518,
+    "truncated": false,
+    "result_sha256": "603fba9db6c8bfbdaa263db6c29d400584e7804a086c62db60932ef73a1cc26a",
+    "canonical_log_sha256": "2e05cfe2891713ba8f7d1495166f72621b8722c8dd16694416abbd3312f14a79",
+    "top_writer_pcs": {"0xFFF47E40": 6878, "0xFFF47E20": 6861, "0xFFF46210": 5115, "0xFFF46230": 2251, "0xFFF44420": 2044, "0xFFF46590": 1518}
+  },
+  "instruction_trace_sha256": "d400e13967d8e78d6315f8985c9166084a52878128e2ccfcc034d3e375fc09e2",
+  "interpretation": "This bounded title-era window does not expose a bulk high-memory record producer. The five sampled changes are insufficient to assign track or geometry semantics; the high-memory producer remains earlier or uses an unobserved boundary."
+}

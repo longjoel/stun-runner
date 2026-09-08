@@ -132,3 +132,11 @@ The probe therefore moves the native producer target earlier than the
 renderer fork. It does not identify the record writer or assign semantics to
 the high-memory fields. Provenance is in
 `reference/experiments/stunrun/m5-gsp-fork-high-write-probe.metadata.json`.
+
+A second bounded probe starts from the title-era `state-600.sta` checkpoint and
+samples the same high-memory window through relative frame 60. Only five of
+32,768 stride-16 samples change. The accompanying write trace has 34,518
+events, but its dominant PCs are register-save/restore and renderer routines;
+it does not expose a bulk record upload. These cells are retained as
+unresolved state deltas, not promoted track fields. Provenance is in
+`reference/experiments/stunrun/m5-gsp-title-high-write-probe.metadata.json`.

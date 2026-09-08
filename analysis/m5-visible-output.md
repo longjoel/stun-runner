@@ -283,6 +283,12 @@ This negative result prevents treating the renderer window itself as the
 native record-production step. See
 `reference/experiments/stunrun/m5-gsp-fork-high-write-probe.metadata.json`.
 
+The title-era follow-up (state 600 plus 60 relative frames) also fails to
+show a bulk high-memory upload: five of 32,768 stride-16 samples change, while
+the full write trace is dominated by stack/register-save and renderer PCs.
+Those deltas remain UNKNOWN rather than being labeled as track state. See
+`reference/experiments/stunrun/m5-gsp-title-high-write-probe.metadata.json`.
+
 PC-filtered writes further bound the transfer shape: each destination receives
 896 full-word writes in seven 128-write bursts across the 1280–1298 window.
 The base-side addresses advance by `0x20` from `0xFFF6F650`; the twin-side
