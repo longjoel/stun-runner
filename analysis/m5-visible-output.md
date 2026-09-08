@@ -339,6 +339,16 @@ that translation remains checkpoint-specific until the coordinate producer is
 traced. This is the first register-level cursor contract for the live text
 blitter, while the native shell still awaits a reconstructed producer.
 
+The register-enabled write trace was repeated on the left steering fork. It
+captured 2,064 writes across frames 1790, 1794, and 1798; each burst retained
+`A10=0xFFF5DBC0`, `A11=64`, and the same A1 low-halfword sequence beginning at
+`0x0040` and stepping by eight. The high halfwords `0x00FD` and `0x0105` also
+recurred, while the A0 descriptor addresses differed from the center fork.
+This is stronger evidence that A1 carries stable screen-cell coordinates and
+that the fork-dependent state primarily changes the descriptor stream, not the
+cursor encoding. It remains a bounded cross-fork observation, not a universal
+coordinate formula.
+
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
 `0x02070610–0x020773D0` at frame 1793 and

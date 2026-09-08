@@ -111,6 +111,17 @@
       ],
       "coordinate_observation": "A0 is post-incremented by 8 address units per glyph; A1 advances by 8 in the low 16 bits per glyph. For these samples, screen_y equals the high A1 word minus 0x28."
     },
+    "pixel_destination_registers_left": {
+      "input": "fork_hold_left",
+      "pc": "0xFFF46590",
+      "registers": ["A0", "A1", "A5", "A10", "A11"],
+      "events": 2064,
+      "frames": [1790, 1794, 1798],
+      "canonical_log_sha256": "24b79f13497fb64105e64d7faaa5fec146990b34c506a28e19b3e7bef3e4c878",
+      "constant_setup": {"A10": "0xFFF5DBC0", "A11": 64},
+      "a1_cell_sequences": ["0x00FD0040, 0x00FD0048, ...", "0x01050040, 0x01050048, ..."],
+      "coordinate_observation": "The left fork preserves the same low-halfword eight-pixel cell sequence and the same high-halfword row values seen in the center fork, while A0 descriptor addresses differ."
+    },
     "glyph_table_center": {
       "input": "fork_center",
       "pc": "0xFFF46AD0",
