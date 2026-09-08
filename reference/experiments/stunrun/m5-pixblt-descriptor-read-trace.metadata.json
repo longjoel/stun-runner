@@ -49,6 +49,36 @@
       },
       "unique_destination_addresses": 992,
       "log_sha256": "fdef6d6940da336de3d56c882f8e0d622f977d18b44844a0acefffb1c0251e06"
+    },
+    "glyph_table_center": {
+      "input": "fork_center",
+      "pc": "0xFFF46AD0",
+      "events": 48,
+      "table_addresses": ["0xFFF5DB00", "0xFFF5DB10"],
+      "table_values": ["0x0008", "0x0008"],
+      "frames": [1793, 1797],
+      "log_sha256": "11fc2a317ef2ea61189be61d7d1ea8869e1d2370002d59caad8f55bdbf7782ee"
+    },
+    "glyph_source_pointer_center": {
+      "input": "fork_center",
+      "pc": "0xFFF46B60",
+      "events": 48,
+      "pointer_words": ["0xDBC0", "0xFFF5"],
+      "inferred_source_base": "0xFFF5DBC0",
+      "log_sha256": "b312bee7f1abf083a000a938ece9cbbeb8348b8558d104e022cfcd71f0b3ffbe"
+    },
+    "glyph_source_snapshot_center": {
+      "base": "0xFFF5DBC0",
+      "count": 512,
+      "width": 16,
+      "address_stride": 16,
+      "frames": [1793, 1797],
+      "nonzero_words": {"1793": 380, "1797": 380},
+      "snapshot_sha256": {
+        "1793": "d84d79299195ebeadf8e8441a4dd5b4f6ceb7318be0dc1c11ab1dca023afcde8",
+        "1797": "0103f03454876aaac97fca685ac43a4dc1cf3c380a25145073d09517334b3c31"
+      },
+      "canonical_log_sha256": "f3db16e3969aeaad710f1b345424a1b86ab7121917ceb7f8dfc136ebc6bed517"
     }
   },
   "observations": {
@@ -60,7 +90,8 @@
     ],
     "read_tap_boundary": "Filtering ordinary RAM reads to PC 0xFFF46590 and 0x02000000–0x0200FFFF produced no events. The PIXBLT source operation is therefore not exposed as an ordinary data read at that filtered PC by this MAME tap.",
     "destination_writes": "Filtering ordinary RAM writes to PC 0xFFF46590 produced two 688-write bursts into GSP VRAM, with different destination ranges on frames 1793 and 1797.",
+    "glyph_setup": "The runtime table lookup supplies 8 and 8 as the two dimensions; the following lookup supplies the split pointer 0xFFF5DBC0. A 512-word snapshot at that base contains 380 nonzero words at each sampled frame.",
     "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."
   },
-  "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT and provides two reproducible packed-text examples. The loop is now a likely HUD/text blitter candidate, but the glyph selection, coordinate fields, and display role remain unproven."
+  "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT, provides two reproducible packed-text examples, and bounds an 8x8 source-tile table at 0xFFF5DBC0. The loop is a likely HUD/text blitter candidate, but glyph selection, pixel bit order, coordinate fields, and display role remain unproven."
 }

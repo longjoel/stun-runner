@@ -250,6 +250,14 @@ not expose that pixel operation as an ordinary data read at the filtered PC.
 The exact commands, counts, and log hashes are recorded in
 `reference/experiments/stunrun/m5-pixblt-descriptor-read-trace.metadata.json`.
 
+The blit setup also loads a fixed `8 × 8` dimension pair from
+`0xFFF5DB00`/`0xFFF5DB10`, followed by the split pointer words `0xDBC0` and
+`0xFFF5`, giving the inferred source base `0xFFF5DBC0`. A 512-word, stride-16
+snapshot at that base contains 380 nonzero words at both sampled blit frames.
+This bounds an 8×8 source-tile table suitable for a future literal native
+fixture. It does not yet establish whether the words are glyph rows, their
+2-bit pixel ordering, or the exact coordinate/character-record relationship.
+
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
 `0x02070610–0x020773D0` at frame 1793 and
