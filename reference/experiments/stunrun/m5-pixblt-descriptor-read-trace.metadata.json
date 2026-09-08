@@ -1,0 +1,48 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-pixblt-descriptor-read-trace",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "purpose": "Capture the source-record loads immediately preceding the GSP PIXBLT B,XY loop and test whether the PIXBLT source read is visible through the ordinary RAM read tap.",
+  "checkpoint": {
+    "state": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "relative_trace_frames": [1790, 1800],
+    "descriptor_window": "0xFF800000–0xFFFFFFFF",
+    "pixel_source_window": "0x02000000–0x0200FFFF",
+    "max_events": 10000
+  },
+  "captures": {
+    "descriptor_left": {
+      "input": "fork_hold_left",
+      "pc": "0xFFF464E0",
+      "events_including_instruction_fetch": 396,
+      "data_events_after_fetch_filter": 198,
+      "data_address_range": "0xFFFBA880–0xFFFEBEC0",
+      "unique_address_data_pairs": 102,
+      "log_sha256": "89cbe61910b0a311c32a72c1846563f2c2307e3c45db3660e462f42de5d8280c"
+    },
+    "descriptor_center": {
+      "input": "fork_center",
+      "pc": "0xFFF464E0",
+      "events_including_instruction_fetch": 264,
+      "data_events_after_fetch_filter": 132,
+      "data_address_range": "0xFFFBAA40–0xFFFEA9E0",
+      "unique_address_data_pairs": 68,
+      "log_sha256": "68916d50c2a71eed149d679c3706a6708af24464cf51c836b3e590396b787247"
+    },
+    "pixel_source_center": {
+      "input": "fork_center",
+      "pc": "0xFFF46590",
+      "events": 0,
+      "log_sha256": "04e05b8eef738f6ed9b866304e22569f4e5f58ff2ffaf724e213a92189a3f25c"
+    }
+  },
+  "observations": {
+    "descriptor_instruction": "The runtime instruction at 0xFFF464E0 is MOVE *A0+,A5,0; the following code masks A5 with 0x7F and uses it to form the PIXBLT source offset.",
+    "source_records": "The descriptor loads come from dynamic addresses in the mirrored high GSP VRAM window, and the left and center forks select different address streams.",
+    "read_tap_boundary": "Filtering ordinary RAM reads to PC 0xFFF46590 and 0x02000000–0x0200FFFF produced no events. The PIXBLT source operation is therefore not exposed as an ordinary data read at that filtered PC by this MAME tap.",
+    "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."
+  },
+  "interpretation": "This confirms the dynamic high-memory source-record boundary for PIXBLT without claiming a decoded descriptor format. The next native blit step still requires a stronger observation of the hardware source/destination operation or a literal descriptor-to-VRAM correlation."
+}

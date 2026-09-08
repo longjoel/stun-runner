@@ -239,6 +239,17 @@ the high-memory record writer/source format; it does not yet assign those
 records to roadway, object, or HUD semantics. Provenance is in
 `reference/experiments/stunrun/m5-gsp-geometry-source-read-trace.metadata.json`.
 
+The next narrow probe filtered the preceding `PIXBLT B,XY` descriptor load at
+`0xFFF464E0`. In the same relative `1790–1800` window it observed 198 data
+reads on the left fork and 132 on the center fork, from different addresses in
+the mirrored high GSP VRAM window. The records include repeated 16-bit words,
+but their values are intentionally left uninterpreted. A simultaneous read tap
+at the `PIXBLT B,XY` PC (`0xFFF46590`) over the low GSP VRAM source window
+returned zero events. This is an instrumentation boundary: the MAME tap does
+not expose that pixel operation as an ordinary data read at the filtered PC.
+The exact commands, counts, and log hashes are recorded in
+`reference/experiments/stunrun/m5-pixblt-descriptor-read-trace.metadata.json`.
+
 The preceding GSP parser is now bounded directly. At `0xFFF45000`, the
 runtime sequence is `MOVE *A3+,A5`, zero extension, `CMPXY`, `SLL 4h,A5`, and
 `ADD A1,A5`: the selected record address is therefore a base plus a 16-byte
