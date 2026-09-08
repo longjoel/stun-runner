@@ -97,6 +97,16 @@ set_target_properties(stunrun-gsp-work-buffer-consumer-slice-test PROPERTIES
   C_STANDARD 99)
 add_test(NAME gsp-work-buffer-consumer-slice-c
   COMMAND stunrun-gsp-work-buffer-consumer-slice-test)
+# Literal GSP PIXBLT descriptor lane/cursor state from the M5 register tap.
+add_executable(stunrun-gsp-text-cursor-slice-test
+  ../reproduction/gsp/text_cursor.c
+  ../reproduction/gsp/text_cursor_test.c)
+target_include_directories(stunrun-gsp-text-cursor-slice-test PRIVATE
+  ../reproduction/gsp)
+set_target_properties(stunrun-gsp-text-cursor-slice-test PROPERTIES
+  C_STANDARD 99)
+add_test(NAME gsp-text-cursor-slice-c
+  COMMAND stunrun-gsp-text-cursor-slice-test)
 # arcade-experiment/v1 parser self-check (valid, corrupt, and schema-
 # violating fixtures; no ROMs or MAME involved).
 add_executable(stunrun-experiment-parser-test

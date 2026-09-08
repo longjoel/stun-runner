@@ -32,3 +32,18 @@ capacity; it does not synthesize or relate the two value streams.
 independent stream. The observed destination families are
 `0xF5000000`/`0xF5800000`; address-space and pixel-format interpretation remain
 outside this transport slice.
+
+## PIXBLT text cursor slice
+
+`text_cursor.c` models the register-level portion of the HUD/text blit traced
+at GSP PC `0xFFF46590`. It consumes packed 16-bit descriptor words in
+low-byte/high-byte order, stops at the first NUL byte, records the selected
+lane and glyph code, advances A0 by eight address units per glyph, and advances
+the low half of A1 by eight pixels per glyph. The caller supplies the y bias;
+the observed `high(A1) - 0x28` relation is currently proven only for the saved
+frame-1793/1797 checkpoint.
+
+The `gsp-text-cursor-slice-c` test reproduces the captured `0:35.0` and
+`Credits: 0 ` descriptor streams, including their raw descriptor addresses
+and register samples. This is a transport/decoder boundary, not a generalized
+gameplay HUD producer.
