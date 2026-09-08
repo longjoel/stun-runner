@@ -301,6 +301,13 @@ The same check now succeeds for source-table index `0x43` (`C`): words
 `3E,63,03,03,03,63,3E,00`. Two independent glyphs therefore validate the
 generic source addressing and orientation; color selection and the broader
 text-record cursor/coordinate producer remain separate work.
+Running the same lane decoder on both saved-state forks separates the producer
+inputs: the left trace has 102 deduplicated records and the center trace has
+68, while both retain the `0:35.0`, `0:00.0`, and `Credits: 0` prefixes. A
+sampled numeric field differs (`...589...` versus `...591...`). The label and
+tile format are therefore shared, but the record stream is state-dependent;
+this is the next constraint for reconstructing the live cursor and its update
+schedule.
 It also succeeds for lowercase source-table index `0x72` (`r`): words
 `0000 6E3E 0606 0006` match the crop at `(220,224)` with masks
 `00,00,3E,6E,06,06,06,00`. The renderer format is therefore consistent across
