@@ -153,3 +153,33 @@ shows these addresses are inside the mirrored shared `gsp_vram` backing, so
 they should be called VRAM-backed staging/command areas rather than separate
 queue devices. Their payload and semantics remain UNKNOWN. Provenance is in
 `reference/experiments/stunrun/m5-gsp-queue-dispatch-probe.metadata.json`.
+
+## Save-state-matched source/write correlation
+
+The high-memory window was then traced during the exact visible-fork interval,
+relative frames 1790–1800, from the common `late_drive` checkpoint. The read
+traces at `0xFFF45A10` and `0xFFF45A40` identify the high-memory source
+addresses consumed by the two `FILL XY` coordinate streams. Every one of those
+source addresses also received a write event in the corresponding GSP write
+trace:
+
+| Fork | High-memory writes | Unique written addresses | Read-source addresses also written |
+|---|---:|---:|---:|
+| center | 19,861 | 13,747 | 3,044 / 3,044 |
+| left | 18,440 | 14,232 | 3,064 / 3,064 |
+
+The write footprints are state-dependent. The center trace includes 869 writes
+from the decoded `LINE 0` primitive at `0xFFF45DD0`; the left trace has a
+different writer mix and no comparable dominant line count. This means the
+records feeding the coordinate loads are actively generated or rewritten by
+the GSP display pipeline during the visible fork, rather than being a static
+road-table copy waiting unchanged in high memory.
+
+This is a producer-boundary result, not a semantic decode. The records may
+represent roadway, objects, or other visible geometry; their ownership and
+field meanings remain UNKNOWN. The native target should therefore preserve
+the high-memory record source as a separate input to the geometry primitives
+until a writer/consumer pair is tied to one visible region.
+
+Provenance is in
+`reference/experiments/stunrun/m5-gsp-high-write-fork-1790.metadata.json`.

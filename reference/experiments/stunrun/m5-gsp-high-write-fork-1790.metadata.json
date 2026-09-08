@@ -1,0 +1,39 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_gsp_high_write_fork_1790",
+  "date": "2026-09-08",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "checkpoint": {
+    "state": "/tmp/stunrun-latedrive2400.sta",
+    "sha256": "e6b529a4632ae120f1663af2d319bb01aed7215c64e947e78ed5f799862fd5b3",
+    "relative_frames": [1790, 1800]
+  },
+  "command_template": "tools/mame-ram-write-trace /tmp/stunrun-roms-system OUTPUT --device :mainpcb:gsp --base 0xFFF80000 --end 0xFFFFFFFF --frames 1800 --start-frame 1790 --end-frame 1800 --tap-frame 1 --max-events 100000 --load-state /tmp/stunrun-latedrive2400.sta --input INPUT --nothrottle",
+  "forks": {
+    "center": {
+      "input": "fork_center",
+      "result": "/tmp/stunrun-m5-gsp-high-write-center-1790/result.json",
+      "result_sha256": "002bf6b16c4e30ca7d7e49c7a0f529cc7bbb42b9874324381c2cdaa8b97cb561",
+      "canonical_log_sha256": "5ae35fa1c381cc64de767b8e34f229db07c9485becb102b444878d86fcdcbc77",
+      "events": 19861,
+      "unique_written_addresses": 13747,
+      "writer_pc_count": 160,
+      "read_source_addresses_also_written": 3044
+    },
+    "left": {
+      "input": "fork_hold_left",
+      "result": "/tmp/stunrun-m5-gsp-high-write-left-1790/result.json",
+      "result_sha256": "c7ad9e5876651afcd08375e24fa878f2d4221e4ad777a1ea684095e26295ca0f",
+      "canonical_log_sha256": "49b56e254c1ec736f39dcfc0270439eb5b90554274298d833ba1f87b8f4a4021",
+      "events": 18440,
+      "unique_written_addresses": 14232,
+      "writer_pc_count": 137,
+      "read_source_addresses_also_written": 3064
+    }
+  },
+  "read_source_provenance": "reference/experiments/stunrun/m5-gsp-geometry-source-read-trace.metadata.json",
+  "conclusion": "Every high-memory address consumed by the two FILL XY coordinate loads also receives a GSP write during the matched visible-fork interval. The source records are actively generated or rewritten by the GSP pipeline; semantic ownership remains UNKNOWN.",
+  "confidence": "SAVE-STATE-MATCHED-WRITE-READ-CORRELATION"
+}
