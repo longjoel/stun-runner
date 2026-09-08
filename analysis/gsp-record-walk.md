@@ -85,6 +85,17 @@ It still does not establish who populates the source records or what their
 fields mean. The full replay hashes and per-PC counts are recorded in
 `reference/experiments/stunrun/m5-gsp-record-parser-read-trace.metadata.json`.
 
+A paired source-window write trace touches the same dynamic address set as the
+indexed reads: 3,585 addresses overlap across 16,060 writes and 4,042 filtered
+reads. However, the captures are separate MAME invocations, so the analyzer
+finds zero same-frame write/read matches. The nearest write timing is centered
+at three frames before the read (`-3`: 1,938 reads), but this is only a
+cross-run timing comparison and cannot establish producer ownership. The result
+is recorded in
+`reference/experiments/stunrun/m5-gsp-record-source-write-correlation.metadata.json`;
+the next producer probe must preserve a same-run or save-state-matched event
+relationship.
+
 ## Human-readable evidence anchors
 
 - Center parser trace: first sampled record reads `0x0130` at

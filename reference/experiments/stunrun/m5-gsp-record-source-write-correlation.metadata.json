@@ -1,0 +1,32 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-record-source-write-correlation",
+  "target": "stunrun",
+  "purpose": "Compare GSP writes and indexed-record reads over the canonical visible fork window.",
+  "write_trace": {
+    "path": "/tmp/stunrun-m5-gsp-record-source-writes-canonical/result.json",
+    "sha256": "9fe5a2a21f9b50037315f58812c203405d233e816ec43f07165208e6cd96eb97",
+    "event_count": 16060,
+    "truncated": false
+  },
+  "read_trace": {
+    "path": "/tmp/stunrun-m5-gsp-record-source-canonical-full/result.json",
+    "sha256": "bb4b7f3bac933726abedb790f107209bda357c96576285ab872c00d8ecdee8b6",
+    "event_count": 21418,
+    "truncated": false
+  },
+  "analyzer": {
+    "tool": "tools/analyze-gsp-read-write-correlation",
+    "result_path": "/tmp/stunrun-m5-record-source-correlation.json",
+    "result_sha256": "14225db5536f281571160722f404aebde3212f451155c5fdad7ff3e02c6ce2f8",
+    "read_pcs": ["0xFFF45000", "0xFFF45090", "0xFFF450F0", "0xFFF45110"],
+    "address_range": "0xFFFA0000–0xFFFEAFFF",
+    "write_event_count": 16060,
+    "read_event_count": 4042,
+    "source_address_count": 3585,
+    "overlap_address_count": 3585,
+    "same_frame_overlap_read_count": 0,
+    "nearest_write_delta_frames": {"-5": 26, "-4": 221, "-3": 1938, "2": 180, "3": 460, "4": 380, "5": 837}
+  },
+  "interpretation": "The separately captured write and read traces touch the same dynamic source-address set, but zero same-frame matches are available because they are separate MAME invocations. The overlap does not prove that any listed PC produces the records. A same-run or save-state-matched write/read instrument is required before promoting producer ownership or field semantics."
+}
