@@ -258,6 +258,16 @@ This bounds an 8×8 source-tile table suitable for a future literal native
 fixture. It does not yet establish whether the words are glyph rows, their
 2-bit pixel ordering, or the exact coordinate/character-record relationship.
 
+The setup values can be followed literally through the register arithmetic:
+the two 16-bit reads at `0xFFF5DB00`/`0xFFF5DB10` combine as
+`A7 = 0x00080008`; `MOVX` and `MOVY` therefore yield width and height 8, and
+the `MPYU` computes `A11 = 64`. The next two reads at
+`0xFFF5DB20`/`0xFFF5DB30` combine as `A10 = 0xFFF5DBC0`. Each source-record
+byte selected by `ANDI 0x7F` is consequently mapped by the loop as
+`source = 0xFFF5DBC0 + (byte & 0x7F) * 64`, before `PIXBLT B,XY` performs the
+VRAM write. This is a register/data-flow contract; the address-unit and pixel
+lane interpretation still require an independent glyph rendering match.
+
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
 `0x02070610–0x020773D0` at frame 1793 and
