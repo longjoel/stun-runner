@@ -384,7 +384,7 @@ are not four unrelated formats:
 words   0–23       identical in all four slots
 words  24,27       differ only in the course-0 slot
 words  25–26,28–47 identical in all four slots
-words  48–143      slot-specific payload (three 16-record blocks)
+words  48–143      slot-specific payload (record boundary not promoted)
 words 144–383      identical in all four slots (five 16-record blocks)
 ```
 
