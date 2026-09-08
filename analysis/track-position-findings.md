@@ -88,6 +88,21 @@ road-progress fields fed by this tick and compare them with road-buffer
 uploads and `0xFF9578` transitions. The physical track-position field remains
 **UNKNOWN**.
 
+## Candidate eliminated: `0xFF9EFC`
+
+The strongest remaining monotonic snapshot candidate was checked with a wider
+writer trace over `0xFF9ED0–0xFF9F20` during frames 1100–1800 of the same
+recorded race. The target word at `0xFF9EFC` (with its adjacent word at
+`0xFF9EFE`) received only 40 lane events on five frames: 1276, 1389, 1513,
+1651, and 1777. It was written by multiple structure/object-builder PCs,
+including `0x02D102`, `0x02ECCC`, `0x03111A`, `0x02D164`, and `0x02D1C6`.
+
+The values at `0xFF9EFC` were `0, 1, 2, 2, 3` at those transition frames;
+the adjacent word carried varying structure data. This is transition/object
+structure state, not a per-frame road-position accumulator. The earlier
+monotonic 32-bit snapshot result was therefore a misleading aggregation of
+fields sampled at coarse intervals.
+
 ## Provenance
 
 - Static listing: `/tmp/stunrun-listing-ff9578/maincpu-68010.lst`, PCs listed
@@ -95,6 +110,9 @@ uploads and `0xFF9578` transitions. The physical track-position field remains
 - Writer trace: `/tmp/stunrun-m5-position-source-trace-24/result.json`,
   replaying `/tmp/race/r1.inp` at bus-visible `0xFF8014–0xFF8017`.
 - Provenance metadata: `reference/experiments/stunrun/m5-global-tick-trace.metadata.json`.
+- Candidate-elimination trace: `/tmp/stunrun-m5-road-progress-trace/result.json`,
+  replaying `/tmp/race/r1.inp` over `0xFF9ED0–0xFF9F20`; the full result had
+  710 events, of which 40 touched `0xFF9EFC–0xFF9EFE`.
 - Snapshot correlation: `/tmp/race/snapshot-1200.json` through
   `/tmp/race/snapshot-4800.json`, analyzed as big-endian 68010 bytes.
 - ROM table/state-index mechanism: `analysis/track-storage.md` and

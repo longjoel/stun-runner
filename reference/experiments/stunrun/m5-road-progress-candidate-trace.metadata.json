@@ -1,0 +1,24 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_road_progress_candidate_trace",
+  "date": "2026-09-08",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "recording": "/tmp/race/r1.inp",
+  "purpose": "Test whether the monotonic snapshot candidate at 0xFF9EFC is a continuously advancing track-position field.",
+  "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-road-progress-trace --device :mainpcb:maincpu --base 0xFF9ED0 --end 0xFF9F20 --frames 1800 --start-frame 1100 --end-frame 1800 --tap-frame 1 --max-events 100000 --playback /tmp/race/r1.inp --nothrottle",
+  "result": {
+    "path": "/tmp/stunrun-m5-road-progress-trace/result.json",
+    "sha256": "605adba7aba04cdbcfd9df4e038a11b9190c3055c7d0810a05580adaaa18d9b2",
+    "canonical_log_sha256": "13d88608c5b60fd98324f7d6d21ae9f126ad9e572d610fc4fe35f9a5d868b417",
+    "window_events": 710,
+    "target_events": 40,
+    "target_addresses": ["0xFF9EFC", "0xFF9EFE"],
+    "target_frames": [1276, 1389, 1513, 1651, 1777],
+    "target_writer_pcs": ["0x02D102", "0x02ECCC", "0x03111A", "0x02D164", "0x02D1C6"],
+    "truncated": false
+  },
+  "conclusion": "0xFF9EFC is transition/object structure state, not a continuously advancing track-position accumulator. The coarse-snapshot monotonic candidate was a misleading aggregation of fields.",
+  "confidence": "WRITER-TRACE-CONFIRMED"
+}
