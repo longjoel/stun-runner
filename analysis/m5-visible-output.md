@@ -227,6 +227,14 @@ work to GSP geometry/pixel primitives while preserving the semantic caveat:
 the line is not yet proven to be roadway, object, or HUD output. Provenance is
 in `reference/experiments/stunrun/m5-gsp-instruction-fork-trace.metadata.json`.
 
+The indexed record-walk control flow is documented in
+`analysis/gsp-record-walk.md`. The literal sequence establishes a table base,
+reads an index stream, selects records at a 16-byte stride, dispatches on the
+low byte of the first record word, and feeds computed values into the
+`FILL XY` loop. This is a stronger native implementation boundary than a list
+of observed addresses, while the record field meanings and producer ownership
+remain `UNKNOWN`.
+
 A PC-filtered GSP read trace then followed the two coordinate loads inside the
 `FILL XY` path. `0xFFF45A10` (`MOVE *A5+,A7,1`) and `0xFFF45A40`
 (`MOVE *A5+,A9,1`) read 16-bit words from dynamic high GSP memory in the
