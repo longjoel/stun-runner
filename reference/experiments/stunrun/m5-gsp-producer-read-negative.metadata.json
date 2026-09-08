@@ -1,0 +1,33 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-producer-read-negative",
+  "target": "stunrun",
+  "purpose": "Test whether the frame-1200 high-memory staging block is read directly during nearby renderer windows.",
+  "window": {
+    "device": ":mainpcb:gsp",
+    "space": "program",
+    "base": "0xFFF982F0",
+    "end": "0xFFF98760",
+    "relative_frames": "1-60",
+    "register_capture": true
+  },
+  "runs": [
+    {
+      "state": "/tmp/race2/state-1200.sta",
+      "result": "/tmp/stunrun-m5-gsp-producer-reads-1200/result.json",
+      "result_sha256": "2415bb1852f135ef81cf4a5fc3aefcfa932ab134acf3856fa9daf9d918e28ff7",
+      "canonical_log_sha256": "8ac5d661e165c28c2d6fbfe8b22c7221ad82d98d7c6c5be04203eadf9a187bfc",
+      "event_count": 0,
+      "truncated": false
+    },
+    {
+      "state": "/tmp/race2/state-1800.sta",
+      "result": "/tmp/stunrun-m5-gsp-producer-reads-1800/result.json",
+      "result_sha256": "f24c5bfad58ab89ee4d3b073727585287a25a2084d33b3442d6e45727bd81e48",
+      "canonical_log_sha256": "2d431718c8aaddd68f385ae23e59cacb6f49331b44b1e6b76e7bb9f528d42d9a",
+      "event_count": 0,
+      "truncated": false
+    }
+  ],
+  "interpretation": "Neither nearby 60-frame window read the sampled 0xFFF982F0-0xFFF98760 block through the traced GSP program space. The block is therefore not promoted as a directly consumed indexed-record source for these windows. This is a bounded negative result, not proof that the block is never read or that its values have no rendering role."
+}

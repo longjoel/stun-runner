@@ -577,3 +577,13 @@ recorded in
 The next bounded step is to correlate reads from this block against the known
 `0xFFF45000` indexed-record walk and the downstream `FILL XY`/display-copy
 passes in the same save-state window.
+
+That correlation was run directly over the block at `0xFFF982F0–0xFFF98760`
+from both the frame-1200 and frame-1800 save states, using 60 relative frames
+and GSP register capture. Both traces completed without truncation and recorded
+zero reads in the sampled window. The recurring writes are therefore not a
+same-window read source for the indexed renderer path. This rules out a direct
+producer-to-consumer claim for these checkpoints, while leaving open an earlier,
+different address translation, or a device-side access not visible to this
+program-space tap. The negative result is recorded in
+`reference/experiments/stunrun/m5-gsp-producer-read-negative.metadata.json`.
