@@ -115,6 +115,15 @@ then applies the evidence-backed two-plane decode in C instead of requiring
 the RGB export step. `tools/export-gsp-native-state` can emit those files with
 `--palette-low-out` and `--palette-high-out` alongside its existing RGB output.
 
+The shell also accepts a bounded text-cursor fixture using
+`STUNRUN_GSP_TEXT_TABLE_BIN` (exactly 512 little-endian 16-bit words) and
+`STUNRUN_GSP_TEXT_WORDS_BIN` (packed descriptor words), plus
+`STUNRUN_GSP_TEXT_A0`, `STUNRUN_GSP_TEXT_A1`, and
+`STUNRUN_GSP_TEXT_Y_BIAS`. It decodes the measured low/high byte lanes and
+renders the glyphs in the supplied table at the observed A1 cells. This is a
+reproducible native producer boundary for captured HUD data; it deliberately
+does not infer a live game-state source for those files.
+
 The optional `STUNRUN_GEOM_TABLE_BIN` input accepts a 768-byte big-endian
 table fixture and exercises the evidence-backed 384-word road-buffer upload
 and twin-copy boundary. It intentionally does not select a course or assign

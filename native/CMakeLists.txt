@@ -65,9 +65,11 @@ add_executable(stunrun-native-shell
   ../reproduction/maincpu/fifo_block.c
   ../reproduction/maincpu/geom_upload.c
   ../reproduction/maincpu/road_fifo.c
+  ../reproduction/gsp/text_cursor.c
   ../reproduction/sound/jsa_latch.c)
 target_include_directories(stunrun-native-shell PRIVATE
-  ../reproduction/adsp ../reproduction/maincpu ../reproduction/sound)
+  ../reproduction/adsp ../reproduction/maincpu ../reproduction/gsp
+  ../reproduction/sound)
 set_target_properties(stunrun-native-shell PROPERTIES C_STANDARD 99)
 add_test(NAME native-shell COMMAND stunrun-native-shell)
 add_executable(stunrun-render-test render.c render_test.c)

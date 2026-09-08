@@ -349,6 +349,14 @@ that the fork-dependent state primarily changes the descriptor stream, not the
 cursor encoding. It remains a bounded cross-fork observation, not a universal
 coordinate formula.
 
+The native shell now has an explicit `gsp-text-cursor-fixture` mode. It loads
+the captured 512-word glyph table and packed descriptor words, applies the
+captured A0/A1 seeds plus caller-supplied y bias, and renders each decoded glyph
+through the verified table-backed primitive. This closes the executable
+fixture path from captured descriptor bytes to native pixels without claiming
+that the fixture files are produced by reconstructed game state; the separate
+whole-VRAM bridge remains the exact full-frame oracle path.
+
 The complementary write probe does expose the `PIXBLT` destination. On the
 center fork, `0xFFF46590` generated two 688-write bursts in the same window:
 `0x02070610–0x020773D0` at frame 1793 and

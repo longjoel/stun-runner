@@ -51,6 +51,7 @@
 #include "checkpoint.h"
 #include "render.h"
 #include "gsp_video.h"
+#include "text_cursor.h"
 
 static int g_failures = 0;
 static unsigned frame = 0;
@@ -147,6 +148,97 @@ static int load_geometry_table(const char *path, uint16_t *table)
     for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++)
         table[i] = (uint16_t)(((uint16_t)bytes[i * 2u] << 8) |
                               bytes[i * 2u + 1u]);
+    return 1;
+}
+
+/* Load a little-endian word fixture with an exact bounded capacity. */
+static int load_word_fixture(const char *path, uint16_t *words,
+                             size_t capacity, size_t *word_count)
+{
+    FILE *file;
+    long bytes;
+    size_t i;
+    unsigned char raw[2];
+
+    if (path == NULL || words == NULL || word_count == NULL)
+        return 0;
+    file = fopen(path, "rb");
+    if (file == NULL || fseek(file, 0, SEEK_END) != 0)
+        goto fail;
+    bytes = ftell(file);
+    if (bytes <= 0 || (bytes & 1) != 0 ||
+        (size_t)bytes / 2u > capacity || fseek(file, 0, SEEK_SET) != 0)
+        goto fail;
+    for (i = 0; i < (size_t)bytes / 2u; i++) {
+        if (fread(raw, 1u, sizeof(raw), file) != sizeof(raw))
+            goto fail;
+        words[i] = (uint16_t)raw[0] | ((uint16_t)raw[1] << 8);
+    }
+    if (fgetc(file) != EOF)
+        goto fail;
+    fclose(file);
+    *word_count = (size_t)bytes / 2u;
+    return 1;
+
+fail:
+    if (file != NULL)
+        fclose(file);
+    return 0;
+}
+
+static int parse_fixture_u32(const char *name, uint32_t *value)
+{
+    const char *text = getenv(name);
+    char *end = NULL;
+    unsigned long parsed;
+
+    if (text == NULL || text[0] == '\0' || value == NULL)
+        return 0;
+    parsed = strtoul(text, &end, 0);
+    if (end == text || *end != '\0' || parsed > UINT32_MAX)
+        return 0;
+    *value = (uint32_t)parsed;
+    return 1;
+}
+
+static int render_text_fixture(stunrun_renderer_t *renderer,
+                               const char *table_path,
+                               const char *words_path)
+{
+    uint16_t table[128u * 4u];
+    uint16_t words[1024u];
+    stunrun_gsp_text_glyph_t glyphs[2048u];
+    size_t word_count = 0u;
+    size_t glyph_count;
+    uint32_t a0;
+    uint32_t a1;
+    uint32_t y_bias;
+    size_t i;
+
+    if (!load_word_fixture(table_path, table, sizeof(table) / sizeof(*table),
+                           &word_count) || word_count != 128u * 4u ||
+        !load_word_fixture(words_path, words,
+                           sizeof(words) / sizeof(*words), &word_count) ||
+        !parse_fixture_u32("STUNRUN_GSP_TEXT_A0", &a0) ||
+        !parse_fixture_u32("STUNRUN_GSP_TEXT_A1", &a1) ||
+        !parse_fixture_u32("STUNRUN_GSP_TEXT_Y_BIAS", &y_bias))
+        return 0;
+    glyph_count = stunrun_gsp_text_cursor_decode(
+        a0, a1, (int)y_bias, words, word_count, glyphs,
+        sizeof(glyphs) / sizeof(*glyphs));
+    if (glyph_count == 0u)
+        return 0;
+    for (i = 0u; i < glyph_count; i++) {
+        if (!stunrun_render_gsp_glyph_from_table(
+                renderer, table, sizeof(table) / sizeof(*table),
+                glyphs[i].glyph_code, glyphs[i].x, glyphs[i].y,
+                0xFFu, 0xFEu, 0u))
+            return 0;
+    }
+    printf("shell: gsp-text fixture=loaded words=%u glyphs=%u "
+           "a0=0x%08X a1=0x%08X y-bias=%u\n",
+           (unsigned)word_count, (unsigned)glyph_count,
+           (unsigned)a0, (unsigned)a1, (unsigned)y_bias);
     return 1;
 }
 
@@ -300,6 +392,8 @@ static int run_walk(void)
     const char *gsp_palette_low_path = getenv("STUNRUN_GSP_PALETTE_LOW_BIN");
     const char *gsp_palette_high_path = getenv("STUNRUN_GSP_PALETTE_HIGH_BIN");
     const char *geometry_table_path = getenv("STUNRUN_GEOM_TABLE_BIN");
+    const char *gsp_text_table_path = getenv("STUNRUN_GSP_TEXT_TABLE_BIN");
+    const char *gsp_text_words_path = getenv("STUNRUN_GSP_TEXT_WORDS_BIN");
     const char *render_mode = "blank-scaffold";
     uint16_t geometry_table[STUNRUN_GEOM_MARCH_WORDS];
     uint16_t geometry_base[STUNRUN_GEOM_MARCH_WORDS];
@@ -441,8 +535,8 @@ static int run_walk(void)
             g_pending++;
     }
 
-    /* Rendering is a deliberately blank native frame boundary until the
-     * first visible-output milestone supplies evidence-backed drawing. */
+    /* Rendering accepts either the captured whole-VRAM bridge or the
+     * evidence-backed text-cursor fixture. Neither path supplies game state. */
     stunrun_render_begin(&renderer, g_terminal, 0u, 0u, 0u);
     {
         int has_vram = gsp_vram_path != NULL && gsp_vram_path[0] != '\0';
@@ -451,7 +545,23 @@ static int run_walk(void)
                       gsp_palette_low_path[0] != '\0';
         int has_high = gsp_palette_high_path != NULL &&
                        gsp_palette_high_path[0] != '\0';
-        if (!has_vram || (has_rgb && (has_low || has_high)) ||
+        int has_text_table = gsp_text_table_path != NULL &&
+                             gsp_text_table_path[0] != '\0';
+        int has_text_words = gsp_text_words_path != NULL &&
+                             gsp_text_words_path[0] != '\0';
+        if ((has_text_table != has_text_words) ||
+            (has_text_table && (has_vram || has_rgb || has_low || has_high))) {
+            printf("shell: gsp-text requires table plus words and excludes gsp-video\n");
+            g_failures++;
+        } else if (has_text_table) {
+            if (!render_text_fixture(&renderer, gsp_text_table_path,
+                                     gsp_text_words_path)) {
+                printf("shell: gsp-text load=error\n");
+                g_failures++;
+            } else {
+                render_mode = "gsp-text-cursor-fixture";
+            }
+        } else if (!has_vram || (has_rgb && (has_low || has_high)) ||
             (!has_rgb && (has_low != has_high))) {
             if (has_vram || has_rgb || has_low || has_high) {
                 printf("shell: gsp-video requires VRAM plus either RGB or both raw palette planes\n");
