@@ -229,8 +229,8 @@ in `reference/experiments/stunrun/m5-gsp-instruction-fork-trace.metadata.json`.
 
 The indexed record-walk control flow is documented in
 `analysis/gsp-record-walk.md`. The literal sequence establishes a table base,
-reads an index stream, selects records at a 16-byte stride, dispatches on the
-low byte of the first record word, and feeds computed values into the
+reads an index stream, selects records at a 16-byte stride, performs a
+low-byte-indexed table lookup/write, and feeds computed values into the
 `FILL XY` loop. This is a stronger native implementation boundary than a list
 of observed addresses, while the record field meanings and producer ownership
 remain `UNKNOWN`.

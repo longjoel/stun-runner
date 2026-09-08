@@ -37,10 +37,12 @@ direct example: index values `0x0001`, `0x0011`, `0x0021`, … occur at
 change between the center and left forks from the same saved-state origin.
 
 `0xFFF45090` reads the first record word into `A4`, tests control bits, then
-reads two more words into `A8` and `A6`. Unless a tested branch diverts, it
-dispatches using the low byte of `A4` through a table based at
-`0xFFF71D20`. The selected handler prepares coordinate-like values and enters
-the raster loop around `0xFFF45460`:
+reads two more words into `A8` and `A6`. One path derives an address from the
+low byte of `A4`, reads a value through the table based at `0xFFF71D20`, and
+writes that value to `0xF4000000`. The trace does not show this as a computed
+code dispatch or prove what the table/device value means. The path then
+prepares coordinate-like values and enters the raster loop around
+`0xFFF45460`:
 
 ```text
 read word -> A8;  B0 = A8;  read word -> A6
@@ -65,7 +67,7 @@ literal instruction/register observations; their semantic ownership is still
 `UNKNOWN`. In particular, this evidence does not prove that every record is a
 road segment, nor that the text-like records found in the high GSP window are
 produced by this exact indexed walk. The native implementation should retain
-the indexed lookup, 16-byte stride, low-byte dispatch, and branch conditions as
+the indexed lookup, 16-byte stride, low-byte table lookup, and branch conditions as
 mechanism until a producer-side correlation proves more.
 
 ## Human-readable evidence anchors
