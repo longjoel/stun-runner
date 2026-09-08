@@ -563,20 +563,21 @@ and every frame from 3 through 59 contains exactly 16 writes.
 The recurring writes occupy 72 word addresses in
 `0xFFF982F0–0xFFF98760`, with the steady-state 16-word block concentrated in
 `0xFFF98670–0xFFF98760`. The only outside write is one transaction at
-`0xFFFCFC00`. The writer set contains the dispatch/record-adjacent PCs
-`0xFFF41060`, `0xFFF45060`, `0xFFF454A0`, and the surrounding setup routines.
-This is the strongest current direct lead for a GSP-side staged producer after
-the fork boundary.
+`0xFFFCFC00`. A runtime instruction trace then showed that the dominant PCs
+`0xFFF47E20`, `0xFFF47E40`, `0xFFF46210`, and `0xFFF46230` are all `MMTM SP`
+register-save prologues. The apparent recurring producer block is therefore
+predominantly GSP stack traffic, not a staged record buffer. The remaining
+writer PCs are not sufficient to promote a producer claim.
 
-The trace establishes timing, address range, and writer ownership only. The
-values may be pointers, descriptors, control words, or payload, but their
-meaning is still `UNKNOWN`; no track, road, object, HUD, craft, weapon, or
-armor field is assigned. The full command, hashes, and writer inventory are
-recorded in
+The trace establishes timing and stack-related writer ownership only. The
+values must not be interpreted as pointers, descriptors, control words, or
+payload from this probe; no track, road, object, HUD, craft, weapon, or armor
+field is assigned. The full command, hashes, and writer inventory are recorded
+in
 `reference/experiments/stunrun/m5-gsp-state1200-high-write-probe.metadata.json`.
-The next bounded step is to correlate reads from this block against the known
-`0xFFF45000` indexed-record walk and the downstream `FILL XY`/display-copy
-passes in the same save-state window.
+The frame-1200 block remains an unclassified write window; the next bounded
+producer step must identify non-stack writes or an alternate address mapping
+before correlating it with the known `0xFFF45000` indexed-record walk.
 
 That correlation was run directly over the block at `0xFFF982F0–0xFFF98760`
 from both the frame-1200 and frame-1800 save states, using 60 relative frames
@@ -588,13 +589,11 @@ different address translation, or a device-side access not visible to this
 program-space tap. The negative result is recorded in
 `reference/experiments/stunrun/m5-gsp-producer-read-negative.metadata.json`.
 
-An earlier comparison from the frame-600 save state found that the same block
-is much more active during the first 120 relative frames: 47,024 of 69,058
-captured GSP writes land in `0xFFF982F0–0xFFF98760`. The dominant writers are
-the routine family at `0xFFF47E20`, `0xFFF46210`, `0xFFF47E40`, and
-`0xFFF46230`; a separate `0xFFFCFC00` transaction recurs every three frames.
-The indexed-reader PC `0xFFF45A10` still produced zero reads from the full
-high-memory window in that same early interval. This strengthens the distinction
-between an early staging/producer activity pattern and a proven direct
-record-to-renderer feed. The command and hashes are in
+An earlier comparison from the frame-600 save state found 47,024 of 69,058
+captured GSP writes in the same address range, but the runtime trace classified
+the dominant writers as stack saves. A separate `0xFFFCFC00` transaction
+recurs every three frames, while the indexed-reader PC `0xFFF45A10` produced
+zero reads from the full high-memory window. This eliminates the apparent
+early staging/producer lead instead of strengthening it. The command, trace
+hash, and classification are in
 `reference/experiments/stunrun/m5-gsp-state600-high-write-probe.metadata.json`.

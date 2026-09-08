@@ -2,7 +2,7 @@
   "schema": "stunrun-experiment-metadata/v1",
   "id": "m5-gsp-state600-high-write-probe",
   "target": "stunrun",
-  "purpose": "Compare early post-title GSP high-memory staging activity with the later frame-1200 producer lead.",
+  "purpose": "Test and classify early post-title GSP high-memory writes that initially appeared to be staging activity.",
   "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-gsp-producer-600 --device :mainpcb:gsp --base 0xFFF80000 --end 0xFFFFFFFF --frames 120 --start-frame 1 --end-frame 120 --tap-frame 1 --max-events 100000 --registers --load-state /tmp/race2/state-600.sta --input none --nothrottle",
   "start_condition": {
     "save_state": "/tmp/race2/state-600.sta",
@@ -28,5 +28,16 @@
     "event_count": 0,
     "canonical_log_sha256": "04a4bf241217cae5e160b86c5d08a5aff8657e6230589acea5e621b03e440aab"
   },
-  "interpretation": "The early state has substantial recurring writes to the sampled high-memory block, but the specific FILL XY-adjacent reader PC 0xFFF45A10 was not observed reading the high-memory window. This bounds an early GSP staging/producer activity pattern without proving a direct indexed-record or visible-output relationship. No semantic field assignments are made."
+  "instruction_trace_classification": {
+    "command": "tools/mame-trace /tmp/stunrun-roms-system /tmp/stunrun-gsp-trace-600 :mainpcb:gsp 5 mame none 1 --load-state /tmp/race2/state-600.sta",
+    "trace_sha256": "4a2c9346d909cb9189ce71ca17ec25d5f698309e4e1657aeccc15d28f396f3d2",
+    "relevant_instructions": {
+      "0xFFF47E20": "MMTM SP,A0-A4,A6-A14",
+      "0xFFF47E40": "MMTM SP,B0-B4,B6-B14",
+      "0xFFF46210": "MMTM SP,A3-A11",
+      "0xFFF46230": "MMTM SP,B1,B3,B8,B9"
+    },
+    "classification": "stack_save_restore"
+  },
+  "interpretation": "The early state has substantial writes to the sampled high-memory block, but the dominant writer PCs are register-save prologues writing through SP. The block activity is therefore predominantly GSP stack traffic, not evidence of a staged record producer. The indexed-reader PC 0xFFF45A10 also produced zero reads from the high-memory window. This eliminates the apparent producer lead and leaves the actual upstream record source unresolved. No semantic field assignments are made."
 }

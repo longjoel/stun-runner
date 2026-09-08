@@ -37,7 +37,7 @@
     "recurring_block": "After initialization, each relative frame 3-59 emits exactly 16 full-word writes into 0xFFF98670-0xFFF98760, with a stable set of pointer-like and control-like values.",
     "initialization": "Relative frame 1 emits 570 writes and relative frame 2 emits 85 writes across the surrounding 0xFFF982F0-0xFFF98760 region.",
     "pointer_landmark": "The only write outside the main block is one write at 0xFFFCFC00 from PC 0xFFF418A0.",
-    "record_writer_proximity": "PC 0xFFF45060 writes 0xFFF98510/0xFFF98520 during the initialization burst; this is a candidate staging/descriptor write site, not yet a proven indexed-record producer."
+    "record_writer_proximity": "PC 0xFFF45060 writes 0xFFF98510/0xFFF98520 during the initialization burst; this remains an unclassified write site, not a proven indexed-record producer."
   },
-  "interpretation": "This is direct GSP-side high-memory staging activity following a saved gameplay state. The recurring block and writer PCs are now bounded for a follow-up read/write correlation. No word, pointer, or block is promoted to track, road, object, HUD, craft, weapon, or armor semantics."
+  "interpretation": "This is direct GSP-side high-memory write activity following a saved gameplay state. A later runtime instruction trace classifies the dominant recurring writer family in the analogous frame-600 probe as stack save/restore traffic, so this block is not promoted as staging without further classification. No word, pointer, or block is promoted to track, road, object, HUD, craft, weapon, or armor semantics."
 }
