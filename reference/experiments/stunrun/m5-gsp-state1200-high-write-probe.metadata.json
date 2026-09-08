@@ -37,7 +37,13 @@
     "recurring_block": "After initialization, each relative frame 3-59 emits exactly 16 full-word writes into 0xFFF98670-0xFFF98760, with a stable set of pointer-like and control-like values.",
     "initialization": "Relative frame 1 emits 570 writes and relative frame 2 emits 85 writes across the surrounding 0xFFF982F0-0xFFF98760 region.",
     "pointer_landmark": "The only write outside the main block is one write at 0xFFFCFC00 from PC 0xFFF418A0.",
-    "record_writer_proximity": "PC 0xFFF45060 writes 0xFFF98510/0xFFF98520 during the initialization burst; this remains an unclassified write site, not a proven indexed-record producer."
+    "record_walk_call_site": "The filtered PC 0xFFF45060 probe reports writes at 0xFFF98510/0xFFF98520 during initialization, but the runtime instruction trace decodes 0xFFF45060 as CALLR FFF45090, the indexed-record reader entry. These events are not promoted as payload writes."
   },
-  "interpretation": "This is direct GSP-side high-memory write activity following a saved gameplay state. A later runtime instruction trace classifies the dominant recurring writer family in the analogous frame-600 probe as stack save/restore traffic, so this block is not promoted as staging without further classification. No word, pointer, or block is promoted to track, road, object, HUD, craft, weapon, or armor semantics."
+  "instruction_trace_classification": {
+    "command": "tools/mame-trace /tmp/stunrun-roms-system /tmp/stunrun-gsp-trace-1200 :mainpcb:gsp 5 mame none 1 --load-state /tmp/race2/state-1200.sta",
+    "trace_sha256": "403d9f504735f92ae80a5cf566483d9929dbb9d8736096ebf7a76dbc747bdd45",
+    "relevant_instruction": "0xFFF45060: CALLR FFF45090h",
+    "classification": "indexed_record_reader_call_site"
+  },
+  "interpretation": "This is direct GSP-side high-memory write activity following a saved gameplay state. Runtime traces classify the dominant recurring writer family in the analogous frame-600 probe as stack save/restore traffic, while the 0xFFF45060 event is an indexed-record reader call site rather than a proven payload writer. The actual upstream producer remains unresolved. No word, pointer, or block is promoted to track, road, object, HUD, craft, weapon, or armor semantics."
 }

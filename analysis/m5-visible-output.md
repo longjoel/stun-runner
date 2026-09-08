@@ -579,6 +579,13 @@ The frame-1200 block remains an unclassified write window; the next bounded
 producer step must identify non-stack writes or an alternate address mapping
 before correlating it with the known `0xFFF45000` indexed-record walk.
 
+The apparent `0xFFF45060` exception was checked separately from the frame-1200
+state. Its filtered trace reports writes at `0xFFF98510/0xFFF98520`, but the
+runtime instruction trace decodes that PC as `CALLR FFF45090`, immediately at
+the indexed-record reader entry. It is therefore a reader call-site artifact,
+not evidence that the call-site itself writes record payload. The classification
+and trace hash are retained in the frame-1200 metadata.
+
 That correlation was run directly over the block at `0xFFF982F0–0xFFF98760`
 from both the frame-1200 and frame-1800 save states, using 60 relative frames
 and GSP register capture. Both traces completed without truncation and recorded
