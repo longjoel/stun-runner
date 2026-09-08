@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+"""Decode descriptor reads plus GSP cursor registers from a RAM trace."""
+
+import argparse
+import json
+import pathlib
+import string
+
+
+def printable(data: bytes) -> str:
+    return "".join(chr(value) if chr(value) in string.printable and
+                    value not in (10, 13) else f"\\x{value:02X}"
+                    for value in data)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("trace", type=pathlib.Path)
+    parser.add_argument("--pc", type=lambda value: int(value, 0), required=True)
+    parser.add_argument("--output", type=pathlib.Path)
+    args = parser.parse_args()
+    source = json.loads(args.trace.read_text(encoding="utf-8"))
+    if source.get("schema") != "stunrun-ram-read-trace-result/v1":
+        raise SystemExit(f"{args.trace}: expected a RAM read trace result")
+    events = source.get("events")
+    if not isinstance(events, list):
+        raise SystemExit(f"{args.trace}: missing events list")
+
+    records = []
+    pending = None
+    for event in events:
+        required = ("frame", "pc", "address", "data", "mask",
+                    "a0", "a1", "a5", "a10", "a11")
+        if any(key not in event for key in required):
+            raise SystemExit(f"{args.trace}: register capture is required")
+        if event["pc"] != args.pc:
+            continue
+        if event["address"] == args.pc:
+            continue
+        key = (event["frame"], event["address"], event["data"],
+               event["mask"])
+        if pending is not None and key != pending["key"]:
+            records.append(pending["record"])
+            pending = None
+        if pending is None:
+            word = event["data"] & 0xffff
+            pending = {"key": key, "record": {
+                "frame": event["frame"], "pc": event["pc"],
+                "address": event["address"], "word": word,
+                "bytes_hex": bytes((word & 0xff, word >> 8)).hex(),
+                "text": printable(bytes((word & 0xff, word >> 8))),
+                "a0_before": event["a0"], "a0_after": event["a0"],
+                "a1": event["a1"], "a5": event["a5"],
+                "a10": event["a10"], "a11": event["a11"]}}
+        else:
+            pending["record"]["a0_after"] = event["a0"]
+    if pending is not None:
+        records.append(pending["record"])
+
+    payload = b"".join(bytes((record["word"] & 0xff,
+                               record["word"] >> 8)) for record in records)
+    result = {
+        "schema": "stunrun-gsp-text-cursor-analysis/v1",
+        "trace": str(args.trace), "pc": args.pc,
+        "source_event_count": len(events),
+        "decoded_record_count": len(records),
+        "decoded_bytes_hex": payload.hex(),
+        "decoded_text": printable(payload),
+        "records": records,
+    }
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

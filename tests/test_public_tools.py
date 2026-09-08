@@ -103,6 +103,37 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["records"][0]["bytes_hex"], "4372")
             self.assertEqual(report["lane_text"], {"low": "Ceis", "high": "rdt:"})
 
+    def test_analyze_gsp_text_cursor_preserves_register_cursor(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            trace = temp / "cursor.json"
+            output = temp / "cursor-analysis.json"
+            trace.write_text(json.dumps({
+                "schema": "stunrun-ram-read-trace-result/v1",
+                "events": [
+                    {"frame": 1793, "pc": 0x464E0, "address": 0x464E0,
+                     "data": 0x9405, "mask": 0xffff, "a0": 0x1000,
+                     "a1": 0xfd0040, "a5": 2, "a10": 0xdbc0, "a11": 64},
+                    {"frame": 1793, "pc": 0x464E0, "address": 0x2000,
+                     "data": 0x7243, "mask": 0xffff, "a0": 0x2000,
+                     "a1": 0xfd0040, "a5": 2, "a10": 0xdbc0, "a11": 64},
+                    {"frame": 1793, "pc": 0x464E0, "address": 0x464E0,
+                     "data": 0x9405, "mask": 0xffff, "a0": 0x2008,
+                     "a1": 0xfd0048, "a5": 0, "a10": 0xdbc0, "a11": 64},
+                    {"frame": 1793, "pc": 0x464E0, "address": 0x2000,
+                     "data": 0x7243, "mask": 0xffff, "a0": 0x2008,
+                     "a1": 0xfd0048, "a5": 0, "a10": 0xdbc0, "a11": 64},
+                ],
+            }), encoding="utf-8")
+            self.run_tool("analyze-gsp-text-cursor", trace, "--pc",
+                          hex(0x464E0), "--output", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["decoded_record_count"], 1)
+            self.assertEqual(report["decoded_text"], "Cr")
+            self.assertEqual(report["records"][0]["a0_before"], 0x2000)
+            self.assertEqual(report["records"][0]["a0_after"], 0x2008)
+            self.assertEqual(report["records"][0]["a1"], 0xFD0040)
+
     def test_export_gsp_text_fixture_writes_little_endian_inputs(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

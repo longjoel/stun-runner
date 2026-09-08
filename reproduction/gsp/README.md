@@ -47,3 +47,13 @@ The `gsp-text-cursor-slice-c` test reproduces the captured `0:35.0` and
 `Credits: 0 ` descriptor streams, including their raw descriptor addresses
 and register samples. This is a transport/decoder boundary, not a generalized
 gameplay HUD producer.
+
+`tools/analyze-gsp-text-cursor` consumes the corresponding register-enabled
+`stunrun-ram-read-trace-result/v1` file and performs the same bounded reduction
+for humans. It filters instruction-fetch taps, folds repeated bus reads, and
+emits the decoded bytes plus A0-before/A0-after and A1 cursor values:
+
+```sh
+tools/analyze-gsp-text-cursor descriptor-register-trace/result.json \\
+  --pc 0xFFF464E0 --output cursor-analysis.json
+```
