@@ -47,6 +47,13 @@
         "1793": "0x02070610–0x020773D0",
         "1797": "0x02034610–0x0203B3D0"
       },
+      "empirical_visible_layout_mapping": {
+        "address_to_word": "word_index = (address - 0x02000000) / 16",
+        "frame_1793_pixel_rows": "y=112–119",
+        "frame_1797_pixel_rows": "y=52–59",
+        "x_positions": "14–506 (120 distinct word-aligned positions)",
+        "unique_mapped_word_positions_per_frame": 496
+      },
       "unique_destination_addresses": 992,
       "log_sha256": "fdef6d6940da336de3d56c882f8e0d622f977d18b44844a0acefffb1c0251e06"
     },
@@ -90,6 +97,7 @@
     ],
     "read_tap_boundary": "Filtering ordinary RAM reads to PC 0xFFF46590 and 0x02000000–0x0200FFFF produced no events. The PIXBLT source operation is therefore not exposed as an ordinary data read at that filtered PC by this MAME tap.",
     "destination_writes": "Filtering ordinary RAM writes to PC 0xFFF46590 produced two 688-write bursts into GSP VRAM, with different destination ranges on frames 1793 and 1797.",
+    "destination_shape": "Under the verified empirical visible layout, each burst covers exactly eight raster rows and spans HUD-width x positions; this is consistent with 8-pixel-high text/tile output.",
     "glyph_setup": "The runtime table lookup supplies 8 and 8 as the two dimensions; the following lookup supplies the split pointer 0xFFF5DBC0. A 512-word snapshot at that base contains 380 nonzero words at each sampled frame.",
     "data_shape_caveat": "The recorded words are mechanism-level observations only; values such as 0x3A30 and 0x2020 have not been assigned semantic fields."
   },

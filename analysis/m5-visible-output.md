@@ -277,6 +277,15 @@ must write into the GSP VRAM pixel space, but the irregular destination ranges
 and unresolved source records are not enough to infer a rectangle or texture
 format yet.
 
+Mapping each destination word through the verified visible-layout formula makes
+the shape much clearer: the frame-1793 burst covers exactly `y=112–119`, and
+the frame-1797 burst covers exactly `y=52–59`; both span x positions `14–506`.
+There are 496 unique mapped word positions per burst. The eight-row height,
+combined with the `8 × 8` source dimensions and packed HUD strings in the
+source records, is strong evidence that this `PIXBLT` path is drawing text or
+small HUD tiles. It still does not prove the source bit order or assign each
+record to a particular on-screen label.
+
 The raw descriptor words also expose a likely text path. Interpreting each
 16-bit word in little-endian byte order gives `0:35.0` at `0xFFFEA4C0` from
 `3A30 3533 302E 0000`, and `Credits: 0 ` at `0xFFFEA810` from
