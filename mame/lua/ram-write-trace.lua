@@ -30,7 +30,10 @@ local read_tap_end_address = read_end_address ~= nil and
     read_end_address + (read_end_address % 2 == 0 and 1 or 0) or nil
 local read_max_events = tonumber(os.getenv('STUNRUN_RAM_READ_MAX_EVENTS') or '50000')
 local read_pc_text = os.getenv('STUNRUN_RAM_READ_PC') or ''
-local read_pc_filter = read_pc_text ~= '' and tonumber(read_pc_text) or nil
+local read_pc_filters = {}
+for token in string.gmatch(read_pc_text, '[^,]+') do
+    read_pc_filters[tonumber(token)] = true
+end
 local capture_order = os.getenv('STUNRUN_RAM_TRACE_ORDER') == '1'
 local frame = 0
 local events = {}
@@ -146,7 +149,7 @@ local function install_tap()
                 if frame < start_frame or frame > end_frame or
                     offset < read_start_address or offset > read_end_address or
                     #read_events >= read_max_events or
-                    (read_pc_filter ~= nil and pc.value ~= read_pc_filter) then
+                    (read_pc_text ~= '' and not read_pc_filters[pc.value]) then
                     return
                 end
                 read_events[#read_events + 1] = {

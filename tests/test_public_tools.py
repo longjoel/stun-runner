@@ -607,6 +607,8 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn('"stunrun-ram-read-write-trace-result/v1"', wrapper)
         self.assertIn('"--order"', wrapper)
         self.assertIn("STUNRUN_RAM_TRACE_ORDER", lua)
+        self.assertIn('action="append"', wrapper)
+        self.assertIn("read_pc_filters", lua)
 
 
 if __name__ == "__main__":

@@ -42,22 +42,30 @@
     "nothrottle": true
   },
   "order_capture": {
-    "path": "/tmp/stunrun-m5-nearest-writer/result.json",
-    "sha256": "63916c7eef8ed3d79d57b060d9acde99ec8a16c5402eb6d2b49d27db0b4f2dc8",
-    "correlation_path": "/tmp/stunrun-m5-nearest-writer/correlation.json",
-    "correlation_sha256": "e4aa6cd6c1f56feed58c569590368684c6b6471d71c6655d884e4945a089067d",
+    "path": "/tmp/stunrun-m5-value-correlation-fixed/result.json",
+    "sha256": "153a6159737ce89b75debcdc29ab7b23602283fcd2417e667e4b0ae8abe32e22",
+    "correlation_path": "/tmp/stunrun-m5-value-correlation-fixed/correlation-filtered.json",
+    "correlation_sha256": "7272e66ed81ccfe36fc4045131c1368b2a5090d4ebf9eebe4293d48aaeeff88e",
     "read_pcs": ["0xFFF45000", "0xFFF45090", "0xFFF450F0", "0xFFF45110"],
-    "read_event_count": 1010,
+    "read_event_count": 4042,
     "same_frame_overlap_read_count": 0,
     "same_order_overlap_read_count": 0,
-    "nearest_write_order_before_read_count": 525,
-    "nearest_write_order_after_read_count": 485,
+    "nearest_write_order_before_read_count": 2212,
+    "nearest_write_order_after_read_count": 1830,
     "nearest_write_pc_counts": {
-      "0xFFF454E0": 488,
-      "0xFFF45500": 52,
-      "0xFFF45DD0": 42,
-      "0xFFF45480": 41
+      "0xFFF454E0": 2263,
+      "0xFFF45500": 203,
+      "0xFFF45460": 146,
+      "0xFFF45480": 127
     }
+  },
+  "value_correlation": {
+    "same_address_and_value_read_count": 2585,
+    "same_value_with_prior_write_count": 2545,
+    "same_value_with_later_write_count": 42,
+    "same_value_excluding_0x0000_and_0xFFFF_count": 2567,
+    "same_value_excluding_common_values_with_prior_write_count": 2532,
+    "nearest_fill_xy_same_value_count": 1575
   },
   "interpretation": "Same-run capture removes the separate-invocation caveat, but zero same-frame and same-order matches still do not identify a producer routine or establish record-field semantics."
 }

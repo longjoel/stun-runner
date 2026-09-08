@@ -39,7 +39,8 @@ def main() -> int:
     parser.add_argument("--max-events", type=int, default=50000)
     parser.add_argument("--read-max-events", type=int, default=50000)
     parser.add_argument("--pc", type=lambda x: int(x, 0))
-    parser.add_argument("--read-pc", type=lambda x: int(x, 0))
+    parser.add_argument("--read-pc", action="append", type=lambda x: int(x, 0),
+                        help="capture reads only at this PC; may be repeated")
     parser.add_argument("--registers", action="store_true")
     parser.add_argument("--order", action="store_true",
                         help="include shared same-run read/write event order")
@@ -72,7 +73,7 @@ def main() -> int:
         "STUNRUN_RAM_READ_BASE": str(args.read_base),
         "STUNRUN_RAM_READ_END": str(args.read_end),
         "STUNRUN_RAM_READ_MAX_EVENTS": str(args.read_max_events),
-        "STUNRUN_RAM_READ_PC": "" if args.read_pc is None else str(args.read_pc),
+        "STUNRUN_RAM_READ_PC": ",".join(str(pc) for pc in (args.read_pc or [])),
     })
     completed = subprocess.run(command, env=env, check=False)
     result_path = args.output / "result.json"

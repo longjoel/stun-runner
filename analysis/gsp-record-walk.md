@@ -153,17 +153,26 @@ write phase.
 
 The tracer now has an optional `--order` mode. It assigns one monotonically
 increasing sequence number across both taps before the events are printed,
-so grouped log output does not destroy read/write ordering. A fresh
-order-enabled capture of the indexed reader found 525 nearest overlapping
-writes before a read and 485 after a read, with zero same-order matches. This
+so grouped log output does not destroy read/write ordering. A corrected
+four-PC order-enabled capture of the indexed reader found 2,212 nearest
+overlapping writes before a read and 1,830 after a read, with zero same-order
+matches. This
 confirms that the event taps are observing distinct accesses in one execution;
 the wide distribution means the current address set still contains staged
 renderer traffic, so an instruction-level producer claim remains premature.
 
-The nearest-writer ranking from that run is dominated by the same broad
-renderer path: `0xFFF454E0` is nearest for 488 of 1,010 indexed reads,
-followed by `0xFFF45500` (52), `0xFFF45DD0` (42), and
-`0xFFF45480` (41). Because the ranking is based on address reuse in the
+The corrected nearest-writer ranking is dominated by the same broad renderer
+path: `0xFFF454E0` is nearest for 2,263 of 4,042 indexed reads, followed by
+`0xFFF45500` (203), `0xFFF45460` (146), and `0xFFF45480` (127). Because the
+ranking is based on address reuse in the
 VRAM-backed mirror, this is a candidate ranking only; it does not turn the
 `FILL XY` path into a record producer. It does, however, give the next
 instruction trace a focused set of PCs to inspect.
+
+The same run also found an exact address-and-value match for 2,585 reads;
+2,545 of those had a matching write earlier in the ordered event stream and
+only 42 had one later. Excluding the common `0x0000` and `0xFFFF` values still
+leaves 2,567 matches, so the result is not explained only by clear/fill
+sentinels. This remains a VRAM reuse observation: the raster path can write
+values that a later indexed reader sees through the mirrored backing, but the
+evidence does not establish that it authored a structured track record.
