@@ -107,3 +107,35 @@ relationship.
   not proof of a semantic field.
 - The visible raster primitive reached by the setup is `FILL XY` at
   `0xFFF454E0`.
+
+## Same-run producer probe
+
+`tools/mame-ram-read-write-trace` wraps the write tracer and enables a second
+read tap in the same MAME invocation. This removes the separate-invocation
+caveat when comparing producer writes with indexed-record reads. Its result
+uses `stunrun-ram-read-write-trace-result/v1`, with the normal write result
+and a nested `stunrun-ram-read-trace-result/v1` object.
+
+Example:
+
+```sh
+tools/mame-ram-read-write-trace /tmp/stunrun-roms-system \
+  /tmp/stunrun-m5-same-run-source \
+  --device :mainpcb:gsp \
+  --write-base 0xFFFA0000 --write-end 0xFFFEAFFF \
+  --read-base 0xFFFA0000 --read-end 0xFFFEAFFF \
+  --frames 1800 --start-frame 1790 --end-frame 1800 \
+  --max-events 30000 --read-max-events 30000 \
+  --registers --tap-frame 1 --load-state /tmp/stunrun-latedrive2400.sta \
+  --input fork_center --nothrottle
+```
+
+The first bounded same-run capture recorded 16,060 writes and 17,759 reads,
+without truncation. Filtering reads to the indexed-record PCs
+(`0xFFF45000`, `0xFFF45090`, `0xFFF450F0`, and `0xFFF45110`) produced 4,042
+reads touching all 3,585 writer addresses, but still zero same-frame matches.
+Nearest writes were `-3: 1,938`, `-4: 221`, `-5: 26`, `+2: 180`, `+3: 460`,
+`+4: 380`, and `+5: 837` frames. This is stronger timing evidence than the
+separate-run comparison, but it still does not identify a producer routine or
+assign meanings to record fields. Provenance is recorded in
+`reference/experiments/stunrun/m5-gsp-record-source-same-run.metadata.json`.

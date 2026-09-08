@@ -22,10 +22,21 @@ local max_events = tonumber(os.getenv('STUNRUN_RAM_TRACE_MAX_EVENTS') or '50000'
 local pc_filter_text = os.getenv('STUNRUN_RAM_TRACE_PC') or ''
 local pc_filter = pc_filter_text ~= '' and tonumber(pc_filter_text) or nil
 local capture_registers = os.getenv('STUNRUN_RAM_TRACE_REGISTERS') == '1'
+local read_base_text = os.getenv('STUNRUN_RAM_READ_BASE') or ''
+local read_end_text = os.getenv('STUNRUN_RAM_READ_END') or ''
+local read_start_address = read_base_text ~= '' and tonumber(read_base_text) or nil
+local read_end_address = read_end_text ~= '' and tonumber(read_end_text) or nil
+local read_tap_end_address = read_end_address ~= nil and
+    read_end_address + (read_end_address % 2 == 0 and 1 or 0) or nil
+local read_max_events = tonumber(os.getenv('STUNRUN_RAM_READ_MAX_EVENTS') or '50000')
+local read_pc_text = os.getenv('STUNRUN_RAM_READ_PC') or ''
+local read_pc_filter = read_pc_text ~= '' and tonumber(read_pc_text) or nil
 local frame = 0
 local events = {}
+local read_events = {}
 local next_event = 1
 local tap
+local read_tap
 
 local input_events = input_mode == 'fork_button2_sweep' and {
     {frame = 2, port = ':mainpcb:8BADC.0', field = 'AD Stick X', action = 'set', value = 128},
@@ -125,6 +136,25 @@ local function install_tap()
                                    a10 = capture_registers and device.state['A10'].value or nil,
                                    a11 = capture_registers and device.state['A11'].value or nil}
         end)
+    if read_start_address ~= nil and read_end_address ~= nil then
+        read_tap = space:install_read_tap(read_start_address, read_tap_end_address,
+            'stunrun_ram_read_trace_same_run', function(offset, data, mask)
+                if frame < start_frame or frame > end_frame or
+                    offset < read_start_address or offset > read_end_address or
+                    #read_events >= read_max_events or
+                    (read_pc_filter ~= nil and pc.value ~= read_pc_filter) then
+                    return
+                end
+                read_events[#read_events + 1] = {
+                    frame = frame, pc = pc.value, address = offset,
+                    data = data, mask = mask,
+                    a0 = capture_registers and device.state['A0'].value or nil,
+                    a1 = capture_registers and device.state['A1'].value or nil,
+                    a5 = capture_registers and device.state['A5'].value or nil,
+                    a10 = capture_registers and device.state['A10'].value or nil,
+                    a11 = capture_registers and device.state['A11'].value or nil}
+            end)
+    end
 end
 
 emu.register_frame_done(function()
@@ -153,6 +183,23 @@ emu.register_frame_done(function()
         end
         print(string.format('M1_RAM_WRITE_DONE frames=%d events=%d truncated=%s output=%s',
             frame, #events, tostring(#events >= max_events), output))
+        if read_start_address ~= nil and read_end_address ~= nil then
+            for _, event in ipairs(read_events) do
+                if capture_registers then
+                    print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X a0=%08X a1=%08X a5=%08X a10=%08X a11=%08X',
+                        event.frame, event.pc, event.address, event.data,
+                        event.mask, event.a0, event.a1, event.a5, event.a10,
+                        event.a11))
+                else
+                    print(string.format('M1_RAM_READ frame=%d pc=%08X addr=%08X data=%08X mask=%08X',
+                        event.frame, event.pc, event.address, event.data,
+                        event.mask))
+                end
+            end
+            print(string.format('M1_RAM_READ_DONE frames=%d events=%d truncated=%s output=%s',
+                frame, #read_events, tostring(#read_events >= read_max_events),
+                output))
+        end
         machine:exit()
     end
 end)

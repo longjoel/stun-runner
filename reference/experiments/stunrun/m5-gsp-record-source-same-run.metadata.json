@@ -1,0 +1,37 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-record-source-same-run",
+  "target": "stunrun",
+  "purpose": "Capture GSP source-window writes and indexed-record reads in one MAME invocation.",
+  "command_tool": "tools/mame-ram-read-write-trace",
+  "result": {
+    "path": "/tmp/stunrun-m5-same-run-source-3/result.json",
+    "sha256": "4ee674cf71ad448c08f471cc966c0fb9e817d9dd2344e68134dd26edeada6083",
+    "write_event_count": 16060,
+    "read_event_count": 17759,
+    "write_truncated": false,
+    "read_truncated": false
+  },
+  "analyzer": {
+    "tool": "tools/analyze-gsp-read-write-correlation",
+    "result_path": "/tmp/stunrun-m5-same-run-source-3/correlation.json",
+    "result_sha256": "9896c8ca99d032a7e2e3a724d274855eb6092e76b901e58edbb797d776eaaa4a",
+    "read_pcs": ["0xFFF45000", "0xFFF45090", "0xFFF450F0", "0xFFF45110"],
+    "address_range": "0xFFFA0000–0xFFFEAFFF",
+    "write_event_count": 16060,
+    "read_event_count": 4042,
+    "source_address_count": 3585,
+    "overlap_address_count": 3585,
+    "same_frame_overlap_read_count": 0,
+    "nearest_write_delta_frames": {"-5": 26, "-4": 221, "-3": 1938, "2": 180, "3": 460, "4": 380, "5": 837}
+  },
+  "start_condition": {
+    "load_state": "/tmp/stunrun-latedrive2400.sta",
+    "input": "fork_center",
+    "frames": "1790–1800",
+    "tap_frame": 1,
+    "registers": true,
+    "nothrottle": true
+  },
+  "interpretation": "Same-run capture removes the separate-invocation caveat, but zero same-frame matches still do not identify a producer routine or establish record-field semantics."
+}

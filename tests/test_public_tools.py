@@ -565,6 +565,17 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn("STUNRUN_RAM_READ_PC", wrapper)
         self.assertIn("pc_filter", lua)
 
+    def test_ram_read_write_trace_exposes_same_run_capture(self):
+        wrapper = (ROOT / "tools" / "mame-ram-read-write-trace").read_text(
+            encoding="utf-8")
+        lua = (ROOT / "mame" / "lua" / "ram-write-trace.lua").read_text(
+            encoding="utf-8")
+        self.assertIn('"--read-base"', wrapper)
+        self.assertIn('"--read-end"', wrapper)
+        self.assertIn("STUNRUN_RAM_READ_BASE", lua)
+        self.assertIn("install_read_tap", lua)
+        self.assertIn('"stunrun-ram-read-write-trace-result/v1"', wrapper)
+
 
 if __name__ == "__main__":
     unittest.main()
