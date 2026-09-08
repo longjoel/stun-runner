@@ -190,6 +190,29 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(output.read_bytes(), b"".join(
                 struct.pack("<H", value) for value in words))
 
+    def test_analyze_gsp_text_record_writes_finds_stride_records(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            trace = temp / "writes.json"
+            output = temp / "records.json"
+            words = [0x4013, 0, 0x40, 0xFD, 0x3A30, 0x3533, 0x302E, 0]
+            events = [{"frame": 1788, "pc": 0xFFF454E0,
+                       "address": 0xA480 + index * 0x10,
+                       "data": word, "mask": 0xFFFF}
+                      for index, word in enumerate(words)]
+            trace.write_text(json.dumps({
+                "schema": "stunrun-ram-write-trace-result/v1",
+                "events": events,
+            }), encoding="utf-8")
+            self.run_tool("analyze-gsp-text-record-writes", trace,
+                          "--frame", "1788", "--output", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["candidate_count"], 1)
+            candidate = report["candidates"][0]
+            self.assertEqual(candidate["descriptor_address"], "0xA4C0")
+            self.assertEqual(candidate["a1"], "0x00FD0040")
+            self.assertEqual(candidate["payload_text"], "0:35.0\\x00\\x00")
+
     def test_track_table_analyzer_snapshot_comparison_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

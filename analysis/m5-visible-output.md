@@ -369,6 +369,13 @@ literal `gsp-text-record-slice-c` boundary. Writer PCs and hashes are recorded
 in `reference/experiments/stunrun/m5-gsp-text-record-producer.metadata.json`;
 header values remain mechanism-level fields.
 
+The reusable write-trace scanner independently finds four complete
+printable-or-NUL text candidates in that frame-1788 window. It rejects the
+other header-shaped records when their payload contains control bytes, leaving
+the two time strings, a speed-like string, and `Credits:` for follow-up. This
+is a pattern classifier, not a semantic assignment; its criterion and output
+are documented with the producer evidence.
+
 The exporter/native path was then exercised with the actual frame-1788 write
 trace: records at `0xFFFEA480`, `0xFFFEA500`, and `0xFFFEA7D0` were extracted
 without hand-entering their words, passed through the record-to-cursor slice,

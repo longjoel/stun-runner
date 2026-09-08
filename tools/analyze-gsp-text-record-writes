@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Find observed 8-word GSP text records in a write-trace result."""
+
+import argparse
+import json
+import pathlib
+import string
+
+
+def printable(words):
+    data = b"".join(bytes((word & 0xff, word >> 8)) for word in words)
+    text = "".join(chr(value) if chr(value) in string.printable and
+                    value not in (10, 13) else f"\\x{value:02X}"
+                    for value in data)
+    return data, text
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("trace", type=pathlib.Path)
+    parser.add_argument("--frame", type=int)
+    parser.add_argument("--output", type=pathlib.Path)
+    args = parser.parse_args()
+    source = json.loads(args.trace.read_text(encoding="utf-8"))
+    if source.get("schema") != "stunrun-ram-write-trace-result/v1":
+        raise SystemExit(f"{args.trace}: expected a RAM write trace result")
+    events = source.get("events")
+    if not isinstance(events, list):
+        raise SystemExit(f"{args.trace}: missing events list")
+    by_frame_address = {}
+    for event in events:
+        if args.frame is not None and event.get("frame") != args.frame:
+            continue
+        by_frame_address[(event.get("frame"), event.get("address"))] = event
+
+    candidates = []
+    for (frame, address), first in sorted(by_frame_address.items()):
+        header = first.get("data", 0) & 0xffff
+        if (header & 0xfff0) != 0x4010:
+            continue
+        words = []
+        complete = True
+        writer_pcs = set()
+        for index in range(8):
+            event = by_frame_address.get((frame, address + index * 0x10))
+            if event is None:
+                complete = False
+                break
+            words.append(event["data"] & 0xffff)
+            if event.get("pc") is not None:
+                writer_pcs.add(f"0x{event['pc']:X}")
+        if not complete:
+            continue
+        payload, text = printable(words[4:])
+        if not any(32 <= value < 127 for value in payload) or not all(
+                value == 0 or 32 <= value < 127 for value in payload):
+            continue
+        candidates.append({
+            "frame": frame, "base": f"0x{address:X}",
+            "words": [f"0x{word:04X}" for word in words],
+            "descriptor_address": f"0x{address + 0x40:X}",
+            "a1": f"0x{(words[3] << 16) | words[2]:08X}",
+            "payload_bytes_hex": payload.hex(), "payload_text": text,
+            "writer_pcs": sorted(writer_pcs),
+        })
+    result = {"schema": "stunrun-gsp-text-record-write-analysis/v1",
+              "trace": str(args.trace), "frame": args.frame,
+              "candidate_count": len(candidates), "candidates": candidates}
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

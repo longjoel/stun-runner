@@ -60,6 +60,11 @@ order. Its output can be supplied as `STUNRUN_GSP_TEXT_RECORD_BIN` to the
 native shell. The frame-1788 capture has been run through this path and is
 recorded under `reference/experiments/stunrun/m5-native-text-record-fixture.metadata.json`.
 
+`tools/analyze-gsp-text-record-writes` scans the same trace for complete
+header-plus-payload records without requiring known bases. It requires every
+payload byte to be printable or NUL, which rejects geometry/control records
+that merely resemble the observed header family.
+
 `tools/analyze-gsp-text-cursor` consumes the corresponding register-enabled
 `stunrun-ram-read-trace-result/v1` file and performs the same bounded reduction
 for humans. It filters instruction-fetch taps, folds repeated bus reads, and
