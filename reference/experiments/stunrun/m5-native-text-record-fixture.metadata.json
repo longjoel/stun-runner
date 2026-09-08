@@ -1,0 +1,14 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-native-text-record-fixture",
+  "target": "stunrun",
+  "purpose": "Export actual frame-1788 GSP text records from the write trace and render them through the native record-to-cursor path.",
+  "inputs": {
+    "write_trace": {"path": "/tmp/stunrun-m5-text-producer-writes/result.json", "schema": "stunrun-ram-write-trace-result/v1", "frame": 1788, "result_canonical_log_sha256": "4992a438caf0cd0800d719b51da1776c7d3d006d3e409dfeb067f551c5a96a02"},
+    "record_bases": ["0xFFFEA480", "0xFFFEA500", "0xFFFEA7D0"],
+    "glyph_table_snapshot_sha256": "d84d79299195ebeadf8e8441a4dd5b4f6ceb7318be0dc1c11ab1dca023afcde8"
+  },
+  "export": {"schema": "stunrun-gsp-text-record-fixture/v1", "record_count": 3, "word_count": 24, "records_bin_sha256": "aae3486e73e69cff4be234ad11d88e555869c490c6d2f1206d0615fcffab703c", "writer_pcs": ["0xFFF45030", "0xFFF45490", "0xFFF454C0", "0xFFF454D0", "0xFFF454E0"]},
+  "native_run": {"mode": "gsp-text-record-fixture", "record_base": "0xFFFEA480", "y_bias": "0x28", "render_hash": "0xDB306ACC", "ppm_sha256": "b0c1255466cd573812753c61f8c54c1b773753ccc5fa771a11160f4f01bbcd51", "result": "PASS"},
+  "interpretation": "The actual GSP-produced records, rather than hand-entered descriptor words, cross the native record-to-cursor and glyph-table boundaries successfully. This proves the captured producer fixture path; it is not yet a live native game-state producer or complete frame replacement."
+}

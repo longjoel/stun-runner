@@ -369,6 +369,14 @@ literal `gsp-text-record-slice-c` boundary. Writer PCs and hashes are recorded
 in `reference/experiments/stunrun/m5-gsp-text-record-producer.metadata.json`;
 header values remain mechanism-level fields.
 
+The exporter/native path was then exercised with the actual frame-1788 write
+trace: records at `0xFFFEA480`, `0xFFFEA500`, and `0xFFFEA7D0` were extracted
+without hand-entering their words, passed through the record-to-cursor slice,
+and rendered with the captured glyph table. The shell reported
+`mode=gsp-text-record-fixture` and `RESULT PASS`; the record binary and output
+hashes are in
+`reference/experiments/stunrun/m5-native-text-record-fixture.metadata.json`.
+
 The native shell now has an explicit `gsp-text-cursor-fixture` mode. It loads
 the captured 512-word glyph table and packed descriptor words, applies the
 captured A0/A1 seeds plus caller-supplied y bias, and renders each decoded glyph

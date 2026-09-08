@@ -167,6 +167,29 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(words_out.read_bytes(),
                              struct.pack("<HH", 0x7243, 0x0000))
 
+    def test_export_gsp_text_record_fixture_extracts_records(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            trace = temp / "writes.json"
+            output = temp / "records.bin"
+            events = []
+            words = [0x4013, 0, 0x40, 0xFD, 0x3A30, 0x3533, 0x302E, 0]
+            for index, word in enumerate(words):
+                events.append({"frame": 1788, "pc": 0xFFF454E0,
+                                "address": 0xA480 + index * 0x10,
+                                "data": word, "mask": 0xFFFF})
+            trace.write_text(json.dumps({
+                "schema": "stunrun-ram-write-trace-result/v1",
+                "events": events,
+            }), encoding="utf-8")
+            result = self.run_tool(
+                "export-gsp-text-record-fixture", trace, "--frame", "1788",
+                "--record-base", "0xA480", "--output", output)
+            report = json.loads(result.stdout)
+            self.assertEqual(report["record_count"], 1)
+            self.assertEqual(output.read_bytes(), b"".join(
+                struct.pack("<H", value) for value in words))
+
     def test_track_table_analyzer_snapshot_comparison_without_roms(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)
