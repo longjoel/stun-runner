@@ -1,0 +1,29 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_global_tick_trace",
+  "date": "2026-09-08",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "recording": "/tmp/race/r1.inp",
+  "purpose": "Disambiguate the monotonic 0xFFFF8014/0xFFDCC0 candidate from a spatial track-position value.",
+  "address_width_note": "The 68010 listing spells the absolute-short address as 0xFFFF8014; the installed MAME program space exposes the 24-bit bus address 0xFF8014.",
+  "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-position-source-trace-24 --device :mainpcb:maincpu --base 0xFF8014 --end 0xFF8017 --frames 4800 --start-frame 600 --end-frame 4800 --tap-frame 1 --max-events 100000 --playback /tmp/race/r1.inp --nothrottle",
+  "result": {
+    "path": "/tmp/stunrun-m5-position-source-trace-24/result.json",
+    "sha256": "a2107dc453249c4660bf3bb3db2714c62a0ead763c338f74e96cd950bd66f64f",
+    "canonical_log_sha256": "e5d37812abd1bb264461ebc1db1c4b57d675129e4495f01c8223dd544d8cc400",
+    "events": 34064,
+    "truncated": false,
+    "writer_pcs": ["0x0222DE"],
+    "address_counts": {
+      "0xFF8014": 17032,
+      "0xFF8016": 17032
+    },
+    "frame_range": [600, 4799]
+  },
+  "static_listing": "/tmp/stunrun-listing-ff9578/maincpu-68010.lst",
+  "static_instruction": "0x0222DE: addq.l #1,$8014.w; the handler returns with RTE at 0x0222F2",
+  "conclusion": "0xFFFF8014 is an interrupt-driven global tick, not a proven track-position accumulator. Its copies and shifted forms remain timing inputs to road, geometry, and object paths.",
+  "confidence": "STATIC + WRITER-TRACE-CONFIRMED"
+}
