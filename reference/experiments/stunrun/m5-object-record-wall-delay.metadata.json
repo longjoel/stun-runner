@@ -1,0 +1,17 @@
+{
+  "schema": "stunrun-experiment/v1",
+  "id": "m5-object-record-wall-delay",
+  "target": "stunrun",
+  "purpose": "Test whether the 0xFFDD00 object-record writer stream depends on wall-clock timing when replaying the same recorded race.",
+  "mame": "0.289 (mame0289-dirty)",
+  "input": {"path": "/tmp/race/r1.inp", "sha256": "4d24c52b96e5c199f301dec65b847e44fcf21d5f39dfc8a9476e703883c902f9", "mode": "recorded playback"},
+  "trace": {"tool": "tools/mame-ram-write-trace", "device": ":mainpcb:maincpu", "space": "program", "range": ["0xFFDD00", "0xFFDDFF"], "frames": [1, 1800], "tap_frame": 1, "max_events": 250000, "nothrottle": true, "event_count": 57631, "truncated": false, "event_stream_sha256": "7f01bb7c8b4887cbe4024812e140a03878cf0ab414867df6be8597d9ac284db7"},
+  "runs": [
+    {"id": "normal-a", "path": "/tmp/stunrun-m5-spawn-r1-full-a", "result_sha256": "7ec59c2afd2b0eb3088a6cbed635652b393bdf047030b6548c17c78b6bd44b0d", "canonical_log_sha256": "56ace0e94b20f99198e50b1ac7e0eb7323fc95c93f08eac4b7619f9301d537c0", "delay": null},
+    {"id": "normal-b", "path": "/tmp/stunrun-m5-spawn-r1-full-b", "result_sha256": "94ef074117f3b0a993e3d7e485e2053572f5315be03294e8e0aedb20b85e4b25", "canonical_log_sha256": "9e18f9820cf11aeec41dd2a1300caca6b0591c9eb7569a50a93280c0cdf1069b", "delay": null},
+    {"id": "wall-delay", "path": "/tmp/stunrun-m5-spawn-r1-full-delay", "result_sha256": "5d6e3ec6eafdb10605ab906dcf41d6dd24005d8ab1ae72868370d7ecf65ed143", "canonical_log_sha256": "662ef6eaf0fb0663d1790b1a12c64c376db34b5407515968a455982247f180fc", "delay": {"frame": 900, "seconds": 2}}
+  ],
+  "observations": {"event_stream_equal": true, "first_event_frame": 37, "last_event_frame": 1799, "transition_frame": 883},
+  "verdict": "WALL-CLOCK-INVARIANT; FRAME-LOCKED VS POSITION-LOCKED NOT DISCRIMINATED",
+  "interpretation": "A deliberate two-second wall-clock pause at emulated frame 900 leaves the complete recorded input and 0xFFDD00 write event stream unchanged. The run is deterministic and not wall-clock-triggered. Because the replay trajectory and emulated frame counter are identical in all runs, this experiment cannot distinguish an emulated-frame trigger from a track-position trigger."
+}

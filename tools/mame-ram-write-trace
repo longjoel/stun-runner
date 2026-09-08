@@ -41,6 +41,10 @@ def main() -> int:
     parser.add_argument("--tap-frame", type=int, default=10,
                         help="install the write tap at this relative frame "
                              "(default: 10; use 1 to catch early input paths)")
+    parser.add_argument("--delay-frame", type=int,
+                        help="pause wall-clock execution at this frame")
+    parser.add_argument("--delay-seconds", type=float, default=0.0,
+                        help="bounded wall-clock pause used with --delay-frame")
     parser.add_argument("--input", choices=("none", "late_drive", "weapon_probe", "button1_probe", "button2_probe", "collision_probe_center", "fork_button2_sweep", "fork_hold_left", "fork_hold_right", "fork_center"), default="none")
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
@@ -53,6 +57,10 @@ def main() -> int:
         parser.error("invalid address or frame range")
     if not (1 <= args.tap_frame <= args.frames):
         parser.error("tap-frame must be between 1 and frames")
+    if args.delay_frame is not None and not (1 <= args.delay_frame <= args.frames):
+        parser.error("delay-frame must be between 1 and frames")
+    if args.delay_seconds < 0 or args.delay_seconds > 60:
+        parser.error("delay-seconds must be between 0 and 60")
     if args.load_state and not args.load_state.is_file():
         raise SystemExit(f"save state does not exist: {args.load_state}")
     if args.load_state and args.playback:
@@ -108,6 +116,8 @@ def main() -> int:
         "STUNRUN_RAM_TRACE_END_ADDRESS": str(args.end),
         "STUNRUN_RAM_TRACE_MAX_EVENTS": str(args.max_events),
         "STUNRUN_RAM_TRACE_TAP_FRAME": str(args.tap_frame),
+        "STUNRUN_RAM_TRACE_DELAY_FRAME": str(args.delay_frame or ""),
+        "STUNRUN_RAM_TRACE_DELAY_SECONDS": str(args.delay_seconds),
         "STUNRUN_RAM_TRACE_PC": str(args.pc) if args.pc is not None else "",
         "STUNRUN_RAM_TRACE_REGISTERS": "1" if args.registers else "0",
         "SDL_VIDEODRIVER": os.environ.get("SDL_VIDEODRIVER", "dummy"),

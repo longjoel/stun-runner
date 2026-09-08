@@ -6,6 +6,9 @@ local limit = tonumber(os.getenv('STUNRUN_RAM_TRACE_FRAMES') or '705')
 local start_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_START') or '680')
 local end_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_END') or tostring(limit))
 local tap_frame = tonumber(os.getenv('STUNRUN_RAM_TRACE_TAP_FRAME') or '10')
+local delay_frame_text = os.getenv('STUNRUN_RAM_TRACE_DELAY_FRAME') or ''
+local delay_frame = delay_frame_text ~= '' and tonumber(delay_frame_text) or nil
+local delay_seconds = tonumber(os.getenv('STUNRUN_RAM_TRACE_DELAY_SECONDS') or '0')
 local input_mode = os.getenv('STUNRUN_RAM_TRACE_INPUT') or 'none'
 local device_tag = assert(os.getenv('STUNRUN_RAM_TRACE_DEVICE'), 'STUNRUN_RAM_TRACE_DEVICE is required')
 local space_name = os.getenv('STUNRUN_RAM_TRACE_SPACE') or 'program'
@@ -130,6 +133,12 @@ emu.register_frame_done(function()
     while next_event <= #input_events and input_events[next_event].frame == frame do
         apply_event(input_events[next_event])
         next_event = next_event + 1
+    end
+    if delay_frame ~= nil and frame == delay_frame and delay_seconds > 0 then
+        -- This deliberately pauses wall-clock execution without changing the
+        -- emulated frame counter. It is used to test frame-vs-wall-clock
+        -- lifecycle hypotheses; the duration is wrapper-bounded.
+        os.execute('sleep ' .. tostring(delay_seconds))
     end
     if frame >= limit then
         for _, event in ipairs(events) do

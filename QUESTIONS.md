@@ -433,6 +433,42 @@ bit-identically through the play sidecar and settles the open points:
   record fidelity) with arg-gate tests. Full suite green (77 at write
   time; count moves as peers add tests).
 
+### Investigation update 11 (2026-09-06, upload lifecycle from existing traces, Agent 2 executed)
+
+Squeezed the twin-buffer dynamics dry without new runs (geom-trace +
+fine/per-frame series); two analysis traps found and corrected:
+- Write-tap events coalesce to EVEN addresses with hi/lo/full masks —
+  address parity is meaningless; lanes come from the mask. The earlier
+  "even-byte animators" reading was this artifact.
+- Residue twin subranges are diff footprints, not structural units:
+  all 32 in-buffer ranges obey positional identity with the march
+  image (buffer offset == march offset).
+Lifecycle per segment (every one of the 16,219 events accounted for):
+bulk verbatim waves at 1286–88, 1345–46, 1367–68 (672+96 offset split
+across lane-PC pairs, base AND twin via disjoint PC sets), interleaved
+with slow base-only animation (0x298C0: 1288–1308, 0x298FA: 1347–64,
+5376 events each, both lanes, ramping values, never settling to march
+bytes) — then both buffers hold the march verbatim (768/768 at 1800).
+Asymmetric animation (base animated, twin bulk-only) suggests
+back/front double-buffer roles; roles unproven. Cross-run
+trace→snapshot reconciliation scores 1/1792 cells in-window, so the
+runs are mutually consistent — no divergence. The C slice (verbatim
+settled copies) stands as validated; the animator is unmodeled
+(semantics unknown: scroll ramp vs next-segment build).
+
+### Investigation update 12 (2026-09-06, render-path dive, Agent 2 executed)
+
+Full road-upload chain closed from existing traces plus three replay
+probes (`/tmp/race/r1.inp`): ROM table → march → base `0xFF9584` +
+twin `0xFF9884` → base-only animation → **transfer PC `0x02248E`
+drains the base buffer sequentially into the GSP FIFO** (1,920 reads
+`0xFF9584`+2… over replay frames 1280–1287, plus `0xFF9000`-region
+reads). Maincpu writes NOTHING to the ADSP serial buffer in-window —
+the FIFO road data comes from the twins, not via `0x810000` staging.
+Details, repro commands, and open remainder (twin-copy reads
+unobserved — trace truncated; animator/field semantics; segment→index
+map) in `analysis/road-upload-path.md`.
+
 ### Investigation update 9 (2026-09-06, stride CLOSED AS FRAMED, Agent 2 executed)
 
 `/tmp/race2/r2.inp` (courses 10→11→12 at frames 950/4548/8085; writers
@@ -527,3 +563,17 @@ the reproduction needs a track cursor (depends on IRQ-0004) or a timer.
 Spawn timing determines the shape of the first gameplay-state model the
 Implementer can write without inventing semantics; a run-varying result
 is equally valuable because it stops a wrong model from being built.
+
+### Investigation update 13 (2026-09-08, wall-clock delay probe)
+
+The same recorded race was replayed three times through frame 1800 while
+tracing `0xFFDD00–0xFFDDFF`: two normal runs and one with a deliberate
+two-second host sleep at emulated frame 900. All three produced 57,631
+untruncated writes with the identical normalized event stream. Writes span
+frames 37–1799; the prominent course-transition burst is at frame 883. The
+result is **wall-clock-invariant** and therefore not host-time-triggered.
+Frame-locked versus position-locked remains **NOT DISCRIMINATED**, because the
+same replay keeps emulated frame and track trajectory coupled. Provenance and
+exact hashes are in
+`reference/experiments/stunrun/m5-object-record-wall-delay.metadata.json`;
+human-facing detail is in `analysis/object-record-wall-delay.md`.

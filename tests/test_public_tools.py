@@ -511,6 +511,10 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn("STUNRUN_RAM_TRACE_TAP_FRAME", wrapper)
         self.assertIn("STUNRUN_RAM_TRACE_TAP_FRAME", lua)
         self.assertIn("frame == tap_frame", lua)
+        self.assertIn('"--delay-frame"', wrapper)
+        self.assertIn('"--delay-seconds"', wrapper)
+        self.assertIn("STUNRUN_RAM_TRACE_DELAY_FRAME", lua)
+        self.assertIn("STUNRUN_RAM_TRACE_DELAY_SECONDS", lua)
 
     def test_ram_read_trace_exposes_pc_filter(self):
         wrapper = (ROOT / "tools" / "mame-ram-read-trace").read_text(
