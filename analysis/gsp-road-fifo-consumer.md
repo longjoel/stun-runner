@@ -193,5 +193,14 @@ ordering, but it is consistent with an 8-frame staged/ring pool. It is not
 consistent with a producer overwriting the exact consumed record in place on
 the read frame.
 
+A neighboring center-fork interval validates the cadence. At relative frames
+1810–1820, the A7/A9 coordinate readers consumed 2,802/2,034 source words and
+the high-memory write trace contained 21,509 events. Again, no source address
+was written on its read frame; nearest writes were two frames earlier for
+1,846/1,338 reads and six frames later for 788/572 reads, with only small
+three-before/five-later edge groups. The phase shifts while the eight-frame
+spacing persists, which is the expected shape of a rotating staged pool and
+not a fixed one-frame producer delay.
+
 Provenance is in
 `reference/experiments/stunrun/m5-gsp-high-write-fork-1790.metadata.json`.
