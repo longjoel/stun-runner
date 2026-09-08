@@ -202,5 +202,20 @@ three-before/five-later edge groups. The phase shifts while the eight-frame
 spacing persists, which is the expected shape of a rotating staged pool and
 not a fixed one-frame producer delay.
 
+This correlation is reproducible with the ROM-free analyzer:
+
+```sh
+tools/analyze-gsp-read-write-correlation \
+  /tmp/stunrun-m5-gsp-high-write-center-1790/result.json \
+  /tmp/stunrun-m5-gsp-read-high-center-a7/result.json \
+  --read-pc 0xFFF45A10 --min-address 0xFFF80000 \
+  --max-address 0xFFFFFFFF --output correlation.json
+```
+
+The report schema is `stunrun-gsp-read-write-correlation/v1`; it records the
+read/write overlap and nearest frame deltas without assigning semantic field
+names. The neighboring-window run produces the same zero same-frame result
+and the shifted `-2/+6` cadence described above.
+
 Provenance is in
 `reference/experiments/stunrun/m5-gsp-high-write-fork-1790.metadata.json`.
