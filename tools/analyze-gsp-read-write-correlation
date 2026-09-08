@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""Correlate GSP source reads with writes by address and emulated frame."""
+
+import argparse
+import collections
+import json
+import pathlib
+
+
+def load(path, expected_schema):
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schema") != expected_schema:
+        raise SystemExit(f"{path}: expected {expected_schema}")
+    events = value.get("events")
+    if not isinstance(events, list):
+        raise SystemExit(f"{path}: missing events list")
+    return value, events
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("writes", type=pathlib.Path)
+    parser.add_argument("reads", type=pathlib.Path)
+    parser.add_argument("--read-pc", action="append", type=lambda value: int(value, 0),
+                        help="restrict reads to one or more reader PCs")
+    parser.add_argument("--min-address", type=lambda value: int(value, 0))
+    parser.add_argument("--max-address", type=lambda value: int(value, 0))
+    parser.add_argument("--keep-fetches", action="store_true",
+                        help="include reads whose address equals the reader PC")
+    parser.add_argument("--output", type=pathlib.Path)
+    args = parser.parse_args()
+    if (args.min_address is not None and args.max_address is not None and
+            args.min_address > args.max_address):
+        parser.error("--min-address must not exceed --max-address")
+
+    write_source, write_events = load(
+        args.writes, "stunrun-ram-write-trace-result/v1")
+    read_source, read_events = load(
+        args.reads, "stunrun-ram-read-trace-result/v1")
+    read_pcs = set(args.read_pc or [])
+
+    def in_range(event):
+        address = event.get("address")
+        return (isinstance(address, int) and
+                (args.min_address is None or address >= args.min_address) and
+                (args.max_address is None or address <= args.max_address))
+
+    writes_by_address = collections.defaultdict(set)
+    write_pcs_by_address = collections.defaultdict(set)
+    selected_writes = [event for event in write_events if in_range(event)]
+    for event in selected_writes:
+        writes_by_address[event["address"]].add(event["frame"])
+        if isinstance(event.get("pc"), int):
+            write_pcs_by_address[event["address"]].add(event["pc"])
+
+    selected_reads = []
+    for event in read_events:
+        if not in_range(event):
+            continue
+        if read_pcs and event.get("pc") not in read_pcs:
+            continue
+        if not args.keep_fetches and event.get("address") == event.get("pc"):
+            continue
+        selected_reads.append(event)
+
+    nearest_deltas = collections.Counter()
+    same_frame = 0
+    overlap_reads = 0
+    for event in selected_reads:
+        frames = writes_by_address.get(event["address"], set())
+        if not frames:
+            continue
+        overlap_reads += 1
+        deltas = [frame - event["frame"] for frame in frames]
+        nearest = min(deltas, key=abs)
+        nearest_deltas[nearest] += 1
+        if nearest == 0:
+            same_frame += 1
+
+    source_addresses = {event["address"] for event in selected_reads}
+    overlap_addresses = source_addresses & set(writes_by_address)
+    result = {
+        "schema": "stunrun-gsp-read-write-correlation/v1",
+        "writes": str(args.writes), "reads": str(args.reads),
+        "write_device": write_source.get("device"),
+        "read_device": read_source.get("device"),
+        "read_pcs": [f"0x{pc:X}" for pc in sorted(read_pcs)],
+        "address_range": {
+            "min": args.min_address, "max": args.max_address
+        },
+        "write_event_count": len(selected_writes),
+        "read_event_count": len(selected_reads),
+        "source_address_count": len(source_addresses),
+        "overlap_address_count": len(overlap_addresses),
+        "overlap_read_count": overlap_reads,
+        "same_frame_overlap_read_count": same_frame,
+        "nearest_write_delta_frames": {
+            str(delta): count for delta, count in sorted(nearest_deltas.items())
+        },
+        "write_pcs_for_source_addresses": [
+            f"0x{pc:X}" for pc in sorted({pc for address in overlap_addresses
+                                           for pc in write_pcs_by_address[address]})
+        ],
+        "interpretation": "Address overlap and frame correlation only; no producer or field semantics are inferred."
+    }
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

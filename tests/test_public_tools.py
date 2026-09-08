@@ -67,6 +67,46 @@ class PublicToolTests(unittest.TestCase):
                 {"start": 0x2000010, "end": 0x2000010, "count": 1},
             ])
 
+    def test_analyze_gsp_read_write_correlation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            writes = temp / "writes.json"
+            reads = temp / "reads.json"
+            output = temp / "correlation.json"
+            writes.write_text(json.dumps({
+                "schema": "stunrun-ram-write-trace-result/v1",
+                "device": ":mainpcb:gsp", "events": [
+                    {"frame": 8, "pc": 0x100, "address": 0x2000,
+                     "data": 1, "mask": 0xFFFF},
+                    {"frame": 16, "pc": 0x110, "address": 0x2000,
+                     "data": 2, "mask": 0xFFFF},
+                ]
+            }), encoding="utf-8")
+            reads.write_text(json.dumps({
+                "schema": "stunrun-ram-read-trace-result/v1",
+                "device": ":mainpcb:gsp", "events": [
+                    {"frame": 11, "pc": 0xFFF45A10, "address": 0x2000,
+                     "data": 1, "mask": 0xFFFF},
+                    {"frame": 16, "pc": 0xFFF45A10, "address": 0x2000,
+                     "data": 2, "mask": 0xFFFF},
+                    {"frame": 11, "pc": 0xFFF45A10,
+                     "address": 0xFFF45A10, "data": 0, "mask": 0xFFFF},
+                    {"frame": 11, "pc": 0xFFF45A10, "address": 0x3000,
+                     "data": 3, "mask": 0xFFFF},
+                ]
+            }), encoding="utf-8")
+            self.run_tool("analyze-gsp-read-write-correlation", writes, reads,
+                          "--read-pc", "0xFFF45A10", "--output", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["schema"],
+                             "stunrun-gsp-read-write-correlation/v1")
+            self.assertEqual(report["read_event_count"], 3)
+            self.assertEqual(report["source_address_count"], 2)
+            self.assertEqual(report["overlap_address_count"], 1)
+            self.assertEqual(report["same_frame_overlap_read_count"], 1)
+            self.assertEqual(report["nearest_write_delta_frames"],
+                             {"-3": 1, "0": 1})
+
     def test_analyze_packed_text_trace_decodes_words_and_filters_fetches(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)
