@@ -127,9 +127,12 @@ does not infer a live game-state source for those files.
 For the upstream record boundary, provide the same table through
 `STUNRUN_GSP_TEXT_TABLE_BIN`, replace the packed-word input with
 `STUNRUN_GSP_TEXT_RECORD_BIN` (a sequence of 8-word little-endian records),
-and set `STUNRUN_GSP_TEXT_RECORD_BASE` plus `STUNRUN_GSP_TEXT_Y_BIAS`. The
-shell derives each record's descriptor address and A1 cursor from its raw
-header and reports `mode=gsp-text-record-fixture`.
+and set `STUNRUN_GSP_TEXT_RECORD_BASES` as a comma-separated list in the same
+order plus `STUNRUN_GSP_TEXT_Y_BIAS`. The shell derives each record's
+descriptor address and A1 cursor from its raw header and reports
+`mode=gsp-text-record-fixture`. If the base-list variable is omitted,
+`STUNRUN_GSP_TEXT_RECORD_BASE` plus an observed `0x80` record stride is used
+as a compatibility fallback.
 
 `tools/export-gsp-text-fixture` converts the captured
 `stunrun-memory-snapshot/v1` glyph-table JSON to the table binary and accepts

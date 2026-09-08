@@ -270,7 +270,7 @@ class NativeShellTests(unittest.TestCase):
             env.update({
                 "STUNRUN_GSP_TEXT_TABLE_BIN": str(table_path),
                 "STUNRUN_GSP_TEXT_RECORD_BIN": str(records_path),
-                "STUNRUN_GSP_TEXT_RECORD_BASE": "0xFFFEA7D0",
+                "STUNRUN_GSP_TEXT_RECORD_BASES": "0xFFFEA7D0",
                 "STUNRUN_GSP_TEXT_Y_BIAS": "0x28",
                 "STUNRUN_RENDER_PPM": str(frame),
             })

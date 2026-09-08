@@ -202,6 +202,34 @@ static int parse_fixture_u32(const char *name, uint32_t *value)
     return 1;
 }
 
+static int parse_fixture_bases(const char *text, uint32_t *bases,
+                               size_t count)
+{
+    size_t index = 0u;
+    const char *cursor = text;
+    char *end;
+    unsigned long value;
+
+    if (text == NULL || bases == NULL || count == 0u)
+        return 0;
+    while (*cursor != '\0' && index < count) {
+        while (*cursor == ' ' || *cursor == '\t' || *cursor == ',')
+            cursor++;
+        if (*cursor == '\0')
+            break;
+        value = strtoul(cursor, &end, 0);
+        if (end == cursor || value > UINT32_MAX)
+            return 0;
+        bases[index++] = (uint32_t)value;
+        cursor = end;
+        while (*cursor == ' ' || *cursor == '\t')
+            cursor++;
+        if (*cursor != '\0' && *cursor != ',')
+            return 0;
+    }
+    return index == count && *cursor == '\0';
+}
+
 static int render_text_fixture(stunrun_renderer_t *renderer,
                                const char *table_path,
                                const char *words_path)
@@ -255,6 +283,8 @@ static int render_text_record_fixture(stunrun_renderer_t *renderer,
     size_t word_count = 0u;
     size_t record_index;
     uint32_t record_base;
+    uint32_t record_bases[128u];
+    const char *record_bases_text;
     uint32_t y_bias;
 
     if (!load_word_fixture(table_path, table, sizeof(table) / sizeof(*table),
@@ -262,9 +292,29 @@ static int render_text_record_fixture(stunrun_renderer_t *renderer,
         !load_word_fixture(records_path, words, sizeof(words) / sizeof(*words),
                            &word_count) ||
         word_count == 0u || word_count % STUNRUN_GSP_TEXT_RECORD_WORDS != 0u ||
-        !parse_fixture_u32("STUNRUN_GSP_TEXT_RECORD_BASE", &record_base) ||
         !parse_fixture_u32("STUNRUN_GSP_TEXT_Y_BIAS", &y_bias))
         return 0;
+    if (word_count / STUNRUN_GSP_TEXT_RECORD_WORDS >
+        sizeof(record_bases) / sizeof(*record_bases))
+        return 0;
+    record_bases_text = getenv("STUNRUN_GSP_TEXT_RECORD_BASES");
+    if (record_bases_text != NULL && record_bases_text[0] != '\0') {
+        char copy[4096];
+        if (strlen(record_bases_text) >= sizeof(copy))
+            return 0;
+        memcpy(copy, record_bases_text, strlen(record_bases_text) + 1u);
+        if (!parse_fixture_bases(
+                copy, record_bases, word_count / STUNRUN_GSP_TEXT_RECORD_WORDS))
+            return 0;
+    } else {
+        if (!parse_fixture_u32("STUNRUN_GSP_TEXT_RECORD_BASE", &record_base))
+            return 0;
+        for (record_index = 0u;
+             record_index < word_count / STUNRUN_GSP_TEXT_RECORD_WORDS;
+             record_index++)
+            record_bases[record_index] = record_base +
+                                         (uint32_t)(record_index * 0x80u);
+    }
     for (record_index = 0u;
          record_index < word_count / STUNRUN_GSP_TEXT_RECORD_WORDS;
          record_index++) {
@@ -276,7 +326,7 @@ static int render_text_record_fixture(stunrun_renderer_t *renderer,
         stunrun_gsp_text_record_load(
             words + record_index * STUNRUN_GSP_TEXT_RECORD_WORDS, &record);
         if (!stunrun_gsp_text_record_cursor(
-                record_base + (uint32_t)(record_index * 0x80u), &record,
+                record_bases[record_index], &record,
                 &descriptor, &a1, &packed))
             return 0;
         (void)descriptor;
@@ -295,7 +345,7 @@ static int render_text_record_fixture(stunrun_renderer_t *renderer,
     printf("shell: gsp-text-record fixture=loaded records=%u words=%u "
            "base=0x%08X y-bias=%u\n",
            (unsigned)(word_count / STUNRUN_GSP_TEXT_RECORD_WORDS),
-           (unsigned)word_count, (unsigned)record_base, (unsigned)y_bias);
+           (unsigned)word_count, (unsigned)record_bases[0], (unsigned)y_bias);
     return 1;
 }
 
