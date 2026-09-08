@@ -48,6 +48,12 @@ The `gsp-text-cursor-slice-c` test reproduces the captured `0:35.0` and
 and register samples. This is a transport/decoder boundary, not a generalized
 gameplay HUD producer.
 
+`text_record.c` models the upstream eight-word record shape recovered from the
+frame-1788 GSP writes. It preserves the raw header, derives the descriptor
+address as record base plus `0x40`, and combines record words 2/3 into the A1
+seed consumed by the cursor. The `gsp-text-record-slice-c` test uses the
+captured `0:35.0` record; header meaning remains intentionally unresolved.
+
 `tools/analyze-gsp-text-cursor` consumes the corresponding register-enabled
 `stunrun-ram-read-trace-result/v1` file and performs the same bounded reduction
 for humans. It filters instruction-fetch taps, folds repeated bus reads, and

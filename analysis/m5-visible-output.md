@@ -358,6 +358,17 @@ from source base `0xFFFBA880`. A10/A11 remain the glyph-table base and 64-word
 stride. This connects the dynamic source-record address to the stable live
 cursor and is the next direct input to a native producer reconstruction.
 
+The upstream write probe now closes that loop at the record boundary. At frame
+1788, before the renderer reads the descriptors, GSP writer PCs populate
+8-word records. For example, record base `0xFFFEA480` contains
+`4013 0000 0040 00FD 3A30 3533 302E 0000`; its descriptor begins at
+`base + 0x40 = 0xFFFEA4C0`, and words 2/3 form A1=`0x00FD0040`. The
+`0xFFFEA7D0` record similarly supplies A1=`0x010800D4` and the
+`Credits: 0 ` payload at `0xFFFEA810`. This is now represented by the
+literal `gsp-text-record-slice-c` boundary. Writer PCs and hashes are recorded
+in `reference/experiments/stunrun/m5-gsp-text-record-producer.metadata.json`;
+header values remain mechanism-level fields.
+
 The native shell now has an explicit `gsp-text-cursor-fixture` mode. It loads
 the captured 512-word glyph table and packed descriptor words, applies the
 captured A0/A1 seeds plus caller-supplied y bias, and renders each decoded glyph

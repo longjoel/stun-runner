@@ -109,6 +109,16 @@ set_target_properties(stunrun-gsp-text-cursor-slice-test PROPERTIES
   C_STANDARD 99)
 add_test(NAME gsp-text-cursor-slice-c
   COMMAND stunrun-gsp-text-cursor-slice-test)
+# Literal 8-word GSP text-record header/coordinate to descriptor-cursor setup.
+add_executable(stunrun-gsp-text-record-slice-test
+  ../reproduction/gsp/text_record.c
+  ../reproduction/gsp/text_record_test.c)
+target_include_directories(stunrun-gsp-text-record-slice-test PRIVATE
+  ../reproduction/gsp)
+set_target_properties(stunrun-gsp-text-record-slice-test PROPERTIES
+  C_STANDARD 99)
+add_test(NAME gsp-text-record-slice-c
+  COMMAND stunrun-gsp-text-record-slice-test)
 # arcade-experiment/v1 parser self-check (valid, corrupt, and schema-
 # violating fixtures; no ROMs or MAME involved).
 add_executable(stunrun-experiment-parser-test
