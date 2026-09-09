@@ -1,0 +1,51 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-object-record-steering-differential",
+  "target": "stunrun",
+  "purpose": "Compare object/craft RAM writes under steering forks from one common gameplay checkpoint.",
+  "trace": {
+    "tool": "tools/mame-ram-write-trace",
+    "device": ":mainpcb:maincpu",
+    "range": ["0xFFDD00", "0xFFDE00"],
+    "frames": "relative 1–1800",
+    "tap_frame": 1,
+    "max_events": 100000,
+    "load_state": "/tmp/stunrun-latedrive2400.sta",
+    "nothrottle": true
+  },
+  "forks": {
+    "held_left": {
+      "input": "fork_hold_left",
+      "path": "/tmp/stunrun-m5-object-left/result.json",
+      "sha256": "71833c22dc1e5ead9923cd8be9a111579216e4a72a6e658664a789579aeb0481",
+      "event_count": 57192,
+      "truncated": false
+    },
+    "center": {
+      "input": "fork_center",
+      "path": "/tmp/stunrun-m5-object-center/result.json",
+      "sha256": "ef93d3abad70a5709bebf6d55ef90a4ad082c23bc3d907bbd9c01fc5c87c1651",
+      "event_count": 56452,
+      "truncated": false
+    }
+  },
+  "comparison": {
+    "tool": "tools/diff-ram-write-trace",
+    "path": "/tmp/stunrun-m5-object-diff.json",
+    "sha256": "9636d133dad57b679e2ed87077bb60c8beb729982c6ca1d477d81e7fa46e2ec3",
+    "first_aligned_difference": {
+      "index": 211,
+      "frame": 303,
+      "pc": "0x03D18",
+      "address": "0xFFDD86",
+      "held_left_data": "0x0000",
+      "center_data": "0x8080"
+    },
+    "first_frame_event_count_difference": {
+      "frame": 304,
+      "held_left": 28,
+      "center": 29
+    }
+  },
+  "interpretation": "The 0xFFDD86 cluster is steering/trajectory-state dependent from a common checkpoint. The experiment does not distinguish track-position from emulated-frame triggers and assigns no armor, weapon, ammunition, or object semantics."
+}

@@ -31,6 +31,22 @@ The transition burst is a literal spawn/update landmark only. The writer PCs
 and address offsets identify touched bytes, but do not prove object identity,
 track position, armor, weapons, ammunition, or a spawn counter.
 
+## Saved-state steering perturbation
+
+The same common `late_drive` save state was forked with held-left and centered
+steering while tracing the full `0xFFDD00–0xFFDE00` range. Both streams were
+untruncated. Their first aligned value difference occurs at relative frame
+303, at `0xFFDD86`, with the same writer PC `0x03D18` but data `0x0000` in
+the left fork versus `0x8080` in the center fork. Per-frame event counts first
+separate at frame 304 (28 versus 29). The writer-PC sets remain effectively
+shared, so this is a state/value perturbation rather than a new spawn routine.
+
+This establishes that the `0xFFDD86` cluster responds to steering/trajectory
+state from the common checkpoint. It does not establish whether the underlying
+trigger is track position or emulated frame, and it does not assign the field
+to armor, weapons, or a specific object. Provenance is in
+`reference/experiments/stunrun/m5-object-record-steering-differential.metadata.json`.
+
 A sidecar write trace over `0xFF9578–0xFF957D` shows that the frame-883 burst
 is not a course-index transition: `0xFF9578` is not written in frames 850–900.
 Instead, `0xFF957A` changes from `0x0003` to `0x0002` at frame 879 and the
