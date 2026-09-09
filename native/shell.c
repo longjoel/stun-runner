@@ -53,6 +53,8 @@
 #include "gsp_video.h"
 #include "text_cursor.h"
 #include "text_record.h"
+#include "fake_ports.h"
+#include "game_loop.h"
 
 static int g_failures = 0;
 static unsigned frame = 0;
@@ -396,7 +398,7 @@ static const char *action_name(stunrun_exp_action_t action)
 /* Dispatch file input events scheduled for the current frame. Order across
  * events sharing a frame follows file order; unsorted files still dispatch
  * every event exactly once because each frame scans the whole list. */
-static void dispatch_inputs(void)
+static void dispatch_inputs(stunrun_fake_ports_t *ports)
 {
     unsigned i;
     for (i = 0; i < g_event_count; i++) {
@@ -412,6 +414,10 @@ static void dispatch_inputs(void)
             printf(" label=%s", ev->label);
         printf("\n");
         input_latch_apply(ev);
+        (void)stunrun_port_set_named(ports, ev->port, ev->field,
+                                     ev->action == STUNRUN_EXP_PRESS ? 1 :
+                                     ev->action == STUNRUN_EXP_RELEASE ? 0 :
+                                     ev->value);
         printf("shell: input-state frame=%u active=%u hash=0x%08X\n",
                frame, input_active_count(), (unsigned)g_input_hash);
     }
@@ -490,6 +496,8 @@ static int run_walk(void)
     stunrun_adsp_control_tally_t tally;
     stunrun_jsa_title_counts_t counts;
     stunrun_fifo_run_summary_t fifo_summary;
+    stunrun_fake_ports_t ports;
+    stunrun_game_loop_t game_loop;
     const char *control_state = "skipped";
     const char *counts_state = "skipped";
     size_t emitted;
@@ -504,11 +512,10 @@ static int run_walk(void)
     const char *gsp_text_record_path = getenv("STUNRUN_GSP_TEXT_RECORD_BIN");
     const char *render_mode = "blank-scaffold";
     uint16_t geometry_table[STUNRUN_GEOM_MARCH_WORDS];
-    uint16_t geometry_base[STUNRUN_GEOM_MARCH_WORDS];
-    uint16_t geometry_twin[STUNRUN_GEOM_MARCH_WORDS];
-    uint16_t geometry_fifo[STUNRUN_ROAD_FIFO_WRITES];
 
     stunrun_jsa_latches_init(&latches);
+    stunrun_ports_init(&ports);
+    stunrun_game_loop_init(&game_loop, &ports);
     stunrun_adsp_control_tally_init(&tally);
     stunrun_render_init(&renderer);
     stunrun_gsp_video_init(&video);
@@ -522,21 +529,17 @@ static int run_walk(void)
             printf("shell: geometry-upload fixture=read-failed\n");
             g_failures++;
         } else {
-            memset(geometry_base, 0, sizeof(geometry_base));
-            memset(geometry_twin, 0, sizeof(geometry_twin));
-            passes = stunrun_geom_upload(STUNRUN_GEOM_COPY_COUNT,
-                                         geometry_table, geometry_base,
-                                         geometry_twin);
-            size_t fifo_words = stunrun_road_fifo_drain(
-                geometry_base, STUNRUN_GEOM_MARCH_WORDS, geometry_fifo,
-                STUNRUN_ROAD_FIFO_WRITES);
+            passes = stunrun_game_loop_load_road_table(&game_loop,
+                                                       geometry_table) ?
+                     STUNRUN_GEOM_COPY_COUNT : 0u;
+            size_t fifo_words = stunrun_game_loop_submit_road(&game_loop);
             int fifo_match = fifo_words == STUNRUN_ROAD_FIFO_WRITES;
             for (i = 0; i < STUNRUN_GEOM_MARCH_WORDS; i++)
-                if (geometry_base[i] != geometry_twin[i] ||
-                    geometry_base[i] != geometry_table[i])
+                if (game_loop.road_base[i] != game_loop.road_twin[i] ||
+                    game_loop.road_base[i] != geometry_table[i])
                     copies_match = 0;
             for (i = 0; i < STUNRUN_ROAD_FIFO_WRITES; i++)
-                if (geometry_fifo[i] != geometry_base[i * 2u])
+                if (game_loop.road_fifo[i] != game_loop.road_base[i * 2u])
                     fifo_match = 0;
             expect(passes == STUNRUN_GEOM_COPY_COUNT);
             expect(copies_match);
@@ -545,13 +548,15 @@ static int run_walk(void)
                    "bytes=%u sum=0x%08X copies=match fifo-drain=%u/384 "
                    "dest=0x%08X\n", passes,
                    STUNRUN_GEOM_MARCH_WORDS * 2u,
-                   (unsigned)geometry_sum(geometry_base),
+                   (unsigned)geometry_sum(game_loop.road_base),
                    (unsigned)fifo_words, STUNRUN_ROAD_FIFO_DEST);
         }
     }
 
     for (frame = 0; frame <= g_terminal; frame++) {
-        dispatch_inputs();
+        dispatch_inputs(&ports);
+        if (frame != 0u)
+            stunrun_game_loop_step(&game_loop);
         if (frame == 1) {
             /* Startup response: 6502 writes 0xFF, main IRQ4 fires,
              * handler reads 0x600000, IRQ4 clears. */

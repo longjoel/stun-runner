@@ -55,6 +55,11 @@ add_test(NAME jsa-latch-slice-c COMMAND stunrun-jsa-latch-slice-test)
 # hold. No speculative game logic.
 add_executable(stunrun-native-shell
   shell.c
+  fake_ports.c
+  game_loop.c
+  ../reproduction/maincpu/trajectory_state.c
+  ../reproduction/maincpu/geom_upload.c
+  ../reproduction/maincpu/road_fifo.c
   render.c
   gsp_video.c
   checkpoint.c
@@ -63,16 +68,24 @@ add_executable(stunrun-native-shell
   ../reproduction/adsp/adsp_control_seq.c
   ../reproduction/adsp/adsp_upload_stream.c
   ../reproduction/maincpu/fifo_block.c
-  ../reproduction/maincpu/geom_upload.c
-  ../reproduction/maincpu/road_fifo.c
   ../reproduction/gsp/text_cursor.c
   ../reproduction/gsp/text_record.c
   ../reproduction/sound/jsa_latch.c)
 target_include_directories(stunrun-native-shell PRIVATE
-  ../reproduction/adsp ../reproduction/maincpu ../reproduction/gsp
+  . ../reproduction/adsp ../reproduction/maincpu ../reproduction/gsp
   ../reproduction/sound)
 set_target_properties(stunrun-native-shell PROPERTIES C_STANDARD 99)
 add_test(NAME native-shell COMMAND stunrun-native-shell)
+add_executable(stunrun-game-loop-test
+  fake_ports.c
+  game_loop.c
+  ../reproduction/maincpu/trajectory_state.c
+  ../reproduction/maincpu/geom_upload.c
+  ../reproduction/maincpu/road_fifo.c
+  game_loop_test.c)
+set_target_properties(stunrun-game-loop-test PROPERTIES C_STANDARD 99)
+target_include_directories(stunrun-game-loop-test PRIVATE . ../reproduction/maincpu)
+add_test(NAME native-game-loop-c COMMAND stunrun-game-loop-test)
 add_executable(stunrun-render-test render.c render_test.c)
 set_target_properties(stunrun-render-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-render-boundary-c COMMAND stunrun-render-test)
