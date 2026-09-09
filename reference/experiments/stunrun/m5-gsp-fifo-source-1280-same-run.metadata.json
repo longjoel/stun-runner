@@ -1,0 +1,43 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-fifo-source-1280-same-run",
+  "target": "stunrun",
+  "purpose": "Correlate the earlier main-CPU FIFO transport window with GSP high-memory queue and indexed-reader activity.",
+  "gsp_capture": {
+    "tool": "tools/mame-ram-read-write-trace",
+    "path": "/tmp/stunrun-m5-gsp-fifo-source-1280/result.json",
+    "sha256": "1477839409daa807605747d4d8ef0d5957d90d6a6ba81661c0923608dc151d75",
+    "correlation_path": "/tmp/stunrun-m5-gsp-fifo-source-1280/correlation.json",
+    "correlation_sha256": "1bdca57d03e9465b49abd91184eaae09200b472be7a6c8fba404c00dcbcc0866",
+    "frames": "1280–1300",
+    "input": "late_drive",
+    "write_event_count": 40660,
+    "read_event_count": 8180,
+    "write_truncated": false,
+    "read_truncated": false,
+    "same_frame_overlap_read_count": 673,
+    "same_address_and_value_read_count": 7297,
+    "same_value_with_prior_write_count": 7273,
+    "nearest_write_order_before_read_count": 7273,
+    "nearest_write_order_after_read_count": 905,
+    "nearest_write_pc_counts": {
+      "0xFFF41060": 5469,
+      "0xFFF414C0": 1113,
+      "0xFFF41650": 687
+    }
+  },
+  "main_fifo_reference": {
+    "path": "/tmp/stunrun-m5-main-fifo-poweron-1280-pc/result.json",
+    "sha256": "a7979e14e5b258e28b472de4cb11ec6f0e7ec92422274929727896e6f7a6f655",
+    "frames": "1280–1300",
+    "pc": "0x02248E",
+    "event_count": 16260,
+    "truncated": false
+  },
+  "instruction_trace": {
+    "path": "/tmp/stunrun-m5-gsp-fifo-source-instruction/gsp-tms34010.trace",
+    "focus": ["0xFFF41060", "0xFFF414C0", "0xFFF41650"],
+    "observation": "0xFFF41060 is a sentinel dispatcher reading queue bases 0xFFF9FC00 and 0xFFFCFC00 and checking 0xFFFF; it is not promoted as a record constructor."
+  },
+  "interpretation": "The common-timeline GSP capture establishes queue/VRAM activity during the earlier FIFO window, but queue payload semantics and conversion into indexed records remain UNKNOWN."
+}

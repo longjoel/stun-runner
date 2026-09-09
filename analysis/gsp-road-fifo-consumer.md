@@ -219,3 +219,24 @@ and the shifted `-2/+6` cadence described above.
 
 Provenance is in
 `reference/experiments/stunrun/m5-gsp-high-write-fork-1790.metadata.json`.
+
+## Same-window queue correlation
+
+To connect the earlier main-CPU FIFO burst with GSP activity, a same-run GSP
+read/write capture was taken over power-on `late_drive` frames 1280–1300. It
+recorded 40,660 high-memory writes and 8,180 indexed-reader reads without
+truncation. The reads overlapped 5,644 written addresses; 673 had a
+same-frame address overlap, and 7,273 had an exact address-and-value match to
+an earlier write. The nearest-writer ranking is dominated by
+`0xFFF41060` (5,469 reads), followed by `0xFFF414C0` (1,113) and
+`0xFFF41650` (687).
+
+The instruction trace identifies `0xFFF41060` as `MOVE *A3,A0,0` in the
+sentinel dispatcher. Its surrounding control flow selects
+`0xFFF9FC00`/`0xFFFCFC00`, checks for `0xFFFF`, and polls queue pointers; it
+does not prove that the routine constructs the indexed records. The result
+therefore establishes a common-timeline queue/VRAM boundary, not a semantic
+record producer. The earlier main-CPU FIFO trace remains the upstream input
+candidate, while the GSP-local queue payload and record conversion remain
+UNKNOWN. Full provenance is in
+`reference/experiments/stunrun/m5-gsp-fifo-source-1280-same-run.metadata.json`.
