@@ -58,6 +58,14 @@ timer meaning are not assigned here. Initialization at `0x03B18C` and
 separate stores. This is enough to replace the native “increment on steering”
 placeholder with a future literal slice once its caller inputs are traced.
 
+The containing routine begins at `0x039B82`. Its setup assigns the local word
+at `-0x18(A6)` the literal `0x07E0` before entering the update path, so the
+comparison at `0x03ABB4–0x03ABC0` is against a caller-frame limit plus
+`0x40`, not directly against an input byte. The same routine keeps separate
+arguments at `($0A,A6)` and `($0F,A6)` and uses a pointer at `-0x0A(A6)` for
+record flags. Those inputs influence several branches, but their gameplay
+semantics are not established by this listing alone.
+
 The listing also resolves the apparent `0xFFDB38` steering differential:
 `0x02F246` executes `move.l $FFFF8014, $FFDB36`, so `0xFFDB38` is the low
 half of a copied global tick in this path. Its one-unit fork difference is
