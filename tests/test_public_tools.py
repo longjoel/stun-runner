@@ -172,6 +172,13 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["same_frame_overlap_read_count"], 1)
             self.assertEqual(report["same_order_overlap_read_count"], 0)
 
+    def test_same_run_trace_exposes_recorded_playback(self):
+        tool = (ROOT / "tools" / "mame-ram-read-write-trace").read_text(
+            encoding="utf-8")
+        self.assertIn('parser.add_argument("--playback"', tool)
+        self.assertIn('"--playback", str(args.playback)', tool)
+        self.assertIn("--load-state and --playback are mutually exclusive", tool)
+
     def test_analyze_packed_text_trace_decodes_words_and_filters_fetches(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

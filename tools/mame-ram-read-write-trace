@@ -47,17 +47,27 @@ def main() -> int:
     parser.add_argument("--tap-frame", type=int, default=10)
     parser.add_argument("--input", default="none")
     parser.add_argument("--load-state", type=pathlib.Path)
+    parser.add_argument("--playback", type=pathlib.Path,
+                        help="replay a recorded .inp instead of scripted input")
     parser.add_argument("--nothrottle", action="store_true")
     args = parser.parse_args()
     if args.load_state and not args.load_state.is_file():
         parser.error(f"save state does not exist: {args.load_state}")
+    if args.playback and not args.playback.is_file():
+        parser.error(f"playback recording does not exist: {args.playback}")
+    if args.load_state and args.playback:
+        parser.error("--load-state and --playback are mutually exclusive")
     write_tool = pathlib.Path(__file__).with_name("mame-ram-write-trace")
     command = [str(write_tool), str(args.rompath), str(args.output),
                "--device", args.device, "--space", args.space,
                "--base", hex(args.write_base), "--end", hex(args.write_end),
                "--frames", str(args.frames), "--start-frame", str(args.start_frame),
                "--end-frame", str(args.end_frame), "--max-events", str(args.max_events),
-               "--tap-frame", str(args.tap_frame), "--input", args.input]
+               "--tap-frame", str(args.tap_frame)]
+    if args.playback:
+        command += ["--playback", str(args.playback)]
+    else:
+        command += ["--input", args.input]
     if args.order:
         command.append("--order")
     if args.pc is not None:
@@ -104,6 +114,7 @@ def main() -> int:
                   "frames": args.frames, "capture_start_frame": args.start_frame,
                   "capture_end_frame": args.end_frame, "pc": args.read_pc,
                   "registers": args.registers, "events": reads,
+                  "playback": str(args.playback) if args.playback else None,
                   "event_count": len(reads),
                   "reader_pcs": sorted({event["pc"] for event in reads}),
                   "canonical_log_sha256": hashlib.sha256(log_text.encode()).hexdigest(),
