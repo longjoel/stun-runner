@@ -187,3 +187,11 @@ are not being submitted through the main-CPU FIFO during this interval. The
 producer must be sought earlier in the saved-state timeline or in GSP-local
 VRAM/work-buffer activity; the result is recorded in
 `reference/experiments/stunrun/m5-main-fifo-1790-negative.metadata.json`.
+
+The corresponding power-on `late_drive` control window is different: frames
+1280–1300 contain 16,260 writes to the same FIFO when filtered to main PC
+`0x02248E`. Thus the FIFO is an active upstream transport earlier in the run,
+but it is not continuously feeding the late indexed-reader interval. The
+remaining producer task is to match those earlier FIFO payloads to the GSP
+record/work-buffer writes rather than assuming that every later VRAM record is
+FIFO-originated.

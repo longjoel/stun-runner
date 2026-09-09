@@ -17,5 +17,15 @@
     "frames": "1790–1800",
     "address_range": "0xC0000C–0xC0000D"
   },
+  "earlier_poweron_control": {
+    "path": "/tmp/stunrun-m5-main-fifo-poweron-1280-pc/result.json",
+    "sha256": "a7979e14e5b258e28b472de4cb11ec6f0e7ec92422274929727896e6f7a6f655",
+    "canonical_log_sha256": "de7e6f9313f80477eb2b65f95c6e0284e0ca150219cff803f7d2f616827cd600",
+    "frames": "1280–1300",
+    "input": "late_drive",
+    "pc": "0x02248E",
+    "event_count": 16260,
+    "truncated": false
+  },
   "interpretation": "No main-CPU FIFO writes occur in this late visible-fork interval. This does not prove the records are GSP-local for their whole lifetime; an earlier producer interval remains to be traced."
 }
