@@ -150,9 +150,11 @@ at `0x02688E` continues to subtract `14`. Full provenance is in
 `reference/experiments/stunrun/m5-timer-all-writers.metadata.json`.
 Settled snapshots independently show `0xFF9578` values `10`, `11`, and `12`
 with corresponding timer reload observations `13420`, `11224`, and `15128`.
-This is a cross-capture correlation: the frame-600 save-state fork predates
-course initialization and stays at index `0` without the original future input
-history, so it is not used as direct evidence for course 10.
+The aligned ROM capture now directly identifies those as table entries 10, 11,
+and 12. Targeted follow-up snapshots show the corresponding index and timer
+after each writer event; the frame-600 save-state fork still predates course
+initialization and stays at index `0` without the original future input history,
+so it is not used for this mapping.
 
 The longer `race2` snapshot series adds a bounded timing shape. At settled
 course landmarks, the raw longword at `0xFF9568` declines from `13294` to

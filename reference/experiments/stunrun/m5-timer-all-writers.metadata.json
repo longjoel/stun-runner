@@ -71,6 +71,19 @@
     "adjacent_tables": ["0xFF47BA", "0xFF4832", "0xFF486E", "0xFF48AA"],
     "call_sites": ["0x027160", "0x027742", "0x02797E", "0x027FA4", "0x02B74E"]
   },
+  "rom_table_capture": {
+    "command": "tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-timer-table-0-12 --device :mainpcb:maincpu --space program --base 0x4EDE6 --count 13 --width 32 --address-stride 4 --frames 1 --targets 1 --nothrottle",
+    "snapshot": "/tmp/stunrun-m5-timer-table-0-12/snapshot-1.json",
+    "snapshot_sha256": "2fc37baed079e0570ba3a8d407b13f9ef91ada9b8a15f3fb5b0edc6a26e4432a",
+    "result_sha256": "041a5acac7c1a5ed87716d045316b3169379e08f70bbc29ce43fa9a4e3848a3e",
+    "address_stride": 4,
+    "entries_0_to_12": [8540, 11102, 13054, 15006, 15494, 15128, 13420, 10004, 11834, 18300, 13420, 11224, 15128]
+  },
+  "exact_reload_followup_snapshots": [
+    {"writer_frame": 949, "followup_frame": 1115, "index_word": 10, "timer_word": 13420, "snapshot_sha256": "18f3ab239ac622d6075db0d2785cbcedbcc4698e24ce36b08ff5fec723aa6cb8"},
+    {"writer_frame": 5170, "followup_frame": 5199, "index_word": 11, "timer_word": 11224, "snapshot_sha256": "07bd12764f40af418334c874d83b936b02699e8b3f99418721713a9f0a683c80"},
+    {"writer_frame": 8753, "followup_frame": 8784, "index_word": 12, "timer_word": 15128, "snapshot_sha256": "39ee237f7dcfe0ba30ca56c74e19628ec08e87ef6e97d8402cc288bb20949479"}
+  ],
   "settled_index_correlation": [
     {
       "snapshot": "/tmp/race2/snapshot-1200.json",
@@ -100,7 +113,7 @@
       "reload_value_observed_at_0x03B236": 15128
     }
   ],
-  "save_state_fork_note": "Forks from settled states preserve the later indices. The frame-600 fork remains at index 0 because it predates the first course initialization and has no future input recording; therefore the index-to-reload mapping is correlated across settled snapshots and the writer trace, not claimed as same-frame direct capture.",
-  "observation": "The complete bounded writer trace separates normal -0xE timer quanta, expiry/scoring decrements and clears, and indexed level-entry reloads. The reload routine shares the 0xFF9578 index with the neighboring course-dependent state fields.",
-  "semantic_status": "TIMER_WRITERS_AND_INDEXED_RELOAD_CONFIRMED; DISPLAY_UNIT_UNRESOLVED; 0xFF9578 COURSE-INDEX ROLE STRONGLY SUPPORTED BUT NOT FULLY SEMANTICALLY PROVEN"
+  "save_state_fork_note": "Forks from settled states preserve the later indices. The frame-600 fork remains at index 0 because it predates the first course initialization and has no future input recording; it is not used for the mapping.",
+  "observation": "The complete bounded writer trace separates normal -0xE timer quanta, expiry/scoring decrements and clears, and indexed level-entry reloads. The aligned ROM capture directly contains entries 10=13420, 11=11224, and 12=15128; targeted follow-up snapshots show those values with the corresponding 0xFF9578 indices after each reload.",
+  "semantic_status": "TIMER_WRITERS_AND_INDEXED_RELOAD_CONFIRMED; COURSE-INDEX_TO_TIMER-TABLE_MAPPING_CONFIRMED_FOR_10_TO_12; DISPLAY_UNIT_UNRESOLVED"
 }
