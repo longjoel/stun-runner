@@ -1,0 +1,24 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_known_state_series",
+  "date": "2026-09-09",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "recording": "/tmp/race2/r2.inp",
+  "source_result": "/tmp/stunrun-track-table-race2-full.json",
+  "source_result_sha256": "6ac02593a7534c5a93948f4750393f6023dc69f5b6322ce4e1ec67af15b857ac",
+  "source_snapshots": {"directory": "/tmp/race2", "frames": [600, 1200, 1800, 2400, 3000, 3600, 4200, 4800, 5400, 6000, 6600, 7200, 7800, 8400, 9000, 9600, 10200, 10800, 11400, 12000, 12600, 13200]},
+  "fields": {
+    "score": {"address": "0xFF9532", "width": 4, "values": [0, 0, 1600, 2605, 3765, 5590, 8145, 119350, 119850, 121475, 122725, 124940, 126415, 141015, 141015, 143115, 144410, 144710, 144980, 147195, 149110, 149660]},
+    "time_remaining_raw": {"address": "0xFF9568", "width": 4, "values": [8540, 13294, 10802, 8548, 6364, 3956, 1492, 0, 10426, 8102, 5820, 3370, 1214, 0, 14246, 12202, 9878, 7610, 5160, 2724, 204, 0]},
+    "course_index_candidate": {"address": "0xFF9578", "width": 2, "values": [0, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12]},
+    "speed_candidate": {"address": "0xFFDD16", "width": 2, "values": [0, 580, 1972, 1944, 1550, 1791, 1994, 0, 1994, 1994, 1598, 1573, 2016, 0, 1994, 1709, 1994, 1389, 2016, 1994, 2016, 0]}
+  },
+  "derived_observation": {
+    "time_settled_ranges": [[1200, 4200], [5400, 7800], [9000, 12600]],
+    "time_transition_frames": [4800, 8400, 13200],
+    "approximate_decrement": "about 4 raw units per emulated frame within each settled interval",
+    "interpretation": "0xFF9568 is a confirmed displayed time-remaining mechanism with a repeatable countdown/reset shape; its display conversion and exact timer unit remain unresolved."
+  },
+  "confidence": "SNAPSHOT-SERIES-OBSERVED; TIMER-ROLE-CONFIRMED; DISPLAY-UNIT-UNRESOLVED"
+}

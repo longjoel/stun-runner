@@ -118,6 +118,17 @@ score awards. Its displayed unit is still unresolved.
 Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
+The longer `race2` snapshot series adds a bounded timing shape. At settled
+course landmarks, the raw longword at `0xFF9568` declines from `13294` to
+`1492` during course 10, from `10426` to `1214` during course 11, and from
+`14246` to `204` during course 12. The samples are approximately four raw
+units apart per emulated frame; the field reaches zero at the observed
+transition landmarks `4800`, `8400`, and `13200`, where the next course value
+is loaded. This confirms a repeatable countdown/reset mechanism, but not the
+displayed unit or conversion. The companion score/course/speed series is
+preserved in
+`reference/experiments/stunrun/m5-known-state-series.metadata.json`.
+
 The adjacent `0xFF9532` longword is the live score accumulator. Static
 listing evidence shows clears at `0x024334`, `0x024BE6`, `0x027196`, and
 `0x02B624`, display/formatting reads at `0x024CEA`, `0x024DA6`, `0x026A60`,
