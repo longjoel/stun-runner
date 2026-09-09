@@ -21,6 +21,10 @@ static void sample_inputs(stunrun_game_loop_t *loop)
 
 static void update_trajectory_state(stunrun_game_loop_t *loop)
 {
+    uint16_t raw_motion_delta;
+    if (stunrun_mem_read16_be(loop->ports, 0xFFDD16u,
+                              &raw_motion_delta))
+        loop->motion_delta = (int16_t)raw_motion_delta;
     loop->trajectory_coordinate = stunrun_trajectory_step(
         loop->trajectory_coordinate, loop->motion_delta);
     /* The field is a literal 16-bit big-endian trajectory boundary. Its
@@ -40,6 +44,7 @@ void stunrun_game_loop_init(stunrun_game_loop_t *loop,
     loop->steering_delta = 0;
     loop->trajectory_coordinate = stunrun_trajectory_initial();
     loop->motion_delta = 0;
+    (void)stunrun_mem_write16_be(ports, 0xFFDD16u, 0u);
     loop->road_fifo_count = 0u;
     loop->road_ready = 0;
 }
@@ -59,8 +64,11 @@ void stunrun_game_loop_step(stunrun_game_loop_t *loop)
 void stunrun_game_loop_set_motion_delta(stunrun_game_loop_t *loop,
                                         int16_t motion_delta)
 {
-    if (loop != NULL)
+    if (loop != NULL) {
         loop->motion_delta = motion_delta;
+        (void)stunrun_mem_write16_be(loop->ports, 0xFFDD16u,
+                                     (uint16_t)motion_delta);
+    }
 }
 
 int stunrun_game_loop_load_road_table(stunrun_game_loop_t *loop,

@@ -9,6 +9,7 @@ int main(void)
     stunrun_fake_ports_t ports;
     stunrun_game_loop_t loop;
     uint32_t tick = 0;
+    uint16_t motion_delta = 0;
     int32_t steering = 0;
     int32_t button = 0;
     uint16_t table[STUNRUN_GAME_LOOP_ROAD_WORDS];
@@ -25,6 +26,8 @@ int main(void)
     assert(loop.trajectory_coordinate == (int16_t)-0x360);
     assert(stunrun_mem_read32_be(&ports, 0xFF8014u, &tick) && tick == 4u);
     stunrun_game_loop_set_motion_delta(&loop, -1);
+    assert(stunrun_mem_read16_be(&ports, 0xFFDD16u, &motion_delta) &&
+           (int16_t)motion_delta == -1);
     stunrun_game_loop_step(&loop);
     assert(loop.trajectory_coordinate == (int16_t)0xFC9F);
     assert(stunrun_port_read(&ports, STUNRUN_PORT_AD_STICK_X, &steering) &&
