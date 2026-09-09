@@ -7,8 +7,12 @@ import json
 import pathlib
 
 
-def load(path, expected_schema):
+def load(path, expected_schema, nested_key):
     value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schema") == "stunrun-ram-read-write-trace-result/v1":
+        nested = value.get(nested_key)
+        if isinstance(nested, dict):
+            value = nested
     if value.get("schema") != expected_schema:
         raise SystemExit(f"{path}: expected {expected_schema}")
     events = value.get("events")
@@ -34,9 +38,9 @@ def main() -> int:
         parser.error("--min-address must not exceed --max-address")
 
     write_source, write_events = load(
-        args.writes, "stunrun-ram-write-trace-result/v1")
+        args.writes, "stunrun-ram-write-trace-result/v1", "write")
     read_source, read_events = load(
-        args.reads, "stunrun-ram-read-trace-result/v1")
+        args.reads, "stunrun-ram-read-trace-result/v1", "read")
     read_pcs = set(args.read_pc or [])
 
     def in_range(event):

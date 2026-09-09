@@ -142,6 +142,36 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["nearest_same_value_write_pc_counts"],
                              {"0x100": 1})
 
+    def test_analyze_gsp_read_write_correlation_accepts_same_run_result(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            trace = temp / "same-run.json"
+            output = temp / "correlation.json"
+            trace.write_text(json.dumps({
+                "schema": "stunrun-ram-read-write-trace-result/v1",
+                "write": {
+                    "schema": "stunrun-ram-write-trace-result/v1",
+                    "device": ":mainpcb:gsp", "events": [
+                        {"frame": 8, "pc": 0x100, "address": 0x2000,
+                         "data": 1, "mask": 0xFFFF, "order": 1},
+                    ]
+                },
+                "read": {
+                    "schema": "stunrun-ram-read-trace-result/v1",
+                    "device": ":mainpcb:gsp", "events": [
+                        {"frame": 8, "pc": 0xFFF45090, "address": 0x2000,
+                         "data": 1, "mask": 0xFFFF, "order": 2},
+                    ]
+                }
+            }), encoding="utf-8")
+            self.run_tool("analyze-gsp-read-write-correlation", trace, trace,
+                          "--read-pc", "0xFFF45090", "--output", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["write_event_count"], 1)
+            self.assertEqual(report["read_event_count"], 1)
+            self.assertEqual(report["same_frame_overlap_read_count"], 1)
+            self.assertEqual(report["same_order_overlap_read_count"], 0)
+
     def test_analyze_packed_text_trace_decodes_words_and_filters_fetches(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)
