@@ -47,11 +47,13 @@ def main() -> int:
 
     writes_by_address = collections.defaultdict(set)
     write_events_by_address = collections.defaultdict(list)
+    write_values_by_address = collections.defaultdict(list)
     write_pcs_by_address = collections.defaultdict(set)
     selected_writes = [event for event in write_events if in_range(event)]
     for event in selected_writes:
         writes_by_address[event["address"]].add(event["frame"])
         write_events_by_address[event["address"]].append(event)
+        write_values_by_address[(event["address"], event.get("data"))].append(event)
         if isinstance(event.get("pc"), int):
             write_pcs_by_address[event["address"]].add(event["pc"])
 
@@ -72,6 +74,10 @@ def main() -> int:
     order_before_read = 0
     order_after_read = 0
     nearest_write_pcs = collections.Counter()
+    same_value_overlap = 0
+    same_value_before = 0
+    same_value_after = 0
+    nearest_same_value_pcs = collections.Counter()
     overlap_reads = 0
     for event in selected_reads:
         frames = writes_by_address.get(event["address"], set())
@@ -103,6 +109,25 @@ def main() -> int:
                 order_before_read += 1
             else:
                 order_after_read += 1
+        value_writes = write_values_by_address[(event["address"], event.get("data"))]
+        if value_writes:
+            same_value_overlap += 1
+            ordered_value_writes = [write_event for write_event in value_writes
+                                    if isinstance(write_event.get("order"), int) and
+                                    isinstance(event.get("order"), int)]
+            if any(write_event["order"] < event["order"]
+                   for write_event in ordered_value_writes):
+                same_value_before += 1
+            if any(write_event["order"] > event["order"]
+                   for write_event in ordered_value_writes):
+                same_value_after += 1
+            if ordered_value_writes:
+                nearest_value_write = min(
+                    ordered_value_writes,
+                    key=lambda write_event: abs(write_event["order"] - event["order"]),
+                )
+                if isinstance(nearest_value_write.get("pc"), int):
+                    nearest_same_value_pcs[nearest_value_write["pc"]] += 1
 
     source_addresses = {event["address"] for event in selected_reads}
     overlap_addresses = source_addresses & set(writes_by_address)
@@ -130,6 +155,13 @@ def main() -> int:
         "nearest_write_pc_counts": {
             f"0x{pc:X}": count for pc, count in
             sorted(nearest_write_pcs.items(), key=lambda item: (-item[1], item[0]))
+        },
+        "same_address_and_value_read_count": same_value_overlap,
+        "same_value_with_prior_write_count": same_value_before,
+        "same_value_with_later_write_count": same_value_after,
+        "nearest_same_value_write_pc_counts": {
+            f"0x{pc:X}": count for pc, count in
+            sorted(nearest_same_value_pcs.items(), key=lambda item: (-item[1], item[0]))
         },
         "nearest_write_delta_frames": {
             str(delta): count for delta, count in sorted(nearest_deltas.items())

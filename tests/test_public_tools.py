@@ -136,6 +136,11 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(report["nearest_write_order_before_read_count"], 0)
             self.assertEqual(report["nearest_write_order_after_read_count"], 1)
             self.assertEqual(report["nearest_write_pc_counts"], {"0x110": 1})
+            self.assertEqual(report["same_address_and_value_read_count"], 1)
+            self.assertEqual(report["same_value_with_prior_write_count"], 1)
+            self.assertEqual(report["same_value_with_later_write_count"], 0)
+            self.assertEqual(report["nearest_same_value_write_pc_counts"],
+                             {"0x100": 1})
 
     def test_analyze_packed_text_trace_decodes_words_and_filters_fetches(self):
         with tempfile.TemporaryDirectory() as temp:
