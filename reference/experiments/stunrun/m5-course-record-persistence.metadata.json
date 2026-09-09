@@ -1,0 +1,46 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_course_record_persistence",
+  "date": "2026-09-09",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "nvram_directory": "/tmp/stunrun-m5-nvram-persist",
+  "table_read": {
+    "base": "0xFF47BA",
+    "count": 13,
+    "width": 32,
+    "address_stride": 4,
+    "meaning": "timer-record table as indexed by routine 0x02BC2A"
+  },
+  "phases": [
+    {
+      "phase": "fresh_baseline",
+      "command": "tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-nvram-before --device :mainpcb:maincpu --base 0xFF47BA --count 13 --width 32 --address-stride 4 --frames 1 --targets 1 --nvram-directory /tmp/stunrun-m5-nvram-persist --nothrottle",
+      "result": "/tmp/stunrun-m5-nvram-before/result.json",
+      "result_sha256": "0f8c933bb7fb7e5f7913130a5becd314622b7035fb009762281534cb33a38c56",
+      "snapshot_sha256": "005cf88e65d6c1c46c02879051b3eeff96d871d8d0d2a340bf6573f348f21382",
+      "values_0_to_12": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      "phase": "bounded_playback",
+      "command": "tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-nvram-after-course12 --device :mainpcb:maincpu --base 0xFF47BA --count 13 --width 32 --address-stride 4 --frames 8784 --targets 8784 --playback /tmp/race2/r2.inp --nvram-directory /tmp/stunrun-m5-nvram-persist --nothrottle",
+      "recording": "/tmp/race2/r2.inp",
+      "recording_sha256": "facdcfa288f2628b8e0a7ca1c874b06240244a3bacb39decbbfa502a38a2de7e",
+      "result": "/tmp/stunrun-m5-nvram-after-course12/result.json",
+      "result_sha256": "bcb2d6569fe69c679b89ecb0aa9c58ae55296ce34f7138c742335974c2dd5117",
+      "snapshot_sha256": "d3af4c25869854acf405fe73a74d7b8aad243c2c5f1bba36a854168e7243d9a7",
+      "values_0_to_12": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 0]
+    },
+    {
+      "phase": "new_process_reboot_read",
+      "command": "tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-nvram-reboot --device :mainpcb:maincpu --base 0xFF47BA --count 13 --width 32 --address-stride 4 --frames 1 --targets 1 --nvram-directory /tmp/stunrun-m5-nvram-persist --nothrottle",
+      "result": "/tmp/stunrun-m5-nvram-reboot/result.json",
+      "result_sha256": "a1aeb12ecef37d9ae890fc04e0532c2f50b2d2dd5de7c3745c43afc46747d204",
+      "snapshot_sha256": "318f9c9c288568608533c471f22a7fc04fee8be59e9ce356aaf73e767d3294f1",
+      "values_0_to_12": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 0]
+    }
+  ],
+  "observation": "Fresh isolated NVRAM starts with all captured timer-record entries zero. The bounded playback changes entry 11 to 136, and a separate MAME process reads the same value at frame 1 using the same NVRAM directory.",
+  "semantic_status": "CROSS-PROCESS-NVRAM-PERSISTENCE-CONFIRMED; RECORD-GAME-LABEL-UNRESOLVED"
+}

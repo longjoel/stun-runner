@@ -205,6 +205,12 @@ at `0xFF486E + 2*10` and `0xFF48AA + 2*10`, matching the live cache fields
 `0xFF9574` and `0xFF9576` for index 10. This confirms the cache-to-table
 relationship at runtime; the timer-record table entry for index 10 is zero in
 that capture, so the timer field and record cache must remain distinct.
+An isolated-NVRAM run adds persistence evidence: a fresh table was all zero,
+bounded playback changed entry 11 at `0xFF47BA + 4*11` to `136`, and a new
+MAME process read `136` at frame 1 from the same NVRAM directory. This proves
+cross-process persistence of the backing table, while its player-facing record
+label remains unresolved. See
+`reference/experiments/stunrun/m5-course-record-persistence.metadata.json`.
 
 The drive/object cluster is now split: `0xFFDD02` is an object-hit/progression
 counter, while `0xFFDD04/06/08` remain bounded coordinate/object-state

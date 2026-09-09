@@ -32,6 +32,8 @@ def main() -> int:
     parser.add_argument("--nothrottle", action="store_true", help="run MAME as fast as possible while preserving emulated frame numbers")
     parser.add_argument("--save-state", type=pathlib.Path, help="save a MAME state at the final requested frame")
     parser.add_argument("--load-state", type=pathlib.Path, help="load a MAME state before starting the relative frame counter")
+    parser.add_argument("--nvram-directory", type=pathlib.Path,
+                        help="isolated MAME NVRAM directory; enables NVRAM saving")
     parser.add_argument("--playback", type=pathlib.Path,
                         help="replay a recorded .inp instead of scripted inputs")
     parser.add_argument("--mame", default="mame")
@@ -42,6 +44,8 @@ def main() -> int:
     if any(int(value) <= 0 or int(value) > args.frames for value in targets.split(',')):
         parser.error("targets must be positive frames no greater than --frames")
     args.output.mkdir(parents=True, exist_ok=True)
+    if args.nvram_directory:
+        args.nvram_directory.mkdir(parents=True, exist_ok=True)
     log = args.output / "mame.log"
     state_stage = None
     state_directory = "/tmp/stunrun-state-dir"
@@ -64,9 +68,14 @@ def main() -> int:
             parser.error("--playback requires --input none")
     config_args = ["-noreadconfig", "-nowriteconfig",
                    "-cfg_directory", "/tmp/stunrun-mame-cfg", "-nonvram_save"]
+    if args.nvram_directory:
+        config_args += ["-nvram_directory", str(args.nvram_directory)]
+        config_args.remove("-nonvram_save")
     playback_args = []
     if playback is not None:
         config_args = []
+        if args.nvram_directory:
+            config_args = ["-nvram_directory", str(args.nvram_directory)]
         playback_args = ["-input_directory", str(playback.parent),
                          "-playback", playback.name]
     command = [
@@ -147,6 +156,7 @@ def main() -> int:
         "playback": str(playback) if playback else None,
         "save_state": str(args.save_state) if args.save_state else None,
         "load_state": str(args.load_state) if args.load_state else None,
+        "nvram_directory": str(args.nvram_directory) if args.nvram_directory else None,
         "returncode": completed.returncode,
         "snapshots": [{"frame": item["frame"], "sha256": item["sha256"],
                        "nonzero": item["nonzero"]} for item in snapshots],

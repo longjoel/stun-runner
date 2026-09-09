@@ -516,6 +516,12 @@ class PublicToolTests(unittest.TestCase):
         self.assertIn("STUNRUN_MEMORY_STRIDE", tool)
         self.assertIn("offset * address_stride", lua)
 
+    def test_memory_snapshot_exposes_isolated_nvram_directory(self):
+        tool = (ROOT / "tools" / "mame-memory-snapshot").read_text()
+        self.assertIn("--nvram-directory", tool)
+        self.assertIn("-nvram_directory", tool)
+        self.assertIn('"nvram_directory"', tool)
+
     def test_gsp_state_snapshot_can_pair_screen_output(self):
         tool = (ROOT / "tools" / "mame-gsp-state-snapshot").read_text()
         lua = (ROOT / "mame" / "lua" / "gsp-state-snapshot.lua").read_text()
