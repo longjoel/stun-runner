@@ -176,3 +176,14 @@ leaves 2,567 matches, so the result is not explained only by clear/fill
 sentinels. This remains a VRAM reuse observation: the raster path can write
 values that a later indexed reader sees through the mirrored backing, but the
 evidence does not establish that it authored a structured track record.
+
+## Upstream FIFO check
+
+The narrow main-CPU GSP FIFO sink (`0xC0000C–0xC0000D`) was also traced over
+the same relative frames 1790–1800 from the saved-state fork. It produced zero
+writes, without truncation, while the GSP indexed readers and raster writers
+were active. This is a bounded negative result: the late visible-fork records
+are not being submitted through the main-CPU FIFO during this interval. The
+producer must be sought earlier in the saved-state timeline or in GSP-local
+VRAM/work-buffer activity; the result is recorded in
+`reference/experiments/stunrun/m5-main-fifo-1790-negative.metadata.json`.

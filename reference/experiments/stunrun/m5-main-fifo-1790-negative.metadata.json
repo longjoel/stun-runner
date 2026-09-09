@@ -1,0 +1,21 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-main-fifo-1790-negative",
+  "target": "stunrun",
+  "purpose": "Check whether the late visible-fork GSP record activity is still fed by main-CPU FIFO writes.",
+  "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-main-fifo-1790 --device :mainpcb:maincpu --base 0xC0000C --end 0xC0000D --frames 1800 --start-frame 1790 --end-frame 1800 --max-events 100000 --registers --tap-frame 1 --load-state /tmp/stunrun-latedrive2400.sta --input fork_center --nothrottle",
+  "result": {
+    "path": "/tmp/stunrun-m5-main-fifo-1790/result.json",
+    "sha256": "6510b5253ef2e7fe470b16aebdfebab5f733d62c210f40abfa6209bbb304df20",
+    "canonical_log_sha256": "a514df7618dc29e0db12ca963c748afa37d52e526468ea736206a1e5bbc707c6",
+    "event_count": 0,
+    "truncated": false
+  },
+  "start_condition": {
+    "load_state": "/tmp/stunrun-latedrive2400.sta",
+    "input": "fork_center",
+    "frames": "1790–1800",
+    "address_range": "0xC0000C–0xC0000D"
+  },
+  "interpretation": "No main-CPU FIFO writes occur in this late visible-fork interval. This does not prove the records are GSP-local for their whole lifetime; an earlier producer interval remains to be traced."
+}
