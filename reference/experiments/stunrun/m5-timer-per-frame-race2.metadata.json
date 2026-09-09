@@ -1,0 +1,19 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_timer_per_frame_race2",
+  "date": "2026-09-09",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "recording": "/tmp/race2/r2.inp",
+  "recording_sha256": "facdcfa288f2628b8e0a7ca1c874b06240244a3bacb39decbbfa502a38a2de7e",
+  "command": "targets=$(seq -s, 1200 1800); tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-timer-per-frame-race2 --device :mainpcb:maincpu --base 0xFF9530 --count 0x40 --width 8 --frames 1800 --targets \"$targets\" --playback /tmp/race2/r2.inp --nothrottle",
+  "result": "/tmp/stunrun-m5-timer-per-frame-race2/result.json",
+  "result_sha256": "70e653885f05432e6941205d5cb136b530b879454352f4f93bcd07577cfa15f3",
+  "canonical_log_sha256": "07f8815a4ebd04fb5a1258ab0bd7b2ef4e9b3d4a0c42b2dc2f1b1edd6571643c",
+  "capture": {"device": ":mainpcb:maincpu", "base": "0xFF9530", "bytes": 64, "targets": [1200, 1201, "...", 1800], "snapshot_count": 601},
+  "field": {"address": "0xFF9568", "width": 4, "start_value": 13294, "end_value": 10802, "net_delta": -2492},
+  "quantization": {"changed_samples": 178, "unchanged_samples": 422, "delta_values": {"-14": 178, "0": 422}, "average_raw_units_per_frame": 4.160267111853088},
+  "observation": "The canonical settled course-10 path decrements the timer in exact -14 quanta at an irregular approximately three-frame cadence. The aggregate is 178 * 14 = 2492 over 599 frame intervals.",
+  "contrast": "A generic late_drive run did not enter the same settled timer regime until much later; its different cadence is path evidence, not a contradiction.",
+  "confidence": "PER-FRAME-QUANTUM-OBSERVED; DISPLAY-UNIT-UNRESOLVED"
+}

@@ -115,6 +115,12 @@ The timer field is now promoted as the displayed time-remaining mechanism:
 `0x028CA8` combines it with the current course index and formats the result
 through the HUD path, while `0x02907E–0x02910A` performs expiry handling and
 score awards. Its displayed unit is still unresolved.
+On the canonical settled course-10 playback, a per-frame 64-byte capture
+shows an exact `-14` raw-value quantum on 178 samples and no change on 422
+samples from frames 1200 through 1800, for a net `-2492` (average `4.160267`
+raw units per frame). This quantized cadence is stronger than the coarse
+series average; the alternate generic `late_drive` path is kept separate
+because it does not enter the same timer regime at the same frames.
 Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
