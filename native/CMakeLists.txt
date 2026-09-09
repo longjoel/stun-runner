@@ -57,6 +57,7 @@ add_executable(stunrun-native-shell
   shell.c
   fake_ports.c
   game_loop.c
+  road_strip.c
   ../reproduction/maincpu/trajectory_state.c
   ../reproduction/maincpu/geom_upload.c
   ../reproduction/maincpu/road_fifo.c
@@ -71,6 +72,7 @@ add_executable(stunrun-native-shell
   ../reproduction/gsp/text_cursor.c
   ../reproduction/gsp/text_record.c
   ../reproduction/sound/jsa_latch.c)
+target_link_libraries(stunrun-native-shell PRIVATE m)
 target_include_directories(stunrun-native-shell PRIVATE
   . ../reproduction/adsp ../reproduction/maincpu ../reproduction/gsp
   ../reproduction/sound)
@@ -89,6 +91,17 @@ add_test(NAME native-game-loop-c COMMAND stunrun-game-loop-test)
 add_executable(stunrun-render-test render.c render_test.c)
 set_target_properties(stunrun-render-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-render-boundary-c COMMAND stunrun-render-test)
+add_executable(stunrun-road-strip-test road_strip.c render.c road_strip_test.c)
+set_target_properties(stunrun-road-strip-test PROPERTIES C_STANDARD 99)
+target_link_libraries(stunrun-road-strip-test PRIVATE m)
+add_test(NAME native-road-strip-c COMMAND stunrun-road-strip-test)
+find_package(OpenGL QUIET)
+if (OpenGL_FOUND)
+  add_library(stunrun-opengl-backend STATIC opengl_backend.c)
+  target_include_directories(stunrun-opengl-backend PRIVATE .)
+  target_link_libraries(stunrun-opengl-backend PRIVATE OpenGL::GL)
+  set_target_properties(stunrun-opengl-backend PROPERTIES C_STANDARD 99)
+endif()
 add_executable(stunrun-gsp-video-test gsp_video.c render.c gsp_video_test.c)
 set_target_properties(stunrun-gsp-video-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-gsp-video-boundary-c COMMAND stunrun-gsp-video-test)
@@ -186,6 +199,15 @@ target_include_directories(stunrun-trajectory-state-slice-test PRIVATE
   ../reproduction/maincpu)
 set_target_properties(stunrun-trajectory-state-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME trajectory-state-slice-c COMMAND stunrun-trajectory-state-slice-test)
+# Literal motion-field branch order from the 0x03ABDE update path. Caller
+# inputs remain mechanism-level until their producers are traced.
+add_executable(stunrun-motion-update-slice-test
+  ../reproduction/maincpu/motion_update.c
+  ../reproduction/maincpu/motion_update_test.c)
+target_include_directories(stunrun-motion-update-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-motion-update-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME motion-update-slice-c COMMAND stunrun-motion-update-slice-test)
 # Course-table march and twin-buffer fan-out against the traced upload
 # mechanism (384-word +2 march, count-gated dual copy, 0x300 stride).
 add_executable(stunrun-geom-upload-slice-test
