@@ -257,3 +257,11 @@ later or differently scheduled phase. The result is not a semantic payload
 assignment. Its exact command, hashes, counts, and non-truncation status are
 recorded in
 `reference/experiments/stunrun/m5-gsp-recorded-playback-phase.metadata.json`.
+
+The next bounded playback window (frames 1300–1500) locates the beginning of
+the indexed-record phase at frame 1304. The four indexed reader PCs then
+produce 68,261 reads through frame 1499 without read truncation. Its write
+stream reached the configured cap, so it is deliberately not used for
+producer correlation; it only supplies the exact phase boundary for a future
+capture. Provenance is in
+`reference/experiments/stunrun/m5-gsp-recorded-index-phase.metadata.json`.

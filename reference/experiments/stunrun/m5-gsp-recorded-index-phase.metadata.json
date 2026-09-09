@@ -1,0 +1,32 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-recorded-index-phase",
+  "target": "stunrun",
+  "purpose": "Locate the first indexed-record reader activity in the canonical recorded race after the FIFO transfer phase.",
+  "mame": "0.289 (mame0289-dirty)",
+  "input": {
+    "path": "/tmp/race/r1.inp",
+    "sha256": "4d24c52b96e5c199f301dec65b847e44fcf21d5f39dfc8a9476e703883c902f9",
+    "mode": "recorded playback"
+  },
+  "capture": {
+    "tool": "tools/mame-ram-read-write-trace",
+    "path": "/tmp/stunrun-m5-playback-phase-transition-1300-1500/result.json",
+    "result_sha256": "f2fc8335d00878139e491b524207758772dc637b4f5b28897f915ee1fe3bdc6d",
+    "canonical_log_sha256": "002d661d854d94dc4ec9efb37ca1d1c91dc6e8c1838235d4195024f59688017b",
+    "device": ":mainpcb:gsp", "space": "program",
+    "address_range": ["0xFFFA0000", "0xFFFEAFFF"],
+    "frames": [1300, 1500], "tap_frame": 1,
+    "max_events": 200000, "read_max_events": 200000,
+    "registers": true, "order": true,
+    "write_event_count": 200000, "write_truncated": true,
+    "read_event_count": 68261, "read_truncated": false
+  },
+  "observations": {
+    "reader_pcs": ["0xFFF45000", "0xFFF45090", "0xFFF450F0", "0xFFF45110"],
+    "first_indexed_reader_frame": 1304,
+    "last_indexed_reader_frame": 1499,
+    "indexed_reader_frames": 165
+  },
+  "interpretation": "The canonical recorded race begins its indexed-record reader activity at frame 1304 after the earlier FIFO-to-work-buffer phase. Because the write stream is truncated, this capture does not identify a producer or support write/read correlation; it is only a bounded phase locator for a follow-up capture."
+}
