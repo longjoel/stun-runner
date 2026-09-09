@@ -88,6 +88,26 @@ road-progress fields fed by this tick and compare them with road-buffer
 uploads and `0xFF9578` transitions. The physical track-position field remains
 **UNKNOWN**.
 
+## Same-state steering differential
+
+The frame-1200 saved state was forked for 600 relative frames with the center
+and hold-left schedules while tracing `0xFFDAE0–0xFFDD30`. The two traces have
+3,070 and 3,071 events respectively. The trajectory and candidate motion
+addresses `0xFFDCC0`, `0xFFDCC6`, `0xFFDD16`, `0xFFDD18`, `0xFFDD1C`,
+`0xFFDD20`, and `0xFFDD22` are byte-for-byte identical across the forks.
+
+The only differing address in the sampled range is `0xFFDB38`, written by
+`0x02F246`. It first differs at relative frame 352 (`0x00C2` center versus
+`0x00C3` left) and remains offset by approximately one through the final
+sample (`0x04A3` versus `0x04A4`). This makes `0xFFDB38` a useful
+schedule-sensitive road/FIFO timing landmark, but not a proven physical
+position. The unchanged motion window is a negative result for assigning
+steering semantics to those fields at this checkpoint, not evidence that the
+fields are globally inert.
+
+Provenance is in
+`reference/experiments/stunrun/m5-same-state-motion-differential.metadata.json`.
+
 ## Candidate eliminated: `0xFF9EFC`
 
 The strongest remaining monotonic snapshot candidate was checked with a wider

@@ -1,0 +1,48 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-same-state-motion-differential",
+  "purpose": "Same-save-state center/left differential over trajectory and candidate motion RAM",
+  "machine": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_path": "/tmp/stunrun-roms-system",
+  "state": "/tmp/stunrun-latedrive1200.sta",
+  "relative_frames": [1, 600],
+  "address_range": ["0xFFDAE0", "0xFFDD30"],
+  "center": {
+    "input": "fork_center",
+    "result": "/tmp/stunrun-m5-motion1200-center/result.json",
+    "result_sha256": "d22f0e0f6eb461cc010358deabda781ecdc5291c163e6f6909aa68a08ca4847e",
+    "canonical_log_sha256": "a3dab11d2911f02aa713c52f01a0e799f5565d4ea7bc2c7e68c10f61cedf1793",
+    "event_count": 3070
+  },
+  "left": {
+    "input": "fork_hold_left",
+    "result": "/tmp/stunrun-m5-motion1200-left/result.json",
+    "result_sha256": "3131c7a83ac9acefa68485994cbf792ef4082011ba51771158903e718ed494a9",
+    "canonical_log_sha256": "4af0266fad14ef4e3026fcc26ee4554cf44555aa6925ada576ae2f04b09c1f09",
+    "event_count": 3071
+  },
+  "comparison": {
+    "identical_field_addresses": ["0xFFDCC0", "0xFFDCC6", "0xFFDD16", "0xFFDD18", "0xFFDD1C", "0xFFDD20", "0xFFDD22"],
+    "different_field_addresses": ["0xFFDB38"],
+    "different_field_summary": {
+      "address": "0xFFDB38",
+      "writer_pc": "0x02F246",
+      "first_differing_relative_frame": 352,
+      "center_value": "0x00C2",
+      "left_value": "0x00C3",
+      "center_last_value": "0x04A3",
+      "left_last_value": "0x04A4"
+    }
+  },
+  "conclusion": {
+    "supported": [
+      "The selected saved-state fork reaches the same trajectory and candidate motion-field writes under center and left schedules for this 600-frame interval.",
+      "0xFFDB38 is sensitive to the fork schedule in this interval and is written by the established road/FIFO timing PC 0x02F246."
+    ],
+    "unresolved": [
+      "The small 0xFFDB38 offset does not establish a physical track position or gameplay semantic.",
+      "The experiment does not prove that all vehicle motion state lies in the sampled address range."
+    ]
+  }
+}
