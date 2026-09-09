@@ -1,0 +1,32 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-recorded-playback-phase",
+  "target": "stunrun",
+  "purpose": "Check the phase of the canonical recorded race during the established 1280–1300 GSP transfer window.",
+  "mame": "0.289 (mame0289-dirty)",
+  "input": {"path": "/tmp/race/r1.inp", "mode": "recorded playback"},
+  "capture": {
+    "tool": "tools/mame-ram-read-write-trace",
+    "path": "/tmp/stunrun-m5-playback-source-unfiltered/result.json",
+    "result_sha256": "f0888b9357997b5f63f1a0c3bbbbdfa39a62f2a6c3c0317d84cd5d962ceceb05",
+    "canonical_log_sha256": "41406d1caefbb97c65e40fa0a3918c65798a8c92fbad3e6408bf2fcef686afa0",
+    "device": ":mainpcb:gsp", "space": "program",
+    "address_range": ["0xFFFA0000", "0xFFFEAFFF"],
+    "frames": [1280, 1300], "tap_frame": 1,
+    "max_events": 5000, "read_max_events": 50000,
+    "registers": true, "order": true,
+    "write_event_count": 3589, "read_event_count": 5374,
+    "write_truncated": false, "read_truncated": false
+  },
+  "reader_pcs": {
+    "fifo_to_work_buffer": {
+      "pcs": ["0xFFF48D50", "0xFFF48D70", "0xFFF48D90", "0xFFF48DD0", "0xFFF48E20"],
+      "events": 4480
+    },
+    "indexed_record_walk": {
+      "pcs": ["0xFFF45000", "0xFFF45090", "0xFFF450F0", "0xFFF45110"],
+      "events": 0
+    }
+  },
+  "interpretation": "The canonical recorded race is in the FIFO-to-work-buffer phase during frames 1280–1300, not the later indexed-record reader phase. The recorded playback and the scripted late_drive schedule must not be treated as interchangeable at this frame window. This is phase evidence only; it does not assign payload or field semantics."
+}

@@ -240,3 +240,20 @@ record producer. The earlier main-CPU FIFO trace remains the upstream input
 candidate, while the GSP-local queue payload and record conversion remain
 UNKNOWN. Full provenance is in
 `reference/experiments/stunrun/m5-gsp-fifo-source-1280-same-run.metadata.json`.
+
+## Recorded-race phase check
+
+The combined tracer was then run against the canonical recorded input
+`/tmp/race/r1.inp`, rather than the reconstructed `late_drive` schedule. The
+same nominal frame window is not the same renderer phase: frames 1280–1300
+produced 5,374 reads in the high GSP range, with 4,480 reads at the FIFO-to-
+work-buffer PCs `0xFFF48D50–0xFFF48E20`, and zero reads at the indexed-record
+PCs `0xFFF45000`, `0xFFF45090`, `0xFFF450F0`, and `0xFFF45110`.
+
+This explains why a playback capture cannot simply be substituted for the
+earlier scripted correlation. The recorded race is still transferring data
+through the FIFO consumer at this point; the indexed-record walk occurs in a
+later or differently scheduled phase. The result is not a semantic payload
+assignment. Its exact command, hashes, counts, and non-truncation status are
+recorded in
+`reference/experiments/stunrun/m5-gsp-recorded-playback-phase.metadata.json`.
