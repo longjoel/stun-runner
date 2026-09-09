@@ -350,6 +350,44 @@ class PublicToolTests(unittest.TestCase):
             self.assertEqual(comparison["settled_tail_sha256"],
                              "00c560922d5d536424b96f2d92e6cdda6055330024c3bd693e41cb1734a801a8")
 
+    def test_rom_read_sequence_analyzer_collapses_lane_duplicates(self):
+        with tempfile.TemporaryDirectory() as temp:
+            temp = pathlib.Path(temp)
+            trace = temp / "reads.json"
+            output = temp / "analysis.json"
+            trace.write_text(json.dumps({
+                "schema": "stunrun-rom-read-trace-result/v1",
+                "events": [
+                    {"frame": 4, "pc": 0x29760, "address": 0x44630,
+                     "data": 1, "mask": 0xFFFF},
+                    {"frame": 4, "pc": 0x29760, "address": 0x44630,
+                     "data": 1, "mask": 0x00FF},
+                    {"frame": 4, "pc": 0x29760, "address": 0x44632,
+                     "data": 2, "mask": 0xFFFF},
+                    {"frame": 4, "pc": 0x29760, "address": 0x44634,
+                     "data": 3, "mask": 0xFFFF},
+                    {"frame": 5, "pc": 0x29760, "address": 0x44640,
+                     "data": 4, "mask": 0xFFFF},
+                    {"frame": 5, "pc": 0x29760, "address": 0x44644,
+                     "data": 5, "mask": 0xFFFF},
+                ],
+            }), encoding="utf-8")
+            self.run_tool("analyze-rom-read-sequence", trace,
+                          "--output", output)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["schema"],
+                             "stunrun-rom-read-sequence-analysis/v1")
+            self.assertEqual(report["source_event_count"], 6)
+            self.assertEqual(report["non_sequential_group_count"], 1)
+            first = report["groups"][0]
+            self.assertEqual(first["deduplicated_address_count"], 3)
+            self.assertEqual(first["runs"][0], {
+                "start": 0x44630, "end": 0x44634,
+                "count": 3, "step": 2,
+            })
+            second = report["groups"][1]
+            self.assertFalse(second["sequential"])
+
     def test_native_visible_bridge_runner(self):
         with tempfile.TemporaryDirectory() as temp:
             temp = pathlib.Path(temp)

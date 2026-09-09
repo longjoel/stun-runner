@@ -125,6 +125,10 @@ cursor over the copied RAM buffer, nor does it decode the words into curvature,
 elevation, or segment records. The raw result hash and exact command are
 preserved in
 `reference/experiments/stunrun/m5-track-rom-read-sequence.metadata.json`.
+The reduction is repeatable without ROMs through
+`tools/analyze-rom-read-sequence <result.json>`; it reports the per-frame/PC
+source-event count, collapsed address count, contiguous runs, and any
+non-sequential break.
 
 ## The course-transition dispatcher (static evidence)
 

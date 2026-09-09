@@ -31,6 +31,8 @@ SOURCES = [
     str(ROOT / "native" / "gsp_video.c"),
     str(ROOT / "native" / "checkpoint.c"),
     str(ROOT / "native" / "experiment.c"),
+    str(ROOT / "native" / "fake_ports.c"),
+    str(ROOT / "native" / "game_loop.c"),
     str(ADSP / "adsp_init_image.c"),
     str(ADSP / "adsp_control_seq.c"),
     str(ADSP / "adsp_upload_stream.c"),

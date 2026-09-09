@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+"""Reduce a main-CPU ROM-read trace to sequential address runs."""
+
+import argparse
+import json
+import pathlib
+
+
+def runs(addresses):
+    """Return maximal runs after collapsing adjacent duplicate bus events."""
+    unique = []
+    for address in addresses:
+        if not unique or address != unique[-1]:
+            unique.append(address)
+    result = []
+    if not unique:
+        return result
+    start = previous = unique[0]
+    for address in unique[1:]:
+        if address != previous + 2:
+            result.append({"start": start, "end": previous,
+                           "count": ((previous - start) // 2) + 1,
+                           "step": 2})
+            start = address
+        previous = address
+    result.append({"start": start, "end": previous,
+                   "count": ((previous - start) // 2) + 1,
+                   "step": 2})
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("trace", type=pathlib.Path,
+                        help="stunrun-rom-read-trace result JSON")
+    parser.add_argument("--output", type=pathlib.Path)
+    args = parser.parse_args()
+    source = json.loads(args.trace.read_text(encoding="utf-8"))
+    if source.get("schema") != "stunrun-rom-read-trace-result/v1":
+        raise SystemExit(f"{args.trace}: expected a ROM read trace result")
+    events = source.get("events")
+    if not isinstance(events, list):
+        raise SystemExit(f"{args.trace}: missing events list")
+
+    grouped = {}
+    for event in events:
+        required = ("frame", "pc", "address", "data", "mask")
+        if any(key not in event for key in required):
+            raise SystemExit(f"{args.trace}: malformed event")
+        key = (event["frame"], event["pc"])
+        grouped.setdefault(key, []).append(event["address"])
+
+    groups = []
+    for (frame, pc), addresses in sorted(grouped.items()):
+        unique_count = len(list(dict.fromkeys(addresses)))
+        group_runs = runs(addresses)
+        groups.append({
+            "frame": frame,
+            "pc": pc,
+            "source_event_count": len(addresses),
+            "deduplicated_address_count": unique_count,
+            "sequential": len(group_runs) == 1 and group_runs[0]["step"] == 2,
+            "runs": group_runs,
+        })
+
+    result = {
+        "schema": "stunrun-rom-read-sequence-analysis/v1",
+        "trace": str(args.trace),
+        "source_event_count": len(events),
+        "group_count": len(groups),
+        "non_sequential_group_count": sum(
+            1 for group in groups if not group["sequential"]),
+        "groups": groups,
+    }
+    encoded = json.dumps(result, indent=2) + "\n"
+    if args.output:
+        args.output.write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+
+
+if __name__ == "__main__":
+    main()
