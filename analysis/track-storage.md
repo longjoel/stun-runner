@@ -98,6 +98,34 @@ It controls progression/award behavior, but its displayed track-label meaning
 has not been proven. The adjacent input-state fields must not be confused with
 it.
 
+## Live ROM-read sequencing
+
+A bounded replay of `/tmp/race/r1.inp` traced the main-CPU ROM reads around the
+table-copy routines (`0x029760`, `0x02976E`, and `0x0297F4`) while restricting
+addresses to `0x044000–0x046000`. The capture was not truncated: 5,856 bus
+events were recorded from frames 900–4800. MAME reports duplicate lane events
+for some 16-bit reads; after collapsing adjacent duplicates, every observed
+run advances by exactly two bytes with no backward jump or non-sequential
+address.
+
+The first copy pass at frames 1082–1083 reads the contiguous range
+`0x044630–0x04492E` through both copy-loop PCs. The same table is revisited
+after the transition at frames 1324–1325. Runtime update passes at
+1139–1141 and 1298–1300 also march forward from `0x044630`, but only partial
+prefixes are visible because those passes span frame boundaries. Later passes
+at frames 3288–3289 and 3361–3362 read the contiguous `0x044930` slot. These
+observations directly support a 384-word, `+0x2` source march for the table
+loader and show slot reuse during one recorded race.
+
+This is useful negative evidence for the open “one RAM cursor walks a single
+ROM control-point stream” hypothesis: the observed table-loading traffic is
+slot-selected and sequential per load, rather than a single long-lived ROM
+address that advances with every frame. It does **not** rule out an indexed
+cursor over the copied RAM buffer, nor does it decode the words into curvature,
+elevation, or segment records. The raw result hash and exact command are
+preserved in
+`reference/experiments/stunrun/m5-track-rom-read-sequence.metadata.json`.
+
 ## The course-transition dispatcher (static evidence)
 
 The code around `0x024CE4` is the clearest static bridge between progression

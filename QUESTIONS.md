@@ -241,6 +241,22 @@ the bulk march (scroll/animation, not just upload). Cursor hunt CLOSED
 at 1-frame resolution. Still open: course-dependent table selection
 (needs course-3 vs course-6 input schedules, which do not exist yet).
 
+### Investigation update 4 (2026-09-09, extended replay ROM-read capture)
+
+The same conclusion holds over the complete recorded-race window, with the
+lane-duplicate issue handled explicitly. A 5,856-event trace covering frames
+900–4800 and ROM addresses `0x044000–0x046000` found every deduplicated read
+run advancing by exactly `+0x2`; no observed table pass jumps by index or
+walks backward. The copy PCs `0x029760`/`0x02976E` read the contiguous
+`0x044630–0x04492E` slot at frames 1082–1083 and again at 1324–1325. Runtime
+passes at `0x0297F4` read contiguous prefixes from `0x044630` around frames
+1139–1141 and 1298–1300, then later read the `0x044930` slot at 3288–3289
+and 3361–3362. This confirms sequential table loading and slot reuse, but
+does not establish a per-frame cursor over the copied RAM buffer or decode
+the table words. Full command, result hash, and burst ranges are recorded in
+`reference/experiments/stunrun/m5-track-rom-read-sequence.metadata.json` and
+the human-facing storage explanation is in `analysis/track-storage.md`.
+
 ---
 
 ## IRQ-0005

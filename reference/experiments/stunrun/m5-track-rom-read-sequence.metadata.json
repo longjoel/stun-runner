@@ -1,0 +1,128 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-track-rom-read-sequence",
+  "purpose": "Bounded ROM-read sequencing experiment for the track-table progression question",
+  "machine": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_path": "/tmp/stunrun-roms-system",
+  "input_playback": "/tmp/race/r1.inp",
+  "command": "tools/mame-rom-read-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-track-rom-reads --pc-range 0x029700-0x029A20 --address-range 0x044000-0x046000 --frames 4800 --start-frame 900 --end-frame 4800 --max-events 200000 --playback /tmp/race/r1.inp --nothrottle",
+  "capture": {
+    "pc_range": [
+      "0x029700",
+      "0x029A20"
+    ],
+    "address_range": [
+      "0x044000",
+      "0x046000"
+    ],
+    "frames": [
+      900,
+      4800
+    ],
+    "event_count": 5856,
+    "truncated": false,
+    "result_sha256": "c0ad2ca46c39b1c4a43a131f52be5ecc9e59b68a90b391a008d72dae25d8d84d"
+  },
+  "observations": [
+    {
+      "frames": [
+        1082,
+        1083
+      ],
+      "pcs": [
+        "0x029760",
+        "0x02976E"
+      ],
+      "address_range": [
+        "0x044630",
+        "0x04492E"
+      ],
+      "deduplicated_address_step": "0x2",
+      "interpretation": "Two copy loops read the same selected ROM table in ascending order; the trace is split across frames."
+    },
+    {
+      "frames": [
+        1139,
+        1140,
+        1141
+      ],
+      "pc": "0x0297F4",
+      "address_range": [
+        "0x044630",
+        "0x0448CE"
+      ],
+      "deduplicated_address_step": "0x2",
+      "interpretation": "A later runtime pass also marches forward through the selected table rather than using an indexed per-frame cursor."
+    },
+    {
+      "frames": [
+        1298,
+        1299,
+        1300
+      ],
+      "pc": "0x0297F4",
+      "address_range": [
+        "0x044630",
+        "0x0448FE"
+      ],
+      "deduplicated_address_step": "0x2",
+      "interpretation": "The transition/update pass again reads a contiguous prefix from the table."
+    },
+    {
+      "frames": [
+        1324,
+        1325
+      ],
+      "pcs": [
+        "0x029760",
+        "0x02976E"
+      ],
+      "address_range": [
+        "0x044630",
+        "0x04492E"
+      ],
+      "deduplicated_address_step": "0x2",
+      "interpretation": "The copy loops repeat the contiguous 384-word table march after the transition."
+    },
+    {
+      "frames": [
+        3288,
+        3289
+      ],
+      "pc": "0x0297F4",
+      "address_range": [
+        "0x044930",
+        "0x044BCE"
+      ],
+      "deduplicated_address_step": "0x2",
+      "interpretation": "A later progression interval selects the 0x044930 ROM slot and reads it sequentially."
+    },
+    {
+      "frames": [
+        3361,
+        3362
+      ],
+      "pc": "0x0297F4",
+      "address_range": [
+        "0x044930",
+        "0x044BFE"
+      ],
+      "deduplicated_address_step": "0x2",
+      "interpretation": "The same 0x044930 slot is revisited by another contiguous runtime pass."
+    }
+  ],
+  "conclusion": {
+    "status": "partial",
+    "supported": [
+      "Observed table loads are sequential contiguous ROM marches with a 16-bit (0x2-byte) source stride.",
+      "The copy path uses fixed 0x300-byte / 384-word table extents when fully observed.",
+      "The recorded race reuses ROM slots across progression intervals; it does not show a single distance cursor walking one ever-advancing ROM address."
+    ],
+    "unresolved": [
+      "The exact semantic meaning of each table word or record remains unknown.",
+      "This capture does not by itself prove whether a later geometry consumer indexes the copied RAM buffer per scanline or segment.",
+      "The progression-state-to-slot selection remains a finite table lookup, not a decoded track-number formula."
+    ]
+  }
+}
