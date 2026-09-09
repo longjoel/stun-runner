@@ -66,6 +66,15 @@ arguments at `($0A,A6)` and `($0F,A6)` and uses a pointer at `-0x0A(A6)` for
 record flags. Those inputs influence several branches, but their gameplay
 semantics are not established by this listing alone.
 
+Three callers show why the argument must remain mechanism-level. At
+`0x02587C`, the routine receives a zero longword and the byte at `0xFFDD82`;
+at `0x0280FE`, it receives a byte selected from ROM-side table `0x04EECC`
+using `0xFFDE72`, plus `0xFFDD82`; and at `0x02853A`, it receives literal
+`0x38` plus a byte from a caller-owned record. Thus the same update routine is
+shared by initialization/event paths with different inputs. The listing
+supports tracing these arguments, but does not support treating the second
+argument as the analog stick or the first as a universal speed limit.
+
 The listing also resolves the apparent `0xFFDB38` steering differential:
 `0x02F246` executes `move.l $FFFF8014, $FFDB36`, so `0xFFDB38` is the low
 half of a copied global tick in this path. Its one-unit fork difference is
