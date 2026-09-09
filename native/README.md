@@ -184,3 +184,9 @@ The shell then reports `mode=road-strip-fixture`. The verified original-data
 boundary remains separate: a supplied geometry table still flows through the
 native game loop's 384-word dual-buffer upload and 192-word fake GSP FIFO
 submission before any future projection decoder is attached.
+
+When GLFW and OpenGL development libraries are available, CMake also builds
+`stunrun-opengl-demo`. It opens a 512×240 window, advances the same fixed-step
+native loop, and submits the strip through the OpenGL backend. Set
+`STUNRUN_OPENGL_FRAMES=N` for a bounded demo run; omit it for an interactive
+window.

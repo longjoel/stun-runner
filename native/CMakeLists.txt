@@ -102,6 +102,27 @@ if (OpenGL_FOUND)
   target_link_libraries(stunrun-opengl-backend PRIVATE OpenGL::GL)
   set_target_properties(stunrun-opengl-backend PROPERTIES C_STANDARD 99)
 endif()
+find_package(PkgConfig QUIET)
+if (OpenGL_FOUND AND PkgConfig_FOUND)
+  pkg_check_modules(GLFW3 QUIET glfw3)
+  if (GLFW3_FOUND)
+    add_executable(stunrun-opengl-demo
+      opengl_demo.c
+      fake_ports.c
+      game_loop.c
+      road_strip.c
+      render.c
+      ../reproduction/maincpu/trajectory_state.c
+      ../reproduction/maincpu/geom_upload.c
+      ../reproduction/maincpu/road_fifo.c)
+    target_include_directories(stunrun-opengl-demo PRIVATE .
+      ../reproduction/maincpu ${GLFW3_INCLUDE_DIRS})
+    target_compile_options(stunrun-opengl-demo PRIVATE ${GLFW3_CFLAGS_OTHER})
+    target_link_libraries(stunrun-opengl-demo PRIVATE
+      stunrun-opengl-backend ${GLFW3_LIBRARIES} OpenGL::GL m)
+    set_target_properties(stunrun-opengl-demo PROPERTIES C_STANDARD 99)
+  endif()
+endif()
 add_executable(stunrun-gsp-video-test gsp_video.c render.c gsp_video_test.c)
 set_target_properties(stunrun-gsp-video-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-gsp-video-boundary-c COMMAND stunrun-gsp-video-test)
