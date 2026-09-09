@@ -137,6 +137,18 @@ the main-CPU snapshot exposes MAME address lanes, the CPU listing is the
 authority for this longword interpretation. See
 `reference/experiments/stunrun/m5-timer-rom-seed.metadata.json`.
 
+The reload mechanism is now resolved. Routine `0x03B220` reads the word at
+`0xFF9578`, scales it by four, and loads the corresponding longword from ROM
+table `0x04EDE6` into `0xFF9568`; it then uses the same index to load adjacent
+course-dependent fields into `0xFF956C`, `0xFF9570`, `0xFF9574`, and
+`0xFF9576` from mapped tables at `0xFF47BA`, `0xFF4832`, `0xFF486E`, and
+`0xFF48AA`. Call sites at `0x027160`, `0x027742`, `0x02797E`, `0x027FA4`,
+and `0x02B74E` establish this as a level-entry/re-entry initializer rather
+than a normal per-frame decrement. The all-writer trace observed reload values
+`13420`, `11224`, and `15128` at `0x03B236`, while the ordinary gameplay writer
+at `0x02688E` continues to subtract `14`. Full provenance is in
+`reference/experiments/stunrun/m5-timer-all-writers.metadata.json`.
+
 The longer `race2` snapshot series adds a bounded timing shape. At settled
 course landmarks, the raw longword at `0xFF9568` declines from `13294` to
 `1492` during course 10, from `10426` to `1214` during course 11, and from

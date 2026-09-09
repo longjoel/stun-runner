@@ -1,0 +1,76 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_timer_all_writers_race2",
+  "date": "2026-09-09",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "recording": "/tmp/race2/r2.inp",
+  "recording_sha256": "facdcfa288f2628b8e0a7ca1c874b06240244a3bacb39decbbfa502a38a2de7e",
+  "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-timer-all-writers --device :mainpcb:maincpu --base 0xFF9568 --end 0xFF956B --frames 13200 --start-frame 600 --end-frame 13200 --tap-frame 1 --max-events 50000 --playback /tmp/race2/r2.inp --nothrottle",
+  "result": "/tmp/stunrun-m5-timer-all-writers/result.json",
+  "result_sha256": "dd0f959899107755c6efe31b3afc38864da9dd79621c4418ddbe0786962f9627",
+  "canonical_log_sha256": "c2ae1bd435fb4bb476e15ba5fd4b8e7a6df68168f4a0e6488bf1c73d6badabb4",
+  "capture": {
+    "device": ":mainpcb:maincpu",
+    "range": "0xFF9568-0xFF956B",
+    "frames": [600, 13200],
+    "tap_frame": 1,
+    "event_count": 6014
+  },
+  "writer_pcs": [
+    {
+      "pc": "0x02688E",
+      "events": 5756,
+      "frames": [1174, 12860],
+      "mechanism": "move.l (D0),0xFF9568 after subtracting 0xE",
+      "classification": "NORMAL_TIMER_DECREMENT"
+    },
+    {
+      "pc": "0x0268DC",
+      "events": 4,
+      "frames": [4548, 12702],
+      "values": [0],
+      "classification": "CLEAR_OR_RESET_PATH"
+    },
+    {
+      "pc": "0x0290E4",
+      "events": 6,
+      "frames": [8135, 8142],
+      "values": [6, 54, 102],
+      "mechanism": "sub.l D0,0xFF9568 during expiry/scoring path",
+      "classification": "EXPIRY_THRESHOLD_PATH"
+    },
+    {
+      "pc": "0x029110",
+      "events": 2,
+      "frames": [8145, 8145],
+      "values": [0],
+      "classification": "EXPIRY_CLEAR"
+    },
+    {
+      "pc": "0x029132",
+      "events": 232,
+      "frames": [4589, 8314],
+      "values": [0],
+      "classification": "EXPIRY_CLEAR"
+    },
+    {
+      "pc": "0x03B236",
+      "events": 14,
+      "frames": [949, 8784],
+      "values": [11224, 13420, 15128],
+      "mechanism": "move.l (0x04EDE6 + 4 * word[0xFF9578]),0xFF9568",
+      "classification": "LEVEL_ENTRY_RELOAD"
+    }
+  ],
+  "static_resolution": {
+    "routine": "0x03B220",
+    "index": "word[0xFF9578]",
+    "timer_table": "0x04EDE6",
+    "adjacent_tables": ["0xFF47BA", "0xFF4832", "0xFF486E", "0xFF48AA"],
+    "call_sites": ["0x027160", "0x027742", "0x02797E", "0x027FA4", "0x02B74E"]
+  },
+  "observation": "The complete bounded writer trace separates normal -0xE timer quanta, expiry/scoring decrements and clears, and indexed level-entry reloads. The reload routine shares the 0xFF9578 index with the neighboring course-dependent state fields.",
+  "semantic_status": "TIMER_WRITERS_AND_INDEXED_RELOAD_CONFIRMED; DISPLAY_UNIT_UNRESOLVED; 0xFF9578 COURSE-INDEX ROLE STRONGLY SUPPORTED BUT NOT FULLY SEMANTICALLY PROVEN"
+}
