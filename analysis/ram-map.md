@@ -200,6 +200,11 @@ companion values such as `0x0096`, `0x000A`, and `0x000B`. This establishes a
 per-course record/comparison mechanism, but not whether the backing ZRAM table
 is battery-persistent or merely rebuilt at boot. See
 `reference/experiments/stunrun/m5-course-record-fields.metadata.json`.
+An aligned direct ZRAM read at frame 1115 shows table-10 values `13` and `15`
+at `0xFF486E + 2*10` and `0xFF48AA + 2*10`, matching the live cache fields
+`0xFF9574` and `0xFF9576` for index 10. This confirms the cache-to-table
+relationship at runtime; the timer-record table entry for index 10 is zero in
+that capture, so the timer field and record cache must remain distinct.
 
 The drive/object cluster is now split: `0xFFDD02` is an object-hit/progression
 counter, while `0xFFDD04/06/08` remain bounded coordinate/object-state

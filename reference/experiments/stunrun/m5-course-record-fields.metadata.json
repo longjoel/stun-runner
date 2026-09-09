@@ -19,11 +19,20 @@
     "record_3": {"base": "0xFF48AA", "stride": 2, "destination": "0xFF9576", "compared_against": "0xFFDD02"}
   },
   "comparison_mechanism": "0x02BC2A updates each cached field and its indexed table entry when the current value is greater than or equal to the cached value; otherwise it leaves that field unchanged.",
+  "direct_zram_table_capture": {
+    "frame": 1115,
+    "recording": "/tmp/race2/r2.inp",
+    "note": "The four table ranges were sampled separately with aligned 16/32-bit reads because the ZRAM device exposes paired byte lanes.",
+    "timer_record": {"base": "0xFF47BA", "width": 32, "stride": 4, "values_0_to_12": [882, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 0], "snapshot_sha256": "4067e5dfa7f554c7bca3251b24b8c687e3bf7c0026d3be05b6784d8c6e94210b", "result_sha256": "9b1e2db3bab33bc68cacdfe8325924ff6cf22773db14c4c75dfaf32fb9007c48"},
+    "record_1": {"base": "0xFF4832", "width": 16, "stride": 2, "values_0_to_12": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "snapshot_sha256": "7f133e816045f449a0a19d92a77f79eda4b44ee084ebebdc65b3bf04c34f88f3", "result_sha256": "3cc0e8ffe35509b50c66da44e82fc6c40c9b572dba3d06177212396d29ffb07c"},
+    "record_2": {"base": "0xFF486E", "width": 16, "stride": 2, "values_0_to_12": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 10, 0], "snapshot_sha256": "9c2bcab5f8de41cb74084c4f06a70efdf905d378e1d0d09340c587b29b693c09", "result_sha256": "737e934beecb4a39bd4302daa783ca6854d70a3df8956a625e0103565f7861bc"},
+    "record_3": {"base": "0xFF48AA", "width": 16, "stride": 2, "values_0_to_12": [36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 11, 0], "snapshot_sha256": "8c373f58bb2555c3d07324a1d7864484010ef687d96ac84b8d5d5aa7bb9e706a", "result_sha256": "cccc1b3f3e4db0bfc02e31740bfc1b3ef5ae5f3d41d5302c79d63a8ff4db5ec6"}
+  },
   "targeted_snapshots": [
     {"frame": 1115, "index_word": 10, "timer": 13420, "timer_record_cache": 0, "record_1_cache": 0, "record_2_cache": 13, "record_3_cache": 15, "snapshot_sha256": "18f3ab239ac622d6075db0d2785cbcedbcc4698e24ce36b08ff5fec723aa6cb8"},
     {"frame": 5199, "index_word": 11, "timer": 11224, "timer_record_cache": 150, "record_1_cache": 0, "record_2_cache": 10, "record_3_cache": 11, "snapshot_sha256": "07bd12764f40af418334c874d83b936b02699e8b3f99418721713a9f0a683c80"},
     {"frame": 8784, "index_word": 12, "timer": 15128, "timer_record_cache": 150, "record_1_cache": 0, "record_2_cache": 0, "record_3_cache": 0, "snapshot_sha256": "39ee237f7dcfe0ba30ca56c74e19628ec08e87ef6e97d8402cc288bb20949479"}
   ],
-  "interpretation": "These are per-course record/comparison fields, not identified craft health, armor, weapons, or ammunition. The table addresses lie in the mapped ZRAM view; backing persistence has not been established.",
+  "interpretation": "These are per-course record/comparison fields, not identified craft health, armor, weapons, or ammunition. At index 10, the direct ZRAM table values 13 and 15 match the transition cache fields 0xFF9574 and 0xFF9576. The table addresses lie in the mapped ZRAM view; backing persistence has not been established.",
   "confidence": "STATIC-MECHANISM-CONFIRMED; TRANSITION-SNAPSHOT-SUPPORTED; PERSISTENCE-UNRESOLVED"
 }
