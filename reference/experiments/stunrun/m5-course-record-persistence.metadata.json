@@ -13,6 +13,20 @@
     "address_stride": 4,
     "meaning": "timer-record table as indexed by routine 0x02BC2A"
   },
+  "nvram_lane_files": {
+    "before_directory": "/tmp/stunrun-m5-nvram-lanes-*.before",
+    "after_directory": "/tmp/stunrun-m5-nvram-lanes/stunrun",
+    "before_sha256": {
+      "mainpcb_200e": "069d6eb051d6d633b5794d0831c3f2d9c21bf53c57e761f7a7a59a6abb1b0ce5",
+      "mainpcb_210e": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "after_sha256": {
+      "mainpcb_200e": "f3641886e8b1bb08103deaaa925efa7c48a90e2ab96147838b8f37dbe782ac3f",
+      "mainpcb_210e": "eb1f4518452b954f410625257f4a9d9e8afc51fb886525dc019fcf531e8e1d50"
+    },
+    "changed_byte_counts": {"mainpcb_200e": 163, "mainpcb_210e": 192},
+    "interpretation": "Both physical lanes changed during the long run, but the changes include broad NVRAM/default initialization; these file diffs are not used to attribute the specific table entry to one lane."
+  },
   "phases": [
     {
       "phase": "fresh_baseline",
