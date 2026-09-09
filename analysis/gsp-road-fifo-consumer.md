@@ -265,3 +265,19 @@ stream reached the configured cap, so it is deliberately not used for
 producer correlation; it only supplies the exact phase boundary for a future
 capture. Provenance is in
 `reference/experiments/stunrun/m5-gsp-recorded-index-phase.metadata.json`.
+
+Using that phase locator, a complete same-run capture over frames 1300–1320
+was focused on the four indexed reader PCs. The first indexed reads occur at
+frame 1304 and continue through frame 1319: 7,293 reads touch 3,919 unique
+source addresses, all of which also receive writes in the same invocation.
+There are 282 same-frame address overlaps but zero same-order overlaps; 6,879
+nearest writes precede a read and 414 follow it. The nearest-writer ranking is
+led by `0xFFF41060` (1,882), `0xFFF454E0` (1,486), `0xFFF41650` (837),
+`0xFFF414C0` (821), and `0xFFF41680` (356).
+
+This closes a stronger producer-boundary candidate set for the canonical
+recorded race, while preserving the important limitation: the writers mix
+queue dispatch and raster/display routines, and the event ordering does not
+identify a single record constructor. No track, road, object, HUD, craft,
+weapon, or armor field is assigned. Full provenance is in
+`reference/experiments/stunrun/m5-gsp-recorded-index-correlation.metadata.json`.
