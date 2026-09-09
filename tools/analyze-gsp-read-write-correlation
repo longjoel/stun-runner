@@ -89,9 +89,9 @@ def main() -> int:
         nearest_deltas[nearest] += 1
         if nearest == 0:
             same_frame += 1
-        write_orders = [write_event.get("order") for write_event in selected_writes
-                        if write_event["address"] == event["address"] and
-                        isinstance(write_event.get("order"), int)]
+        write_orders = [write_event.get("order") for write_event in
+                        write_events_by_address[event["address"]]
+                        if isinstance(write_event.get("order"), int)]
         if isinstance(event.get("order"), int) and write_orders:
             ordered_writes = write_events_by_address[event["address"]]
             nearest_write = min(
