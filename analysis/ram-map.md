@@ -128,6 +128,15 @@ halfword writes (178 longword updates) from PC `0x02688E` in the same window.
 Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
+The reset seed is pinned separately: listing address `0x024372` executes
+`move.l $4EDE6.l,$FF9568.l`, and the first decoded ROM longword is `0x215C`
+(`8540`), matching the early RAM value. Neighboring decoded words
+(`0x2B5E`, `0x32FE`, `0x3A9E`, `0x3C86`, `0x3B18`) are retained as ROM-data
+candidates only; the table-selection mechanism remains unresolved. Because
+the main-CPU snapshot exposes MAME address lanes, the CPU listing is the
+authority for this longword interpretation. See
+`reference/experiments/stunrun/m5-timer-rom-seed.metadata.json`.
+
 The longer `race2` snapshot series adds a bounded timing shape. At settled
 course landmarks, the raw longword at `0xFF9568` declines from `13294` to
 `1492` during course 10, from `10426` to `1214` during course 11, and from

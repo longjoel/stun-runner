@@ -1,0 +1,14 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_timer_rom_seed",
+  "date": "2026-09-09",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "listing": {"path": "/tmp/stunrun-listing-timer/maincpu-68010.lst", "sha256": "171e56ccf1a9940635a2e8e9929ab7edaa5841ac3238ef78acf0d6630f8e45e7", "instruction": "0x024372: move.l $4EDE6.l, $FF9568.l"},
+  "rom_capture": {"command": "tools/mame-memory-snapshot /tmp/stunrun-roms-system /tmp/stunrun-m5-timer-rom --device :mainpcb:maincpu --space program --base 0x4EDE0 --count 0x20 --width 8 --frames 1 --targets 1 --nothrottle", "result": "/tmp/stunrun-m5-timer-rom/result.json", "result_sha256": "b1b410696323fdaf6b0d4178652a8e9376dae5582f24749863a36495abf53914", "snapshot_sha256": "43eaeb3be603e79ffd8482a6781534d64f467835db850a487a3286432d6c85b5", "canonical_log_sha256": "947a7277cf5ad266d5b2abe102eeb4a55990aad256ae05499736488333153dc8"},
+  "seed": {"rom_address": "0x04EDE6", "decoded_longword": "0x0000215C", "decimal": 8540, "ram_address": "0xFF9568"},
+  "neighboring_decoded_words": ["0x215C", "0x2B5E", "0x32FE", "0x3A9E", "0x3C86", "0x3B18"],
+  "interpretation": "The reset routine seeds the confirmed time-remaining mechanism from ROM. The neighboring values are recorded as ROM data candidates only; their selection/use has not been promoted. Raw 8-bit snapshot lanes show MAME's address-unit behavior and must not be read as an ordinary flat longword without the CPU listing.",
+  "confidence": "STATIC-AND-RUNTIME-SEED-MATCH; TABLE-SELECTION-UNRESOLVED"
+}
