@@ -674,9 +674,9 @@ static int run_walk(void)
             printf("shell: road-strip fixture excludes other render inputs\n");
             g_failures++;
         } else if (has_road_strip) {
-            stunrun_road_strip_t strip;
-            stunrun_road_strip_fixture(&strip);
-            if (!stunrun_render_road_strip(&renderer, &strip)) {
+            stunrun_road_frame_t road_frame;
+            stunrun_road_frame_fixture(&road_frame);
+            if (!stunrun_render_road_frame(&renderer, &road_frame)) {
                 printf("shell: road-strip fixture=error\n");
                 g_failures++;
             } else {
