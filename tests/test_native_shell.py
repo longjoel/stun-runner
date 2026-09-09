@@ -31,8 +31,6 @@ SOURCES = [
     str(ROOT / "native" / "gsp_video.c"),
     str(ROOT / "native" / "checkpoint.c"),
     str(ROOT / "native" / "experiment.c"),
-    str(ROOT / "native" / "fake_ports.c"),
-    str(ROOT / "native" / "game_loop.c"),
     str(ADSP / "adsp_init_image.c"),
     str(ADSP / "adsp_control_seq.c"),
     str(ADSP / "adsp_upload_stream.c"),
@@ -43,6 +41,14 @@ SOURCES = [
     str(ROOT / "reproduction" / "gsp" / "text_record.c"),
     str(SOUND / "jsa_latch.c"),
 ]
+
+# The game-loop sources are an in-progress native-shell extension. Include
+# them when present so this test covers that working tree, while keeping the
+# public test runnable from a clean checkout at the earlier shell boundary.
+for optional_source in (ROOT / "native" / "fake_ports.c",
+                        ROOT / "native" / "game_loop.c"):
+    if optional_source.is_file():
+        SOURCES.append(str(optional_source))
 
 
 class NativeShellTests(unittest.TestCase):
