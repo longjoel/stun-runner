@@ -71,6 +71,36 @@
     "adjacent_tables": ["0xFF47BA", "0xFF4832", "0xFF486E", "0xFF48AA"],
     "call_sites": ["0x027160", "0x027742", "0x02797E", "0x027FA4", "0x02B74E"]
   },
+  "settled_index_correlation": [
+    {
+      "snapshot": "/tmp/race2/snapshot-1200.json",
+      "snapshot_sha256": "23076994535b4752651619860ca131b5578ef678d7d36b35c00622378ef2fab3",
+      "frame": 1200,
+      "index_address": "0xFF9578",
+      "index_word": 10,
+      "timer_word": 13294,
+      "reload_value_observed_at_0x03B236": 13420
+    },
+    {
+      "snapshot": "/tmp/race2/snapshot-5400.json",
+      "snapshot_sha256": "c5cfc77b5ac6e4e7ce7135d1f64c4fec4f4b45f30c4ed3a92c9df588fb72280f",
+      "frame": 5400,
+      "index_address": "0xFF9578",
+      "index_word": 11,
+      "timer_word": 10426,
+      "reload_value_observed_at_0x03B236": 11224
+    },
+    {
+      "snapshot": "/tmp/race2/snapshot-9000.json",
+      "snapshot_sha256": "819dc00c7b6b11a28945c21054ac4b2b3772b0db108e8535f26869b0e4b4749d",
+      "frame": 9000,
+      "index_address": "0xFF9578",
+      "index_word": 12,
+      "timer_word": 14246,
+      "reload_value_observed_at_0x03B236": 15128
+    }
+  ],
+  "save_state_fork_note": "Forks from settled states preserve the later indices. The frame-600 fork remains at index 0 because it predates the first course initialization and has no future input recording; therefore the index-to-reload mapping is correlated across settled snapshots and the writer trace, not claimed as same-frame direct capture.",
   "observation": "The complete bounded writer trace separates normal -0xE timer quanta, expiry/scoring decrements and clears, and indexed level-entry reloads. The reload routine shares the 0xFF9578 index with the neighboring course-dependent state fields.",
   "semantic_status": "TIMER_WRITERS_AND_INDEXED_RELOAD_CONFIRMED; DISPLAY_UNIT_UNRESOLVED; 0xFF9578 COURSE-INDEX ROLE STRONGLY SUPPORTED BUT NOT FULLY SEMANTICALLY PROVEN"
 }
