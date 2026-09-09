@@ -486,6 +486,13 @@ any individual coordinate/width/curvature field. The complete command,
 result hash, and frame-by-frame classification are in
 `reference/experiments/stunrun/m5-track-table-snapshot-sweep.metadata.json`.
 
+For human inspection, `tools/track-visualizer/index.html` is an offline,
+single-file viewer for one or more `stunrun-memory-snapshot/v1` captures. Drop
+in snapshots containing `0xFF9584–0xFF9B83` to scrub the base/twin windows,
+compare adjacent frames, and inspect individual byte lanes. Its readout labels
+the course and score addresses as candidates/observations rather than
+asserting semantics.
+
 ## What is still unknown
 
 - Which word or bit fields describe lateral position, height, width, or

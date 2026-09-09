@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>STUN Runner track buffer visualizer</title>
+<style>
+  body { background: #111417; color: #d7dce0; font-family: monospace; margin: 16px; }
+  h1 { font-size: 16px; margin: 0 0 4px 0; color: #e8ecf0; }
+  .sub { font-size: 12px; color: #9aa3ab; margin-bottom: 12px; }
+  .row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .panel { background: #181d22; border: 1px solid #2a3138; padding: 10px; margin-bottom: 12px; }
+  .panel h2 { font-size: 13px; margin: 0 0 8px 0; color: #e8ecf0; }
+  canvas { display: block; background: #0a0c0e; cursor: crosshair; }
+  #readout, #inspector { font-size: 12px; white-space: pre; }
+  #filelist { font-size: 12px; max-height: 120px; overflow-y: auto; }
+  input[type=range] { width: 600px; }
+  button { font-family: monospace; background: #242c33; color: #d7dce0; border: 1px solid #3a444d; padding: 4px 10px; }
+  .warn { color: #d8a93f; }
+</style>
+</head>
+<body>
+<h1>STUN Runner track buffer visualizer</h1>
+<div class="sub">Offline single file. Drop in <b>stunrun-memory-snapshot/v1</b> JSON files (local only, nothing is uploaded).
+Buffers and addresses below are OBSERVED-IN-TRACE only; no field semantics are claimed.</div>
+
+<div class="panel">
+  <h2>1. Snapshots</h2>
+  <input type="file" id="files" accept=".json,application/json" multiple>
+  <div id="filelist">no files loaded</div>
+</div>
+
+<div class="panel">
+  <h2>2. Frame scrubber</h2>
+  <div class="row">
+    <button id="play">play</button>
+    <input type="range" id="scrub" min="0" max="0" value="0" step="1">
+    <span id="framelabel">frame -</span>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>3. Twin buffers: byte value as bar height, heat strip below, diff strip at bottom</h2>
+  <canvas id="view" width="768" height="340"></canvas>
+  <div id="inspector">hover or click the canvas to inspect a byte index</div>
+</div>
+
+<div class="panel">
+  <h2>4. Readout (words are big-endian 68000 order)</h2>
+  <div id="readout">no frame selected</div>
+</div>
+
+<script>
+"use strict";
+/* Track buffer visualizer for S.T.U.N. Runner MAME memory snapshots.
+ * Provenance: OBSERVED-IN-TRACE Twin Upload Model + award-path slice header.
+ * Draws the 768-byte windows at 0xFF9584 (base) and 0xFF9884 (twin) as
+ * waveforms so buffer alternation, animation ramps, and per-frame deltas
+ * are visible without claiming any field semantics.
+ */
+
+var StunVis = (function () {
+  var BASE_ADDR = 0xFF9584;      /* OBSERVED twin base window */
+  var TWIN_ADDR = 0xFF9884;      /* OBSERVED twin copy window (base + 0x300) */
+  var WIN_LEN = 768;             /* 0x300 bytes */
+  var SCORE_ADDR = 0xFF9578;     /* STUNRUN_SCORE_ADDR, award-path slice */
+  var COURSE_ADDR = 0xFF9532;    /* UNVERIFIED: seen as course word in traces, not sliced */
+
+  var frames = [];   /* {name, frame, input, base, values} sorted by frame */
+  var current = -1;
+  var playing = false;
+  var lastTick = 0;
+
+  function parseSnapshot(obj, name) {
+    if (!obj || obj.schema !== "stunrun-memory-snapshot/v1") return null;
+    if (!Array.isArray(obj.values) || typeof obj.base !== "number") return null;
+    return { name: name || "", frame: obj.frame | 0, input: obj.input || "",
+             base: obj.base | 0, values: obj.values };
+  }
+
+  function byteAt(fr, addr) {
+    var off = (addr - fr.base) | 0;
+    if (off < 0 || off >= fr.values.length) return -1;
+    return fr.values[off] & 0xFF;
+  }
+
+  function wordAt(fr, addr) {
+    var hi = byteAt(fr, addr), lo = byteAt(fr, addr + 1);
+    if (hi < 0 || lo < 0) return -1;
+    return ((hi << 8) | lo) & 0xFFFF;
+  }
+
+  function windowAt(fr, addr) {
+    var off = (addr - fr.base) | 0;
+    if (off < 0 || off + WIN_LEN > fr.values.length) return null;
+    return fr.values.slice(off, off + WIN_LEN);
+  }
+
+  function heat(v) {
+    /* dark -> amber ramp, no purple/blue heroics */
+    var r = (40 + v) | 0, g = (20 + (v * 0.55)) | 0, b = (10 + (v * 0.15)) | 0;
+    if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+
+  function drawWave(ctx, data, x0, y0, w, h, diff) {
+    var n = data.length, i, v, bh;
+    for (i = 0; i < n; i++) {
+      v = data[i] & 0xFF;
+      bh = Math.round((v / 255) * h);
+      ctx.fillStyle = diff ? (v ? "#c8572e" : "#1c2126") : "#7d8b96";
+      ctx.fillRect(x0 + i, y0 + h - bh, 1, bh);
+    }
+  }
+
+  function drawHeat(ctx, data, x0, y0, w, h) {
+    var n = data.length, i;
+    for (i = 0; i < n; i++) ctx.fillStyle = heat(data[i] & 0xFF),
+      ctx.fillRect(x0 + i, y0, 1, h);
+  }
+
+  /* Layout inside the 768x340 canvas: two waveform+heat blocks then a diff strip. */
+  function renderFrame(ctx, fr, prev) {
+    var base = windowAt(fr, BASE_ADDR), twin = windowAt(fr, TWIN_ADDR);
+    if (!base || !twin) return false;
+    var i, diff = new Array(WIN_LEN), delta = new Array(WIN_LEN), pb = null;
+    for (i = 0; i < WIN_LEN; i++) diff[i] = Math.abs(base[i] - twin[i]) & 0xFF;
+    if (prev) pb = windowAt(prev, BASE_ADDR);
+    for (i = 0; i < WIN_LEN; i++)
+      delta[i] = pb ? (Math.abs(base[i] - pb[i]) & 0xFF) : 0;
+    ctx.clearRect(0, 0, 768, 340);
+    ctx.fillStyle = "#c8cfd6";
+    ctx.fillText("base 0xFF9584 frame " + fr.frame, 4, 10);
+    drawWave(ctx, base, 0, 14, 768, 100, false);
+    drawHeat(ctx, base, 0, 116, 768, 14);
+    ctx.fillText("twin 0xFF9884 (base+0x300)", 4, 142);
+    drawWave(ctx, twin, 0, 146, 768, 100, false);
+    drawHeat(ctx, twin, 0, 248, 768, 14);
+    ctx.fillText("base^twin diff (red = differ)", 4, 274);
+    drawWave(ctx, diff, 0, 278, 768, 24, true);
+    ctx.fillText("base delta vs prev frame", 400, 274);
+    drawWave(ctx, delta, 0, 302, 768, 24, true);
+    return true;
+  }
+
+  function fmtWord(w) { return w < 0 ? "out-of-range" : ("0x" + ("000" + w.toString(16)).slice(-4) + " (" + w + ")"); }
+
+  function readoutText(fr) {
+    var base = windowAt(fr, BASE_ADDR), twin = windowAt(fr, TWIN_ADDR), i, ndiff = -1;
+    if (base && twin) { ndiff = 0; for (i = 0; i < WIN_LEN; i++) if (base[i] !== twin[i]) ndiff++; }
+    return "file: " + fr.name + "  frame: " + fr.frame + "  input: " + fr.input + "\n" +
+      "score? [0xFF9578]  = " + fmtWord(wordAt(fr, SCORE_ADDR)) + "\n" +
+      "course? [0xFF9532] = " + fmtWord(wordAt(fr, COURSE_ADDR)) + "  UNVERIFIED\n" +
+      "base[0..7]  = " + (base ? base.slice(0, 8).join(" ") : "out-of-range") + "\n" +
+      "twin[0..7]  = " + (twin ? twin.slice(0, 8).join(" ") : "out-of-range") + "\n" +
+      "bytes differing base vs twin: " + (ndiff < 0 ? "out-of-range" : ndiff + " / 768");
+  }
+
+  function inspectText(fr, idx) {
+    if (!fr || idx < 0 || idx >= WIN_LEN) return "index out of range (0..767)";
+    var b = byteAt(fr, BASE_ADDR + idx), t = byteAt(fr, TWIN_ADDR + idx);
+    var s = "index " + idx + " (0x" + idx.toString(16) + "): base=" + b + " twin=" + t;
+    if (b >= 0 && t >= 0 && b !== t) s += "  DIFFER";
+    return s;
+  }
+
+  function setFrames(list) {
+    frames = list.slice().sort(function (a, b) { return a.frame - b.frame; });
+    current = frames.length ? 0 : -1;
+  }
+
+  function drawCurrent(ctx) {
+    if (current < 0 || current >= frames.length) return false;
+    var prev = current > 0 ? frames[current - 1] : null;
+    return renderFrame(ctx, frames[current], prev);
+  }
+
+  function step(dir) {
+    if (!frames.length) return -1;
+    current = (current + dir + frames.length) % frames.length;
+    return current;
+  }
+
+  function api() {
+    return { parseSnapshot: parseSnapshot, byteAt: byteAt, wordAt: wordAt,
+             windowAt: windowAt, renderFrame: renderFrame, readoutText: readoutText,
+             inspectText: inspectText, setFrames: setFrames, drawCurrent: drawCurrent,
+             step: step, BASE_ADDR: BASE_ADDR, TWIN_ADDR: TWIN_ADDR, WIN_LEN: WIN_LEN,
+             frames: function () { return frames; }, current: function () { return current; } };
+  }
+
+  function init(doc, raf) {
+    var canvas = doc.getElementById("view"), ctx = canvas.getContext("2d");
+    var scrub = doc.getElementById("scrub"), flabel = doc.getElementById("framelabel");
+    var readout = doc.getElementById("readout"), insp = doc.getElementById("inspector");
+    var filelist = doc.getElementById("filelist"), playBtn = doc.getElementById("play");
+
+    function refresh() {
+      if (current < 0) return;
+      drawCurrent(ctx);
+      readout.textContent = readoutText(frames[current]);
+      flabel.textContent = "frame " + frames[current].frame + " (" + (current + 1) + "/" + frames.length + ")";
+      scrub.max = String(frames.length - 1);
+      scrub.value = String(current);
+    }
+
+    function tick(ts) {
+      if (!playing) return;
+      if (ts - lastTick > 200) { lastTick = ts; step(1); refresh(); }
+      raf(tick);
+    }
+
+    doc.getElementById("files").addEventListener("change", function (ev) {
+      var files = Array.prototype.slice.call(ev.target.files), pending = files.length, out = [];
+      if (!pending) return;
+      filelist.textContent = "loading " + pending + " files...";
+      files.forEach(function (f) {
+        var rd = new FileReader();
+        rd.onload = function () {
+          try {
+            var fr = parseSnapshot(JSON.parse(rd.result), f.name);
+            if (fr) out.push(fr);
+          } catch (e) { /* skip unreadable file */ }
+          if (--pending === 0) {
+            setFrames(out);
+            filelist.textContent = out.length + " snapshots: " +
+              frames.map(function (x) { return x.frame; }).join(", ");
+            refresh();
+          }
+        };
+        rd.readAsText(f);
+      });
+    });
+
+    scrub.addEventListener("input", function () { current = parseInt(scrub.value, 10) || 0; refresh(); });
+    playBtn.addEventListener("click", function () {
+      playing = !playing;
+      playBtn.textContent = playing ? "pause" : "play";
+      if (playing) { lastTick = 0; raf(tick); }
+    });
+
+    function posToIndex(ev) {
+      var r = canvas.getBoundingClientRect();
+      var x = Math.floor(ev.clientX - r.left);
+      if (x < 0) x = 0; if (x > 767) x = 767;
+      return x;
+    }
+    canvas.addEventListener("mousemove", function (ev) {
+      if (current >= 0) insp.textContent = inspectText(frames[current], posToIndex(ev));
+    });
+    canvas.addEventListener("click", function (ev) {
+      if (current >= 0) insp.textContent = inspectText(frames[current], posToIndex(ev));
+    });
+    return { refresh: refresh, tick: tick };
+  }
+
+  if (typeof document !== "undefined" && typeof requestAnimationFrame !== "undefined" &&
+      typeof window !== "undefined" && window.__stunvis_autoinit !== false) {
+    document.addEventListener("DOMContentLoaded", function () { init(document, requestAnimationFrame); });
+  }
+
+  var exports = api();
+  exports.init = init;
+  return exports;
+})();
+
+if (typeof module !== "undefined" && module.exports) module.exports = StunVis;
+</script>
+</body>
+</html>
