@@ -46,7 +46,8 @@ SOURCES = [
 # them when present so this test covers that working tree, while keeping the
 # public test runnable from a clean checkout at the earlier shell boundary.
 for optional_source in (ROOT / "native" / "fake_ports.c",
-                        ROOT / "native" / "game_loop.c"):
+                        ROOT / "native" / "game_loop.c",
+                        ROOT / "reproduction" / "maincpu" / "trajectory_state.c"):
     if optional_source.is_file():
         SOURCES.append(str(optional_source))
 
