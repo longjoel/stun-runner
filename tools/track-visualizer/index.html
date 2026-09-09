@@ -63,7 +63,9 @@ var StunVis = (function () {
   var TWIN_ADDR = 0xFF9884;      /* OBSERVED twin copy window (base + 0x300) */
   var WIN_LEN = 768;             /* 0x300 bytes */
   var SCORE_ADDR = 0xFF9532;     /* DYNAMIC-SCORE-CONFIRMED longword */
+  var TIME_ADDR = 0xFF9568;      /* displayed time-remaining mechanism */
   var COURSE_ADDR = 0xFF9578;    /* award-path state/index; displayed label unproven */
+  var SPEED_ADDR = 0xFFDD16;     /* speed/velocity candidate */
 
   var frames = [];   /* {name, frame, input, base, values} sorted by frame */
   var current = -1;
@@ -155,7 +157,10 @@ var StunVis = (function () {
     if (base && twin) { ndiff = 0; for (i = 0; i < WIN_LEN; i++) if (base[i] !== twin[i]) ndiff++; }
     return "file: " + fr.name + "  frame: " + fr.frame + "  input: " + fr.input + "\n" +
       "score [0xFF9532]    = " + (longAt(fr, SCORE_ADDR) < 0 ? "out-of-range" : longAt(fr, SCORE_ADDR)) + "\n" +
+      "time [0xFF9568]     = " + (longAt(fr, TIME_ADDR) < 0 ? "out-of-range" : longAt(fr, TIME_ADDR)) + "  unit unresolved\n" +
       "course? [0xFF9578] = " + fmtWord(wordAt(fr, COURSE_ADDR)) + "  UNVERIFIED\n" +
+      "speed? [0xFFDD16]  = " + fmtWord(wordAt(fr, SPEED_ADDR)) + "  UNVERIFIED\n" +
+      "craft/armor/weapons = not identified\n" +
       "base[0..7]  = " + (base ? base.slice(0, 8).join(" ") : "out-of-range") + "\n" +
       "twin[0..7]  = " + (twin ? twin.slice(0, 8).join(" ") : "out-of-range") + "\n" +
       "bytes differing base vs twin: " + (ndiff < 0 ? "out-of-range" : ndiff + " / 768");
