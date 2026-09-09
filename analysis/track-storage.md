@@ -465,6 +465,27 @@ the segment-to-slot selection sequence, not whether later slot loads can
 occur. The ROM tracer accepts `--address-range` filters so this question can
 be repeated without collecting the entire program-ROM fetch stream.
 
+### Full settled snapshot sweep
+
+The retained `race2` playback was also checked at 22 six-hundred-frame
+landmarks against all six statically identified slots. Once the buffer had
+settled, the observed sequence was:
+
+| Settled frames | Best ROM slot | Exact RAM words | Runtime tail |
+| --- | --- | ---: | --- |
+| 1200–4200 | `0x045530` | 0–359 | 360–383 |
+| 5400–7800 | `0x045230` | 0–359 | 360–383 |
+| 9000–12600 | `0x044630` | 0–359 | 360–383 |
+
+Frames 4800, 8400, and 13200 are transition observations rather than settled
+selectors: they differ from their eventual best slot in 361, 47, and 47 words
+respectively. Frame 600 is an early/non-settled negative. This strengthens the
+course-to-slot sequence as a RAM-backed observation and gives the native
+boundary a repeatable settled input, but it does not decode the 24-word tail or
+any individual coordinate/width/curvature field. The complete command,
+result hash, and frame-by-frame classification are in
+`reference/experiments/stunrun/m5-track-table-snapshot-sweep.metadata.json`.
+
 ## What is still unknown
 
 - Which word or bit fields describe lateral position, height, width, or
