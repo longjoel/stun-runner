@@ -6,5 +6,6 @@
 
 /* Requires a current OpenGL context owned by the caller. */
 void stunrun_opengl_draw_road_strip(const stunrun_road_strip_t *strip);
+void stunrun_opengl_draw_road_frame(const stunrun_road_frame_t *frame);
 
 #endif

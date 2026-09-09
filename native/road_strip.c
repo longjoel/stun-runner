@@ -62,6 +62,44 @@ void stunrun_road_strip_fixture(stunrun_road_strip_t *strip)
     strip->blue = 0x50u;
 }
 
+void stunrun_road_frame_fixture(stunrun_road_frame_t *frame)
+{
+    static const float centers[] = {
+        256.0f, 252.0f, 248.0f, 244.0f, 240.0f, 237.0f,
+        235.0f, 234.0f, 234.0f
+    };
+    static const float widths[] = {
+        272.0f, 246.0f, 222.0f, 198.0f, 175.0f, 153.0f,
+        132.0f, 112.0f, 94.0f
+    };
+    unsigned i;
+
+    if (frame == NULL)
+        return;
+    frame->count = (unsigned)(sizeof(centers) / sizeof(centers[0])) - 1u;
+    for (i = 0u; i < frame->count; i++) {
+        float y_near = 224.0f - (float)i * 16.0f;
+        float y_far = y_near - 16.0f;
+        float near_center = centers[i];
+        float far_center = centers[i + 1u];
+        float near_width = widths[i];
+        float far_width = widths[i + 1u];
+        stunrun_road_strip_t *strip = &frame->strips[i];
+
+        strip->vertices[0] = (stunrun_road_vertex_t){
+            near_center - near_width * 0.5f, y_near, (float)i};
+        strip->vertices[1] = (stunrun_road_vertex_t){
+            near_center + near_width * 0.5f, y_near, (float)i};
+        strip->vertices[2] = (stunrun_road_vertex_t){
+            far_center + far_width * 0.5f, y_far, (float)i + 1.0f};
+        strip->vertices[3] = (stunrun_road_vertex_t){
+            far_center - far_width * 0.5f, y_far, (float)i + 1.0f};
+        strip->red = (i & 1u) ? 0x38u : 0x40u;
+        strip->green = (i & 1u) ? 0x40u : 0x48u;
+        strip->blue = (i & 1u) ? 0x48u : 0x50u;
+    }
+}
+
 int stunrun_render_road_strip(stunrun_renderer_t *renderer,
                               const stunrun_road_strip_t *strip)
 {
@@ -69,4 +107,19 @@ int stunrun_render_road_strip(stunrun_renderer_t *renderer,
         return 0;
     return draw_triangle(renderer, strip, 0u, 1u, 2u) &&
            draw_triangle(renderer, strip, 0u, 2u, 3u);
+}
+
+int stunrun_render_road_frame(stunrun_renderer_t *renderer,
+                              const stunrun_road_frame_t *frame)
+{
+    unsigned i;
+
+    if (renderer == NULL || frame == NULL ||
+        frame->count > STUNRUN_ROAD_FRAME_MAX_STRIPS)
+        return 0;
+    for (i = frame->count; i > 0u; i--) {
+        if (!stunrun_render_road_strip(renderer, &frame->strips[i - 1u]))
+            return 0;
+    }
+    return 1;
 }

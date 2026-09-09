@@ -15,3 +15,13 @@ void stunrun_opengl_draw_road_strip(const stunrun_road_strip_t *strip)
     }
     glEnd();
 }
+
+void stunrun_opengl_draw_road_frame(const stunrun_road_frame_t *frame)
+{
+    unsigned i;
+
+    if (frame == NULL || frame->count > STUNRUN_ROAD_FRAME_MAX_STRIPS)
+        return;
+    for (i = 0u; i < frame->count; i++)
+        stunrun_opengl_draw_road_strip(&frame->strips[i]);
+}

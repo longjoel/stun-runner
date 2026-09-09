@@ -23,7 +23,7 @@ int main(void)
     GLFWwindow *window;
     stunrun_fake_ports_t ports;
     stunrun_game_loop_t loop;
-    stunrun_road_strip_t strip;
+    stunrun_road_frame_t frame_data;
     unsigned limit = frame_limit();
     unsigned frame = 0u;
 
@@ -50,7 +50,7 @@ int main(void)
 
     stunrun_ports_init(&ports);
     stunrun_game_loop_init(&loop, &ports);
-    stunrun_road_strip_fixture(&strip);
+    stunrun_road_frame_fixture(&frame_data);
     while (!glfwWindowShouldClose(window) &&
            (limit == 0u || frame < limit)) {
         glfwPollEvents();
@@ -58,7 +58,7 @@ int main(void)
         glClearColor(0.02f, 0.03f, 0.04f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glLoadIdentity();
-        stunrun_opengl_draw_road_strip(&strip);
+        stunrun_opengl_draw_road_frame(&frame_data);
         glfwSwapBuffers(window);
         frame++;
     }

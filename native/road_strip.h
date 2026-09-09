@@ -23,11 +23,24 @@ typedef struct stunrun_road_strip {
     uint8_t blue;
 } stunrun_road_strip_t;
 
+#define STUNRUN_ROAD_FRAME_MAX_STRIPS 16u
+
+typedef struct stunrun_road_frame {
+    stunrun_road_strip_t strips[STUNRUN_ROAD_FRAME_MAX_STRIPS];
+    unsigned count;
+} stunrun_road_frame_t;
+
 /* Construct the first deterministic projected-strip fixture. */
 void stunrun_road_strip_fixture(stunrun_road_strip_t *strip);
+
+/* Construct an ordered multi-strip projection sandbox. */
+void stunrun_road_frame_fixture(stunrun_road_frame_t *frame);
 
 /* Software backend used for deterministic tests and image comparison. */
 int stunrun_render_road_strip(stunrun_renderer_t *renderer,
                               const stunrun_road_strip_t *strip);
+
+int stunrun_render_road_frame(stunrun_renderer_t *renderer,
+                              const stunrun_road_frame_t *frame);
 
 #endif

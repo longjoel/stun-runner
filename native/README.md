@@ -165,14 +165,16 @@ absolute error rather than treating a mismatched image as a vague failure.
 ## Projected road-strip boundary
 
 `road_strip.h` / `road_strip.c` define the first backend-neutral projected
-strip command: four screen-space vertices plus a uniform color. The software
-backend rasterizes the strip deterministically for tests and PPM comparison.
-`opengl_backend.c` submits the same vertices as an OpenGL
-`GL_TRIANGLE_STRIP` to a caller-owned current context; it does not create a
+strip command: four screen-space vertices plus a uniform color. They also
+provide an ordered multi-strip frame fixture so the demo exercises a complete
+small road surface rather than one isolated polygon. The software backend
+rasterizes these deterministically for tests and PPM comparison.
+`opengl_backend.c` submits the same vertices as OpenGL
+`GL_TRIANGLE_STRIP`s to a caller-owned current context; it does not create a
 window or assign semantics to the unresolved road-buffer fields.
 
 The built-in geometry is explicitly an intermediate rendering fixture, not a
-decoded original track segment. Enable it with:
+decoded original track segment. Enable the shell fixture with:
 
 ```sh
 STUNRUN_ROAD_STRIP_FIXTURE=1 \
