@@ -56,3 +56,13 @@ the object trigger and track-position relationship unresolved.
 
 Full provenance and hashes are in
 `reference/experiments/stunrun/m5-object-record-wall-delay.metadata.json`.
+
+The focused `0xFFDD86–0xFFDD87` follow-up captures 3,041 writes in each fork
+with the same writer-PC set. The first value difference is still frame 303:
+held-left writes `0x0000` while center writes `0x8080`. The two traces have
+the same total event count and 1,499 active frames, but their frame sequences
+are not identical: periodic two-write phase shifts begin at frame 350. This
+is consistent with trajectory-dependent update cadence after the initial
+divergence, but it is not enough to label the field as a position cursor or a
+spawn trigger. Provenance is in
+`reference/experiments/stunrun/m5-dd86-steering-cadence.metadata.json`.

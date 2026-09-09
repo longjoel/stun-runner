@@ -1,0 +1,48 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-dd86-steering-cadence",
+  "target": "stunrun",
+  "purpose": "Compare the update cadence of the steering-sensitive 0xFFDD86 field under saved-state forks.",
+  "trace": {
+    "tool": "tools/mame-ram-write-trace",
+    "device": ":mainpcb:maincpu",
+    "range": ["0xFFDD86", "0xFFDD87"],
+    "frames": "relative 1–1800",
+    "tap_frame": 1,
+    "max_events": 100000,
+    "load_state": "/tmp/stunrun-latedrive2400.sta",
+    "nothrottle": true
+  },
+  "forks": {
+    "held_left": {
+      "input": "fork_hold_left",
+      "path": "/tmp/stunrun-m5-dd86-left/result.json",
+      "sha256": "4c3408e2680f8f245ab4b4b15cb60c2e5d3ac8733a0b6767e23b973c86ec7633",
+      "event_count": 3041,
+      "active_frames": 1499,
+      "truncated": false
+    },
+    "center": {
+      "input": "fork_center",
+      "path": "/tmp/stunrun-m5-dd86-center/result.json",
+      "sha256": "e8dd4daa70607ac14fbe96b8ba2b2af86de3a992c242d26e84587b08531e5c27",
+      "event_count": 3041,
+      "active_frames": 1499,
+      "truncated": false
+    }
+  },
+  "comparison": {
+    "first_value_difference": {
+      "frame": 303,
+      "pc": "0x03D18",
+      "address": "0xFFDD86",
+      "held_left_data": "0x0000",
+      "center_data": "0x8080"
+    },
+    "value_differences_in_aligned_prefix": 3032,
+    "frame_sequence_equal": false,
+    "first_frame_count_difference": 350,
+    "periodic_phase_shift": "two writes move between adjacent frames after frame 350"
+  },
+  "interpretation": "The field is trajectory-sensitive and its update cadence later phase-shifts between forks. The result does not distinguish position-triggered from frame-triggered behavior and does not assign gameplay semantics."
+}
