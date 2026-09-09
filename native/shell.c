@@ -55,6 +55,7 @@
 #include "text_record.h"
 #include "fake_ports.h"
 #include "game_loop.h"
+#include "road_strip.h"
 
 static int g_failures = 0;
 static unsigned frame = 0;
@@ -510,6 +511,7 @@ static int run_walk(void)
     const char *gsp_text_table_path = getenv("STUNRUN_GSP_TEXT_TABLE_BIN");
     const char *gsp_text_words_path = getenv("STUNRUN_GSP_TEXT_WORDS_BIN");
     const char *gsp_text_record_path = getenv("STUNRUN_GSP_TEXT_RECORD_BIN");
+    const char *road_strip_fixture = getenv("STUNRUN_ROAD_STRIP_FIXTURE");
     const char *render_mode = "blank-scaffold";
     uint16_t geometry_table[STUNRUN_GEOM_MARCH_WORDS];
 
@@ -664,8 +666,23 @@ static int run_walk(void)
                              gsp_text_words_path[0] != '\0';
         int has_text_records = gsp_text_record_path != NULL &&
                                gsp_text_record_path[0] != '\0';
+        int has_road_strip = road_strip_fixture != NULL &&
+                             strcmp(road_strip_fixture, "1") == 0;
         int has_any_text = has_text_table || has_text_words || has_text_records;
-        if (has_any_text && (!has_text_table ||
+        if (has_road_strip &&
+            (has_vram || has_rgb || has_low || has_high || has_any_text)) {
+            printf("shell: road-strip fixture excludes other render inputs\n");
+            g_failures++;
+        } else if (has_road_strip) {
+            stunrun_road_strip_t strip;
+            stunrun_road_strip_fixture(&strip);
+            if (!stunrun_render_road_strip(&renderer, &strip)) {
+                printf("shell: road-strip fixture=error\n");
+                g_failures++;
+            } else {
+                render_mode = "road-strip-fixture";
+            }
+        } else if (has_any_text && (!has_text_table ||
             (has_text_words == has_text_records) ||
             (has_text_table && (has_vram || has_rgb || has_low || has_high)))) {
             printf("shell: gsp-text requires table plus exactly one of words/records and excludes gsp-video\n");
@@ -722,6 +739,12 @@ static int run_walk(void)
     printf("render frame=%u width=%u height=%u hash=0x%08X mode=%s\n",
            renderer.frame, STUNRUN_RENDER_WIDTH, STUNRUN_RENDER_HEIGHT,
            (unsigned)stunrun_render_hash(&renderer), render_mode);
+    printf("game-loop frame=%u ticks=%u steering=%d trajectory=0x%04X "
+           "motion-delta=%d\n",
+           game_loop.frame, (unsigned)game_loop.global_tick,
+           (int)game_loop.steering_delta,
+           (unsigned)(uint16_t)game_loop.trajectory_coordinate,
+           (int)game_loop.motion_delta);
     printf("checkpoint frames=%u time-us=%u events=%u pending=%u "
            "input-active=%u input-hash=0x%08X upload=%s "
            "install_ready=%d control=%s counts=%s nmi=%d irq4=%d\n",

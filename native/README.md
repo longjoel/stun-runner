@@ -161,3 +161,26 @@ remain open.
 Convert an MAME PNG to PPM and compare it with the native output using
 `tools/compare-ppm`; the tool reports dimensions, changed pixels/channels, and
 absolute error rather than treating a mismatched image as a vague failure.
+
+## Projected road-strip boundary
+
+`road_strip.h` / `road_strip.c` define the first backend-neutral projected
+strip command: four screen-space vertices plus a uniform color. The software
+backend rasterizes the strip deterministically for tests and PPM comparison.
+`opengl_backend.c` submits the same vertices as an OpenGL
+`GL_TRIANGLE_STRIP` to a caller-owned current context; it does not create a
+window or assign semantics to the unresolved road-buffer fields.
+
+The built-in geometry is explicitly an intermediate rendering fixture, not a
+decoded original track segment. Enable it with:
+
+```sh
+STUNRUN_ROAD_STRIP_FIXTURE=1 \
+STUNRUN_RENDER_PPM=/tmp/stunrun-road-strip.ppm \
+  ./build/native/stunrun-native-shell
+```
+
+The shell then reports `mode=road-strip-fixture`. The verified original-data
+boundary remains separate: a supplied geometry table still flows through the
+native game loop's 384-word dual-buffer upload and 192-word fake GSP FIFO
+submission before any future projection decoder is attached.

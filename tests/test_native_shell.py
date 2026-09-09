@@ -47,7 +47,9 @@ SOURCES = [
 # public test runnable from a clean checkout at the earlier shell boundary.
 for optional_source in (ROOT / "native" / "fake_ports.c",
                         ROOT / "native" / "game_loop.c",
-                        ROOT / "reproduction" / "maincpu" / "trajectory_state.c"):
+                        ROOT / "native" / "road_strip.c",
+                        ROOT / "reproduction" / "maincpu" / "trajectory_state.c",
+                        ROOT / "reproduction" / "maincpu" / "road_strip.c"):
     if optional_source.is_file():
         SOURCES.append(str(optional_source))
 
@@ -61,7 +63,7 @@ class NativeShellTests(unittest.TestCase):
             [cc, "-std=c99", "-Wall", "-Wextra",
              "-I", str(ADSP), "-I", str(MAINCPU),
              "-I", str(ROOT / "reproduction" / "gsp"), "-I", str(SOUND),
-             "-o", str(binary), *SOURCES],
+             "-o", str(binary), *SOURCES, "-lm"],
             capture_output=True, text=True, check=False,
         )
         self.assertEqual(compile_proc.returncode, 0,
@@ -89,6 +91,8 @@ class NativeShellTests(unittest.TestCase):
             self.assertIn("input-hash=0x", first.stdout)
             self.assertIn("render frame=600 width=512 height=240 "
                           "hash=0x", first.stdout)
+            self.assertIn("game-loop frame=600 ticks=2400 steering=0 "
+                          "trajectory=0xFCA0 motion-delta=0", first.stdout)
             self.assertIn('checkpoint-json={', first.stdout)
             self.assertIn('"description": "native-shell-transport-model"',
                           first.stdout)
