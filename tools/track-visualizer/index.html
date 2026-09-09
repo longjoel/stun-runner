@@ -62,8 +62,8 @@ var StunVis = (function () {
   var BASE_ADDR = 0xFF9584;      /* OBSERVED twin base window */
   var TWIN_ADDR = 0xFF9884;      /* OBSERVED twin copy window (base + 0x300) */
   var WIN_LEN = 768;             /* 0x300 bytes */
-  var SCORE_ADDR = 0xFF9578;     /* STUNRUN_SCORE_ADDR, award-path slice */
-  var COURSE_ADDR = 0xFF9532;    /* UNVERIFIED: seen as course word in traces, not sliced */
+  var SCORE_ADDR = 0xFF9532;     /* DYNAMIC-SCORE-CONFIRMED longword */
+  var COURSE_ADDR = 0xFF9578;    /* award-path state/index; displayed label unproven */
 
   var frames = [];   /* {name, frame, input, base, values} sorted by frame */
   var current = -1;
@@ -87,6 +87,12 @@ var StunVis = (function () {
     var hi = byteAt(fr, addr), lo = byteAt(fr, addr + 1);
     if (hi < 0 || lo < 0) return -1;
     return ((hi << 8) | lo) & 0xFFFF;
+  }
+
+  function longAt(fr, addr) {
+    var a = wordAt(fr, addr), b = wordAt(fr, addr + 2);
+    if (a < 0 || b < 0) return -1;
+    return (a * 0x10000) + b;
   }
 
   function windowAt(fr, addr) {
@@ -148,8 +154,8 @@ var StunVis = (function () {
     var base = windowAt(fr, BASE_ADDR), twin = windowAt(fr, TWIN_ADDR), i, ndiff = -1;
     if (base && twin) { ndiff = 0; for (i = 0; i < WIN_LEN; i++) if (base[i] !== twin[i]) ndiff++; }
     return "file: " + fr.name + "  frame: " + fr.frame + "  input: " + fr.input + "\n" +
-      "score? [0xFF9578]  = " + fmtWord(wordAt(fr, SCORE_ADDR)) + "\n" +
-      "course? [0xFF9532] = " + fmtWord(wordAt(fr, COURSE_ADDR)) + "  UNVERIFIED\n" +
+      "score [0xFF9532]    = " + (longAt(fr, SCORE_ADDR) < 0 ? "out-of-range" : longAt(fr, SCORE_ADDR)) + "\n" +
+      "course? [0xFF9578] = " + fmtWord(wordAt(fr, COURSE_ADDR)) + "  UNVERIFIED\n" +
       "base[0..7]  = " + (base ? base.slice(0, 8).join(" ") : "out-of-range") + "\n" +
       "twin[0..7]  = " + (twin ? twin.slice(0, 8).join(" ") : "out-of-range") + "\n" +
       "bytes differing base vs twin: " + (ndiff < 0 ? "out-of-range" : ndiff + " / 768");
@@ -181,7 +187,7 @@ var StunVis = (function () {
   }
 
   function api() {
-    return { parseSnapshot: parseSnapshot, byteAt: byteAt, wordAt: wordAt,
+    return { parseSnapshot: parseSnapshot, byteAt: byteAt, wordAt: wordAt, longAt: longAt,
              windowAt: windowAt, renderFrame: renderFrame, readoutText: readoutText,
              inspectText: inspectText, setFrames: setFrames, drawCurrent: drawCurrent,
              step: step, BASE_ADDR: BASE_ADDR, TWIN_ADDR: TWIN_ADDR, WIN_LEN: WIN_LEN,
