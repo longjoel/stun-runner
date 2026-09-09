@@ -1,0 +1,45 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-gsp-recorded-index-instruction-context",
+  "target": "stunrun",
+  "purpose": "Decode the leading GSP writer candidates during the canonical recorded indexed-reader phase.",
+  "mame": "0.289 (mame0289-dirty)",
+  "input": {"path": "/tmp/race/r1.inp", "mode": "recorded playback"},
+  "trace": {
+    "tool": "tools/mame-trace",
+    "path": "/tmp/stunrun-m5-playback-index-instruction/gsp-tms34010.trace",
+    "sha256": "c3468946106493054bb36844e41a97e3d87398cb0c31ecf86f5fad197bde9102",
+    "frames": [1304, 1320],
+    "trace_start_frame": 1304,
+    "instruction_lines": 541504
+  },
+  "decoded_context": {
+    "0xFFF41060": {
+      "instruction": "MOVE *A3,A0,0",
+      "setup": ["MOVI 0xFFF9FC00,A3", "CMPI 0xFFFF,A0", "then MOVI 0xFFFCFC00,A3"],
+      "classification": "sentinel queue polling"
+    },
+    "0xFFF414C0": {
+      "instruction": "MOVE @FFF71670h,A0,1",
+      "loop": "JRNE 0xFFF414C0",
+      "setup": ["MOVI 0x0203C000,B4", "MOVI 0x0203C000,A0", "MOVE A0,@FFF71670h,1"],
+      "classification": "pointer/status polling"
+    },
+    "0xFFF41650": {
+      "instruction": "MOVE @FFF71670h,A0,1",
+      "loop": "JRNE 0xFFF41650",
+      "setup": ["MOVI 0x0203C000,B4", "MOVI 0x0203C000,A0", "MOVE A0,@FFF71670h,1"],
+      "classification": "pointer/status polling"
+    },
+    "0xFFF454E0": {
+      "instruction": "FILL XY",
+      "setup": ["ADD A9,A0", "ADDC B1,B0", "ADD A7,A4", "ADDC A8,A6", "SUBXY B2,B7"],
+      "classification": "raster primitive"
+    },
+    "0xFFF48D50": {
+      "instruction": "MOVE *A5+,A3,0; MOVE A3,*A0+,0",
+      "classification": "FIFO-to-work-buffer byte/word transfer"
+    }
+  },
+  "interpretation": "The leading same-run writer candidates are queue/status polling or raster instructions, not a proven indexed-record constructor. The producer search should follow FIFO/work-buffer data into the indexed source window while retaining these routines as synchronization and rendering boundaries."
+}

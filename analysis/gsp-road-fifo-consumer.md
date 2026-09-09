@@ -281,3 +281,15 @@ queue dispatch and raster/display routines, and the event ordering does not
 identify a single record constructor. No track, road, object, HUD, craft,
 weapon, or armor field is assigned. Full provenance is in
 `reference/experiments/stunrun/m5-gsp-recorded-index-correlation.metadata.json`.
+
+An instruction trace over the same recorded phase decodes the leading
+candidate PCs. `0xFFF41060` reads and tests the sentinel queue bases
+`0xFFF9FC00` and `0xFFFCFC00`; `0xFFF414C0` and `0xFFF41650` repeatedly read
+the pointer/status location `0xFFF71670`; and `0xFFF454E0` is the `FILL XY`
+raster instruction after coordinate arithmetic. The FIFO consumer at
+`0xFFF48D50` directly combines incoming words and writes the separate work
+buffers. This removes the first three candidate PCs as standalone record
+constructors and keeps the FIFO/work-buffer path as the most economical
+upstream producer boundary. The trace preserves literal setup and loop
+instructions without assigning payload semantics; provenance is in
+`reference/experiments/stunrun/m5-gsp-recorded-index-instruction-context.metadata.json`.
