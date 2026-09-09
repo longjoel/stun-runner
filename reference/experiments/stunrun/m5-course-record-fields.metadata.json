@@ -1,0 +1,29 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "experiment": "m5_course_record_fields",
+  "date": "2026-09-09",
+  "target": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_manifest": "roms/stunrun.manifest.json",
+  "static_listing": {
+    "path": "/tmp/stunrun-listing-timer/maincpu-68010.lst",
+    "sha256": "171e56ccf1a9940635a2e8e9929ab7edaa5841ac3238ef78acf0d6630f8e45e7",
+    "initializer": "0x03B220",
+    "comparison_writer": "0x02BC2A",
+    "additional_call_sites": ["0x028DF0", "0x03AC64"]
+  },
+  "tables": {
+    "timer_record": {"base": "0xFF47BA", "stride": 4, "destination": "0xFF956C", "compared_against": "0xFF9568"},
+    "record_1": {"base": "0xFF4832", "stride": 2, "destination": "0xFF9570", "compared_against": "0xFFDD08"},
+    "record_2": {"base": "0xFF486E", "stride": 2, "destination": "0xFF9574", "compared_against": "0xFFDD06"},
+    "record_3": {"base": "0xFF48AA", "stride": 2, "destination": "0xFF9576", "compared_against": "0xFFDD02"}
+  },
+  "comparison_mechanism": "0x02BC2A updates each cached field and its indexed table entry when the current value is greater than or equal to the cached value; otherwise it leaves that field unchanged.",
+  "targeted_snapshots": [
+    {"frame": 1115, "index_word": 10, "timer": 13420, "timer_record_cache": 0, "record_1_cache": 0, "record_2_cache": 13, "record_3_cache": 15, "snapshot_sha256": "18f3ab239ac622d6075db0d2785cbcedbcc4698e24ce36b08ff5fec723aa6cb8"},
+    {"frame": 5199, "index_word": 11, "timer": 11224, "timer_record_cache": 150, "record_1_cache": 0, "record_2_cache": 10, "record_3_cache": 11, "snapshot_sha256": "07bd12764f40af418334c874d83b936b02699e8b3f99418721713a9f0a683c80"},
+    {"frame": 8784, "index_word": 12, "timer": 15128, "timer_record_cache": 150, "record_1_cache": 0, "record_2_cache": 0, "record_3_cache": 0, "snapshot_sha256": "39ee237f7dcfe0ba30ca56c74e19628ec08e87ef6e97d8402cc288bb20949479"}
+  ],
+  "interpretation": "These are per-course record/comparison fields, not identified craft health, armor, weapons, or ammunition. The table addresses lie in the mapped ZRAM view; backing persistence has not been established.",
+  "confidence": "STATIC-MECHANISM-CONFIRMED; TRANSITION-SNAPSHOT-SUPPORTED; PERSISTENCE-UNRESOLVED"
+}

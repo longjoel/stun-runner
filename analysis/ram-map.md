@@ -36,6 +36,7 @@ not ordinary 68010 work RAM.
 | `0xFFDBA4` | one byte in an indexed table written by `0x030212` from table base `0xFFDB64`; semantic ownership unresolved | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9564–0xFF9567` | elapsed-update counter candidate; `0x024506` increments the longword continuously during the gameplay window | `STATIC + OBSERVED-IN-TRACE` |
 | `0xFF9568–0xFF956B` | displayed time-remaining mechanism; initialized from ROM, decremented by timer logic, tested for expiry and a `0x988` threshold, and combined with a track-indexed base by HUD routine `0x028CA8` | `DYNAMIC-TIME-REMAINING-CONFIRMED` |
+| `0xFF956C–0xFF9577` | transient per-course record/comparison cache: `0xFF956C` holds the timer record candidate, while `0xFF9570`, `0xFF9574`, and `0xFF9576` cache values compared against `0xFFDD08`, `0xFFDD06`, and `0xFFDD02`; updated by routine `0x02BC2A` only when the current value reaches/exceeds the cached value | `STATIC-RESOLVED-RECORD-CACHE; NOT-CRAFT-STATUS` |
 | `0xFFFF8014` (bus-visible `0xFF8014`) | interrupt-driven global tick; PC `0x0222DE` executes `addq.l #1,$8014.w` in an `RTE`-terminated handler, producing about four updates per frame; copied to `0xFFDCC0`, `0xFFDB36`, and `0xFFDDEC`, with shifted forms passed to placement helpers | `STATIC + WRITER-TRACE-CONFIRMED; TIMING-SOURCE, NOT TRACK POSITION` |
 | `0xFF954E` | road-buffer copy/animation countdown and divisor latch; startup loads `0x78`, the table-copy routine stores its divisor argument here, and state-machine callers decrement it before selecting the full-buffer subtract (`0x0298C0`) or add (`0x0298FA`) pass; not the HUD time-remaining field | `STATIC + DYNAMIC-TRACE; TRANSFORM-TIMER-CANDIDATE` |
 | `0xFF9550` | broad game-state/dispatch latch; startup clears it, `0x02452C` dispatches through a state jump table, and many gameplay/UI paths assign constants including `1`, `2`, `0x20`, `0x27`, `0x43`, and `0x45`; the road transform observes it but does not define its full semantics | `STATIC-STATE-DISPATCH-CONFIRMED; ROAD-ROLE-SECONDARY` |
@@ -185,6 +186,20 @@ backed by the two persistent byte lanes `:mainpcb:200e` (M48T02) and
 `:mainpcb:210e` (2816 EEPROM); neither lane should be treated as ordinary
 work RAM. See
 `reference/experiments/stunrun/main-nvram-high-score-table.metadata.json`.
+
+The neighboring indexed tables are a separate record mechanism. Routine
+`0x02BC2A` receives a course index, compares the current timer and object-state
+values against cached values at `0xFF956C`, `0xFF9570`, `0xFF9574`, and
+`0xFF9576`, and writes back the new value plus the corresponding indexed table
+entry when the current value is greater or equal. Its source tables are
+`0xFF47BA + 4*n`, `0xFF4832 + 2*n`, `0xFF486E + 2*n`, and `0xFF48AA + 2*n`.
+The callers pass either the current `0xFF9578` index or the HUD/course index
+minus one. Exact transition snapshots show the cache carrying timer `13420`,
+`11224`, and `15128` for indices 10, 11, and 12, and also show transient
+companion values such as `0x0096`, `0x000A`, and `0x000B`. This establishes a
+per-course record/comparison mechanism, but not whether the backing ZRAM table
+is battery-persistent or merely rebuilt at boot. See
+`reference/experiments/stunrun/m5-course-record-fields.metadata.json`.
 
 The drive/object cluster is now split: `0xFFDD02` is an object-hit/progression
 counter, while `0xFFDD04/06/08` remain bounded coordinate/object-state
