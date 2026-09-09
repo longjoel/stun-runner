@@ -1,0 +1,126 @@
+{
+  "schema": "stunrun-experiment-metadata/v1",
+  "id": "m5-motion-field-write-trace",
+  "purpose": "Bounded comparison of candidate motion/object fields during an active recorded drive",
+  "machine": "stunrun",
+  "mame": "0.289 (mame0289-dirty)",
+  "rom_path": "/tmp/stunrun-roms-system",
+  "active_run": {
+    "input": "late_drive",
+    "command": "tools/mame-ram-write-trace /tmp/stunrun-roms-system /tmp/stunrun-m5-motion-latedrive --device :mainpcb:maincpu --base 0xFFDD10 --end 0xFFDD30 --frames 1800 --start-frame 600 --end-frame 1800 --max-events 100000 --tap-frame 1 --input late_drive --nothrottle",
+    "result_sha256": "1d09a22a2fca9eeb8d94e8b73dc408c71c58da64f0343ab44af12c782014d297",
+    "canonical_log_sha256": "37f43af8f95ee46f8fbe3f9438d7e365874a38dafc837a068c7ba8392e2d6498",
+    "event_count": 572,
+    "truncated": false,
+    "range": [
+      "0xFFDD10",
+      "0xFFDD30"
+    ],
+    "field_summary": {
+      "0xFFDD16": {
+        "writes": 49,
+        "frames": [
+          767,
+          1797
+        ],
+        "writer_pcs": [
+          "0x025474",
+          "0x02B976",
+          "0x03ABDE",
+          "0x03B18C",
+          "0x03B29E"
+        ],
+        "sample_values": [
+          "0x003A",
+          "0x0074",
+          "0x015C",
+          "0x0244",
+          "0x0353",
+          "0x0401",
+          "0x04A7",
+          "0x04D7"
+        ]
+      },
+      "0xFFDD18": {
+        "writes": 43,
+        "writer_pcs": [
+          "0x02546C",
+          "0x03AA4A"
+        ],
+        "sample_values": [
+          "0x0000",
+          "0xFCAA",
+          "0xFDA8",
+          "0xEE5B"
+        ]
+      },
+      "0xFFDD1C": {
+        "writes": 80,
+        "writer_pcs": [
+          "0x025460",
+          "0x0324BA",
+          "0x03A7EE",
+          "0x03A824",
+          "0x03A8D4",
+          "0x03A90A",
+          "0x03B17A",
+          "0x03B2F0"
+        ],
+        "sample_values": [
+          "0x0000",
+          "0xFDD0",
+          "0xFF48",
+          "0xFA40",
+          "0xF95E"
+        ]
+      },
+      "0xFFDD20": {
+        "writes": 47,
+        "writer_pcs": [
+          "0x03B16E",
+          "0x03B2FC",
+          "0x03B37C"
+        ],
+        "sample_values": [
+          "0x0000",
+          "0x0001",
+          "0x0005",
+          "0x0009",
+          "0x0013"
+        ]
+      }
+    }
+  },
+  "saved_state_control": {
+    "state": "/tmp/stunrun-latedrive2400.sta",
+    "relative_frames": [
+      1,
+      600
+    ],
+    "center": {
+      "input": "fork_center",
+      "result_sha256": "45f29842b307d9f8167bd185d4855a99326b355ad16634f18110ba989784974c",
+      "canonical_log_sha256": "eadccb7840a505db6e3f4e684fbbad18c2fe339f7c469de2cd2e86b868e67f73",
+      "event_count": 52
+    },
+    "left": {
+      "input": "fork_hold_left",
+      "result_sha256": "700471f1f98fc9662479a2b0896f7df4b57e70a9f37f25b4e45ec1e26b1f56bf",
+      "canonical_log_sha256": "31bfe277396f9c6695af60a894c5665275536fa9782f25db75a62bdde80e4ef2",
+      "event_count": 52
+    },
+    "finding": "Both saved-state forks captured the same initialization/clear event shape and no later active update of the candidate field window; they are a negative control for this interval, not a stationary semantic oracle."
+  },
+  "conclusion": {
+    "supported": [
+      "0xFFDD16 is an actively written 16-bit field during the recorded drive and takes changing values.",
+      "The neighboring fields have distinct writer sets and value streams.",
+      "The captured writer/value evidence does not establish that 0xFFDD16 is speed, armor, weapon, or another gameplay semantic."
+    ],
+    "unresolved": [
+      "Exact field width/representation beyond the observed 16-bit writes.",
+      "Whether the 0xFFDD16 progression is velocity, an animation/geometry parameter, or another derived state.",
+      "How this window maps to the visible GSP output."
+    ]
+  }
+}
