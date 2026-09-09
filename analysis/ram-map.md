@@ -121,6 +121,10 @@ samples from frames 1200 through 1800, for a net `-2492` (average `4.160267`
 raw units per frame). This quantized cadence is stronger than the coarse
 series average; the alternate generic `late_drive` path is kept separate
 because it does not enter the same timer regime at the same frames.
+The static listing now explains the quantum literally: `0x026884–0x02688E`
+loads `0xFF9568`, subtracts `0xE`, and stores it back, gated by
+`0xFF9550 == 1` and `0xFF950A == 0`. The runtime writer trace records 356
+halfword writes (178 longword updates) from PC `0x02688E` in the same window.
 Full provenance is in
 `reference/experiments/stunrun/main-ram-temporal-candidates.metadata.json`.
 
