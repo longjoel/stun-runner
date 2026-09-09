@@ -37,8 +37,41 @@ the native scaffold must not replace the observed trajectory transform with
 `0xFFDCC0 = global_tick`, nor derive speed as “one unit per nonzero steering.”
 Those are implementation placeholders, not oracle facts.
 
-The next discriminating experiment is a same-state schedule pair that changes
-only steering and captures this field plus `0xFFDCC0`, the trajectory record,
-and the road-buffer/FIFO boundary in one run. Full provenance for this probe is
-in
+## Static arithmetic boundary
+
+The regenerated main-CPU listing gives the literal update shape around the
+active writer at `0x03ABDE`:
+
+```text
+if (timer_at_FFDD4E != 0 && FFDD16 < 0x0B00)
+    FFDD16 += 0x40;
+else if (FFDD16 > (local_limit + 0x40))
+    FFDD16 -= 0x20;
+else
+    FFDD16 = FFDD1E + FFDD1A;
+FFDBFE += FFDD16;
+```
+
+The pseudo-code preserves only the observed operations; the local limit and
+timer meaning are not assigned here. Initialization at `0x03B18C` and
+`0x03B29E` clears `0xFFDD16`, while neighboring fields are initialized by
+separate stores. This is enough to replace the native “increment on steering”
+placeholder with a future literal slice once its caller inputs are traced.
+
+The listing also resolves the apparent `0xFFDB38` steering differential:
+`0x02F246` executes `move.l $FFFF8014, $FFDB36`, so `0xFFDB38` is the low
+half of a copied global tick in this path. Its one-unit fork difference is
+therefore not evidence of a physical track cursor.
+
+Static provenance is the pinned listing
+`/tmp/stunrun-motion-listing/maincpu-68010.lst`, SHA-256
+`171e56ccf1a9940635a2e8e9929ab7edaa5841ac3238ef78acf0d6630f8e45e7`.
+
+The same-state center/left pair is now recorded separately in
+`reference/experiments/stunrun/m5-same-state-motion-differential.metadata.json`.
+The next discriminating experiment is to trace the caller inputs at the
+`0x03AB` update block while pairing its field writes with the road-buffer/FIFO
+boundary. That can establish which local limit and timer inputs drive the
+literal arithmetic without assigning a gameplay name prematurely. Full
+provenance for the active-run probe is in
 `reference/experiments/stunrun/m5-motion-field-write-trace.metadata.json`.
