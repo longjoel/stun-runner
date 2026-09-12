@@ -71,6 +71,12 @@ cmake -S native -B build/native && cmake --build build/native
 ctest --test-dir build/native
 ```
 
+Do not configure with a Release-family build type (`Release`,
+`RelWithDebInfo`, `MinSizeRel`): those define `NDEBUG`, which compiles
+out the `assert()` calls that the C self-checks are built from, so the
+suite passes vacuously. The plain configure above (empty build type)
+keeps asserts live; `-DCMAKE_BUILD_TYPE=Debug` is also fine.
+
 Public ROM-free checks: `tests/test_native_shell.py` (pass +
 determinism) alongside the per-slice C tests.
 
@@ -169,6 +175,43 @@ strip command: four screen-space vertices plus a uniform color. They also
 provide an ordered multi-strip frame fixture so the demo exercises a complete
 small road surface rather than one isolated polygon. The software backend
 rasterizes these deterministically for tests and PPM comparison.
+The OpenGL demo advances the fixture phase from the fixed-step loop, providing
+bounded scrolling motion without presenting that phase as decoded game state.
+Its arrow keys drive the named AD-stick fake port and apply the sampled
+steering delta to the sandbox projection; this is an input/render plumbing
+check, not a claim that the original game maps the field this way.
+The stage also draws a separate provisional vehicle fixture that follows the
+same sampled steering input; its shape is not promoted as the original craft
+geometry.
+
+The demo can also draw the evidence-backed GSP 8×8 text path when supplied
+with exported local fixtures:
+
+```sh
+STUNRUN_OPENGL_TEXT_TABLE=/tmp/glyph-table.bin \
+STUNRUN_OPENGL_TEXT_WORDS=/tmp/credits-words.bin \
+STUNRUN_OPENGL_FRAMES=1 ./build/native/stunrun-opengl-demo
+```
+
+Those files use the little-endian format emitted by
+`tools/export-gsp-text-fixture`; no commercial ROM or captured table is
+committed.
+
+Set `STUNRUN_GEOM_TABLE_BIN` to a 768-byte big-endian file emitted by
+`tools/export-geometry-native-state` to exercise the verified 384-word
+twin-buffer upload and 192-word FIFO submission before the visual fixture is
+drawn. The table words are transported literally; they are not yet decoded
+into the projected vertices.
+
+For an exact captured visible frame, set `STUNRUN_OPENGL_GSP_VRAM` and
+`STUNRUN_OPENGL_GSP_PALETTE` to exported native GSP fixture files. The window
+then displays the evidence-backed VRAM/palette layout directly; this is an
+oracle-frame mode and does not imply that the native stage has reconstructed
+the original GSP producer.
+
+Set `STUNRUN_OPENGL_CAPTURE_PPM` together with a bounded
+`STUNRUN_OPENGL_FRAMES` value to capture the actual OpenGL framebuffer for
+`tools/compare-ppm`.
 `opengl_backend.c` submits the same vertices as OpenGL
 `GL_TRIANGLE_STRIP`s to a caller-owned current context; it does not create a
 window or assign semantics to the unresolved road-buffer fields.
@@ -192,3 +235,9 @@ When GLFW and OpenGL development libraries are available, CMake also builds
 native loop, and submits the strip through the OpenGL backend. Set
 `STUNRUN_OPENGL_FRAMES=N` for a bounded demo run; omit it for an interactive
 window.
+
+For an exact captured visible frame, set `STUNRUN_OPENGL_GSP_VRAM` and
+`STUNRUN_OPENGL_GSP_PALETTE` to exported native GSP fixture files. The window
+then displays the evidence-backed VRAM/palette layout directly; this is an
+oracle-frame mode and does not imply that the native stage has reconstructed
+the original GSP producer.

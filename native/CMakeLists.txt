@@ -50,6 +50,16 @@ target_include_directories(stunrun-jsa-latch-slice-test PRIVATE
   ../reproduction/sound)
 set_target_properties(stunrun-jsa-latch-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME jsa-latch-slice-c COMMAND stunrun-jsa-latch-slice-test)
+# 68010 sound-command queue ($301CA enqueue / $3013C drain) feeding
+# the JSA latch transport; resolves the jsa_latch.h producer-buffer
+# open item on the 68010 side.
+add_executable(stunrun-sound-queue-slice-test
+  ../reproduction/sound/sound_queue.c
+  ../reproduction/sound/sound_queue_test.c)
+target_include_directories(stunrun-sound-queue-slice-test PRIVATE
+  ../reproduction/sound)
+set_target_properties(stunrun-sound-queue-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME sound-queue-slice-c COMMAND stunrun-sound-queue-slice-test)
 # Agent 2 M4 step 1: deterministic native shell. Fixed 600-frame walk over
 # the five verified slices, checkpoint on stdout, exit 0 iff all asserts
 # hold. No speculative game logic.
@@ -95,6 +105,26 @@ add_executable(stunrun-road-strip-test road_strip.c render.c road_strip_test.c)
 set_target_properties(stunrun-road-strip-test PROPERTIES C_STANDARD 99)
 target_link_libraries(stunrun-road-strip-test PRIVATE m)
 add_test(NAME native-road-strip-c COMMAND stunrun-road-strip-test)
+add_executable(stunrun-tunnel-rib-test tunnel_rib.c road_strip.c render.c tunnel_rib_test.c)
+set_target_properties(stunrun-tunnel-rib-test PROPERTIES C_STANDARD 99)
+target_link_libraries(stunrun-tunnel-rib-test PRIVATE m)
+add_test(NAME native-tunnel-rib-c COMMAND stunrun-tunnel-rib-test)
+add_executable(stunrun-vista-quad-test vista_quad.c road_strip.c render.c vista_quad_test.c)
+set_target_properties(stunrun-vista-quad-test PROPERTIES C_STANDARD 99)
+target_link_libraries(stunrun-vista-quad-test PRIVATE m)
+add_test(NAME native-vista-quad-c COMMAND stunrun-vista-quad-test)
+add_executable(stunrun-torus-lines-test torus_lines.c render.c torus_lines_test.c)
+set_target_properties(stunrun-torus-lines-test PROPERTIES C_STANDARD 99)
+target_link_libraries(stunrun-torus-lines-test PRIVATE m)
+add_test(NAME native-torus-lines-c COMMAND stunrun-torus-lines-test)
+add_executable(stunrun-craft-test craft.c road_strip.c render.c craft_test.c)
+set_target_properties(stunrun-craft-test PROPERTIES C_STANDARD 99)
+target_link_libraries(stunrun-craft-test PRIVATE m)
+add_test(NAME native-craft-c COMMAND stunrun-craft-test)
+add_executable(stunrun-scene-test scene.c vista_quad.c tunnel_rib.c craft.c road_strip.c render.c scene_test.c)
+set_target_properties(stunrun-scene-test PROPERTIES C_STANDARD 99)
+target_link_libraries(stunrun-scene-test PRIVATE m)
+add_test(NAME native-scene-c COMMAND stunrun-scene-test)
 find_package(OpenGL QUIET)
 if (OpenGL_FOUND)
   add_library(stunrun-opengl-backend STATIC opengl_backend.c)
@@ -106,8 +136,17 @@ find_package(PkgConfig QUIET)
 if (OpenGL_FOUND AND PkgConfig_FOUND)
   pkg_check_modules(GLFW3 QUIET glfw3)
   if (GLFW3_FOUND)
-    add_executable(stunrun-opengl-demo
+add_executable(stunrun-opengl-demo
       opengl_demo.c
+      stage.c
+      vehicle.c
+      gsp_video.c
+      ../reproduction/maincpu/score.c
+      ../reproduction/maincpu/award_path.c
+      ../reproduction/maincpu/collision.c
+      ../reproduction/maincpu/star_counter.c
+      ../reproduction/maincpu/select_countdown.c
+      ../reproduction/sound/sound_queue.c
       fake_ports.c
       game_loop.c
       road_strip.c
@@ -116,13 +155,36 @@ if (OpenGL_FOUND AND PkgConfig_FOUND)
       ../reproduction/maincpu/geom_upload.c
       ../reproduction/maincpu/road_fifo.c)
     target_include_directories(stunrun-opengl-demo PRIVATE .
-      ../reproduction/maincpu ${GLFW3_INCLUDE_DIRS})
+      ../reproduction/maincpu ../reproduction/sound ${GLFW3_INCLUDE_DIRS})
     target_compile_options(stunrun-opengl-demo PRIVATE ${GLFW3_CFLAGS_OTHER})
     target_link_libraries(stunrun-opengl-demo PRIVATE
       stunrun-opengl-backend ${GLFW3_LIBRARIES} OpenGL::GL m)
     set_target_properties(stunrun-opengl-demo PROPERTIES C_STANDARD 99)
   endif()
 endif()
+add_executable(stunrun-stage-test
+  stage.c
+  fake_ports.c
+  game_loop.c
+  road_strip.c
+  vehicle.c
+  render.c
+  gsp_video.c
+  ../reproduction/maincpu/score.c
+  ../reproduction/maincpu/award_path.c
+  ../reproduction/maincpu/collision.c
+  ../reproduction/maincpu/star_counter.c
+  ../reproduction/maincpu/select_countdown.c
+  ../reproduction/sound/sound_queue.c
+  ../reproduction/maincpu/trajectory_state.c
+  ../reproduction/maincpu/geom_upload.c
+  ../reproduction/maincpu/road_fifo.c
+  stage_test.c)
+target_include_directories(stunrun-stage-test PRIVATE . ../reproduction/maincpu
+  ../reproduction/sound)
+target_link_libraries(stunrun-stage-test PRIVATE m)
+set_target_properties(stunrun-stage-test PROPERTIES C_STANDARD 99)
+add_test(NAME native-stage-c COMMAND stunrun-stage-test)
 add_executable(stunrun-gsp-video-test gsp_video.c render.c gsp_video_test.c)
 set_target_properties(stunrun-gsp-video-test PROPERTIES C_STANDARD 99)
 add_test(NAME native-gsp-video-boundary-c COMMAND stunrun-gsp-video-test)
@@ -135,6 +197,16 @@ target_include_directories(stunrun-gsp-record-parser-slice-test PRIVATE
   ../reproduction/gsp)
 set_target_properties(stunrun-gsp-record-parser-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME gsp-record-parser-slice-c COMMAND stunrun-gsp-record-parser-slice-test)
+# GSP record control-word dispatch from the race-1800 walk decode: bit 15
+# skips, bit 12 takes the perspective-sprite path, else the FILL worker.
+add_executable(stunrun-gsp-record-dispatch-slice-test
+  ../reproduction/gsp/record_dispatch.c
+  ../reproduction/gsp/record_dispatch_test.c)
+target_include_directories(stunrun-gsp-record-dispatch-slice-test PRIVATE
+  ../reproduction/gsp)
+set_target_properties(stunrun-gsp-record-dispatch-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME gsp-record-dispatch-slice-c
+  COMMAND stunrun-gsp-record-dispatch-slice-test)
 # Literal GSP FIFO-fed work-buffer setup from the M5 consumer trace.  This
 # preserves the masked selector, 16-byte stride, and byte-lane operation
 # without assigning semantics to either destination buffer.
@@ -203,6 +275,36 @@ target_include_directories(stunrun-nvram-scores-slice-test PRIVATE
   ../reproduction/maincpu)
 set_target_properties(stunrun-nvram-scores-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME nvram-scores-slice-c COMMAND stunrun-nvram-scores-slice-test)
+# Level-select countdown/decay against the boot_coin_start screenshot
+# cadence (digit law and race-start expiry observed; backing cell open).
+add_executable(stunrun-select-countdown-slice-test
+  ../reproduction/maincpu/select_countdown.c
+  ../reproduction/maincpu/select_countdown_test.c)
+target_include_directories(stunrun-select-countdown-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-select-countdown-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME select-countdown-slice-c
+  COMMAND stunrun-select-countdown-slice-test)
+# Red-star collectible counter against the human star-run golden endpoint
+# (84 pickups; increment/clear PCs attributed, detection upstream open).
+add_executable(stunrun-star-counter-slice-test
+  ../reproduction/maincpu/star_counter.c
+  ../reproduction/maincpu/star_counter_test.c)
+target_include_directories(stunrun-star-counter-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-star-counter-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME star-counter-slice-c
+  COMMAND stunrun-star-counter-slice-test)
+# Collision verdict (AABB proximity) from the $3B02C listing decode:
+# band scaling, conditional grace margins, strict-greater-than.
+add_executable(stunrun-collision-slice-test
+  ../reproduction/maincpu/collision.c
+  ../reproduction/maincpu/collision_test.c)
+target_include_directories(stunrun-collision-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-collision-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME collision-slice-c
+  COMMAND stunrun-collision-slice-test)
 # ADSP-buffer to GSP-FIFO block framing and transfer-shape contract.
 add_executable(stunrun-fifo-block-slice-test
   ../reproduction/maincpu/fifo_block.c
@@ -261,3 +363,13 @@ target_include_directories(stunrun-award-path-slice-test PRIVATE
   ../reproduction/maincpu)
 set_target_properties(stunrun-award-path-slice-test PROPERTIES C_STANDARD 99)
 add_test(NAME award-path-slice-c COMMAND stunrun-award-path-slice-test)
+# Object-record slot template ($03CEFA immediates) and per-frame
+# peak/chase servo ($03D1A0) feeding the collision record fields.
+add_executable(stunrun-object-record-slice-test
+  ../reproduction/maincpu/object_record.c
+  ../reproduction/maincpu/object_record_test.c)
+target_include_directories(stunrun-object-record-slice-test PRIVATE
+  ../reproduction/maincpu)
+set_target_properties(stunrun-object-record-slice-test PROPERTIES C_STANDARD 99)
+add_test(NAME object-record-slice-c
+  COMMAND stunrun-object-record-slice-test)
